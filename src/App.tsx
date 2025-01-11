@@ -9,8 +9,8 @@ function App() {
     <Routes>
       <Route path="/" element={<ShoppingList />} />
 
-      <Route path="/mealplanner" element={<MealPlanner />} />
       <Route path="/shoppinglist" element={<ShoppingList />} />
+      <Route path="/mealplanner" element={<MealPlanner />} />
       <Route path="/discover" element={<Discover />} />
       <Route path="/bookmarks" element={<Bookmarks />} />
     </Routes>

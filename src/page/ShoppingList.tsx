@@ -8,7 +8,7 @@ export default function ShoppingList() {
       <Header />
 
       <div className="w-full flex gap-2 flex-col">
-        <h1 className="text-2xl">Bookmarks</h1>
+        <h1 className="text-2xl">Shopping List</h1>
         <ShoppingItem name="Apple" quantity={5} />
         <ShoppingItem name="Bannana" quantity={3} />
         <ShoppingItem name="Meat" quantity={500} />
