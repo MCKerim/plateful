@@ -1,11 +1,13 @@
-import { Button } from './components/ui/button'
+import BottomNav from './components/atoms/BottomNav'
+import ShoppingList from './page/ShoppingList'
 
 function App() {
   return (
-    <>
-      <h1>Plateful</h1>
-      <Button>Click me</Button>
-    </>
+    <div className="w-full max-w-lg flex flex-col items-center m-auto gap-3">
+      <h1 className="font-bold text-2xl mt-4">Plateful</h1>
+      <ShoppingList />
+      <BottomNav />
+    </div>
   )
 }
 
