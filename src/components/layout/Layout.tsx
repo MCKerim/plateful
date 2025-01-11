@@ -10,7 +10,7 @@ export default function Layout({ children }: Readonly<Props>) {
     <div className="w-full max-w-lg flex flex-col items-center m-auto">
       <Header />
 
-      <div className="w-full flex gap-2 flex-col">{children}</div>
+      <div className="w-full flex gap-2 flex-col px-4">{children}</div>
 
       <BottomNav />
     </div>

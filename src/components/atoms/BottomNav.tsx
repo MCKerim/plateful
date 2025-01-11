@@ -7,7 +7,7 @@ export default function BottomNav() {
     <div className="w-full max-w-lg fixed bottom-0 mb-2">
       <Separator className="mt-4 mb-2" />
 
-      <div className="flex justify-between w-full gap-1">
+      <div className="flex justify-between w-full gap-1 px-2">
         <NavLink to="/" className="w-full">
           {({ isActive }) => (
             <Button
