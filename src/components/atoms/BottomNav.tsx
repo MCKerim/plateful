@@ -6,6 +6,7 @@ export default function BottomNav() {
   return (
     <>
       <div style={{ height: "100px" }}></div>
+
       <div className="w-full max-w-lg fixed bottom-0 pb-2 bg-background">
         <Separator className="mb-2" />
 
