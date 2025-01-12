@@ -1,6 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import supabase from "@/utils/supabase";
 
 export default function ShoppingList() {
   const [items, setItems] = useState([
@@ -15,6 +16,15 @@ export default function ShoppingList() {
     { name: "Pasta", amount: 1, bought: false },
     { name: "Rice", amount: 1, bought: false },
   ]);
+
+  useEffect(() => {
+    getItems();
+  }, []);
+
+  async function getItems() {
+    const { data } = await supabase.from("shopping_list_items").select();
+    console.log(data);
+  }
 
   function handleItemClick(index: number) {
     const newItems = [...items];
