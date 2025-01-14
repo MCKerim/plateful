@@ -2,20 +2,16 @@ import Layout from "@/components/layout/Layout";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
+import { Button } from "@/components/ui/button";
+
+type Item = {
+  name: string;
+  amount: number;
+  bought: boolean;
+};
 
 export default function ShoppingList() {
-  const [items, setItems] = useState([
-    { name: "Milk", amount: 1, bought: false },
-    { name: "Bread", amount: 2, bought: false },
-    { name: "Eggs", amount: 12, bought: false },
-    { name: "Butter", amount: 1, bought: false },
-    { name: "Cheese", amount: 1, bought: false },
-    { name: "Apples", amount: 6, bought: false },
-    { name: "Bananas", amount: 6, bought: false },
-    { name: "Oranges", amount: 6, bought: false },
-    { name: "Pasta", amount: 1, bought: false },
-    { name: "Rice", amount: 1, bought: false },
-  ]);
+  const [items, setItems] = useState<Item[]>([]);
 
   useEffect(() => {
     getItems();
@@ -23,7 +19,33 @@ export default function ShoppingList() {
 
   async function getItems() {
     const { data } = await supabase.from("shopping_list_items").select();
-    console.log(data);
+    const newItems: Item[] = [];
+
+    if (!data) {
+      setItems(newItems);
+      return;
+    }
+
+    data.map((item) => {
+      const newItem: Item = {
+        name: item.item_id,
+        amount: item.amount,
+        bought: item.bought,
+      };
+      newItems.push(newItem);
+    });
+    setItems(newItems);
+  }
+
+  async function addItem() {
+    const { data } = await supabase
+      .from("shopping_list_items")
+      .insert([{ shopping_list_id: 1, item_id: 1, amount: 30, bought: true }])
+      .select();
+
+    if (data) {
+      getItems();
+    }
   }
 
   function handleItemClick(index: number) {
@@ -44,6 +66,11 @@ export default function ShoppingList() {
           onClick={() => handleItemClick(index)}
         />
       ))}
+      <div className="flex justify-end">
+        <Button className="w-full" onClick={addItem}>
+          Add Item
+        </Button>
+      </div>
     </Layout>
   );
 }
