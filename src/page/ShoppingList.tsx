@@ -18,7 +18,13 @@ export default function ShoppingList() {
   }, []);
 
   async function getItems() {
-    const { data } = await supabase.from("shopping_list_items").select();
+    const { data } = await supabase.from("shopping_list_items").select(`
+      id,
+      amount,
+      bought,
+      item ( id, name )
+    `);
+
     const newItems: Item[] = [];
 
     if (!data) {
@@ -26,11 +32,11 @@ export default function ShoppingList() {
       return;
     }
 
-    data.map((item) => {
+    data.forEach((shoppingListItem) => {
       const newItem: Item = {
-        name: item.item_id,
-        amount: item.amount,
-        bought: item.bought,
+        name: shoppingListItem.item.name,
+        amount: shoppingListItem.amount,
+        bought: shoppingListItem.bought,
       };
       newItems.push(newItem);
     });
