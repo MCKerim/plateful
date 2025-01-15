@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-type Item = {
-  name: string;
+type ShoppingListItem = {
+  id: number;
+  itemName: string;
   amount: number;
   bought: boolean;
 };
 
 export default function ShoppingList() {
-  const [items, setItems] = useState<Item[]>([]);
+  const [items, setItems] = useState<ShoppingListItem[]>([]);
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 
@@ -27,9 +28,9 @@ export default function ShoppingList() {
       amount,
       bought,
       item ( id, name )
-    `);
+    `).order("created_at", { ascending: true });
 
-    const newItems: Item[] = [];
+    const newItems: ShoppingListItem[] = [];
 
     if (!data) {
       setItems(newItems);
@@ -37,13 +38,15 @@ export default function ShoppingList() {
     }
 
     data.forEach((shoppingListItem) => {
-      const newItem: Item = {
-        name: shoppingListItem.item.name,
+      const newItem: ShoppingListItem = {
+        id: shoppingListItem.id,
+        itemName: shoppingListItem.item.name,
         amount: shoppingListItem.amount,
         bought: shoppingListItem.bought,
       };
       newItems.push(newItem);
     });
+    console.log("Items: ", newItems);
     setItems(newItems);
   }
 
@@ -65,7 +68,7 @@ export default function ShoppingList() {
 
   async function addToShoppingList(itemId: number) {
     const amount = parseInt(newItemAmount);
-    if(isNaN(amount)) return;
+    if (isNaN(amount)) return;
     setNewItemAmount("");
 
     const { data } = await supabase
@@ -80,22 +83,29 @@ export default function ShoppingList() {
     }
   }
 
-  function handleItemClick(index: number) {
-    const newItems = [...items];
-    newItems[index].bought = !newItems[index].bought;
-    setItems(newItems);
+  async function handleItemClick(shoppingListItemId: number, bought: boolean) {
+    const { data } = await supabase
+      .from("shopping_list_items")
+      .update({ bought: !bought })
+      .eq("id", shoppingListItemId)
+      .select();
+
+    if (data) {
+      console.log("Item bought status updated: ", data);
+      getItems();
+    }
   }
 
   return (
     <Layout>
       <h1 className="text-2xl">Shopping List</h1>
-      {items.map((item, index) => (
+      {items.map((shoppingListItem, index) => (
         <ShoppingItem
           key={"item-" + index}
-          name={item.name}
-          amount={item.amount}
-          bought={item.bought}
-          onClick={() => handleItemClick(index)}
+          name={shoppingListItem.itemName}
+          amount={shoppingListItem.amount}
+          bought={shoppingListItem.bought}
+          onClick={() => handleItemClick(shoppingListItem.id, shoppingListItem.bought)}
         />
       ))}
 
