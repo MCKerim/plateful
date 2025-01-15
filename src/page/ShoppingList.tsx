@@ -71,7 +71,7 @@ export default function ShoppingList() {
     const { data } = await supabase
       .from("shopping_list_items")
       .insert([
-        { shopping_list_id: 1, item_id: itemId, amount: amount, bought: true },
+        { shopping_list_id: 1, item_id: itemId, amount: amount, bought: false },
       ])
       .select();
 
