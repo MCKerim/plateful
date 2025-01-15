@@ -1,5 +1,4 @@
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import ItemMenu from "./ItemMenu";
 
 type Props = {
   name: string;
@@ -28,7 +27,6 @@ export default function ShoppingItem({
               {amount}
             </CardDescription>
           </div>
-          <ItemMenu />
         </div>
       </CardHeader>
     </Card>
