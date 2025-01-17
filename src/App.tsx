@@ -3,6 +3,7 @@ import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Discover from "./page/Discover";
 import Bookmarks from "./page/Bookmarks";
+import Recipe from "./page/Recipe";
 
 function App() {
   return (
@@ -13,6 +14,8 @@ function App() {
       <Route path="/mealplanner" element={<MealPlanner />} />
       <Route path="/discover" element={<Discover />} />
       <Route path="/bookmarks" element={<Bookmarks />} />
+
+      <Route path="/recipe/:recipeId" element={<Recipe />} />
     </Routes>
   );
 }

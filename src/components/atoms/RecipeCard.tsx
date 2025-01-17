@@ -1,17 +1,21 @@
+import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 type Props = {
+  id: number;
   name: string;
   description: string;
 };
 
-export default function RecipeCard({ name, description }: Readonly<Props>) {
+export default function RecipeCard({ id, name, description }: Readonly<Props>) {
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>{name}</CardTitle>
-        <CardDescription>{description}</CardDescription>
-      </CardHeader>
-    </Card>
+    <NavLink to={`/recipe/${id}`} className="w-full">
+      <Card>
+        <CardHeader>
+          <CardTitle>{name}</CardTitle>
+          <CardDescription>{description}</CardDescription>
+        </CardHeader>
+      </Card>
+    </NavLink>
   );
 }
