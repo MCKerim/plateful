@@ -29,7 +29,7 @@ export default function ShoppingList() {
       item ( id, name )
     `
       )
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     const newItems: ShoppingListItem[] = [];
 
@@ -51,8 +51,6 @@ export default function ShoppingList() {
     setItems(newItems);
   }
 
-  
-
   async function handleItemClick(shoppingListItemId: number, bought: boolean) {
     const { data } = await supabase
       .from("shopping_list_items")
@@ -70,17 +68,36 @@ export default function ShoppingList() {
     <Layout>
       <h1 className="text-2xl">Shopping List</h1>
 
-      {items.map((shoppingListItem, index) => (
-        <ShoppingItem
-          key={"item-" + index}
-          name={shoppingListItem.itemName}
-          amount={shoppingListItem.amount}
-          bought={shoppingListItem.bought}
-          onClick={() =>
-            handleItemClick(shoppingListItem.id, shoppingListItem.bought)
-          }
-        />
-      ))}
+      {items
+        .filter((shoppingListItem) => !shoppingListItem.bought)
+        .map((shoppingListItem, index) => (
+          <ShoppingItem
+            key={"item-" + index}
+            name={shoppingListItem.itemName}
+            amount={shoppingListItem.amount}
+            bought={shoppingListItem.bought}
+            onClick={() =>
+              handleItemClick(shoppingListItem.id, shoppingListItem.bought)
+            }
+          />
+        ))}
+
+      <h2>Bought</h2>
+
+      {items
+        .filter((shoppingListItem) => shoppingListItem.bought)
+        .slice(0, 10)
+        .map((shoppingListItem, index) => (
+          <ShoppingItem
+            key={"item-" + index}
+            name={shoppingListItem.itemName}
+            amount={shoppingListItem.amount}
+            bought={shoppingListItem.bought}
+            onClick={() =>
+              handleItemClick(shoppingListItem.id, shoppingListItem.bought)
+            }
+          />
+        ))}
 
       <AddNewItemDrawer onItemAdded={() => getItems()} />
     </Layout>
