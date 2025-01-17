@@ -1,20 +1,22 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router";
+import { NavLink, useParams } from "react-router";
 
 type Recipe = {
   id: number;
   recipeName: string;
   description: string;
+  link: string;
 };
 
 export default function Recipe() {
   const params = useParams();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [recipeItems, setRecipeItems] = useState<Recipe | null>(null);
 
   useEffect(() => {
     getRecipe();
@@ -24,7 +26,7 @@ export default function Recipe() {
     if (!params.recipeId) return;
     const { data } = await supabase
       .from("recipes")
-      .select()
+      .select("*")
       .eq("id", params.recipeId);
 
     if (!data) {
@@ -36,6 +38,7 @@ export default function Recipe() {
       id: data[0].id,
       recipeName: data[0].name,
       description: data[0].description,
+      link: data[0].link,
     });
   }
 
@@ -59,11 +62,20 @@ export default function Recipe() {
         voluptua.
       </p>
 
+      <NavLink
+        to={recipe?.link || "/discover"}
+        className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
+      >
+        To the recipe
+      </NavLink>
+
       <div className="flex gap-2 w-full mt-11">
         <Button className="w-full" variant="secondary">
           Save
         </Button>
-        <Button className="w-full">Plan</Button>
+        <Button className="w-full" disabled>
+          Plan
+        </Button>
       </div>
     </Layout>
   );
