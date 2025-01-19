@@ -3,6 +3,13 @@ import ShoppingItem from "@/components/atoms/ShoppingItem";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import AddNewItemDrawer from "@/components/atoms/ItemMenu";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 
 type ShoppingListItem = {
   id: number;
@@ -68,6 +75,19 @@ export default function ShoppingList() {
     <Layout>
       <h1 className="text-2xl">Shopping List</h1>
 
+      {items.filter((shoppingListItem) => !shoppingListItem.bought).length ===
+        0 && (
+        <Card className="w-full my-3">
+          <CardHeader className="px-4 py-2">
+            <div className="flex">
+              <div className="flex-1">
+                <CardDescription>No items in the list</CardDescription>
+              </div>
+            </div>
+          </CardHeader>
+        </Card>
+      )}
+
       {items
         .filter((shoppingListItem) => !shoppingListItem.bought)
         .map((shoppingListItem, index) => (
@@ -82,22 +102,30 @@ export default function ShoppingList() {
           />
         ))}
 
-      <h2>Bought</h2>
-
-      {items
-        .filter((shoppingListItem) => shoppingListItem.bought)
-        .slice(0, 10)
-        .map((shoppingListItem, index) => (
-          <ShoppingItem
-            key={"item-" + index}
-            name={shoppingListItem.itemName}
-            amount={shoppingListItem.amount}
-            bought={shoppingListItem.bought}
-            onClick={() =>
-              handleItemClick(shoppingListItem.id, shoppingListItem.bought)
-            }
-          />
-        ))}
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Bought</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-2">
+            {items
+              .filter((shoppingListItem) => shoppingListItem.bought)
+              .slice(0, 10)
+              .map((shoppingListItem, index) => (
+                <ShoppingItem
+                  key={"item-" + index}
+                  name={shoppingListItem.itemName}
+                  amount={shoppingListItem.amount}
+                  bought={shoppingListItem.bought}
+                  onClick={() =>
+                    handleItemClick(
+                      shoppingListItem.id,
+                      shoppingListItem.bought
+                    )
+                  }
+                />
+              ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <AddNewItemDrawer onItemAdded={() => getItems()} />
     </Layout>
