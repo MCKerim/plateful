@@ -1,3 +1,4 @@
+import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -12,40 +13,88 @@ type Recipe = {
   link: string;
 };
 
+type RecipeItem = {
+  id: number;
+  itemName: string;
+  amount: string;
+};
+
 export default function Recipe() {
   const params = useParams();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
 
   useEffect(() => {
+    async function getRecipe() {
+      if (!params.recipeId) return;
+      const recipeId = parseInt(params.recipeId);
+
+      const { data } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("id", recipeId);
+
+      if (!data) {
+        setRecipe(null);
+        return;
+      }
+
+      setRecipe({
+        id: data[0].id,
+        recipeName: data[0].name,
+        description: data[0].description ?? "",
+        link: data[0].link ?? "",
+      });
+    }
+
     getRecipe();
   }, [params.recipeId]);
 
-  async function getRecipe() {
-    if (!params.recipeId) return;
-    const { data } = await supabase
-      .from("recipes")
-      .select("*")
-      .eq("id", params.recipeId);
+  useEffect(() => {
+    async function getRecipeItems() {
+      if (!recipe) return;
 
-    if (!data) {
-      setRecipe(null);
-      return;
+      const { data } = await supabase
+        .from("recipe_items")
+        .select(
+          `
+        id,
+        recipe_id,
+        amount,
+        item ( id, name )
+      `
+        )
+        .eq("recipe_id", recipe.id)
+        .order("created_at", { ascending: false });
+
+      const newRecipeItems: RecipeItem[] = [];
+
+      if (!data) {
+        setRecipeItems(newRecipeItems);
+        return;
+      }
+
+      data.forEach((recipeItem) => {
+        const newRecipeItem: RecipeItem = {
+          id: recipeItem.id,
+          itemName: recipeItem.item.name,
+          amount: recipeItem.amount,
+        };
+        newRecipeItems.push(newRecipeItem);
+      });
+      console.log("Items: ", newRecipeItems);
+      setRecipeItems(newRecipeItems);
     }
 
-    setRecipe({
-      id: data[0].id,
-      recipeName: data[0].name,
-      description: data[0].description ?? "",
-      link: data[0].link ?? "",
-    });
-  }
+    getRecipeItems();
+  }, [recipe]);
 
   return (
     <Layout>
       <h1 className="text-2xl font-bold">{recipe?.recipeName}</h1>
 
-      <AspectRatio ratio={16 / 9} className="bg-muted">
+      <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
           src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           alt="by Drew Beamer"
@@ -67,6 +116,18 @@ export default function Recipe() {
       >
         To the recipe
       </NavLink>
+
+      <h2 className="text-md font-bold mt-2">Ingredients</h2>
+
+      {recipeItems.map((recipeItem, index) => (
+        <ShoppingItem
+          key={"item-" + index}
+          name={recipeItem.itemName}
+          amount={recipeItem.amount}
+          bought={false}
+          onClick={() => {}}
+        />
+      ))}
 
       <div className="flex gap-2 w-full mt-11">
         <Button className="w-full" variant="secondary">

@@ -32,25 +32,25 @@ export type Database = {
       }
       recipe_items: {
         Row: {
-          amount: string | null
+          amount: string
           created_at: string
           id: number
-          item_id: number | null
-          recipe_id: number | null
+          item_id: number
+          recipe_id: number
         }
         Insert: {
-          amount?: string | null
+          amount?: string
           created_at?: string
           id?: number
-          item_id?: number | null
-          recipe_id?: number | null
+          item_id: number
+          recipe_id: number
         }
         Update: {
-          amount?: string | null
+          amount?: string
           created_at?: string
           id?: number
-          item_id?: number | null
-          recipe_id?: number | null
+          item_id?: number
+          recipe_id?: number
         }
         Relationships: [
           {
