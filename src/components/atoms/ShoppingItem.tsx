@@ -2,7 +2,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 
 type Props = {
   name: string;
-  amount: number;
+  amount: string;
   bought: boolean;
 
   onClick: () => void;

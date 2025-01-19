@@ -14,7 +14,7 @@ import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 type ShoppingListItem = {
   id: number;
   itemName: string;
-  amount: number;
+  amount: string;
   bought: boolean;
 };
 

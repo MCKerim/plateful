@@ -23,7 +23,7 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
   const [newItemAmount, setNewItemAmount] = useState("");
 
   async function addItem() {
-    if (!newItemName || !newItemAmount) {
+    if (!newItemName) {
       return;
     }
 
@@ -39,13 +39,15 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
   }
 
   async function addToShoppingList(itemId: number) {
-    const amount = parseInt(newItemAmount);
-    if (isNaN(amount)) return;
-
     const { data } = await supabase
       .from("shopping_list_items")
       .insert([
-        { shopping_list_id: 1, item_id: itemId, amount: amount, bought: false },
+        {
+          shopping_list_id: 1,
+          item_id: itemId,
+          amount: newItemAmount,
+          bought: false,
+        },
       ])
       .select();
 
@@ -58,9 +60,7 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
   return (
     <Drawer>
       <DrawerTrigger className="fixed bottom-20">
-        <Button onClick={addItem}>
-          Add Item
-        </Button>
+        <Button onClick={addItem}>Add Item</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -83,7 +83,7 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
             <div className="grid w-full items-center gap-1.5">
               <Label htmlFor="amountInput">Amount</Label>
               <Input
-                type="number"
+                type="text"
                 id="amountInput"
                 placeholder="5"
                 value={newItemAmount}
