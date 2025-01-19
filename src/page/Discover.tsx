@@ -39,7 +39,7 @@ export default function Discover() {
       const newRecipe: Recipe = {
         id: recipe.id,
         recipeName: recipe.name,
-        description: recipe.description,
+        description: recipe.description ?? "",
       };
       newRecipes.push(newRecipe);
     });

@@ -16,7 +16,6 @@ export default function Recipe() {
   const params = useParams();
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
-  const [recipeItems, setRecipeItems] = useState<Recipe | null>(null);
 
   useEffect(() => {
     getRecipe();
@@ -37,8 +36,8 @@ export default function Recipe() {
     setRecipe({
       id: data[0].id,
       recipeName: data[0].name,
-      description: data[0].description,
-      link: data[0].link,
+      description: data[0].description ?? "",
+      link: data[0].link ?? "",
     });
   }
 
@@ -63,7 +62,7 @@ export default function Recipe() {
       </p>
 
       <NavLink
-        to={recipe?.link || "/discover"}
+        to={recipe?.link ?? "/discover"}
         className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
       >
         To the recipe
