@@ -90,6 +90,27 @@ export default function Recipe() {
     getRecipeItems();
   }, [recipe]);
 
+  async function addItemsToShoppingList() {
+    const itemsToInsert = recipeItems.map((recipeItem) => ({
+      shopping_list_id: 1,
+      item_id: recipeItem.id,
+      amount: recipeItem.amount,
+      bought: false,
+    }));
+
+    const { error } = await supabase
+      .from("shopping_list_items")
+      .insert(itemsToInsert);
+
+    if (error) {
+      console.error("Error adding items to shopping list: ", error);
+      alert("Error adding items to shopping list");
+      return;
+    } else {
+      alert("Items added to shopping list");
+    }
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl font-bold">{recipe?.recipeName}</h1>
@@ -128,6 +149,13 @@ export default function Recipe() {
           onClick={() => {}}
         />
       ))}
+      <Button
+        className="w-full"
+        variant="secondary"
+        onClick={addItemsToShoppingList}
+      >
+        Add items to shopping list
+      </Button>
 
       <div className="flex gap-2 w-full mt-11">
         <Button className="w-full" variant="secondary">
