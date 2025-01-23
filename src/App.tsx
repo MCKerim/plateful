@@ -4,6 +4,7 @@ import MealPlanner from "./page/MealPlanner";
 import Discover from "./page/Discover";
 import Bookmarks from "./page/Bookmarks";
 import Recipe from "./page/Recipe";
+import AddRecipe from "./page/AddRecipe";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
       <Route path="/bookmarks" element={<Bookmarks />} />
 
       <Route path="/recipe/:recipeId" element={<Recipe />} />
+      <Route path="/recipe/add" element={<AddRecipe />} />
     </Routes>
   );
 }

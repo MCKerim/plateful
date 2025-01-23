@@ -1,7 +1,9 @@
 import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
+import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
+import { Link } from "react-router";
 
 type Recipe = {
   id: number;
@@ -60,6 +62,11 @@ export default function Discover() {
             description={recipe.description}
           />
         ))}
+      </div>
+      <div className="fixed bottom-20">
+        <Button asChild>
+          <Link to="/recipe/add">Add Recipe</Link>
+        </Button>
       </div>
     </Layout>
   );
