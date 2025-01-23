@@ -77,7 +77,7 @@ export default function Recipe() {
 
       data.forEach((recipeItem) => {
         const newRecipeItem: RecipeItem = {
-          id: recipeItem.id,
+          id: recipeItem.item.id,
           itemName: recipeItem.item.name,
           amount: recipeItem.amount,
         };
@@ -91,6 +91,7 @@ export default function Recipe() {
   }, [recipe]);
 
   async function addItemsToShoppingList() {
+    console.log("Adding items to shopping list: ", recipeItems);
     const itemsToInsert = recipeItems.map((recipeItem) => ({
       shopping_list_id: 1,
       item_id: recipeItem.id,
@@ -149,6 +150,7 @@ export default function Recipe() {
           onClick={() => {}}
         />
       ))}
+
       <Button
         className="w-full"
         variant="secondary"
