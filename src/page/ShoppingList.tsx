@@ -22,6 +22,21 @@ export default function ShoppingList() {
   const [items, setItems] = useState<ShoppingListItem[]>([]);
 
   useEffect(() => {
+    supabase
+      .channel("shopping_list_items")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "shopping_list_items" },
+        () => getItems()
+      )
+      .subscribe();
+
+    return () => {
+      supabase.channel("shopping_list_items").unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     getItems();
   }, []);
 
