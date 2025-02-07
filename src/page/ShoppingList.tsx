@@ -86,6 +86,10 @@ export default function ShoppingList() {
     }
   }
 
+  function handleItemEdit(shoppingListItemId: number) {
+    console.log("Edit item: ", shoppingListItemId);
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">Shopping List</h1>
@@ -114,6 +118,7 @@ export default function ShoppingList() {
             onClick={() =>
               handleItemClick(shoppingListItem.id, shoppingListItem.bought)
             }
+            onEdit={() => handleItemEdit(shoppingListItem.id)}
           />
         ))}
 
@@ -136,6 +141,7 @@ export default function ShoppingList() {
                       shoppingListItem.bought
                     )
                   }
+                  onEdit={() => handleItemEdit(shoppingListItem.id)}
                 />
               ))}
           </AccordionContent>
