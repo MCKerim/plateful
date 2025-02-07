@@ -76,6 +76,7 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
                 id="itemInput"
                 placeholder="Appel"
                 value={newItemName}
+                autoFocus
                 onChange={(e) => setNewItemName(e.target.value)}
               />
             </div>
