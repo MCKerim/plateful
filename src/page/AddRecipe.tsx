@@ -146,6 +146,7 @@ export default function AddRecipe() {
               amount={recipeItem.amount}
               bought={false}
               onClick={() => removeItem(index)}
+              onEdit={() => {}}
             />
           ))}
           <AddRecipeItemMenu onItemAdded={addItem} />

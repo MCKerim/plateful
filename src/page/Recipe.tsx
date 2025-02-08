@@ -148,6 +148,7 @@ export default function Recipe() {
           amount={recipeItem.amount}
           bought={false}
           onClick={() => {}}
+          onEdit={() => {}}
         />
       ))}
 
