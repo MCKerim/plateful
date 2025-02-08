@@ -90,6 +90,26 @@ export default function ShoppingList() {
     console.log("Edit item: ", shoppingListItemId);
   }
 
+  function GroupAndSortItems(items: ShoppingListItem[]): ShoppingListItem[] {
+    console.log("UnItems: ", items);
+    const groupedItems: ShoppingListItem[] = [];
+
+    items.forEach((item) => {
+      const index = groupedItems.findIndex(
+        (groupedItem) => groupedItem.itemName === item.itemName
+      );
+
+      if (index === -1) {
+        groupedItems.push(item);
+      } else {
+        groupedItems[index].amount += ", " + item.amount;
+      }
+    });
+
+    console.log("Grouped items: ", groupedItems);
+    return groupedItems;
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">Shopping List</h1>
@@ -107,8 +127,7 @@ export default function ShoppingList() {
         </Card>
       )}
 
-      {items
-        .filter((shoppingListItem) => !shoppingListItem.bought)
+      {GroupAndSortItems(items.filter((shoppingListItem) => !shoppingListItem.bought))
         .map((shoppingListItem, index) => (
           <ShoppingItem
             key={"item-" + index}
@@ -126,8 +145,7 @@ export default function ShoppingList() {
         <AccordionItem value="item-1">
           <AccordionTrigger>Bought</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2">
-            {items
-              .filter((shoppingListItem) => shoppingListItem.bought)
+            {GroupAndSortItems(items.filter((shoppingListItem) => shoppingListItem.bought))
               .slice(0, 10)
               .map((shoppingListItem, index) => (
                 <ShoppingItem
