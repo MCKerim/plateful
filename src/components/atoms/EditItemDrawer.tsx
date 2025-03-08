@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import {
   Drawer,
   DrawerClose,
   DrawerContent,
-  DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
@@ -15,14 +14,21 @@ import { Label } from "../ui/label";
 import supabase from "@/utils/supabase";
 
 type Props = {
-  onItemAdded: () => void;
+  currentName: string;
+  currentAmount: string;
+  onItemEdited: () => void;
 };
 
-export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
+export default function EditItemDrawer({ currentName, currentAmount, onItemEdited }: Readonly<Props>) {
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 
-  async function addItem() {
+  useEffect(() => {
+    setNewItemName(currentName);
+    setNewItemAmount(currentAmount);
+  }, [currentName, currentAmount]);
+
+  async function editItem() {
     if (!newItemName) {
       return;
     }
@@ -53,19 +59,23 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
 
     if (data) {
       setNewItemAmount("");
-      onItemAdded();
+      onItemEdited();
     }
+  }
+
+  function resetForm() {
+    setNewItemName(currentName);
+    setNewItemAmount(currentAmount);
   }
 
   return (
     <Drawer>
-      <DrawerTrigger className="fixed bottom-20">
-        <Button onClick={addItem}>Add Item</Button>
+      <DrawerTrigger>
+        <Button variant="outline">E</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Add new Item</DrawerTitle>
-          <DrawerDescription>To Kerims shopping List</DrawerDescription>
+          <DrawerTitle>Edit Item</DrawerTitle>
         </DrawerHeader>
         <DrawerFooter>
           <div className="flex flex-col space-y-2 mt-4">
@@ -92,12 +102,12 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
               />
             </div>
 
-            <Button className="w-full" onClick={addItem}>
+            <Button className="w-full" onClick={editItem}>
               Add Item
             </Button>
           </div>
           <DrawerClose>
-            <Button variant="outline" className="w-full">
+            <Button variant="outline" className="w-full" onClick={resetForm}>
               Cancel
             </Button>
           </DrawerClose>

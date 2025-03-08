@@ -1,5 +1,5 @@
-import { Button } from "../ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import EditItemDrawer from "./EditItemDrawer";
 
 type Props = {
   name: string;
@@ -31,7 +31,7 @@ export default function ShoppingItem({
             </CardDescription>
           </div>
           <div className="flex items-center pl-2">
-            <Button variant="outline" onClick={onEdit}>E</Button>
+            <EditItemDrawer currentName={name} currentAmount={amount} onItemEdited={onEdit} />
           </div>
         </div>
       </CardHeader>

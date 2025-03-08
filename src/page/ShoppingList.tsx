@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
-import AddNewItemDrawer from "@/components/atoms/ItemMenu";
+import AddNewItemDrawer from "@/components/atoms/AddNewItemDrawer";
 import {
   Accordion,
   AccordionContent,
