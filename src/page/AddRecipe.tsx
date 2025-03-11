@@ -24,7 +24,7 @@ export default function AddRecipe() {
 
   function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
-    setRecipeItems([...recipeItems, { itemName: name, amount }]);
+    setRecipeItems([...recipeItems, {itemName: name, amount }]);
   }
 
   function removeItem(index: number) {
@@ -142,6 +142,7 @@ export default function AddRecipe() {
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
               key={"item-" + index}
+              id={0}
               name={recipeItem.itemName}
               amount={recipeItem.amount}
               bought={false}

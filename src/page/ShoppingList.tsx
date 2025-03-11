@@ -62,7 +62,7 @@ export default function ShoppingList() {
 
     data.forEach((shoppingListItem) => {
       const newItem: ShoppingListItem = {
-        id: shoppingListItem.id,
+        id: shoppingListItem.item.id,
         itemName: shoppingListItem.item.name,
         amount: shoppingListItem.amount,
         bought: shoppingListItem.bought,
@@ -84,10 +84,6 @@ export default function ShoppingList() {
       console.log("Item bought status updated: ", data);
       getItems();
     }
-  }
-
-  function handleItemEdit(shoppingListItemId: number) {
-    console.log("Edit item: ", shoppingListItemId);
   }
 
   function GroupAndSortItems(items: ShoppingListItem[]): ShoppingListItem[] {
@@ -131,13 +127,14 @@ export default function ShoppingList() {
         .map((shoppingListItem, index) => (
           <ShoppingItem
             key={"item-" + index}
+            id={shoppingListItem.id}
             name={shoppingListItem.itemName}
             amount={shoppingListItem.amount}
             bought={shoppingListItem.bought}
             onClick={() =>
               handleItemClick(shoppingListItem.id, shoppingListItem.bought)
             }
-            onEdit={() => handleItemEdit(shoppingListItem.id)}
+            onEdit={getItems}
           />
         ))}
 
@@ -150,6 +147,7 @@ export default function ShoppingList() {
               .map((shoppingListItem, index) => (
                 <ShoppingItem
                   key={"item-" + index}
+                  id={shoppingListItem.id}
                   name={shoppingListItem.itemName}
                   amount={shoppingListItem.amount}
                   bought={shoppingListItem.bought}
@@ -159,7 +157,7 @@ export default function ShoppingList() {
                       shoppingListItem.bought
                     )
                   }
-                  onEdit={() => handleItemEdit(shoppingListItem.id)}
+                  onEdit={getItems}
                 />
               ))}
           </AccordionContent>

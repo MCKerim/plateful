@@ -2,6 +2,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import EditItemDrawer from "./EditItemDrawer";
 
 type Props = {
+  id: number;
   name: string;
   amount: string;
   bought: boolean;
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export default function ShoppingItem({
+  id,
   name,
   amount,
   bought,
@@ -20,7 +22,6 @@ export default function ShoppingItem({
   return (
     <Card
       className={(bought ? "bg-gray-700" : "") + " w-full"}
-      
     >
       <CardHeader className="px-4 py-2">
         <div className="flex">
@@ -31,7 +32,7 @@ export default function ShoppingItem({
             </CardDescription>
           </div>
           <div className="flex items-center pl-2">
-            <EditItemDrawer currentName={name} currentAmount={amount} onItemEdited={onEdit} />
+            <EditItemDrawer currentId={id} currentName={name} currentAmount={amount} onItemEdited={onEdit} />
           </div>
         </div>
       </CardHeader>

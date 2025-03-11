@@ -14,12 +14,13 @@ import { Label } from "../ui/label";
 import supabase from "@/utils/supabase";
 
 type Props = {
+  currentId: number;
   currentName: string;
   currentAmount: string;
   onItemEdited: () => void;
 };
 
-export default function EditItemDrawer({ currentName, currentAmount, onItemEdited }: Readonly<Props>) {
+export default function EditItemDrawer({ currentId, currentName, currentAmount, onItemEdited }: Readonly<Props>) {
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 
@@ -35,37 +36,13 @@ export default function EditItemDrawer({ currentName, currentAmount, onItemEdite
 
     const { data } = await supabase
       .from("item")
-      .insert([{ name: newItemName }])
+      .update({ name: newItemName })
+      .eq('id', currentId)
       .select();
 
     if (data) {
-      setNewItemName("");
-      addToShoppingList(data[0].id);
-    }
-  }
-
-  async function addToShoppingList(itemId: number) {
-    const { data } = await supabase
-      .from("shopping_list_items")
-      .insert([
-        {
-          shopping_list_id: 1,
-          item_id: itemId,
-          amount: newItemAmount,
-          bought: false,
-        },
-      ])
-      .select();
-
-    if (data) {
-      setNewItemAmount("");
       onItemEdited();
     }
-  }
-
-  function resetForm() {
-    setNewItemName(currentName);
-    setNewItemAmount(currentAmount);
   }
 
   return (
@@ -101,13 +78,15 @@ export default function EditItemDrawer({ currentName, currentAmount, onItemEdite
                 onChange={(e) => setNewItemAmount(e.target.value)}
               />
             </div>
-
-            <Button className="w-full" onClick={editItem}>
-              Add Item
-            </Button>
+            
+            <DrawerClose>
+              <Button className="w-full" onClick={editItem}>
+                Add Item
+              </Button>
+            </DrawerClose>
           </div>
           <DrawerClose>
-            <Button variant="outline" className="w-full" onClick={resetForm}>
+            <Button variant="outline" className="w-full">
               Cancel
             </Button>
           </DrawerClose>
