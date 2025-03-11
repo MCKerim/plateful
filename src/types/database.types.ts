@@ -30,6 +30,35 @@ export type Database = {
         }
         Relationships: []
       }
+      meal_planning: {
+        Row: {
+          created_at: string
+          id: number
+          planned_date: string | null
+          recipe_id: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          planned_date?: string | null
+          recipe_id?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          planned_date?: string | null
+          recipe_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meal_planning_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_items: {
         Row: {
           amount: string
