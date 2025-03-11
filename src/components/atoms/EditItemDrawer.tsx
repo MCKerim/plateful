@@ -34,13 +34,19 @@ export default function EditItemDrawer({ currentId, currentName, currentAmount, 
       return;
     }
 
-    const { data } = await supabase
+    const { data: itemData } = await supabase
       .from("item")
       .update({ name: newItemName })
       .eq('id', currentId)
       .select();
 
-    if (data) {
+    const { data: amountData } = await supabase
+      .from("shopping_list_items")
+      .update({ amount: newItemAmount })
+      .eq('item_id', currentId)
+      .select();
+
+    if (itemData && amountData) {
       onItemEdited();
     }
   }
