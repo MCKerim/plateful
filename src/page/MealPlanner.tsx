@@ -23,7 +23,7 @@ export default function MealPlanner() {
         planned_date,
         recipes (id, name)
       `
-    );
+    ).order("planned_date", { ascending: true });
 
     const newItems: MealPlannerItem[] = [];
 
@@ -40,7 +40,11 @@ export default function MealPlanner() {
       };
       newItems.push(newItem);
     });
-    setPlannedItems(newItems);
+
+    const twoDaysAgo = new Date();
+    twoDaysAgo.setDate(twoDaysAgo.getDate() - 3);
+
+    setPlannedItems(newItems.filter((item) => item.date >= twoDaysAgo));
   }
 
   return (
