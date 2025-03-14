@@ -87,7 +87,7 @@ export default function EditItemDrawer({ currentId, currentName, currentAmount, 
             
             <DrawerClose>
               <Button className="w-full" onClick={editItem}>
-                Add Item
+                Edit Item
               </Button>
             </DrawerClose>
           </div>
