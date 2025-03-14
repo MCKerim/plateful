@@ -50,9 +50,9 @@ export default function MealPlanner() {
   return (
     <Layout>
       <h1 className="text-2xl">Meal Planner</h1>
-      {plannedItems.map((item) => (
+      {plannedItems.map((item, index) => (
         <MealPlannerItem
-          key={item.id}
+          key={index}
           id={item.id}
           recipeName={item.recipeName}
           date={item.date}

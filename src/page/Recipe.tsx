@@ -1,3 +1,4 @@
+import DayPicker from "@/components/atoms/DayPicker";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -106,9 +107,29 @@ export default function Recipe() {
     if (error) {
       console.error("Error adding items to shopping list: ", error);
       alert("Error adding items to shopping list");
-      return;
     } else {
       alert("Items added to shopping list");
+    }
+  }
+
+  async function planRecipe() {
+    const dayToPlan = new Date();
+
+    if (!recipe || !dayToPlan) {
+      return;
+    }
+
+    console.log(dayToPlan.toISOString());
+
+    const { error } = await supabase
+      .from("meal_planning")
+      .insert({ recipe_id: recipe.id, planned_date: dayToPlan.toISOString() });
+
+    if (error) {
+      console.error("Error while planning recipe: ", error);
+      alert("Error while planning recipe");
+    } else {
+      alert("Recipe planned!");
     }
   }
 
@@ -144,6 +165,7 @@ export default function Recipe() {
       {recipeItems.map((recipeItem, index) => (
         <ShoppingItem
           key={"item-" + index}
+          id={recipeItem.id}
           name={recipeItem.itemName}
           amount={recipeItem.amount}
           bought={false}
@@ -164,7 +186,10 @@ export default function Recipe() {
         <Button className="w-full" variant="secondary">
           Save
         </Button>
-        <Button className="w-full" disabled>
+
+        <DayPicker />
+
+        <Button className="w-full" onClick={planRecipe}>
           Plan
         </Button>
       </div>
