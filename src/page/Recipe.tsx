@@ -176,18 +176,16 @@ export default function Recipe() {
       </Button>
 
       <div className="flex gap-2 w-full mt-11">
-        <Button className="w-full" variant="secondary">
-          Save
+        <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+
+        <Button className="w-full" onClick={planRecipe}>
+          Plan
         </Button>
-
-        <div>
-          <DayPicker date={dateToPlan} setDate={setDateToPlan} />
-
-          <Button className="w-full" onClick={planRecipe}>
-            Plan
-          </Button>
-        </div>
       </div>
+
+      <Button className="w-full" variant="secondary">
+        Save recipe
+      </Button>
     </Layout>
   );
 }
