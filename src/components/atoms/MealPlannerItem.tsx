@@ -1,10 +1,11 @@
 import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { toWeekday } from "@/lib/dateHelper";
 
 type Props = {
   id: number;
   recipeName: string;
-  date: string;
+  date: Date;
 };
 
 export default function MealPlannerItem({
@@ -22,7 +23,7 @@ export default function MealPlannerItem({
           <div className="flex-1">
             <CardTitle className="text-lg">{recipeName}</CardTitle>
             <CardDescription style={{ margin: "0px" }}>
-              {date}
+              {toWeekday(date)}
             </CardDescription>
           </div>
         </div>

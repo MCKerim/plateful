@@ -6,7 +6,7 @@ import supabase from "@/utils/supabase";
 type MealPlannerItem = {
   id: number;
   recipeName: string;
-  date: string;
+  date: Date;
 };
 
 export default function MealPlanner() {
@@ -35,7 +35,7 @@ export default function MealPlanner() {
     data.forEach((item) => {
       const newItem: MealPlannerItem = {
         id: item.recipes?.id ?? 1,
-        date: item.planned_date ?? "no date",
+        date: new Date(item.planned_date ?? ""),
         recipeName: item.recipes?.name ?? "no name",
       };
       newItems.push(newItem);
