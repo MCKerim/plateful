@@ -25,6 +25,7 @@ export default function Recipe() {
 
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
 
   useEffect(() => {
     async function getRecipe() {
@@ -113,17 +114,15 @@ export default function Recipe() {
   }
 
   async function planRecipe() {
-    const dayToPlan = new Date();
-
-    if (!recipe || !dayToPlan) {
+    if (!recipe || !dateToPlan) {
       return;
     }
 
-    console.log(dayToPlan.toISOString());
+    console.log(dateToPlan.toISOString());
 
     const { error } = await supabase
       .from("meal_planning")
-      .insert({ recipe_id: recipe.id, planned_date: dayToPlan.toISOString() });
+      .insert({ recipe_id: recipe.id, planned_date: dateToPlan.toISOString() });
 
     if (error) {
       console.error("Error while planning recipe: ", error);
@@ -146,12 +145,6 @@ export default function Recipe() {
       </AspectRatio>
 
       <p className="font-bold">{recipe?.description}</p>
-
-      <p>
-        Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
-        eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-        voluptua.
-      </p>
 
       <NavLink
         to={recipe?.link ?? "/discover"}
@@ -187,11 +180,13 @@ export default function Recipe() {
           Save
         </Button>
 
-        <DayPicker />
+        <div>
+          <DayPicker date={dateToPlan} setDate={setDateToPlan} />
 
-        <Button className="w-full" onClick={planRecipe}>
-          Plan
-        </Button>
+          <Button className="w-full" onClick={planRecipe}>
+            Plan
+          </Button>
+        </div>
       </div>
     </Layout>
   );

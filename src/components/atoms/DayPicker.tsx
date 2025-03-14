@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { format } from "date-fns"
 import { CalendarIcon } from "lucide-react"
 
@@ -11,8 +10,20 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 
-export default function DayPicker() {
-  const [date, setDate] = useState<Date>();
+type Props = Readonly<{
+  date: Date | undefined;
+  setDate: (date: Date | undefined) => void;
+}>
+
+export default function DayPicker({ date, setDate }: Props) {
+  const handleDateChange = (selectedDate: Date | undefined) => {
+    if (selectedDate) {
+      const localDate = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000);
+      setDate(localDate);
+    } else {
+      setDate(undefined);
+    }
+  };
 
   return (
     <Popover>
@@ -34,7 +45,7 @@ export default function DayPicker() {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={setDate}
+          onSelect={handleDateChange}
           initialFocus
         />
       </PopoverContent>
