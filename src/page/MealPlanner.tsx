@@ -5,6 +5,7 @@ import supabase from "@/utils/supabase";
 
 type MealPlannerItem = {
   id: number;
+  recipeId: number;
   recipeName: string;
   date: Date;
 };
@@ -34,7 +35,8 @@ export default function MealPlanner() {
 
     data.forEach((item) => {
       const newItem: MealPlannerItem = {
-        id: item.recipes?.id ?? 1,
+        id: item.id,
+        recipeId: item.recipes?.id ?? 1,
         date: new Date(item.planned_date ?? ""),
         recipeName: item.recipes?.name ?? "no name",
       };
@@ -47,6 +49,20 @@ export default function MealPlanner() {
     setPlannedItems(newItems.filter((item) => item.date >= twoDaysAgo));
   }
 
+  async function deletePlannedItem(id: number) {
+    const { error } = await supabase
+      .from("meal_planning")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error while deleting planned item: ", error);
+      alert("Error while deleting planned item");
+    } else {
+      setPlannedItems(plannedItems.filter((item) => item.id !== id));
+    }
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">Meal Planner</h1>
@@ -54,8 +70,10 @@ export default function MealPlanner() {
         <MealPlannerItem
           key={index}
           id={item.id}
+          recipeId={item.recipeId}
           recipeName={item.recipeName}
           date={item.date}
+          onDelete={deletePlannedItem}
         />
       ))}
     </Layout>
