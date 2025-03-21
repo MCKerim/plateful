@@ -7,6 +7,17 @@ import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { Recipes } from "@/types/exportedDatabaseTypes.types";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type RecipeItem = {
   id: number;
@@ -19,7 +30,9 @@ export default function Recipe() {
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
+  const [daysToPlan, setDaysToPlan] = useState<number>(1);
 
   const navigate = useNavigate();
 
@@ -111,7 +124,7 @@ export default function Recipe() {
   }
 
   async function planRecipe() {
-    if (!recipe || !dateToPlan) {
+    if (!recipe || !dateToPlan || !daysToPlan) {
       return;
     }
 
@@ -119,13 +132,17 @@ export default function Recipe() {
 
     const { error } = await supabase
       .from("meal_planning")
-      .insert({ recipe_id: recipe.id, planned_date: dateToPlan.toISOString() });
+      .insert({
+        recipe_id: recipe.id,
+        planned_date: dateToPlan.toISOString(),
+        days: daysToPlan,
+      });
 
     if (error) {
       console.error("Error while planning recipe: ", error);
       alert("Error while planning recipe");
     } else {
-      alert("Recipe planned!");
+      setIsDialogOpen(false);
     }
   }
 
@@ -133,12 +150,12 @@ export default function Recipe() {
     if (!recipe) {
       return;
     }
-  
+
     const { error } = await supabase
       .from("recipes")
       .delete()
       .eq("id", recipe.id);
-  
+
     if (error) {
       console.error("Error while deleting recipe: ", error);
       alert("Error while deleting recipe");
@@ -147,6 +164,12 @@ export default function Recipe() {
       navigate("/discover");
     }
   }
+
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setDateToPlan(undefined);
+    setDaysToPlan(1);
+    setIsDialogOpen(isOpen);
+  };
 
   return (
     <Layout>
@@ -191,13 +214,42 @@ export default function Recipe() {
         Add items to shopping list
       </Button>
 
-      <div className="flex gap-2 w-full mt-11">
-        <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+      <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+        <DialogTrigger>
+          <Button className="w-full" variant="outline">Plan recipe</Button>
+        </DialogTrigger>
 
-        <Button className="w-full" onClick={planRecipe}>
-          Plan
-        </Button>
-      </div>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Plan recipe</DialogTitle>
+          </DialogHeader>
+
+          <DialogDescription className="flex flex-col py-4 gap-4">
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="days">Date</Label>
+              <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+            </div>
+
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="days">Number of days</Label>
+
+              <Input
+                type="number"
+                id="days"
+                placeholder="Days"
+                value={daysToPlan}
+                onChange={(e) => setDaysToPlan(Number(e.target.value))}
+              />
+            </div>
+          </DialogDescription>
+
+          <DialogFooter>
+            <Button className="w-full" onClick={planRecipe}>
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <div className="flex gap-2 w-full mt-11">
         <NavLink

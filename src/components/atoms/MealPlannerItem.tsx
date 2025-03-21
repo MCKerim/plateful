@@ -35,9 +35,9 @@ export default function MealPlannerItem({
   onDelete,
   onUpdateDate,
 }: Readonly<Props>) {
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [dateToPlan, setDateToPlan] = useState<Date | undefined>(date);
   const [daysToPlan, setDaysToPlan] = useState<number>(days);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const saveDate = () => {
     if (dateToPlan) {
