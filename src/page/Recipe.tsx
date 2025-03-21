@@ -6,8 +6,8 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import { Recipes } from "@/types/database.types";
-
+import { Recipes } from "@/types/exportedDatabaseTypes.types";
+S
 type RecipeItem = {
   id: number;
   itemName: string;

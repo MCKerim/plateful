@@ -33,18 +33,21 @@ export type Database = {
       meal_planning: {
         Row: {
           created_at: string
+          days: number
           id: number
           planned_date: string | null
           recipe_id: number | null
         }
         Insert: {
           created_at?: string
+          days?: number
           id?: number
           planned_date?: string | null
           recipe_id?: number | null
         }
         Update: {
           created_at?: string
+          days?: number
           id?: number
           planned_date?: string | null
           recipe_id?: number | null
@@ -325,5 +328,3 @@ export type CompositeTypes<
   : PublicCompositeTypeNameOrOptions extends keyof PublicSchema["CompositeTypes"]
     ? PublicSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
     : never
-
-export type Recipes = Database["public"]["Tables"]["recipes"]["Row"];
