@@ -30,7 +30,7 @@ export default function MealPlannerItem({
             </CardDescription>
           </NavLink>
 
-          <div className="flex gap-2">
+          <div className="flex gap-2 items-center">
             <Button variant="secondary">E</Button>
 
             <Button variant="destructive" onClick={() => onDelete(id)}>
