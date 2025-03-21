@@ -41,6 +41,13 @@ export default function MealPlannerItem({
     }
   };
 
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    setIsDialogOpen(isOpen);
+    if (isOpen) {
+      setDateToPlan(date);
+    }
+  };
+
   return (
     <Card className={"w-full"}>
       <CardHeader className="px-4 py-2">
@@ -54,7 +61,7 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
               <DialogTrigger>
                 <Button variant="outline">Edit</Button>
               </DialogTrigger>
