@@ -1,24 +1,26 @@
-import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { format } from "date-fns";
+import { CalendarIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from "@/components/ui/popover"
+} from "@/components/ui/popover";
 
 type Props = Readonly<{
   date: Date | undefined;
   setDate: (date: Date | undefined) => void;
-}>
+}>;
 
 export default function DayPicker({ date, setDate }: Props) {
   const handleDateChange = (selectedDate: Date | undefined) => {
     if (selectedDate) {
-      const localDate = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000);
+      const localDate = new Date(
+        selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000
+      );
       setDate(localDate);
     } else {
       setDate(undefined);
@@ -41,7 +43,10 @@ export default function DayPicker({ date, setDate }: Props) {
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="w-auto p-0">
+      <PopoverContent
+        className="w-auto p-0"
+        portalled={false}
+      >
         <Calendar
           mode="single"
           selected={date}

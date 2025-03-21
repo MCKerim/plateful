@@ -2,6 +2,17 @@ import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import { toWeekday } from "@/lib/dateHelper";
 import { Button } from "../ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import DayPicker from "@/components/atoms/DayPicker";
+import { useState } from "react";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 type Props = {
   id: number;
@@ -18,6 +29,8 @@ export default function MealPlannerItem({
   date,
   onDelete,
 }: Readonly<Props>) {
+  const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
+
   return (
     <Card className={"w-full"}>
       <CardHeader className="px-4 py-2">
@@ -31,7 +44,27 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-            <Button variant="secondary">E</Button>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline">Edit</Button>
+              </DialogTrigger>
+
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Edit date</DialogTitle>
+                </DialogHeader>
+
+                <DialogDescription>
+                  <div className="flex gap-2 w-full py-4">
+                    <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+                  </div>
+                </DialogDescription>
+
+                <DialogFooter>
+                  <Button type="submit">Save changes</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
 
             <Button variant="destructive" onClick={() => onDelete(id)}>
               D
