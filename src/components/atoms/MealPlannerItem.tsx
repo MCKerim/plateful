@@ -20,6 +20,7 @@ type Props = {
   recipeName: string;
   date: Date;
   onDelete: (id: number) => void;
+  onUpdateDate: (id: number, newDate: Date) => void;
 };
 
 export default function MealPlannerItem({
@@ -28,8 +29,17 @@ export default function MealPlannerItem({
   recipeName,
   date,
   onDelete,
+  onUpdateDate,
 }: Readonly<Props>) {
-  const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
+  const [dateToPlan, setDateToPlan] = useState<Date | undefined>(date);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const saveDate = () => {
+    if (dateToPlan) {
+      onUpdateDate(id, dateToPlan);
+      setIsDialogOpen(false);
+    }
+  };
 
   return (
     <Card className={"w-full"}>
@@ -44,8 +54,8 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-            <Dialog>
-              <DialogTrigger asChild>
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger>
                 <Button variant="outline">Edit</Button>
               </DialogTrigger>
 
@@ -54,14 +64,12 @@ export default function MealPlannerItem({
                   <DialogTitle>Edit date</DialogTitle>
                 </DialogHeader>
 
-                <DialogDescription>
-                  <div className="flex gap-2 w-full py-4">
-                    <DayPicker date={dateToPlan} setDate={setDateToPlan} />
-                  </div>
+                <DialogDescription className="flex gap-2 w-full py-4">
+                  <DayPicker date={dateToPlan} setDate={setDateToPlan} />
                 </DialogDescription>
 
                 <DialogFooter>
-                  <Button type="submit">Save changes</Button>
+                  <Button className="w-full" onClick={saveDate}>Save</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

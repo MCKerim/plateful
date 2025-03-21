@@ -63,9 +63,24 @@ export default function MealPlanner() {
     }
   }
 
+  async function updatePlannedItemDate(id: number, newDate: Date) {
+    const { error } = await supabase
+      .from("meal_planning")
+      .update({ planned_date: newDate.toISOString() })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error while updating planned item date: ", error);
+      alert("Error while updating planned item date");
+    } else {
+      getMealPlannerItems();
+    }
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">Meal Planner</h1>
+
       {plannedItems.map((item, index) => (
         <MealPlannerItem
           key={index}
@@ -74,6 +89,7 @@ export default function MealPlanner() {
           recipeName={item.recipeName}
           date={item.date}
           onDelete={deletePlannedItem}
+          onUpdateDate={updatePlannedItemDate}
         />
       ))}
     </Layout>
