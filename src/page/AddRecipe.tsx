@@ -6,8 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import supabase from "@/utils/supabase";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router";
 
 type RecipeItem = {
   itemName: string;
@@ -15,12 +15,36 @@ type RecipeItem = {
 };
 
 export default function AddRecipe() {
+  const params = useParams();
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function getRecipe() {
+      if (!params.recipeId) return;
+      const recipeId = parseInt(params.recipeId);
+
+      const { data } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("id", recipeId);
+
+      if (!data) {
+        return;
+      }
+
+      setTitle(data[0].name);
+      setDescription(data[0].description ?? "");
+      setLink(data[0].link ?? "")
+    }
+
+    getRecipe();
+  }, [params.recipeId]);
 
   function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
@@ -39,16 +63,35 @@ export default function AddRecipe() {
       return;
     }
 
-    const { data, error } = await supabase
-      .from("recipes")
-      .insert([{ name: title, description, link }])
-      .select();
-
-    if (!error && data) {
-      saveRecipeItems(data[0].id);
+    if (params.recipeId) {
+      // Update existing recipe
+      const recipeId = parseInt(params.recipeId);
+      const { data, error } = await supabase
+        .from("recipes")
+        .update({ name: title, description, link })
+        .eq("id", recipeId)
+        .select();
+  
+      if (!error && data) {
+        //await saveRecipeItems(recipeId);
+        navigate(`/recipe/${recipeId}`);
+      } else {
+        console.error(error);
+        alert("An error occurred. Please try again.");
+      }
     } else {
-      console.error(error);
-      alert("An error occurred. Please try again.");
+      // Insert new recipe
+      const { data, error } = await supabase
+        .from("recipes")
+        .insert([{ name: title, description, link }])
+        .select();
+  
+      if (!error && data) {
+        await saveRecipeItems(data[0].id);
+      } else {
+        console.error(error);
+        alert("An error occurred. Please try again.");
+      }
     }
   }
 
@@ -95,14 +138,14 @@ export default function AddRecipe() {
         return;
       } else {
         alert("Recipe saved successfully.");
-        navigate("/discover");
+        navigate(`/recipe/${recipeId}`);
       }
     }
   }
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-10">Add Recipe</h1>
+      <h1 className="text-2xl font-bold mb-10">{params.recipeId ? "Edit" : "Add"} Recipe</h1>
 
       <div className="grid w-full items-center gap-5">
         <div className="grid w-full items-center gap-2">
@@ -156,7 +199,7 @@ export default function AddRecipe() {
 
       <div className="flex gap-2 w-full mt-11">
         <Button asChild className="w-full" variant="secondary">
-          <Link to="/discover">Cancel</Link>
+          <Link to={params.recipeId ? `/recipe/${params.recipeId}` : "/discover"}>Cancel</Link>
         </Button>
         <Button className="w-full" onClick={saveRecipe}>
           Save

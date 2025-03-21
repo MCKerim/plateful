@@ -5,14 +5,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { NavLink, useParams } from "react-router";
-
-type Recipe = {
-  id: number;
-  recipeName: string;
-  description: string;
-  link: string;
-};
+import { NavLink, useParams, useNavigate } from "react-router";
+import { Recipes } from "@/types/database.types";
 
 type RecipeItem = {
   id: number;
@@ -23,9 +17,11 @@ type RecipeItem = {
 export default function Recipe() {
   const params = useParams();
 
-  const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getRecipe() {
@@ -44,9 +40,10 @@ export default function Recipe() {
 
       setRecipe({
         id: data[0].id,
-        recipeName: data[0].name,
+        name: data[0].name,
         description: data[0].description ?? "",
         link: data[0].link ?? "",
+        created_at: data[0].created_at ?? "",
       });
     }
 
@@ -132,9 +129,28 @@ export default function Recipe() {
     }
   }
 
+  async function deleteRecipe() {
+    if (!recipe) {
+      return;
+    }
+  
+    const { error } = await supabase
+      .from("recipes")
+      .delete()
+      .eq("id", recipe.id);
+  
+    if (error) {
+      console.error("Error while deleting recipe: ", error);
+      alert("Error while deleting recipe");
+    } else {
+      alert("Recipe deleted!");
+      navigate("/discover");
+    }
+  }
+
   return (
     <Layout>
-      <h1 className="text-2xl font-bold">{recipe?.recipeName}</h1>
+      <h1 className="text-2xl font-bold">{recipe?.name}</h1>
 
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
@@ -183,9 +199,18 @@ export default function Recipe() {
         </Button>
       </div>
 
-      <Button className="w-full" variant="secondary">
-        Save recipe
-      </Button>
+      <div className="flex gap-2 w-full mt-11">
+        <NavLink
+          to={`/recipe/edit/${recipe?.id}`}
+          className={buttonVariants({ variant: "secondary" }) + " w-full"}
+        >
+          Edit recipe
+        </NavLink>
+
+        <Button className="w-full" variant="destructive" onClick={deleteRecipe}>
+          Delete
+        </Button>
+      </div>
     </Layout>
   );
 }
