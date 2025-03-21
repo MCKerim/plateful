@@ -8,6 +8,7 @@ type MealPlannerItem = {
   recipeId: number;
   recipeName: string;
   date: Date;
+  days: number;
 };
 
 export default function MealPlanner() {
@@ -22,6 +23,7 @@ export default function MealPlanner() {
       `
         id,
         planned_date,
+        days,
         recipes (id, name)
       `
     ).order("planned_date", { ascending: true });
@@ -39,6 +41,7 @@ export default function MealPlanner() {
         recipeId: item.recipes?.id ?? 1,
         date: new Date(item.planned_date ?? ""),
         recipeName: item.recipes?.name ?? "no name",
+        days: item.days,
       };
       newItems.push(newItem);
     });
@@ -63,10 +66,10 @@ export default function MealPlanner() {
     }
   }
 
-  async function updatePlannedItemDate(id: number, newDate: Date) {
+  async function updatePlannedItemDate(id: number, newDate: Date, newDays: number) {
     const { error } = await supabase
       .from("meal_planning")
-      .update({ planned_date: newDate.toISOString() })
+      .update({ planned_date: newDate.toISOString(), days: newDays })
       .eq("id", id);
 
     if (error) {
@@ -88,6 +91,7 @@ export default function MealPlanner() {
           recipeId={item.recipeId}
           recipeName={item.recipeName}
           date={item.date}
+          days={item.days}
           onDelete={deletePlannedItem}
           onUpdateDate={updatePlannedItemDate}
         />

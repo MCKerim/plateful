@@ -13,14 +13,17 @@ import {
 import DayPicker from "@/components/atoms/DayPicker";
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 
 type Props = {
   id: number;
   recipeId: number;
   recipeName: string;
   date: Date;
+  days: number;
   onDelete: (id: number) => void;
-  onUpdateDate: (id: number, newDate: Date) => void;
+  onUpdateDate: (id: number, newDate: Date, newDays: number) => void;
 };
 
 export default function MealPlannerItem({
@@ -28,15 +31,17 @@ export default function MealPlannerItem({
   recipeId,
   recipeName,
   date,
+  days,
   onDelete,
   onUpdateDate,
 }: Readonly<Props>) {
   const [dateToPlan, setDateToPlan] = useState<Date | undefined>(date);
+  const [daysToPlan, setDaysToPlan] = useState<number>(days);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const saveDate = () => {
     if (dateToPlan) {
-      onUpdateDate(id, dateToPlan);
+      onUpdateDate(id, dateToPlan, daysToPlan);
       setIsDialogOpen(false);
     }
   };
@@ -45,6 +50,7 @@ export default function MealPlannerItem({
     setIsDialogOpen(isOpen);
     if (isOpen) {
       setDateToPlan(date);
+      setDaysToPlan(days);
     }
   };
 
@@ -56,7 +62,7 @@ export default function MealPlannerItem({
             <CardTitle className="text-lg">{recipeName}</CardTitle>
 
             <CardDescription style={{ margin: "0px" }}>
-              {toWeekday(date)}
+              {toWeekday(date)} • {days} {days > 1 ? "days" : "day"}
             </CardDescription>
           </NavLink>
 
@@ -71,8 +77,17 @@ export default function MealPlannerItem({
                   <DialogTitle>Edit date</DialogTitle>
                 </DialogHeader>
 
-                <DialogDescription className="flex gap-2 w-full py-4">
-                  <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+                <DialogDescription className="flex flex-col py-4 gap-4">
+                  <div className="grid w-full max-w-sm items-center gap-1.5">
+                  <Label htmlFor="days">Date</Label>
+                    <DayPicker date={dateToPlan} setDate={setDateToPlan} />
+                  </div>
+                  
+
+                  <div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label htmlFor="days">Number of days</Label>
+                    <Input type="number" id="days" placeholder="Days" value={daysToPlan} onChange={(e) => setDaysToPlan(Number(e.target.value))} />
+                  </div>
                 </DialogDescription>
 
                 <DialogFooter>
