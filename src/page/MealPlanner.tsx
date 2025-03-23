@@ -31,7 +31,7 @@ export default function MealPlanner() {
         recipes (id, name)
       `
       )
-      .order("planned_date", { ascending: true });
+      .order("created_at", { ascending: true });
 
     const newItems: MealPlannerItem[] = [];
 
