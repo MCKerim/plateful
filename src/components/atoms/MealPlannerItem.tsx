@@ -34,7 +34,7 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-            <PlanDialog id={id} days={days} onUpdateDate={onUpdateDate} />
+            <PlanDialog isEdit id={id} initialDays={days} onUpdateDate={onUpdateDate} />
 
             <Button variant="destructive" onClick={() => onDelete(id)}>
               D

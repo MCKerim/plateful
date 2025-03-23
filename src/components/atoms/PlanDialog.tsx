@@ -2,7 +2,6 @@ import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -11,67 +10,65 @@ import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 
 type Props = {
+  isEdit?: boolean;
   id: number;
-  days: number;
+  initialDays?: number;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
 };
 
 export default function PlanDialog({
+  isEdit = false,
   id,
-  days,
+  initialDays = 0,
   onUpdateDate,
 }: Readonly<Props>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  // const [dateToPlan, setDateToPlan] = useState<Date | null>(date);
-  const [daysToPlan, setDaysToPlan] = useState<number>(days);
+  const [daysToPlan, setDaysToPlan] = useState<number>(initialDays);
 
-  const saveDate = () => {
-    onUpdateDate(id, null, daysToPlan);
+  function saveDate(days: number) {
+    onUpdateDate(id, null, days);
     setIsDialogOpen(false);
-  };
+  }
 
-  const handleDialogOpenChange = (isOpen: boolean) => {
+  function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
     if (isOpen) {
-      // setDateToPlan(date);
-      setDaysToPlan(days);
+      setDaysToPlan(initialDays);
     }
-  };
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
-        <Button variant="outline">Edit</Button>
+        <Button variant="outline" className="w-full">
+          {isEdit ? "Edit" : "Plan recipe"}
+        </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Plan your meal</DialogTitle>
+          <DialogTitle>Select number of days</DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col py-4 gap-4">
-          {/*<div className="grid w-full max-w-sm items-center gap-1.5">
-                    <Label htmlFor="days">Date</Label>
-
-                    <DayPicker date={dateToPlan} setDate={setDateToPlan} />
-                  </div>*/}
-
           <div className="flex gap-2">
-            <Button className="w-full" variant={daysToPlan === 1 ? "secondary" : "outline"} onClick={() => setDaysToPlan(1)}>
+            <Button
+              className="w-full"
+              variant={daysToPlan === 1 ? "secondary" : "outline"}
+              onClick={() => saveDate(1)}
+            >
               1 Day
             </Button>
 
-            <Button className="w-full" variant={daysToPlan === 2 ? "secondary" : "outline"} onClick={() => setDaysToPlan(2)}>
+            <Button
+              className="w-full"
+              variant={daysToPlan === 2 ? "secondary" : "outline"}
+              onClick={() => saveDate(2)}
+            >
               2 Days
             </Button>
           </div>
         </DialogDescription>
-
-        <DialogFooter>
-          <Button className="w-full" onClick={saveDate}>
-            Save
-          </Button>
-        </DialogFooter>
       </DialogContent>
     </Dialog>
   );
