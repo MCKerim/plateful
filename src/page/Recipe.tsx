@@ -110,13 +110,11 @@ export default function Recipe() {
   }
 
   async function planRecipe(id: number, newDate: Date | null, newDays: number) {
-    const { error } = await supabase
-      .from("meal_planning")
-      .insert({
-        recipe_id: id,
-        planned_date: newDate?.toISOString(),
-        days: newDays,
-      });
+    const { error } = await supabase.from("meal_planning").insert({
+      recipe_id: id,
+      planned_date: newDate?.toISOString(),
+      days: newDays,
+    });
 
     if (error) {
       console.error("Error while planning recipe: ", error);
@@ -138,7 +136,6 @@ export default function Recipe() {
       console.error("Error while deleting recipe: ", error);
       alert("Error while deleting recipe");
     } else {
-      alert("Recipe deleted!");
       navigate("/discover");
     }
   }
@@ -146,7 +143,7 @@ export default function Recipe() {
   return (
     <Layout>
       <h1 className="text-2xl font-bold">{recipe?.name}</h1>
-
+      
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
           src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
@@ -157,40 +154,41 @@ export default function Recipe() {
 
       <p className="font-bold">{recipe?.description}</p>
 
-      <NavLink
-        to={recipe?.link ?? "/discover"}
-        className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
-      >
-        To the recipe
-      </NavLink>
+      {recipe?.link && (
+        <NavLink
+          to={recipe.link}
+          className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
+        >
+          To the recipe
+        </NavLink>
+      )}
 
-      <h2 className="text-md font-bold mt-2">Ingredients</h2>
+      {recipeItems.length > 0 && (
+        <>
+          <h2 className="text-md font-bold mt-2">Ingredients</h2>
 
-      {recipeItems.map((recipeItem, index) => (
-        <ShoppingItem
-          key={"item-" + index}
-          id={recipeItem.id}
-          name={recipeItem.itemName}
-          amount={recipeItem.amount}
-          bought={false}
-          onClick={() => {}}
-          onEdit={() => {}}
-        />
-      ))}
+          {recipeItems.map((recipeItem, index) => (
+            <ShoppingItem
+              key={"item-" + index}
+              id={recipeItem.id}
+              name={recipeItem.itemName}
+              amount={recipeItem.amount}
+              bought={false}
+              onClick={() => {}}
+              onEdit={() => {}}
+            />
+          ))}
+          <Button
+            className="w-full"
+            variant="secondary"
+            onClick={addItemsToShoppingList}
+          >
+            Add items to shopping list
+          </Button>
+        </>
+      )}
 
-      <Button
-        className="w-full"
-        variant="secondary"
-        onClick={addItemsToShoppingList}
-      >
-        Add items to shopping list
-      </Button>
-
-      {
-        recipe &&
-        <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />
-      }
-      
+      {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
 
       <div className="flex gap-2 w-full mt-11">
         <NavLink
