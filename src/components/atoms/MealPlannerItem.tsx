@@ -9,7 +9,6 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import DayPicker from "@/components/atoms/DayPicker";
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { Input } from "../ui/input";
@@ -19,36 +18,33 @@ type Props = {
   id: number;
   recipeId: number;
   recipeName: string;
-  date: Date;
+  date: Date | null;
   days: number;
   onDelete: (id: number) => void;
-  onUpdateDate: (id: number, newDate: Date, newDays: number) => void;
+  onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
 };
 
 export default function MealPlannerItem({
   id,
   recipeId,
   recipeName,
-  date,
   days,
   onDelete,
   onUpdateDate,
 }: Readonly<Props>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dateToPlan, setDateToPlan] = useState<Date | undefined>(date);
+  // const [dateToPlan, setDateToPlan] = useState<Date | null>(date);
   const [daysToPlan, setDaysToPlan] = useState<number>(days);
 
   const saveDate = () => {
-    if (dateToPlan) {
-      onUpdateDate(id, dateToPlan, daysToPlan);
-      setIsDialogOpen(false);
-    }
+    onUpdateDate(id, null, daysToPlan);
+    setIsDialogOpen(false);
   };
 
   const handleDialogOpenChange = (isOpen: boolean) => {
     setIsDialogOpen(isOpen);
     if (isOpen) {
-      setDateToPlan(date);
+      // setDateToPlan(date);
       setDaysToPlan(days);
     }
   };
@@ -77,14 +73,15 @@ export default function MealPlannerItem({
                 </DialogHeader>
 
                 <DialogDescription className="flex flex-col py-4 gap-4">
-                  <div className="grid w-full max-w-sm items-center gap-1.5">
-                  <Label htmlFor="days">Date</Label>
+                  {/*<div className="grid w-full max-w-sm items-center gap-1.5">
+                    <Label htmlFor="days">Date</Label>
+
                     <DayPicker date={dateToPlan} setDate={setDateToPlan} />
-                  </div>
-                  
+                  </div>*/}
 
                   <div className="grid w-full max-w-sm items-center gap-1.5">
                     <Label htmlFor="days">Number of days</Label>
+
                     <Input type="number" id="days" placeholder="Days" value={daysToPlan} onChange={(e) => setDaysToPlan(Number(e.target.value))} />
                   </div>
                 </DialogDescription>

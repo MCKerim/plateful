@@ -1,4 +1,3 @@
-import DayPicker from "@/components/atoms/DayPicker";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -31,7 +30,7 @@ export default function Recipe() {
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dateToPlan, setDateToPlan] = useState<Date | undefined>();
+  const [dateToPlan, setDateToPlan] = useState<Date | null>(null);
   const [daysToPlan, setDaysToPlan] = useState<number>(1);
 
   const navigate = useNavigate();
@@ -124,17 +123,15 @@ export default function Recipe() {
   }
 
   async function planRecipe() {
-    if (!recipe || !dateToPlan || !daysToPlan) {
+    if (!recipe || !daysToPlan) {
       return;
     }
-
-    console.log(dateToPlan.toISOString());
 
     const { error } = await supabase
       .from("meal_planning")
       .insert({
         recipe_id: recipe.id,
-        planned_date: dateToPlan.toISOString(),
+        planned_date: dateToPlan?.toISOString(),
         days: daysToPlan,
       });
 
@@ -166,7 +163,7 @@ export default function Recipe() {
   }
 
   const handleDialogOpenChange = (isOpen: boolean) => {
-    setDateToPlan(undefined);
+    setDateToPlan(null);
     setDaysToPlan(1);
     setIsDialogOpen(isOpen);
   };
@@ -225,10 +222,10 @@ export default function Recipe() {
           </DialogHeader>
 
           <DialogDescription className="flex flex-col py-4 gap-4">
-            <div className="grid w-full max-w-sm items-center gap-1.5">
+            {/*<div className="grid w-full max-w-sm items-center gap-1.5">
               <Label htmlFor="days">Date</Label>
               <DayPicker date={dateToPlan} setDate={setDateToPlan} />
-            </div>
+            </div>*/}
 
             <div className="grid w-full max-w-sm items-center gap-1.5">
               <Label htmlFor="days">Number of days</Label>
