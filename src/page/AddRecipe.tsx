@@ -58,7 +58,7 @@ export default function AddRecipe() {
   }
 
   async function saveRecipe() {
-    if (title === "" || description === "") {
+    if (title === "") {
       alert("Please fill in all fields.");
       return;
     }
@@ -137,7 +137,6 @@ export default function AddRecipe() {
         alert("An error occurred. Please try again.");
         return;
       } else {
-        alert("Recipe saved successfully.");
         navigate(`/recipe/${recipeId}`);
       }
     }
