@@ -3,7 +3,7 @@ import Layout from "@/components/layout/Layout";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import { Separator } from "../components/ui/separator";
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
 
 type MealPlannerItem = {
   id: number;
@@ -90,12 +90,32 @@ export default function MealPlanner() {
     }
   }
 
+  function plannedDays() {
+    const initialValue = 0;
+    const sumWithInitial = plannedItems.reduce(
+      (accumulator, currentItem) => accumulator + currentItem.days,
+      initialValue
+    );
+
+    return sumWithInitial;
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">Meal Planner</h1>
 
       <div className="flex gap-2 flex-col">
-        <p>Today • {format(new Date(), "EEEE • dd.MM.yyyy")}</p>
+        <div className="flex justify-between">
+          <p>{format(new Date(), "EEEE • dd.MM.yyyy")}</p> •{" "}
+          <p>
+            {plannedDays()} {plannedDays() > 1 ? "days" : "day"}
+          </p>{" "}
+          •{" "}
+          <p>
+            {format(addDays(new Date(), plannedDays()), "EEEE • dd.MM.yyyy")}
+          </p>
+        </div>
+
         <Separator />
       </div>
 
