@@ -14,6 +14,7 @@ type Props = {
   id: number;
   initialDays?: number;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
+  onDeleteDate?: (id: number) => void;
 };
 
 export default function PlanDialog({
@@ -21,12 +22,21 @@ export default function PlanDialog({
   id,
   initialDays = 0,
   onUpdateDate,
+  onDeleteDate,
 }: Readonly<Props>) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [daysToPlan, setDaysToPlan] = useState<number>(initialDays);
 
   function saveDate(days: number) {
     onUpdateDate(id, null, days);
+    setIsDialogOpen(false);
+  }
+
+  function deleteDate() {
+    if (!onDeleteDate) {
+      return;
+    }
+    onDeleteDate(id);
     setIsDialogOpen(false);
   }
 
@@ -68,6 +78,16 @@ export default function PlanDialog({
               2 Days
             </Button>
           </div>
+
+          {onDeleteDate && (
+            <Button
+              className="w-full"
+              variant="destructive"
+              onClick={deleteDate}
+            >
+              Remove
+            </Button>
+          )}
         </DialogDescription>
       </DialogContent>
     </Dialog>

@@ -1,6 +1,5 @@
 import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
 import PlanDialog from "./PlanDialog";
 
 type Props = {
@@ -9,7 +8,7 @@ type Props = {
   recipeName: string;
   date: Date | null;
   days: number;
-  onDelete: (id: number) => void;
+  onDeleteDate: (id: number) => void;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
 };
 
@@ -18,7 +17,7 @@ export default function MealPlannerItem({
   recipeId,
   recipeName,
   days,
-  onDelete,
+  onDeleteDate,
   onUpdateDate,
 }: Readonly<Props>) {
   return (
@@ -34,11 +33,7 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-            <PlanDialog isEdit id={id} initialDays={days} onUpdateDate={onUpdateDate} />
-
-            <Button variant="destructive" onClick={() => onDelete(id)}>
-              D
-            </Button>
+            <PlanDialog isEdit id={id} initialDays={days} onUpdateDate={onUpdateDate} onDeleteDate={onDeleteDate} />
           </div>
         </div>
       </CardHeader>

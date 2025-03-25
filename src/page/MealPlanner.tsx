@@ -129,7 +129,7 @@ export default function MealPlanner() {
           recipeName={item.recipeName}
           date={item.date}
           days={item.days}
-          onDelete={deletePlannedItem}
+          onDeleteDate={deletePlannedItem}
           onUpdateDate={updatePlannedItemDate}
         />
       ))}
