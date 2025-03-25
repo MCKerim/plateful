@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import { Separator } from "../components/ui/separator";
 import { format, addDays } from "date-fns";
+import { useTranslation } from 'react-i18next'
 
 type MealPlannerItem = {
   id: number;
@@ -15,6 +16,8 @@ type MealPlannerItem = {
 
 export default function MealPlanner() {
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
+
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     getMealPlannerItems();
@@ -113,13 +116,15 @@ export default function MealPlanner() {
 
   return (
     <Layout>
-      <h1 className="text-2xl">Meal Planner • {getPlannedDaysFormatted()}</h1>
+      <h1 className="text-2xl">{t("mealPlannerTitle")} • {getPlannedDaysFormatted()}</h1>
 
       <div className="flex gap-2 flex-col">
         <p className="w-full text-center">{getPlannedRangeFormatted()}</p>
 
         <Separator />
       </div>
+      <button onClick={() => i18n.changeLanguage('en')}>English</button>
+      <button onClick={() => i18n.changeLanguage('de')}>Deutsch</button>
 
       {plannedItems.map((item) => (
         <MealPlannerItem
