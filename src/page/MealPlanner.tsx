@@ -100,21 +100,16 @@ export default function MealPlanner() {
     return sumWithInitial;
   }
 
+  function getText() {
+    return `${format(new Date(), "EEEE, dd.MM.yyyy")} - ${format(addDays(new Date(), plannedDays()), "EEEE, dd.MM.yyyy")}`;
+  }
+
   return (
     <Layout>
-      <h1 className="text-2xl">Meal Planner</h1>
+      <h1 className="text-2xl">Meal Planner • {plannedDays()} {plannedDays() > 1 ? "days" : "day"}</h1>
 
       <div className="flex gap-2 flex-col">
-        <div className="flex justify-between">
-          <p>{format(new Date(), "EEEE • dd.MM.yyyy")}</p> •{" "}
-          <p>
-            {plannedDays()} {plannedDays() > 1 ? "days" : "day"}
-          </p>{" "}
-          •{" "}
-          <p>
-            {format(addDays(new Date(), plannedDays()), "EEEE • dd.MM.yyyy")}
-          </p>
-        </div>
+        <p className="w-full text-center">{getText()}</p>
 
         <Separator />
       </div>
