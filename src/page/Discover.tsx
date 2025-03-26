@@ -54,7 +54,6 @@ export default function Discover() {
       };
       newRecipes.push(newRecipe);
     });
-    console.log("Items: ", newRecipes);
     setRecipes(newRecipes);
     setSearchResults(newRecipes);
   }
@@ -67,7 +66,6 @@ export default function Discover() {
   });
 
   const handleSearch = async () => {
-    console.log("searc");
     if (searchTerm.trim() === "") {
       setSearchResults(recipes);
       return;
