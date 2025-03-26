@@ -96,7 +96,7 @@ export default function Discover() {
       </div>
 
       <div className="w-full max-w-lg pr-8 fixed bottom-[4.5rem] bg-background">
-        <div className="flex w-full items-center gap-4">
+        <div className="flex w-full items-center gap-2">
           <Input
             className="w-full"
             type="text"
@@ -105,8 +105,23 @@ export default function Discover() {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
+          {searchTerm && (
+            <Button variant="outline" onClick={() => setSearchTerm("")}>
+              Clear
+            </Button>
+          )}
+
           <Button asChild>
-            <Link to={"/recipe/add" + (searchTerm.trim() !== "" ? `?recipeNameFromSearch=${searchTerm.trim()}` : "")}>Add recipe</Link>
+            <Link
+              to={
+                "/recipe/add" +
+                (searchTerm.trim() !== ""
+                  ? `?recipeNameFromSearch=${searchTerm.trim()}`
+                  : "")
+              }
+            >
+              Add recipe
+            </Link>
           </Button>
         </div>
       </div>
