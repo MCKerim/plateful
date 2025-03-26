@@ -97,8 +97,8 @@ export default function Discover() {
         ))}
       </div>
 
-      <div className="w-full max-w-lg pr-8 fixed bottom-20 p-0 m-0 bg-background">
-        <div className="flex w-full items-center my-2 gap-4">
+      <div className="w-full max-w-lg pr-8 fixed bottom-[4.5rem] bg-background">
+        <div className="flex w-full items-center gap-4">
           <Input
             className="w-full"
             type="text"
@@ -108,7 +108,7 @@ export default function Discover() {
           />
 
           <Button asChild>
-            <Link to="/recipe/add">Add Recipe</Link>
+            <Link to={"/recipe/add" + (searchTerm.trim() !== "" ? `?recipeNameFromSearch=${searchTerm.trim()}` : "")}>Add recipe</Link>
           </Button>
         </div>
       </div>

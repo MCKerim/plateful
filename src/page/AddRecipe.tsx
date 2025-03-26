@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 type RecipeItem = {
   itemName: string;
@@ -21,12 +21,13 @@ export default function AddRecipe() {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    async function getRecipe() {
-      if (!params.recipeId) return;
+    async function getRecipe(): Promise<boolean> {
+      if (!params.recipeId) return false;
       const recipeId = parseInt(params.recipeId);
 
       const { data } = await supabase
@@ -34,21 +35,29 @@ export default function AddRecipe() {
         .select("*")
         .eq("id", recipeId);
 
-      if (!data) {
-        return;
+      if (!data || data.length === 0) {
+        return false;
       }
 
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
-      setLink(data[0].link ?? "")
+      setLink(data[0].link ?? "");
+      return true;
     }
 
-    getRecipe();
-  }, [params.recipeId]);
+    getRecipe().then((hasFound) => {
+      if (hasFound) return;
+      const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
+      if (recipeNameFromSearch !== null) {
+        setTitle(recipeNameFromSearch.trim());
+        setSearchParams("");
+      }
+    });
+  }, [params.recipeId, searchParams, setSearchParams]);
 
   function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
-    setRecipeItems([...recipeItems, {itemName: name, amount }]);
+    setRecipeItems([...recipeItems, { itemName: name, amount }]);
   }
 
   function removeItem(index: number) {
@@ -71,7 +80,7 @@ export default function AddRecipe() {
         .update({ name: title, description, link })
         .eq("id", recipeId)
         .select();
-  
+
       if (!error && data) {
         //await saveRecipeItems(recipeId);
         navigate(`/recipe/${recipeId}`);
@@ -85,7 +94,7 @@ export default function AddRecipe() {
         .from("recipes")
         .insert([{ name: title, description, link }])
         .select();
-  
+
       if (!error && data) {
         await saveRecipeItems(data[0].id);
       } else {
@@ -144,7 +153,9 @@ export default function AddRecipe() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-10">{params.recipeId ? "Edit" : "Add"} Recipe</h1>
+      <h1 className="text-2xl font-bold mb-10">
+        {params.recipeId ? "Edit" : "Add"} Recipe
+      </h1>
 
       <div className="grid w-full items-center gap-5">
         <div className="grid w-full items-center gap-2">
@@ -198,7 +209,11 @@ export default function AddRecipe() {
 
       <div className="flex gap-2 w-full mt-11">
         <Button asChild className="w-full" variant="secondary">
-          <Link to={params.recipeId ? `/recipe/${params.recipeId}` : "/discover"}>Cancel</Link>
+          <Link
+            to={params.recipeId ? `/recipe/${params.recipeId}` : "/discover"}
+          >
+            Cancel
+          </Link>
         </Button>
         <Button className="w-full" onClick={saveRecipe}>
           Save
