@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
+import { useTranslation } from "react-i18next";
 
 type RecipeItem = {
   id: number;
@@ -15,6 +16,8 @@ type RecipeItem = {
 };
 
 export default function Recipe() {
+  const { t } = useTranslation();
+
   const params = useParams();
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
@@ -195,11 +198,11 @@ export default function Recipe() {
           to={`/recipe/edit/${recipe?.id}`}
           className={buttonVariants({ variant: "secondary" }) + " w-full"}
         >
-          Edit recipe
+          {t("common.edit")}
         </NavLink>
 
         <Button className="w-full" variant="destructive" onClick={deleteRecipe}>
-          Delete
+          {t("common.delete")}
         </Button>
       </div>
     </Layout>

@@ -1,0 +1,40 @@
+{
+  "common": {
+    "edit": "Bearbeiten",
+    "remove": "Entfernen",
+    "clear": "Löschen",
+    "delete": "Löschen",
+    "cancel": "Abbrechen",
+    "save": "Speichern"
+  },
+  "mealPlanner": {
+    "title": "Essens Planer",
+    "planRecipe": "Rezept planen",
+    "selectNumberOfDays": "Wähle die anzahl der Tage aus"
+  },
+  "discover": {
+    "title": "Entdecke Rezepte",
+    "addRecipe": "Rezept hinzufügen",
+    "enterRecipeName": "Rezeptname eingeben..."
+  },
+  "addRecipe": {
+    "editRecipe": "Rezept bearbeiten",
+    "addRecipe": "Rezept hinzufügen",
+    "name": "Name",
+    "namePlaceholder": "Tomatensuppe",
+    "description": "Beschreibung",
+    "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
+    "link": "Link",
+    "linkPlaceholder": "https://www.tomaten-suppe.de"
+  },
+
+
+  "ingredients": "Zutaten",
+  "addIngredient": "Zutat hinzufügen",
+
+  "dayWithCount_one": "{{count}} Tag",
+  "dayWithCount_other": "{{count}} Tage",
+
+  "recipeWithCount_one": "{{count}} Rezept",
+  "recipeWithCount_other": "{{count}} Rezepte"
+}

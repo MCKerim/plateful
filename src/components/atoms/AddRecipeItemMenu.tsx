@@ -12,12 +12,15 @@ import {
 } from "../ui/drawer";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   onItemAdded: (name: string, amount: string) => void;
 };
 
 export default function AddRecipeItemMenu({ onItemAdded }: Readonly<Props>) {
+  const { t } = useTranslation();
+  
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 
@@ -35,7 +38,7 @@ export default function AddRecipeItemMenu({ onItemAdded }: Readonly<Props>) {
   return (
     <Drawer>
       <DrawerTrigger>
-        <Button className="w-full" variant="secondary" onClick={addItem}>Add Item</Button>
+        <Button className="w-full" variant="secondary" onClick={addItem}>{t("addIngredient")}</Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>

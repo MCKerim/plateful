@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
 type RecipeItem = {
@@ -15,6 +16,8 @@ type RecipeItem = {
 };
 
 export default function AddRecipe() {
+  const { t } = useTranslation();
+
   const params = useParams();
 
   const [title, setTitle] = useState("");
@@ -154,25 +157,25 @@ export default function AddRecipe() {
   return (
     <Layout>
       <h1 className="text-2xl font-bold mb-10">
-        {params.recipeId ? "Edit" : "Add"} Recipe
+        {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
       </h1>
 
       <div className="grid w-full items-center gap-5">
         <div className="grid w-full items-center gap-2">
-          <Label htmlFor="title">Title</Label>
+          <Label htmlFor="title">{t("addRecipe.name")}</Label>
           <Input
             type="text"
             id="title"
-            placeholder="Tomato soup"
+            placeholder={t("addRecipe.namePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
 
         <div className="grid w-full gap-2">
-          <Label htmlFor="message">Description</Label>
+          <Label htmlFor="message">{t("addRecipe.description")}</Label>
           <Textarea
-            placeholder="A beatiful and healthy dish."
+            placeholder={t("addRecipe.descriptionPlaceholder")}
             id="message"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -180,17 +183,17 @@ export default function AddRecipe() {
         </div>
 
         <div className="grid w-full items-center gap-2">
-          <Label htmlFor="link">Link</Label>
+          <Label htmlFor="link">{t("addRecipe.link")}</Label>
           <Input
             type="text"
             id="link"
-            placeholder="https://www.tomato-soup.com"
+            placeholder={t("addRecipe.linkPlaceholder")}
             value={link}
             onChange={(e) => setLink(e.target.value)}
           />
         </div>
         <div className="w-full flex gap-2 flex-col">
-          <h2 className="text-md font-bold mt-2">Ingredients</h2>
+          <h2 className="text-md font-bold mt-2">{t("ingredients")}</h2>
 
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
@@ -212,11 +215,11 @@ export default function AddRecipe() {
           <Link
             to={params.recipeId ? `/recipe/${params.recipeId}` : "/discover"}
           >
-            Cancel
+            {t("common.cancel")}
           </Link>
         </Button>
         <Button className="w-full" onClick={saveRecipe}>
-          Save
+          {t("common.save")}
         </Button>
       </div>
     </Layout>

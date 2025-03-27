@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   isEdit?: boolean;
@@ -24,6 +25,8 @@ export default function PlanDialog({
   onUpdateDate,
   onDeleteDate,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [daysToPlan, setDaysToPlan] = useState<number>(initialDays);
 
@@ -51,13 +54,13 @@ export default function PlanDialog({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
         <Button variant="outline" className="w-full">
-          {isEdit ? "Edit" : "Plan recipe"}
+          {isEdit ? t("common.edit") : t("mealPlanner.planRecipe")}
         </Button>
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Select number of days</DialogTitle>
+          <DialogTitle>{t("mealPlanner.selectNumberOfDays")}</DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col py-4 gap-4">
@@ -67,7 +70,7 @@ export default function PlanDialog({
               variant={daysToPlan === 1 ? "secondary" : "outline"}
               onClick={() => saveDate(1)}
             >
-              1 Day
+              {t("dayWithCount", { count: 1 })}
             </Button>
 
             <Button
@@ -75,7 +78,7 @@ export default function PlanDialog({
               variant={daysToPlan === 2 ? "secondary" : "outline"}
               onClick={() => saveDate(2)}
             >
-              2 Days
+              {t("dayWithCount", { count: 2 })}
             </Button>
           </div>
 
@@ -85,7 +88,7 @@ export default function PlanDialog({
               variant="destructive"
               onClick={deleteDate}
             >
-              Remove
+              {t("common.remove")}
             </Button>
           )}
         </DialogDescription>

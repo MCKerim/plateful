@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import { Separator } from "../components/ui/separator";
 import { format, addDays } from "date-fns";
-import { useTranslation } from 'react-i18next'
+import { useTranslation } from "react-i18next";
+import { de, enUS } from "date-fns/locale";
 
 type MealPlannerItem = {
   id: number;
@@ -103,20 +104,20 @@ export default function MealPlanner() {
     return sumWithInitial;
   }
 
-  function getPlannedDaysFormatted() {
-    return `${plannedDays()} ${plannedDays() > 1 ? "days" : "day"}`;
-  }
-
   function getPlannedRangeFormatted() {
-    return `${format(new Date(), "EEEE, dd.MM.yyyy")} - ${format(
+    const currentLanguage = i18n.language;
+    const locale = currentLanguage === "de" ? de : enUS;
+
+    return `${format(new Date(), "EEEE, dd.MM.yyyy", { locale })} - ${format(
       addDays(new Date(), plannedDays()),
-      "EEEE, dd.MM.yyyy"
+      "EEEE, dd.MM.yyyy",
+      { locale }
     )}`;
   }
 
   return (
     <Layout>
-      <h1 className="text-2xl">{t("mealPlannerTitle")} • {getPlannedDaysFormatted()}</h1>
+      <h1 className="text-2xl">{t("mealPlanner.title")} • {t("dayWithCount", { count: plannedDays() })}</h1>
 
       <div className="flex gap-2 flex-col">
         <p className="w-full text-center">{getPlannedRangeFormatted()}</p>

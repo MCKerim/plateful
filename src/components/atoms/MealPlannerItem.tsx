@@ -1,6 +1,7 @@
 import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import PlanDialog from "./PlanDialog";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   id: number;
@@ -20,6 +21,8 @@ export default function MealPlannerItem({
   onDeleteDate,
   onUpdateDate,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   return (
     <Card className={"w-full"}>
       <CardHeader className="px-4 py-2">
@@ -28,7 +31,7 @@ export default function MealPlannerItem({
             <CardTitle className="text-lg">{recipeName}</CardTitle>
 
             <CardDescription style={{ margin: "0px" }}>
-              {days} {days > 1 ? "days" : "day"}
+              {t("dayWithCount", { count: days })}
             </CardDescription>
           </NavLink>
 

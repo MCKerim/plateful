@@ -6,6 +6,7 @@ import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Fuse from "fuse.js";
+import { useTranslation } from "react-i18next";
 
 type Recipe = {
   id: number;
@@ -14,6 +15,8 @@ type Recipe = {
 };
 
 export default function Discover() {
+  const { t } = useTranslation();
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
@@ -80,8 +83,8 @@ export default function Discover() {
   return (
     <Layout>
       <h1 className="text-2xl">
-        Discover{" "}
-        {searchResults.length > 0 && `• ${searchResults.length} recipes`}
+        {t("discover.title")}{" "}
+        {searchResults.length > 0 && `• ${t("recipeWithCount", { count: searchResults.length})}`}
       </h1>
 
       <div className="flex flex-col gap-2 items-center">
@@ -100,14 +103,14 @@ export default function Discover() {
           <Input
             className="w-full"
             type="text"
-            placeholder="Enter recipe name..."
+            placeholder={t("discover.enterRecipeName")}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
 
           {searchTerm && (
             <Button variant="outline" onClick={() => setSearchTerm("")}>
-              Clear
+              {t("common.clear")}
             </Button>
           )}
 
@@ -120,7 +123,7 @@ export default function Discover() {
                   : "")
               }
             >
-              Add recipe
+              {t("discover.addRecipe")}
             </Link>
           </Button>
         </div>
