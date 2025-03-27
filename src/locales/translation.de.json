@@ -27,6 +27,9 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de"
   },
+  "settings": {
+    "title": "Einstellungen"
+  },
 
 
   "ingredients": "Zutaten",
