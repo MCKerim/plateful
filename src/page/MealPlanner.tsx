@@ -124,8 +124,6 @@ export default function MealPlanner() {
 
         <Separator />
       </div>
-      <button onClick={() => i18n.changeLanguage('en')}>English</button>
-      <button onClick={() => i18n.changeLanguage('de')}>Deutsch</button>
 
       {plannedItems.map((item) => (
         <MealPlannerItem
