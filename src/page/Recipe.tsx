@@ -162,7 +162,7 @@ export default function Recipe() {
           to={recipe.link}
           className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
         >
-          To the recipe
+          {t("recipe.toTheRecipe")}
         </NavLink>
       )}
 

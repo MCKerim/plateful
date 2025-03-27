@@ -15,13 +15,16 @@
   },
   "mealPlanner": {
     "title": "Meal planner",
-    "planRecipe": "Plan recipe",
     "selectNumberOfDays": "Select the number of days"
   },
   "discover": {
     "title": "Discover recipes",
     "addRecipe": "Add recipe",
     "enterRecipeName": "Enter recipe name..."
+  },
+  "recipe": {
+    "toTheRecipe": "To the recipe",
+    "planRecipe": "Plan recipe"
   },
   "addRecipe": {
     "editRecipe": "Edit recipe",
@@ -34,7 +37,8 @@
     "linkPlaceholder": "https://www.tomato-soup.com"
   },  
   "settings": {
-    "title": "Settings"
+    "title": "Settings",
+    "language": "Language"
   },
 
   "ingredients": "Ingredients",

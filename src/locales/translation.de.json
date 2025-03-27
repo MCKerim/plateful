@@ -15,13 +15,16 @@
   },
   "mealPlanner": {
     "title": "Essens Planer",
-    "planRecipe": "Rezept planen",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus"
   },
   "discover": {
     "title": "Entdecke Rezepte",
     "addRecipe": "Rezept hinzufügen",
     "enterRecipeName": "Rezeptname eingeben..."
+  },
+  "recipe": {
+    "toTheRecipe": "Zum Rezept",
+    "planRecipe": "Rezept planen"
   },
   "addRecipe": {
     "editRecipe": "Rezept bearbeiten",
@@ -34,7 +37,8 @@
     "linkPlaceholder": "https://www.tomaten-suppe.de"
   },
   "settings": {
-    "title": "Einstellungen"
+    "title": "Einstellungen",
+    "language": "Sprache"
   },
 
 
