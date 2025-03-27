@@ -1,8 +1,11 @@
 import { NavLink } from "react-router";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
+import { useTranslation } from "react-i18next";
 
 export default function BottomNav() {
+  const { t } = useTranslation();
+
   return (
     <>
       <div style={{ height: "100px" }}></div>
@@ -18,7 +21,7 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                1
+                {t("bottomNav.shoppingList")}
               </Button>
             )}
           </NavLink>
@@ -30,7 +33,7 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                2
+                {t("bottomNav.planner")}
               </Button>
             )}
           </NavLink>
@@ -42,7 +45,7 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                3
+                {t("bottomNav.recipes")}
               </Button>
             )}
           </NavLink>
@@ -54,7 +57,7 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                4
+                {t("bottomNav.settings")}
               </Button>
             )}
           </NavLink>

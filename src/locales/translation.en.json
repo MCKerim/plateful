@@ -7,6 +7,12 @@
     "cancel": "Cancel",
     "save": "Save"
   },
+  "bottomNav": {
+    "shoppingList": "Shopping list",
+    "planner": "Planer",
+    "recipes": "Recipes",
+    "settings": "Settings"
+  },
   "mealPlanner": {
     "title": "Meal planner",
     "planRecipe": "Plan recipe",

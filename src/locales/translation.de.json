@@ -7,6 +7,12 @@
     "cancel": "Abbrechen",
     "save": "Speichern"
   },
+  "bottomNav": {
+    "shoppingList": "Einkaufsliste",
+    "planner": "Planer",
+    "recipes": "Rezepte",
+    "settings": "Einstellungen"
+  },
   "mealPlanner": {
     "title": "Essens Planer",
     "planRecipe": "Rezept planen",
