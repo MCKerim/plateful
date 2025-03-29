@@ -5,10 +5,13 @@ import Discover from "./page/Discover";
 import Bookmarks from "./page/Bookmarks";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
+import SignUp from "./page/SignUp";
 
 function App() {
   return (
     <Routes>
+      <Route path="/signup" element={<SignUp />} />
+
       <Route path="/" element={<ShoppingList />} />
 
       <Route path="/shoppinglist" element={<ShoppingList />} />
