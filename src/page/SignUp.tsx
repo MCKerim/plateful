@@ -12,8 +12,18 @@ import supabase from "@/utils/supabase";
 
 export default function SignUp() {
   const signUp = async () => {
+    const environment = import.meta.env.VITE_NODE_ENV;
+
+    const redirectUri =
+      environment === "production"
+        ? "https://www.plateful.cloud/"
+        : "http://localhost:5173/";
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: redirectUri,
+      },
     });
   };
 
