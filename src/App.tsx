@@ -9,6 +9,7 @@ import SignUp from "./page/SignUp";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
+import Settings from "./page/Settings";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -40,6 +41,8 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
 
       <Route path="/" element={ifLoggedIn(<ShoppingList />)} />
+
+      <Route path="/settings" element={ifLoggedIn(<Settings />)} />
 
       <Route path="/shoppinglist" element={ifLoggedIn(<ShoppingList />)} />
       <Route path="/mealplanner" element={ifLoggedIn(<MealPlanner />)} />

@@ -57,7 +57,7 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                {t("bottomNav.settings")}
+                {t("bottomNav.bookmarks")}
               </Button>
             )}
           </NavLink>

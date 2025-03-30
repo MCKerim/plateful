@@ -11,7 +11,7 @@
     "shoppingList": "Einkaufsliste",
     "planner": "Planer",
     "recipes": "Rezepte",
-    "settings": "Einstellungen"
+    "bookmarks": "Lesezeichen"
   },
   "mealPlanner": {
     "title": "Essens Planer",
@@ -36,9 +36,20 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de"
   },
+  "bookmarks": {
+    "title": "Lesezeichen"
+  },
   "settings": {
     "title": "Einstellungen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "appearance": "Darstellung",
+    "dangerZone": "Gefahrenzone",
+    "signOut": "Abmelden",
+    "modeToggle": {
+      "light": "Hell",
+      "dark": "Dunkel",
+      "system": "System"
+    }
   },
 
 

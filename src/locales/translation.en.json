@@ -11,7 +11,7 @@
     "shoppingList": "Shopping list",
     "planner": "Planer",
     "recipes": "Recipes",
-    "settings": "Settings"
+    "bookmarks": "Bookmarks"
   },
   "mealPlanner": {
     "title": "Meal planner",
@@ -36,9 +36,20 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com"
   },  
+  "bookmarks": {
+    "title": "Bookmarks"
+  },
   "settings": {
     "title": "Settings",
-    "language": "Language"
+    "language": "Language",
+    "appearance": "Appearance",
+    "dangerZone": "Danger zone",
+    "signOut": "Sign out",
+    "modeToggle": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
   },
 
   "ingredients": "Ingredients",
