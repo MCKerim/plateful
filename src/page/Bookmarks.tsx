@@ -1,4 +1,5 @@
 import Layout from "@/components/layout/Layout";
+import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
@@ -37,7 +38,11 @@ export default function Bookmarks() {
         </Button>
       </div>
 
-      <Button variant="outline" onClick={signOut}>
+      <h2>Design</h2>
+      <ModeToggle />
+
+      <h2>Danger</h2>
+      <Button variant="destructive" onClick={signOut}>
         Sign out
       </Button>
     </Layout>
