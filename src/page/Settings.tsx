@@ -1,5 +1,5 @@
 import Layout from "@/components/layout/Layout";
-import { ModeToggle } from "@/components/mode-toggle";
+import { ModeToggle } from "@/components/atoms/mode-toggle";
 import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";

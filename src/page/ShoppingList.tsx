@@ -10,6 +10,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import { CommingSoon } from "@/components/ui/commingSoonOverlay";
 
 type ShoppingListItem = {
   id: number;
@@ -108,6 +109,8 @@ export default function ShoppingList() {
 
   return (
     <Layout>
+      <CommingSoon />
+
       <h1 className="text-2xl">Shopping List</h1>
 
       {items.filter((shoppingListItem) => !shoppingListItem.bought).length ===

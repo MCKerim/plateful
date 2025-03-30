@@ -11,7 +11,7 @@ export default function BottomNav() {
     <>
       <div style={{ height: "100px" }}></div>
 
-      <div className="w-full max-w-lg fixed bottom-0 pb-2 bg-background">
+      <div className="w-full max-w-lg fixed bottom-0 pb-2 bg-background z-20">
         <Separator className="mb-2" />
 
         <div className="flex justify-between w-full gap-1 px-2">
