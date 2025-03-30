@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
 import { useTranslation } from "react-i18next";
-import { Bookmark, CalendarDays, CookingPot, ScrollText } from "lucide-react";
+import { Bookmark, BookOpenText, CalendarDays, ScrollText } from "lucide-react";
 
 export default function BottomNav() {
   const { t } = useTranslation();
@@ -52,7 +52,7 @@ export default function BottomNav() {
               >
                 {t("bottomNav.recipes")}
 
-                <CookingPot />
+                <BookOpenText />
               </Button>
             )}
           </NavLink>
