@@ -2,7 +2,6 @@
   "common": {
     "edit": "Bearbeiten",
     "remove": "Entfernen",
-    "clear": "Löschen",
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "save": "Speichern",
@@ -14,7 +13,6 @@
   },
   "discover": {
     "title": "Entdecke Rezepte",
-    "addRecipe": "Rezept hinzufügen",
     "enterRecipeName": "Rezeptname eingeben..."
   },
   "recipe": {

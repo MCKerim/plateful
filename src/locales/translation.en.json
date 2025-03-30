@@ -2,7 +2,6 @@
   "common": {
     "edit": "Edit",
     "remove": "Remove",
-    "clear": "Clear",
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
@@ -14,7 +13,6 @@
   },
   "discover": {
     "title": "Discover recipes",
-    "addRecipe": "Add recipe",
     "enterRecipeName": "Enter recipe name..."
   },
   "recipe": {

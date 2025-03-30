@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
+import { Delete, Plus } from "lucide-react";
 
 type Recipe = {
   id: number;
@@ -84,7 +85,8 @@ export default function Discover() {
     <Layout>
       <h1 className="text-2xl">
         {t("discover.title")}{" "}
-        {searchResults.length > 0 && `• ${t("recipeWithCount", { count: searchResults.length})}`}
+        {searchResults.length > 0 &&
+          `• ${t("recipeWithCount", { count: searchResults.length })}`}
       </h1>
 
       <div className="flex flex-col gap-2 items-center">
@@ -110,7 +112,7 @@ export default function Discover() {
 
           {searchTerm && (
             <Button variant="outline" onClick={() => setSearchTerm("")}>
-              {t("common.clear")}
+              <Delete />
             </Button>
           )}
 
@@ -123,7 +125,7 @@ export default function Discover() {
                   : "")
               }
             >
-              {t("discover.addRecipe")}
+              <Plus />
             </Link>
           </Button>
         </div>
