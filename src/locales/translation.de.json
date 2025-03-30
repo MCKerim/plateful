@@ -8,12 +8,6 @@
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar"
   },
-  "bottomNav": {
-    "shoppingList": "Einkaufsliste",
-    "planner": "Planer",
-    "recipes": "Rezepte",
-    "bookmarks": "Lesezeichen"
-  },
   "mealPlanner": {
     "title": "Essens Planer",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus"

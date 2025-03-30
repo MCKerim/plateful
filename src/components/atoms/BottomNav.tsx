@@ -22,8 +22,6 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                {t("bottomNav.shoppingList")}
-
                 <ScrollText />
               </Button>
             )}
@@ -36,8 +34,6 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                {t("bottomNav.planner")}
-
                 <CalendarDays />
               </Button>
             )}
@@ -50,8 +46,6 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                {t("bottomNav.recipes")}
-
                 <BookOpenText />
               </Button>
             )}
@@ -64,8 +58,6 @@ export default function BottomNav() {
                   (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
                 }
               >
-                {t("bottomNav.bookmarks")}
-
                 <Bookmark />
               </Button>
             )}

@@ -8,12 +8,6 @@
     "save": "Save",
     "commingSoon": "Comming soon"
   },
-  "bottomNav": {
-    "shoppingList": "Shopping list",
-    "planner": "Planer",
-    "recipes": "Recipes",
-    "bookmarks": "Bookmarks"
-  },
   "mealPlanner": {
     "title": "Meal planner",
     "selectNumberOfDays": "Select the number of days"
