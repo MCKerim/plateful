@@ -83,7 +83,7 @@ export default function Discover() {
 
   return (
     <Layout>
-      <h1 className="text-2xl">
+      <h1 className="text-2xl mb-2">
         {t("discover.title")}{" "}
         {searchResults.length > 0 &&
           `• ${t("recipeWithCount", { count: searchResults.length })}`}
