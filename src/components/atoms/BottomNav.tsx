@@ -1,12 +1,9 @@
 import { NavLink } from "react-router";
 import { Button } from "../ui/button";
 import { Separator } from "../ui/separator";
-import { useTranslation } from "react-i18next";
 import { Bookmark, BookOpenText, CalendarDays, ScrollText } from "lucide-react";
 
 export default function BottomNav() {
-  const { t } = useTranslation();
-
   return (
     <>
       <div style={{ height: "100px" }}></div>
