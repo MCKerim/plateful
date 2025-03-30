@@ -12,8 +12,15 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: "autoUpdate",
-        devOptions: {
-          enabled: true,
+        manifest: {
+          name: 'My App',
+          short_name: 'App',
+          description: 'My awesome PWA!',
+          theme_color: '#ffffff',
+          background_color: '#ffffff',
+          display: 'standalone',
+          scope: '/',
+          start_url: '/',
         },
       }),
     ],
