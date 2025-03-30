@@ -7,6 +7,9 @@
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar"
   },
+  "shoppingList": {
+    "title": "Einkaufsliste"
+  },
   "mealPlanner": {
     "title": "Essens Planer",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus"

@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { CommingSoon } from "@/components/ui/commingSoonOverlay";
+import { useTranslation } from "react-i18next";
 
 type ShoppingListItem = {
   id: number;
@@ -20,6 +21,8 @@ type ShoppingListItem = {
 };
 
 export default function ShoppingList() {
+  const { t } = useTranslation();
+
   const [items, setItems] = useState<ShoppingListItem[]>([]);
 
   useEffect(() => {
@@ -111,7 +114,7 @@ export default function ShoppingList() {
     <Layout>
       <CommingSoon />
 
-      <h1 className="text-2xl">Shopping List</h1>
+      <h1 className="text-2xl">{t("shoppingList.title")}</h1>
 
       {items.filter((shoppingListItem) => !shoppingListItem.bought).length ===
         0 && (
@@ -126,26 +129,29 @@ export default function ShoppingList() {
         </Card>
       )}
 
-      {GroupAndSortItems(items.filter((shoppingListItem) => !shoppingListItem.bought))
-        .map((shoppingListItem, index) => (
-          <ShoppingItem
-            key={"item-" + index}
-            id={shoppingListItem.id}
-            name={shoppingListItem.itemName}
-            amount={shoppingListItem.amount}
-            bought={shoppingListItem.bought}
-            onClick={() =>
-              handleItemClick(shoppingListItem.id, shoppingListItem.bought)
-            }
-            onEdit={getItems}
-          />
-        ))}
+      {GroupAndSortItems(
+        items.filter((shoppingListItem) => !shoppingListItem.bought)
+      ).map((shoppingListItem, index) => (
+        <ShoppingItem
+          key={"item-" + index}
+          id={shoppingListItem.id}
+          name={shoppingListItem.itemName}
+          amount={shoppingListItem.amount}
+          bought={shoppingListItem.bought}
+          onClick={() =>
+            handleItemClick(shoppingListItem.id, shoppingListItem.bought)
+          }
+          onEdit={getItems}
+        />
+      ))}
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
           <AccordionTrigger>Bought</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-2">
-            {GroupAndSortItems(items.filter((shoppingListItem) => shoppingListItem.bought))
+            {GroupAndSortItems(
+              items.filter((shoppingListItem) => shoppingListItem.bought)
+            )
               .slice(0, 10)
               .map((shoppingListItem, index) => (
                 <ShoppingItem

@@ -7,6 +7,9 @@
     "save": "Save",
     "commingSoon": "Comming soon"
   },
+  "shoppingList": {
+    "title": "Shopping list"
+  },
   "mealPlanner": {
     "title": "Meal planner",
     "selectNumberOfDays": "Select the number of days"
