@@ -122,6 +122,8 @@ export default function Recipe() {
     if (error) {
       console.error("Error while planning recipe: ", error);
       alert("Error while planning recipe");
+    } else {
+      navigate("/mealplanner");
     }
   }
 
