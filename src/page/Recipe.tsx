@@ -8,6 +8,7 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
+import { Pencil, Trash2 } from "lucide-react";
 
 type RecipeItem = {
   id: number;
@@ -200,11 +201,11 @@ export default function Recipe() {
           to={`/recipe/edit/${recipe?.id}`}
           className={buttonVariants({ variant: "secondary" }) + " w-full"}
         >
-          {t("common.edit")}
+          <Pencil />{t("common.edit")}
         </NavLink>
 
         <Button className="w-full" variant="destructive" onClick={deleteRecipe}>
-          {t("common.delete")}
+          <Trash2 />{t("common.delete")}
         </Button>
       </div>
     </Layout>

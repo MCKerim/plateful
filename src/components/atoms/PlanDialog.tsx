@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
+import { Pencil, CalendarDays } from "lucide-react";
 
 type Props = {
   isEdit?: boolean;
@@ -54,7 +55,7 @@ export default function PlanDialog({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
         <Button variant="outline" className="w-full">
-          {isEdit ? t("common.edit") : t("recipe.planRecipe")}
+          {isEdit ? <Pencil /> : <><CalendarDays />{t("recipe.planRecipe")} </>}
         </Button>
       </DialogTrigger>
 
