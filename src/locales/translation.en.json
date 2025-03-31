@@ -16,7 +16,9 @@
   },
   "discover": {
     "title": "Discover recipes",
-    "enterRecipeName": "Enter recipe name..."
+    "enterRecipeName": "Enter recipe name...",
+    "nothingFound": "Nothing found...",
+    "addNewViaPlus": "...add a new recipe via the '+' button!"
   },
   "recipe": {
     "toTheRecipe": "To the recipe",

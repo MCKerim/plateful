@@ -8,6 +8,12 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../components/ui/card";
 
 type Recipe = {
   id: number;
@@ -80,7 +86,7 @@ export default function Discover() {
 
     setSearchResults(matchedRecipes);
   };
-
+  // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
       <h1 className="text-2xl mb-2">
@@ -89,18 +95,7 @@ export default function Discover() {
           `• ${t("recipeWithCount", { count: searchResults.length })}`}
       </h1>
 
-      <div className="flex flex-col gap-2 items-center">
-        {searchResults.map((recipe, index) => (
-          <RecipeCard
-            key={index}
-            id={recipe.id}
-            name={recipe.recipeName}
-            description={recipe.description}
-          />
-        ))}
-      </div>
-
-      <div className="w-full max-w-lg pr-8 fixed bottom-[4.5rem] bg-background">
+      <div className="w-full max-w-lg bg-background mb-2">
         <div className="flex w-full items-center gap-2">
           <Input
             className="w-full"
@@ -129,6 +124,31 @@ export default function Discover() {
             </Link>
           </Button>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-2 items-center">
+        {searchResults.map((recipe, index) => (
+          <RecipeCard
+            key={index}
+            id={recipe.id}
+            name={recipe.recipeName}
+            description={recipe.description}
+          />
+        ))}
+
+        {searchResults.length === 0 && (
+          <Card className="w-full">
+            <CardHeader>
+              <CardTitle>
+                {t("discover.nothingFound")}
+              </CardTitle>
+
+              <CardDescription>
+                {t("discover.addNewViaPlus")}
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        )}
       </div>
     </Layout>
   );

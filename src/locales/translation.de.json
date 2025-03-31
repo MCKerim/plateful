@@ -16,7 +16,9 @@
   },
   "discover": {
     "title": "Entdecke Rezepte",
-    "enterRecipeName": "Rezeptname eingeben..."
+    "enterRecipeName": "Rezeptname eingeben...",
+    "nothingFound": "Nichts gefunden...",
+    "addNewViaPlus": "...füge über das '+' ein neues Rezept hinzu!"
   },
   "recipe": {
     "toTheRecipe": "Zum Rezept",
