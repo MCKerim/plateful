@@ -2,7 +2,6 @@ import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
 import PlanDialog from "./PlanDialog";
 import { useTranslation } from "react-i18next";
-import { useState } from "react";
 import { Button } from "../ui/button";
 import { Wheat, WheatOff } from "lucide-react";
 
@@ -12,6 +11,8 @@ type Props = {
   recipeName: string;
   date: Date | null;
   days: number;
+  daysEaten: number;
+  setDaysEaten: (days: number) => void;
   onDeleteDate: (id: number) => void;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
 };
@@ -21,15 +22,19 @@ export default function MealPlannerItem({
   recipeId,
   recipeName,
   days,
+  daysEaten,
+  setDaysEaten,
   onDeleteDate,
   onUpdateDate,
 }: Readonly<Props>) {
   const { t } = useTranslation();
 
-  const [daysEaten, setDaysEaten] = useState(0);
-
   function eat() {
-    setDaysEaten((prevDaysEaten) => (prevDaysEaten + 1 > days ? 0 : prevDaysEaten + 1));
+    if (daysEaten + 1 > days) {
+      setDaysEaten(0);
+    } else {
+      setDaysEaten(daysEaten + 1);
+    }
   }
 
   return (
@@ -45,13 +50,23 @@ export default function MealPlannerItem({
           </NavLink>
 
           <div className="flex gap-2 items-center">
-          {Array.from({ length: days }, (_, index) =>
-            index < daysEaten ? <WheatOff key={index} /> : <Wheat key={index} />
-          )}
+            {Array.from({ length: days }, (_, index) =>
+              index < daysEaten ? (
+                <WheatOff key={index} />
+              ) : (
+                <Wheat key={index} />
+              )
+            )}
 
             <Button onClick={eat}>+</Button>
 
-            <PlanDialog isEdit id={id} initialDays={days} onUpdateDate={onUpdateDate} onDeleteDate={onDeleteDate} />
+            <PlanDialog
+              isEdit
+              id={id}
+              initialDays={days}
+              onUpdateDate={onUpdateDate}
+              onDeleteDate={onDeleteDate}
+            />
           </div>
         </div>
       </CardHeader>

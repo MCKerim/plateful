@@ -13,6 +13,7 @@ type MealPlannerItem = {
   recipeName: string;
   date: Date;
   days: number;
+  daysEaten: number;
 };
 
 export default function MealPlanner() {
@@ -32,6 +33,7 @@ export default function MealPlanner() {
         id,
         planned_date,
         days,
+        daysEaten,
         recipes (id, name)
       `
       )
@@ -51,6 +53,7 @@ export default function MealPlanner() {
         date: new Date(item.planned_date ?? ""),
         recipeName: item.recipes?.name ?? "no name",
         days: item.days,
+        daysEaten: item.daysEaten,
       };
       newItems.push(newItem);
     });
@@ -115,6 +118,24 @@ export default function MealPlanner() {
     )}`;
   }
 
+  async function setDaysEaten(id: number, newDaysEaten: number) {
+    const { error } = await supabase
+      .from("meal_planning")
+      .update({ daysEaten: newDaysEaten })
+      .eq("id", id);
+  
+    if (error) {
+      console.error("Error while updating daysEaten: ", error);
+      alert("Error while updating daysEaten");
+    } else {
+      setPlannedItems((prevItems) =>
+        prevItems.map((item) =>
+          item.id === id ? { ...item, daysEaten: newDaysEaten } : item
+        )
+      );
+    }
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl">{t("mealPlanner.title")} • {t("dayWithCount", { count: plannedDays() })}</h1>
@@ -133,6 +154,8 @@ export default function MealPlanner() {
           recipeName={item.recipeName}
           date={item.date}
           days={item.days}
+          daysEaten={item.daysEaten}
+          setDaysEaten={(days) => setDaysEaten(item.id, days)}
           onDeleteDate={deletePlannedItem}
           onUpdateDate={updatePlannedItemDate}
         />
