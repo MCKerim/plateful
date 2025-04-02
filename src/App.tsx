@@ -29,7 +29,6 @@ function App() {
   }, []);
 
   function ifLoggedIn(page: JSX.Element) {
-    return page;
     if (session) {
       return page;
     } else {

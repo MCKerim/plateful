@@ -35,6 +35,17 @@ export default defineConfig(({ mode }) => {
           scope: "/",
           start_url: "/",
           orientation: "portrait",
+
+          share_target: {
+            action: "/recipe/add", // route in your app
+            method: "GET",
+            enctype: "application/x-www-form-urlencoded",
+            params: {
+              title: "title",
+              text: "text",
+              url: "url"
+            },
+          },
         },
       }),
     ],

@@ -19,12 +19,16 @@ export default function AddRecipe() {
   const { t } = useTranslation();
 
   const params = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const searchUrl = searchParams.get("url");
+  const searchTitle = searchParams.get("title");
+  const searchText = searchParams.get("text");
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
 
@@ -171,6 +175,10 @@ export default function AddRecipe() {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
+
+        <p>Search: {searchTitle}</p>
+        <p>url: {searchUrl}</p>
+        <p>text: {searchText}</p>
 
         <div className="grid w-full gap-2">
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
