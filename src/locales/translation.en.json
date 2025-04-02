@@ -12,7 +12,8 @@
   },
   "mealPlanner": {
     "title": "Meal planner",
-    "selectNumberOfDays": "Select the number of days"
+    "selectNumberOfDays": "Select the number of days",
+    "alreadyEaten": "Already eaten"
   },
   "discover": {
     "title": "Discover recipes",

@@ -12,7 +12,8 @@
   },
   "mealPlanner": {
     "title": "Essens Planer",
-    "selectNumberOfDays": "Wähle die anzahl der Tage aus"
+    "selectNumberOfDays": "Wähle die anzahl der Tage aus",
+    "alreadyEaten": "Bereits gegessen"
   },
   "discover": {
     "title": "Entdecke Rezepte",

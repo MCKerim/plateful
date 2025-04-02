@@ -179,7 +179,10 @@ export default function MealPlanner() {
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
-          <AccordionTrigger>Eaten</AccordionTrigger>
+          <AccordionTrigger>
+            {t("mealPlanner.alreadyEaten")}
+          </AccordionTrigger>
+
           <AccordionContent className="flex flex-col gap-2">
             {plannedItems
               .filter((item) => {
