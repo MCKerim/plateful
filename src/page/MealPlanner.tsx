@@ -16,9 +16,9 @@ type MealPlannerItem = {
 };
 
 export default function MealPlanner() {
-  const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
-
   const { t, i18n } = useTranslation();
+
+  const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
 
   useEffect(() => {
     getMealPlannerItems();
