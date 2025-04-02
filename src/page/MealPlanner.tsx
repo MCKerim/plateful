@@ -6,6 +6,12 @@ import { Separator } from "../components/ui/separator";
 import { format, addDays } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { de, enUS } from "date-fns/locale";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type MealPlannerItem = {
   id: number;
@@ -152,20 +158,50 @@ export default function MealPlanner() {
         <Separator />
       </div>
 
-      {plannedItems.map((item) => (
-        <MealPlannerItem
-          key={item.id}
-          id={item.id}
-          recipeId={item.recipeId}
-          recipeName={item.recipeName}
-          date={item.date}
-          days={item.days}
-          daysEaten={item.daysEaten}
-          setDaysEaten={(days) => setDaysEaten(item.id, days)}
-          onDeleteDate={deletePlannedItem}
-          onUpdateDate={updatePlannedItemDate}
-        />
-      ))}
+      {plannedItems
+        .filter((item) => {
+          return item.days > item.daysEaten;
+        })
+        .map((item) => (
+          <MealPlannerItem
+            key={item.id}
+            id={item.id}
+            recipeId={item.recipeId}
+            recipeName={item.recipeName}
+            date={item.date}
+            days={item.days}
+            daysEaten={item.daysEaten}
+            setDaysEaten={(days) => setDaysEaten(item.id, days)}
+            onDeleteDate={deletePlannedItem}
+            onUpdateDate={updatePlannedItemDate}
+          />
+        ))}
+
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>Eaten</AccordionTrigger>
+          <AccordionContent className="flex flex-col gap-2">
+            {plannedItems
+              .filter((item) => {
+                return item.days <= item.daysEaten;
+              })
+              .map((item) => (
+                <MealPlannerItem
+                  key={item.id}
+                  id={item.id}
+                  recipeId={item.recipeId}
+                  recipeName={item.recipeName}
+                  date={item.date}
+                  days={item.days}
+                  daysEaten={item.daysEaten}
+                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                  onDeleteDate={deletePlannedItem}
+                  onUpdateDate={updatePlannedItemDate}
+                />
+              ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </Layout>
   );
 }
