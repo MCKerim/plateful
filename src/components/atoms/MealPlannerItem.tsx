@@ -58,7 +58,9 @@ export default function MealPlannerItem({
               )
             )}
 
-            <Button onClick={eat}>+</Button>
+            <Button className="text-xl" onClick={eat}>
+              +
+            </Button>
 
             <PlanDialog
               isEdit

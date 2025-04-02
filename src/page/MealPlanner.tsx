@@ -98,13 +98,17 @@ export default function MealPlanner() {
   }
 
   function plannedDays() {
-    const initialValue = 0;
-    const sumWithInitial = plannedItems.reduce(
+    const sumDaysPlanned = plannedItems.reduce(
       (accumulator, currentItem) => accumulator + currentItem.days,
-      initialValue
+      0
     );
 
-    return sumWithInitial;
+    const sumDaysEaten = plannedItems.reduce(
+      (accumulator, currentItem) => accumulator + currentItem.daysEaten,
+      0
+    );
+
+    return sumDaysPlanned - sumDaysEaten;
   }
 
   function getPlannedRangeFormatted() {
@@ -123,7 +127,7 @@ export default function MealPlanner() {
       .from("meal_planning")
       .update({ daysEaten: newDaysEaten })
       .eq("id", id);
-  
+
     if (error) {
       console.error("Error while updating daysEaten: ", error);
       alert("Error while updating daysEaten");
@@ -138,7 +142,9 @@ export default function MealPlanner() {
 
   return (
     <Layout>
-      <h1 className="text-2xl">{t("mealPlanner.title")} • {t("dayWithCount", { count: plannedDays() })}</h1>
+      <h1 className="text-2xl">
+        {t("mealPlanner.title")} • {t("dayWithCount", { count: plannedDays() })}
+      </h1>
 
       <div className="flex gap-2 flex-col">
         <p className="w-full text-center">{getPlannedRangeFormatted()}</p>
