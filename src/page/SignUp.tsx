@@ -14,10 +14,20 @@ export default function SignUp() {
   const signUp = async () => {
     const environment = import.meta.env.VITE_NODE_ENV;
 
-    const redirectUri =
-      environment === "production"
-        ? "https://www.plateful.cloud/"
-        : "http://localhost:5173/";
+    let redirectUri;
+    switch(environment) {
+      case "development":
+        redirectUri = "http://localhost:5173/";
+        break;
+      
+      case "codespace":
+        redirectUri = "https://humble-space-telegram-gpvg45vjxqv3vpv9-5173.app.github.dev/";
+        break;
+
+      case "production":
+        redirectUri = "https://www.plateful.cloud/";
+        break;
+    }
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
