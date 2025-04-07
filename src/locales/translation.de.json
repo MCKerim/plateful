@@ -42,6 +42,8 @@
     "title": "Einstellungen",
     "language": "Sprache",
     "appearance": "Darstellung",
+    "household": "Haushalt",
+    "manageYourHousehold": "Verwalte dein Haushalt",
     "dangerZone": "Gefahrenzone",
     "signOut": "Abmelden",
     "modeToggle": {

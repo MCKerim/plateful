@@ -42,6 +42,8 @@
     "title": "Settings",
     "language": "Language",
     "appearance": "Appearance",
+    "household": "Household",
+    "manageYourHousehold": "Manage your household",
     "dangerZone": "Danger zone",
     "signOut": "Sign out",
     "modeToggle": {

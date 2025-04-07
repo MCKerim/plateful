@@ -3,6 +3,7 @@ import { ModeToggle } from "@/components/atoms/mode-toggle";
 import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
+import { NavLink } from "react-router";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -41,13 +42,23 @@ export default function Settings() {
           </div>
         </div>
 
-        <div  className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
           <h2>{t("settings.appearance")}</h2>
-          
+
           <ModeToggle />
         </div>
 
-        <div  className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2">
+          <h2>{t("settings.household")}</h2>
+
+          <NavLink to="/household">
+            <Button variant="secondary" className="w-full">
+              {t("settings.manageYourHousehold")}
+            </Button>
+          </NavLink>
+        </div>
+
+        <div className="flex flex-col gap-2">
           <h2>{t("settings.dangerZone")}</h2>
 
           <Button variant="destructive" onClick={signOut}>
