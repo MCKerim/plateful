@@ -30,6 +30,61 @@ export type Database = {
         }
         Relationships: []
       }
+      invites: {
+        Row: {
+          created_at: string
+          expires_at: string
+          household_id: number
+          id: number
+          invited_by: string | null
+          token: string
+          used: boolean
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          expires_at: string
+          household_id: number
+          id?: number
+          invited_by?: string | null
+          token: string
+          used?: boolean
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          expires_at?: string
+          household_id?: number
+          id?: number
+          invited_by?: string | null
+          token?: string
+          used?: boolean
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invites_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invites_invited_by_fkey"
+            columns: ["invited_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invites_used_by_fkey"
+            columns: ["used_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       item: {
         Row: {
           created_at: string

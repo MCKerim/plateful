@@ -41,13 +41,7 @@ export default function Recipe() {
         return;
       }
 
-      setRecipe({
-        id: data[0].id,
-        name: data[0].name,
-        description: data[0].description ?? "",
-        link: data[0].link ?? "",
-        created_at: data[0].created_at ?? "",
-      });
+      setRecipe(data[0]);
     }
 
     getRecipe();

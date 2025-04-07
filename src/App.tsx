@@ -11,6 +11,7 @@ import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
 import Household from "./page/Household";
+import InvitePage from "./page/InvitePage";
 
 function App() {
   const [session, setSession] = useState<Session | null>(null);
@@ -45,6 +46,7 @@ function App() {
 
       <Route path="/settings" element={ifLoggedIn(<Settings />)} />
       <Route path="/household" element={ifLoggedIn(<Household />)} />
+      <Route path="/invite/:token" element={ifLoggedIn(<InvitePage />)} />
 
       <Route path="/shoppinglist" element={ifLoggedIn(<ShoppingList />)} />
       <Route path="/mealplanner" element={ifLoggedIn(<MealPlanner />)} />
