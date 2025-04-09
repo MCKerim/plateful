@@ -1,14 +1,11 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
-import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { Household, User } from "@/types/exportedDatabaseTypes.types";
 import { v4 as uuidv4 } from "uuid";
 
 export default function Hosehold() {
-  const { t } = useTranslation();
-
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [household, setHousehold] = useState<Household | null>(null);
   const [mitglieder, setMitglieder] = useState<User[] | null>(null);

@@ -28,9 +28,9 @@ export default function AddRecipe() {
 
   const navigate = useNavigate();
 
-  const searchUrl = searchParams.get("url") ?? "";
-  const searchTitle = searchParams.get("title") ?? "";
-  const searchText = searchParams.get("text") ?? "";
+  const searchUrl = searchParams.get("url");
+  const searchTitle = searchParams.get("title");
+  const searchText = searchParams.get("text");
 
   useEffect(() => {
     /*
@@ -42,6 +42,10 @@ export default function AddRecipe() {
     - falls nicht nimm aus text
     */
     const extractSharedData = () => {
+      if(!searchUrl && !searchTitle && !searchText) {
+        return;
+      }
+
       let finalUrl = "";
       let finalTitle = "";
 
