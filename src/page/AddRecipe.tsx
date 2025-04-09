@@ -64,6 +64,10 @@ export default function AddRecipe() {
         finalTitle = searchTitle;
       }
 
+      if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
+        finalTitle = finalTitle.replace(/ - gefunden auf chefkoch\.de$/i, "").trim();
+      }
+
       setTitle(finalTitle);
       setLink(finalUrl);
     };
