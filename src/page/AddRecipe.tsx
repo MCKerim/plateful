@@ -21,16 +21,51 @@ export default function AddRecipe() {
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const searchUrl = searchParams.get("url");
-  const searchTitle = searchParams.get("title");
-  const searchText = searchParams.get("text");
-
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
 
   const navigate = useNavigate();
+
+  const searchUrl = searchParams.get("url") ?? "";
+  const searchTitle = searchParams.get("title") ?? "";
+  const searchText = searchParams.get("text") ?? "";
+
+  useEffect(() => {
+    /*
+    nimmt url aus url
+    falls nicht nimm aus text
+    - falls nicht nimm aus title
+
+    nimmt title aus title
+    - falls nicht nimm aus text
+    */
+    const extractSharedData = () => {
+      let finalUrl = "";
+      let finalTitle = "";
+
+      if (searchUrl) {
+        finalUrl = searchUrl;
+      }
+
+      if (!finalUrl && searchText) {
+        const urlMatch = searchText.match(/https?:\/\/[^\s]+/);
+        if (urlMatch) {
+          finalUrl = urlMatch[0];
+        }
+      }
+
+      if (searchTitle) {
+        finalTitle = searchTitle;
+      }
+
+      setTitle(finalTitle);
+      setLink(finalUrl);
+    };
+
+    extractSharedData();
+  }, [searchUrl, searchTitle, searchText]);
 
   useEffect(() => {
     async function getRecipe(): Promise<boolean> {
@@ -175,10 +210,6 @@ export default function AddRecipe() {
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
-
-        <p>Search: {searchTitle}</p>
-        <p>url: {searchUrl}</p>
-        <p>text: {searchText}</p>
 
         <div className="grid w-full gap-2">
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
