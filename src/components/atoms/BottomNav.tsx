@@ -20,6 +20,8 @@ export default function BottomNav() {
                 }
               >
                 <ScrollText />
+
+                Liste
               </Button>
             )}
           </NavLink>
@@ -32,6 +34,8 @@ export default function BottomNav() {
                 }
               >
                 <CalendarDays />
+
+                Plan
               </Button>
             )}
           </NavLink>
@@ -44,6 +48,8 @@ export default function BottomNav() {
                 }
               >
                 <BookOpenText />
+
+                Rezepte
               </Button>
             )}
           </NavLink>
@@ -56,6 +62,8 @@ export default function BottomNav() {
                 }
               >
                 <Bookmark />
+
+                Gemerkt
               </Button>
             )}
           </NavLink>
