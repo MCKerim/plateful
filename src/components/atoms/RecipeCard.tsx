@@ -16,7 +16,10 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
       <Card>
         <CardHeader>
           <CardTitle>{name}</CardTitle>
-          <CardDescription>{truncatedDescription}</CardDescription>
+          {
+            description &&
+            <CardDescription>{truncatedDescription}</CardDescription>
+          }
         </CardHeader>
       </Card>
     </NavLink>

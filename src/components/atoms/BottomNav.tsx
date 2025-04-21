@@ -15,14 +15,12 @@ export default function BottomNav() {
           <NavLink to="/" className="w-full">
             {({ isActive }) => (
               <Button
-                className={
-                  (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
-                }
-              >
-                <ScrollText />
-
-                Liste
-              </Button>
+              className={
+                (isActive ? "bg-gray-700 hover:bg-gray-700" : "") + " w-full"
+              }
+            >
+              <ScrollText />
+            </Button>
             )}
           </NavLink>
 
@@ -34,8 +32,6 @@ export default function BottomNav() {
                 }
               >
                 <CalendarDays />
-
-                Plan
               </Button>
             )}
           </NavLink>
@@ -48,8 +44,6 @@ export default function BottomNav() {
                 }
               >
                 <BookOpenText />
-
-                Rezepte
               </Button>
             )}
           </NavLink>
@@ -62,8 +56,6 @@ export default function BottomNav() {
                 }
               >
                 <Bookmark />
-
-                Gemerkt
               </Button>
             )}
           </NavLink>
