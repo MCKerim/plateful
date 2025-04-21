@@ -5,10 +5,11 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import { Recipes } from "@/types/exportedDatabaseTypes.types";
+import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2, Link } from "lucide-react";
+import { format } from "date-fns";
 
 type RecipeItem = {
   id: number;
@@ -18,11 +19,11 @@ type RecipeItem = {
 
 export default function Recipe() {
   const { t } = useTranslation();
-
   const params = useParams();
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
 
   const navigate = useNavigate();
 
@@ -140,6 +141,28 @@ export default function Recipe() {
     }
   }
 
+  useEffect(() => {
+    async function getMealPlanningInfo() {
+      if (!params.recipeId) return;
+      const recipeId = parseInt(params.recipeId);
+
+      const { data } = await supabase
+        .from("meal_planning")
+        .select("*")
+        .eq("recipe_id", recipeId)
+        .order("created_at", { ascending: false });
+
+      if (data && data.length > 0) {
+        const latestPlan = data[0];
+        setLastMealPlan(latestPlan);
+      } else {
+        setLastMealPlan(null);
+      }
+    }
+
+    getMealPlanningInfo();
+  }, [params.recipeId]);
+
   return (
     <Layout>
       <h1 className="text-2xl font-bold">{recipe?.name}</h1>
@@ -151,17 +174,6 @@ export default function Recipe() {
           className="h-full w-full rounded-md object-cover"
         />
       </AspectRatio>
-
-      {recipe?.link && (
-        <NavLink
-          to={recipe.link}
-          className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
-        >
-          <Link />
-
-          {t("recipe.toTheRecipe")}
-        </NavLink>
-      )}
 
       {recipeItems.length > 0 && (
         <>
@@ -188,12 +200,30 @@ export default function Recipe() {
         </>
       )}
 
+      <p className="mt-4">
+        {lastMealPlan
+          ? lastMealPlan.daysEaten < lastMealPlan.days
+            ? "Aktuell geplant"
+            : `Zuletzt geplant am ${format(
+                new Date(lastMealPlan.created_at),
+                "dd.MM.yyyy"
+              )}`
+          : "Noch nie geplant"}
+      </p>
+
       {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
 
-      <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
-        {recipe?.description}
-      </p>
-      
+      {recipe?.link && (
+        <NavLink
+          to={recipe.link}
+          className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
+        >
+          <Link />
+
+          {t("recipe.toTheRecipe")}
+        </NavLink>
+      )}
+
       <div className="flex gap-2 w-full mt-11">
         <NavLink
           to={`/recipe/edit/${recipe?.id}`}

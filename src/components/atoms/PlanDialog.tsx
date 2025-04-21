@@ -55,7 +55,7 @@ export default function PlanDialog({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
         <Button variant="outline" className="w-full">
-          {isEdit ? <Pencil /> : <><CalendarDays />{t("recipe.planRecipe")} </>}
+          {isEdit ? <Pencil /> : <><CalendarDays />{t("recipe.planRecipe")}</>}
         </Button>
       </DialogTrigger>
 
