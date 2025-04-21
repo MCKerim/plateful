@@ -8,12 +8,15 @@ type Props = {
 };
 
 export default function RecipeCard({ id, name, description }: Readonly<Props>) {
+  const truncatedDescription =
+    description.length > 100 ? description.slice(0, 100) + "..." : description;
+  
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
       <Card>
         <CardHeader>
           <CardTitle>{name}</CardTitle>
-          <CardDescription>{description}</CardDescription>
+          <CardDescription>{truncatedDescription}</CardDescription>
         </CardHeader>
       </Card>
     </NavLink>
