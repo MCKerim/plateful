@@ -143,7 +143,7 @@ export default function Recipe() {
   return (
     <Layout>
       <h1 className="text-2xl font-bold">{recipe?.name}</h1>
-      
+
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
           src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
@@ -151,8 +151,6 @@ export default function Recipe() {
           className="h-full w-full rounded-md object-cover"
         />
       </AspectRatio>
-
-      <p className="font-bold">{recipe?.description}</p>
 
       {recipe?.link && (
         <NavLink
@@ -192,6 +190,10 @@ export default function Recipe() {
 
       {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
 
+      <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
+        {recipe?.description}
+      </p>
+      
       <div className="flex gap-2 w-full mt-11">
         <NavLink
           to={`/recipe/edit/${recipe?.id}`}
@@ -203,7 +205,8 @@ export default function Recipe() {
         </NavLink>
 
         <Button className="w-full" variant="destructive" onClick={deleteRecipe}>
-          <Trash2 />{t("common.delete")}
+          <Trash2 />
+          {t("common.delete")}
         </Button>
       </div>
     </Layout>
