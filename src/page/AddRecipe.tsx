@@ -1,5 +1,5 @@
-import AddRecipeItemMenu from "@/components/atoms/AddRecipeItemMenu";
-import ShoppingItem from "@/components/atoms/ShoppingItem";
+//import AddRecipeItemMenu from "@/components/atoms/AddRecipeItemMenu";
+//import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,10 +10,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 
-type RecipeItem = {
+/*type RecipeItem = {
   itemName: string;
   amount: string;
-};
+};*/
 
 export default function AddRecipe() {
   const { t } = useTranslation();
@@ -24,7 +24,7 @@ export default function AddRecipe() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
 
   const navigate = useNavigate();
 
@@ -42,7 +42,7 @@ export default function AddRecipe() {
     - falls nicht nimm aus text
     */
     const extractSharedData = () => {
-      if(!searchUrl && !searchTitle && !searchText) {
+      if (!searchUrl && !searchTitle && !searchText) {
         return;
       }
 
@@ -65,7 +65,9 @@ export default function AddRecipe() {
       }
 
       if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
-        finalTitle = finalTitle.replace(/ - gefunden auf chefkoch\.de$/i, "").trim();
+        finalTitle = finalTitle
+          .replace(/ - gefunden auf chefkoch\.de$/i, "")
+          .trim();
       }
 
       setTitle(finalTitle);
@@ -105,7 +107,7 @@ export default function AddRecipe() {
     });
   }, [params.recipeId, searchParams, setSearchParams]);
 
-  function addItem(name: string, amount: string) {
+  /*function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
     setRecipeItems([...recipeItems, { itemName: name, amount }]);
   }
@@ -114,7 +116,7 @@ export default function AddRecipe() {
     const newItems = [...recipeItems];
     newItems.splice(index, 1);
     setRecipeItems(newItems);
-  }
+  }*/
 
   async function saveRecipe() {
     if (title === "") {
@@ -146,7 +148,7 @@ export default function AddRecipe() {
         .select();
 
       if (!error && data) {
-        await saveRecipeItems(data[0].id);
+        //await saveRecipeItems(data[0].id);
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -154,7 +156,7 @@ export default function AddRecipe() {
     }
   }
 
-  async function saveItems() {
+  /*async function saveItems() {
     const newItemsToInsert = recipeItems.map((item) => ({
       name: item.itemName,
     }));
@@ -170,9 +172,9 @@ export default function AddRecipe() {
       return null;
     }
     return data;
-  }
+  }*/
 
-  async function saveRecipeItems(recipeId: number) {
+  /*async function saveRecipeItems(recipeId: number) {
     const newInsertedItems = await saveItems();
 
     if (!newInsertedItems) {
@@ -199,7 +201,7 @@ export default function AddRecipe() {
         navigate(`/recipe/${recipeId}`);
       }
     }
-  }
+  }*/
 
   return (
     <Layout>
@@ -210,6 +212,7 @@ export default function AddRecipe() {
       <div className="grid w-full items-center gap-5">
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
+
           <Input
             type="text"
             id="title"
@@ -221,6 +224,7 @@ export default function AddRecipe() {
 
         <div className="grid w-full gap-2">
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
+
           <Textarea
             placeholder={t("addRecipe.descriptionPlaceholder")}
             id="message"
@@ -231,6 +235,7 @@ export default function AddRecipe() {
 
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="link">{t("addRecipe.link")}</Label>
+
           <Input
             type="text"
             id="link"
@@ -239,7 +244,8 @@ export default function AddRecipe() {
             onChange={(e) => setLink(e.target.value)}
           />
         </div>
-        <div className="w-full flex gap-2 flex-col">
+
+        {/*<div className="w-full flex gap-2 flex-col">
           <h2 className="text-md font-bold mt-2">{t("ingredients")}</h2>
 
           {recipeItems.map((recipeItem, index) => (
@@ -253,8 +259,9 @@ export default function AddRecipe() {
               onEdit={() => {}}
             />
           ))}
+
           <AddRecipeItemMenu onItemAdded={addItem} />
-        </div>
+        </div>*/}
       </div>
 
       <div className="flex gap-2 w-full mt-11">
@@ -265,6 +272,7 @@ export default function AddRecipe() {
             {t("common.cancel")}
           </Link>
         </Button>
+
         <Button className="w-full" onClick={saveRecipe}>
           {t("common.save")}
         </Button>
