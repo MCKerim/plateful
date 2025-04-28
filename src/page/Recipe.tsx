@@ -190,6 +190,7 @@ export default function Recipe() {
               onEdit={() => {}}
             />
           ))}
+
           <Button
             className="w-full"
             variant="secondary"
@@ -223,6 +224,10 @@ export default function Recipe() {
           {t("recipe.toTheRecipe")}
         </NavLink>
       )}
+
+      <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
+        {recipe?.description}
+      </p>
 
       <div className="flex gap-2 w-full mt-11">
         <NavLink
