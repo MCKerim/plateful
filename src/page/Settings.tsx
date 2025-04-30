@@ -9,10 +9,6 @@ import { useEffect } from "react";
 export default function Settings() {
   const { t, i18n } = useTranslation();
 
-  function myCallback() {
-    console.log('The user was identified');
-  }
-
   useEffect(() => {
     // Benutzeridentifikation mit Canny
     supabase.auth.getUser().then(({ data, error }) => {
@@ -21,19 +17,17 @@ export default function Settings() {
         return;
       }
 
-      console.log("User: ", data.user.email);
-
       if (window.Canny) {
         window.Canny("identify", {
-          appID: "6811199a61c6b4f3d0e8cd93", // Ersetzen Sie dies durch Ihre App-ID
+          appID: "6811199a61c6b4f3d0e8cd93",
           user: {
-            id: data.user.id, // Benutzer-ID
-            email: data.user.email, // Benutzer-E-Mail
-            name: data.user.user_metadata.full_name || "Anonymous", // Benutzername
-            avatarURL: data.user.user_metadata.avatar_url || "", // Benutzer-Avatar (optional)
-            created: new Date(data.user.created_at).toISOString(), // Benutzer-Erstellungsdatum
+            id: data.user.id,
+            email: data.user.email,
+            name: data.user.user_metadata.full_name ?? "Anonymous",
+            avatarURL: data.user.user_metadata.avatar_url ?? "",
+            created: new Date(data.user.created_at).toISOString(),
           },
-        }, myCallback);
+        });
       }
     });
   }, []);
@@ -51,7 +45,7 @@ export default function Settings() {
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2">
-          <h2>{t("settings.language")}</h2>
+          <h2 className="border-b">{t("settings.language")}</h2>
 
           <div className="w-full flex gap-2">
             <Button
@@ -73,13 +67,13 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2>{t("settings.appearance")}</h2>
+          <h2 className="border-b">{t("settings.appearance")}</h2>
 
           <ModeToggle />
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2>{t("settings.household")}</h2>
+          <h2 className="border-b">{t("settings.household")}</h2>
 
           <NavLink to="/household">
             <Button variant="secondary" className="w-full">
@@ -89,29 +83,31 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2>Support & Feedback</h2>
+          <h2 className="border-b">{t("settings.supportFeedback")}</h2>
+          
+          <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
           <NavLink data-canny-link to="https://plateful.canny.io/support/create" target="blank">
             <Button variant="secondary" className="w-full">
-              Suggest a feature or report a bug
+              {t("settings.suggestFeatureOrReportBug")}
             </Button>
           </NavLink>
 
           <NavLink data-canny-link to="https://plateful.canny.io/changelog" target="blank">
             <Button variant="secondary" className="w-full">
-              Find out what's new
+              {t("settings.whatsNew")}
             </Button>
           </NavLink>
 
           <NavLink data-canny-link to="https://plateful.canny.io" target="blank">
             <Button variant="secondary" className="w-full">
-              See our Roadmap
+              {t("settings.viewRoadmap")}
             </Button>
           </NavLink>
         </div>
 
         <div className="flex flex-col gap-2">
-          <h2>{t("settings.dangerZone")}</h2>
+          <h2 className="border-b">{t("settings.dangerZone")}</h2>
 
           <Button variant="destructive" onClick={signOut}>
             {t("settings.signOut")}

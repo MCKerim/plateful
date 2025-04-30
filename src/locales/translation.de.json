@@ -44,6 +44,13 @@
     "appearance": "Darstellung",
     "household": "Haushalt",
     "manageYourHousehold": "Verwalte dein Haushalt",
+  
+    "supportFeedback": "Support & Feedback",
+    "supportFeedbackDescription": "Wir freuen uns auf Ihr Feedback! Teilen Sie Ihre Ideen, melden Sie Fehler oder schlagen Sie neue Funktionen vor.",
+    "suggestFeatureOrReportBug": "Feature vorschlagen oder Fehler melden",
+    "whatsNew": "Neuigkeiten Entdecken",
+    "viewRoadmap": "Roadmap ansehen",
+
     "dangerZone": "Gefahrenzone",
     "signOut": "Abmelden",
     "modeToggle": {

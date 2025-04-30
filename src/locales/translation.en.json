@@ -44,7 +44,14 @@
     "appearance": "Appearance",
     "household": "Household",
     "manageYourHousehold": "Manage your household",
-    "dangerZone": "Danger zone",
+
+    "supportFeedback": "Support & Feedback",
+    "supportFeedbackDescription": "We value your input! Use the links below to share your thoughts, report bugs, or suggest features.",
+    "suggestFeatureOrReportBug": "Suggest a feature or report a bug",
+    "whatsNew": "Discover what's new",
+    "viewRoadmap": "View our roadmap",
+
+    "dangerZone": "Proceed with caution",
     "signOut": "Sign out",
     "modeToggle": {
       "light": "Light",
