@@ -41,10 +41,10 @@ export default function Settings() {
 
   return (
     <Layout>
-      <h1 className="text-2xl mb-2">{t("settings.title")}</h1>
+      <h1 className="text-2xl">{t("settings.title")}</h1>
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.language")}</h2>
 
           <div className="w-full flex gap-2">
@@ -66,13 +66,13 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.appearance")}</h2>
 
           <ModeToggle />
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.household")}</h2>
 
           <NavLink to="/household">
@@ -82,7 +82,7 @@ export default function Settings() {
           </NavLink>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.supportFeedback")}</h2>
           
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
@@ -106,7 +106,7 @@ export default function Settings() {
           </NavLink>
         </div>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.dangerZone")}</h2>
 
           <Button variant="destructive" onClick={signOut}>
