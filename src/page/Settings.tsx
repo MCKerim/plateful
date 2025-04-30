@@ -84,22 +84,34 @@ export default function Settings() {
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.supportFeedback")}</h2>
-          
+
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
-          <NavLink data-canny-link to="https://plateful.canny.io/support/create" target="blank">
+          <NavLink
+            data-canny-link
+            to="https://plateful.canny.io/support/create"
+            target="blank"
+          >
             <Button variant="secondary" className="w-full">
               {t("settings.suggestFeatureOrReportBug")}
             </Button>
           </NavLink>
 
-          <NavLink data-canny-link to="https://plateful.canny.io/changelog" target="blank">
+          <NavLink
+            data-canny-link
+            to="https://plateful.canny.io/changelog"
+            target="blank"
+          >
             <Button variant="secondary" className="w-full">
               {t("settings.whatsNew")}
             </Button>
           </NavLink>
 
-          <NavLink data-canny-link to="https://plateful.canny.io" target="blank">
+          <NavLink
+            data-canny-link
+            to="https://plateful.canny.io"
+            target="blank"
+          >
             <Button variant="secondary" className="w-full">
               {t("settings.viewRoadmap")}
             </Button>
