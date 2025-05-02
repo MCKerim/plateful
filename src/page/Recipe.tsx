@@ -170,7 +170,7 @@ export default function Recipe() {
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
           src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
-          alt="by Drew Beamer"
+          alt="Recipe"
           className="h-full w-full rounded-md object-cover"
         />
       </AspectRatio>
