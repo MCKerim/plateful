@@ -42,7 +42,7 @@ export default function MealPlannerItem({
       <CardHeader className="px-4 py-2">
         <div className="flex">
           <NavLink className="flex-1" to={`/recipe/${recipeId}`}>
-            <CardTitle className="text-lg">{recipeName}</CardTitle>
+            <CardTitle className="text-lg text-background">{recipeName}</CardTitle>
 
             <CardDescription style={{ margin: "0px" }}>
               {t("dayWithCount", { count: days })}
