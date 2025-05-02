@@ -23,7 +23,7 @@ export default function BottomNavButton({
         >
           <div className="w-full flex justify-center">{icon}</div>
 
-          {label}
+          <p>{label}</p>
         </button>
       )}
     </NavLink>
