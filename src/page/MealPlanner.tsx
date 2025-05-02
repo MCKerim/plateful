@@ -121,9 +121,9 @@ export default function MealPlanner() {
     const currentLanguage = i18n.language;
     const locale = currentLanguage === "de" ? de : enUS;
 
-    return `${format(new Date(), "EEEE, dd.MM.yyyy", { locale })} - ${format(
+    return `${format(new Date(), "EEEE, dd.MM", { locale })} - ${format(
       addDays(new Date(), plannedDays()),
-      "EEEE, dd.MM.yyyy",
+      "EEEE, dd.MM",
       { locale }
     )}`;
   }
@@ -148,15 +148,12 @@ export default function MealPlanner() {
 
   return (
     <Layout>
-      <h1 className="text-2xl">
-        {t("mealPlanner.title")} • {t("dayWithCount", { count: plannedDays() })}
-      </h1>
+      <p className="w-full text-center">
+        {t("dayWithCount", { count: plannedDays() })} •{" "}
+        {getPlannedRangeFormatted()}
+      </p>
 
-      <div className="flex gap-2 flex-col">
-        <p className="w-full text-center">{getPlannedRangeFormatted()}</p>
-
-        <Separator />
-      </div>
+      <Separator />
 
       <div className="flex flex-col gap-2.5">
         {plannedItems
@@ -181,9 +178,7 @@ export default function MealPlanner() {
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
-          <AccordionTrigger>
-            {t("mealPlanner.alreadyEaten")}
-          </AccordionTrigger>
+          <AccordionTrigger>{t("mealPlanner.alreadyEaten")}</AccordionTrigger>
 
           <AccordionContent className="flex flex-col gap-2.5">
             {plannedItems
