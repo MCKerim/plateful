@@ -158,24 +158,26 @@ export default function MealPlanner() {
         <Separator />
       </div>
 
-      {plannedItems
-        .filter((item) => {
-          return item.days > item.daysEaten;
-        })
-        .map((item) => (
-          <MealPlannerItem
-            key={item.id}
-            id={item.id}
-            recipeId={item.recipeId}
-            recipeName={item.recipeName}
-            date={item.date}
-            days={item.days}
-            daysEaten={item.daysEaten}
-            setDaysEaten={(days) => setDaysEaten(item.id, days)}
-            onDeleteDate={deletePlannedItem}
-            onUpdateDate={updatePlannedItemDate}
-          />
-        ))}
+      <div className="flex flex-col gap-2.5">
+        {plannedItems
+          .filter((item) => {
+            return item.days > item.daysEaten;
+          })
+          .map((item) => (
+            <MealPlannerItem
+              key={item.id}
+              id={item.id}
+              recipeId={item.recipeId}
+              recipeName={item.recipeName}
+              date={item.date}
+              days={item.days}
+              daysEaten={item.daysEaten}
+              setDaysEaten={(days) => setDaysEaten(item.id, days)}
+              onDeleteDate={deletePlannedItem}
+              onUpdateDate={updatePlannedItemDate}
+            />
+          ))}
+      </div>
 
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
@@ -183,7 +185,7 @@ export default function MealPlanner() {
             {t("mealPlanner.alreadyEaten")}
           </AccordionTrigger>
 
-          <AccordionContent className="flex flex-col gap-2">
+          <AccordionContent className="flex flex-col gap-2.5">
             {plannedItems
               .filter((item) => {
                 return item.days <= item.daysEaten;
