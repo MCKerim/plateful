@@ -59,6 +59,12 @@
       "system": "System"
     }
   },
+  "bottomNav": {
+    "list": "List",
+    "planner": "Planner",
+    "recipes": "Recipes",
+    "home": "Home"
+  },
 
   "ingredients": "Ingredients",
   "addIngredient": "Add ingredient",

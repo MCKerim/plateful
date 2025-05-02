@@ -59,6 +59,12 @@
       "system": "System"
     }
   },
+  "bottomNav": {
+    "list": "Liste",
+    "planner": "Planer",
+    "recipes": "Rezepte",
+    "home": "Home"
+  },
 
 
   "ingredients": "Zutaten",
