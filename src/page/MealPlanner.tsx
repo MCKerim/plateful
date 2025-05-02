@@ -185,6 +185,7 @@ export default function MealPlanner() {
               .filter((item) => {
                 return item.days <= item.daysEaten;
               })
+              .reverse()
               .map((item) => (
                 <MealPlannerItem
                   key={item.id}
