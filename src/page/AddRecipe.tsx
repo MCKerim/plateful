@@ -149,6 +149,7 @@ export default function AddRecipe() {
 
       if (!error && data) {
         //await saveRecipeItems(data[0].id);
+        navigate(`/recipe/${data[0].id}`)
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
