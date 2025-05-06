@@ -12,6 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import RatingModal from "@/components/atoms/RatingModal";
 
 type MealPlannerItem = {
   id: number;
@@ -148,6 +149,8 @@ export default function MealPlanner() {
 
   return (
     <Layout>
+      <RatingModal />
+
       <p className="w-full text-center">
         {t("dayWithCount", { count: plannedDays() })} •{" "}
         {getPlannedRangeFormatted()}
