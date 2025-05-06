@@ -9,11 +9,11 @@ import {
 } from "@/components/ui/dialog";
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { CalendarDays } from "lucide-react";
+import HotelClassIcon from "@mui/icons-material/HotelClass";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Textarea } from "../ui/textarea";
 
 type Props = {
   showTriggerButton?: boolean;
@@ -38,6 +38,9 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
     function handleDialogOpenChange(isOpen: boolean) {
       setIsDialogOpen(isOpen);
+
+      setNote("");
+      setRating(1);
     }
 
     function saveButtonPressed() {
@@ -51,8 +54,8 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
             <Button variant="outline" className="w-full">
               {
                 <>
-                  <CalendarDays />
-                  Rate
+                  <HotelClassIcon />
+                  Bewerten
                 </>
               }
             </Button>
@@ -84,8 +87,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
             <div className="grid w-full items-center gap-2">
               <Label htmlFor="note">Anmerkungen</Label>
 
-              <Input
-                type="text"
+              <Textarea
                 id="note"
                 placeholder="Nächstes mal weniger..."
                 value={note}
