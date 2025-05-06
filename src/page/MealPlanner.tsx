@@ -1,6 +1,6 @@
 import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import supabase from "@/utils/supabase";
 import { Separator } from "../components/ui/separator";
 import { format, addDays } from "date-fns";
@@ -12,7 +12,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import RatingModal from "@/components/atoms/RatingModal";
+import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 
 type MealPlannerItem = {
   id: number;
@@ -27,6 +27,9 @@ export default function MealPlanner() {
   const { t, i18n } = useTranslation();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
+
+  const ratingModalRef = useRef<RatingModalRef>(null);
+  const [recipeToRate, setRecipeToRate] = useState<number>();
 
   useEffect(() => {
     getMealPlannerItems();
@@ -147,9 +150,18 @@ export default function MealPlanner() {
     }
   }
 
+  function showRateRecipeModal(recipeId: number) {
+    setRecipeToRate(recipeId);
+    ratingModalRef.current?.open();
+  }
+
   return (
     <Layout>
-      <RatingModal />
+      <RatingModal
+        showTriggerButton={false}
+        ref={ratingModalRef}
+        recipeId={recipeToRate}
+      />
 
       <p className="w-full text-center">
         {t("dayWithCount", { count: plannedDays() })} •{" "}
@@ -175,6 +187,7 @@ export default function MealPlanner() {
               setDaysEaten={(days) => setDaysEaten(item.id, days)}
               onDeleteDate={deletePlannedItem}
               onUpdateDate={updatePlannedItemDate}
+              onRecipeEaten={showRateRecipeModal}
             />
           ))}
       </div>
@@ -201,6 +214,7 @@ export default function MealPlanner() {
                   setDaysEaten={(days) => setDaysEaten(item.id, days)}
                   onDeleteDate={deletePlannedItem}
                   onUpdateDate={updatePlannedItemDate}
+                  onRecipeEaten={showRateRecipeModal}
                 />
               ))}
           </AccordionContent>

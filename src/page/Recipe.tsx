@@ -226,7 +226,7 @@ export default function Recipe() {
         </NavLink>
       )}
 
-      <RatingModal />
+      <RatingModal recipeId={recipe?.id} />
 
       <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
         {recipe?.description}

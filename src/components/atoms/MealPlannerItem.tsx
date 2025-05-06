@@ -14,6 +14,7 @@ type Props = {
   setDaysEaten: (days: number) => void;
   onDeleteDate: (id: number) => void;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
+  onRecipeEaten: (id: number) => void;
 };
 
 export default function MealPlannerItem({
@@ -22,12 +23,18 @@ export default function MealPlannerItem({
   days,
   daysEaten,
   setDaysEaten,
+  onRecipeEaten,
 }: Readonly<Props>) {
   function eat() {
     if (daysEaten + 1 > days) {
       setDaysEaten(0);
     } else {
-      setDaysEaten(daysEaten + 1);
+      const updatedDaysEaten = daysEaten + 1;
+      setDaysEaten(updatedDaysEaten);
+
+      if (updatedDaysEaten >= days) {
+        onRecipeEaten(recipeId);
+      }
     }
   }
 
