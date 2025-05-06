@@ -55,7 +55,14 @@ export default function PlanDialog({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
         <Button variant="outline" className="w-full">
-          {isEdit ? <Pencil /> : <><CalendarDays />{t("recipe.planRecipe")}</>}
+          {isEdit ? (
+            <Pencil />
+          ) : (
+            <>
+              <CalendarDays />
+              {t("recipe.planRecipe")}
+            </>
+          )}
         </Button>
       </DialogTrigger>
 
@@ -68,7 +75,13 @@ export default function PlanDialog({
           <div className="flex gap-2">
             <Button
               className="w-full"
-              variant={daysToPlan === 1 ? "secondary" : "outline"}
+              variant={
+                initialDays === 0
+                  ? "secondary"
+                  : daysToPlan === 1
+                  ? "secondary"
+                  : "outline"
+              }
               onClick={() => saveDate(1)}
             >
               {t("dayWithCount", { count: 1 })}
@@ -76,7 +89,13 @@ export default function PlanDialog({
 
             <Button
               className="w-full"
-              variant={daysToPlan === 2 ? "secondary" : "outline"}
+              variant={
+                initialDays === 0
+                  ? "secondary"
+                  : daysToPlan === 2
+                  ? "secondary"
+                  : "outline"
+              }
               onClick={() => saveDate(2)}
             >
               {t("dayWithCount", { count: 2 })}

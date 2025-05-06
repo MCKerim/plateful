@@ -10,6 +10,7 @@ import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2, Link } from "lucide-react";
 import { format } from "date-fns";
+import RatingModal from "@/components/atoms/RatingModal";
 
 type RecipeItem = {
   id: number;
@@ -224,6 +225,8 @@ export default function Recipe() {
           {t("recipe.toTheRecipe")}
         </NavLink>
       )}
+
+      <RatingModal />
 
       <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
         {recipe?.description}
