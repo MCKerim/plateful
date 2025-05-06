@@ -40,6 +40,10 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       setIsDialogOpen(isOpen);
     }
 
+    function saveButtonPressed() {
+      setIsDialogOpen(false);
+    }
+
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         {showTriggerButton && (
@@ -91,7 +95,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
           </DialogDescription>
 
           <DialogFooter>
-            <Button onClick={() => {}}>Speichern</Button>
+            <Button onClick={saveButtonPressed}>Speichern</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
