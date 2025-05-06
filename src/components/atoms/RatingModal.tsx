@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/dialog";
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import { useTranslation } from "react-i18next";
 import { CalendarDays } from "lucide-react";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
@@ -17,8 +16,6 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 
 export default function RatingModal() {
-  const { t } = useTranslation();
-
   const [rating, setRating] = useState(1);
   const [note, setNote] = useState("");
 
