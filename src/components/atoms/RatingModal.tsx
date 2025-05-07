@@ -14,6 +14,7 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+import supabase from "@/utils/supabase";
 
 type Props = {
   showTriggerButton?: boolean;
@@ -43,8 +44,23 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       setRating(1);
     }
 
-    function saveButtonPressed() {
+    async function saveButtonPressed() {
+      if (!recipeId || rating < 1) {
+        return;
+      }
+
+      const { error } = await supabase
+        .from("recipe_ratings")
+        .insert([{ recipe_id: recipeId, stars: rating, note: note }]);
+
+      if (error) {
+        console.error("Fehler beim Speichern der Bewertung:", error.message);
+        return;
+      }
+
       setIsDialogOpen(false);
+      setNote("");
+      setRating(1);
     }
 
     return (
@@ -64,7 +80,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Wie hat es dir geschmeckt? {recipeId}</DialogTitle>
+            <DialogTitle>Wie hat es dir geschmeckt?</DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col py-4 gap-4">

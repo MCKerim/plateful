@@ -183,6 +183,48 @@ export type Database = {
           },
         ]
       }
+      recipe_ratings: {
+        Row: {
+          created_at: string
+          id: number
+          note: string
+          owner_id: string
+          recipe_id: number
+          stars: number
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          note?: string
+          owner_id?: string
+          recipe_id: number
+          stars?: number
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          note?: string
+          owner_id?: string
+          recipe_id?: number
+          stars?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ratings_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_ratings_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipes: {
         Row: {
           created_at: string
