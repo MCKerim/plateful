@@ -202,6 +202,7 @@ export default function MealPlanner() {
                 return item.days <= item.daysEaten;
               })
               .reverse()
+              .slice(0, 10)
               .map((item) => (
                 <MealPlannerItem
                   key={item.id}
