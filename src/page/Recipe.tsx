@@ -25,8 +25,58 @@ export default function Recipe() {
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
+  
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    async function getAllRecipeImages() {
+      const { data, error } = await supabase.storage
+        .from("recipeimages")
+        .list(`recipe_${params.recipeId}/`);
+  
+      if (error) {
+        console.error("Error fetching images: ", error);
+        return;
+      }
+  
+      if (data) {
+        const urls = await Promise.all(
+          data.map(async (file) => {
+            const { data: signedUrlData, error: signedUrlError } =
+              await supabase.storage
+                .from("recipeimages")
+                .createSignedUrl(`recipe_${params.recipeId}/${file.name}`, 3600);
+  
+            if (signedUrlError) {
+              console.error("Error creating signed URL: ", signedUrlError);
+              return null;
+            }
+  
+            return signedUrlData?.signedUrl;
+          })
+        );
+  
+        setImageUrls(urls.filter((url) => url !== null) as string[]);
+      }
+    }
+  
+    getAllRecipeImages();
+  }, [params.recipeId]);
+
+  function handleNextImage() {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
+    );
+  }
+  
+  function handlePreviousImage() {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
+    );
+  }
 
   useEffect(() => {
     async function getRecipe() {
@@ -170,11 +220,26 @@ export default function Recipe() {
 
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
-          src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+          src={
+            imageUrls.length > 0
+              ? imageUrls[currentImageIndex]
+              : "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+          }
           alt="Recipe"
           className="h-full w-full rounded-md object-cover"
         />
       </AspectRatio>
+
+      {imageUrls.length > 1 && (
+      <div className="flex justify-between mt-2">
+        <Button variant="secondary" onClick={handlePreviousImage}>
+          Previous
+        </Button>
+        <Button variant="secondary" onClick={handleNextImage}>
+          Next
+        </Button>
+      </div>
+    )}
 
       {recipeItems.length > 0 && (
         <>
