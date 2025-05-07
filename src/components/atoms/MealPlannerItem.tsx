@@ -3,6 +3,8 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
+import supabase from "@/utils/supabase";
+import { useEffect, useState } from "react";
 
 type Props = {
   id: number;
@@ -25,6 +27,37 @@ export default function MealPlannerItem({
   setDaysEaten,
   onRecipeEaten,
 }: Readonly<Props>) {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchImage() {
+      const { data, error } = await supabase.storage
+        .from("recipeimages")
+        .list(`recipe_${recipeId}/`);
+
+      if (error) {
+        console.error("Error fetching images: ", error);
+        return;
+      }
+
+      if (data && data.length > 0) {
+        const { data: signedUrlData, error: signedUrlError } =
+          await supabase.storage
+            .from("recipeimages")
+            .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, 3600);
+
+        if (signedUrlError) {
+          console.error("Error creating signed URL: ", signedUrlError);
+          return;
+        }
+
+        setImageUrl(signedUrlData?.signedUrl || null);
+      }
+    }
+
+    fetchImage();
+  }, [recipeId]);
+
   function eat() {
     if (daysEaten + 1 > days) {
       setDaysEaten(0);
@@ -41,7 +74,10 @@ export default function MealPlannerItem({
   return (
     <Card className="h-[90px] flex items-center">
       <img
-        src="https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+        src={
+          imageUrl ??
+          "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+        }
         alt="Spaghetti"
         className="h-full w-[74px] object-cover border-r-4 border-background"
       />
