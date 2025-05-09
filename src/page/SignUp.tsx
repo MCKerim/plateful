@@ -21,7 +21,7 @@ export default function SignUp() {
         break;
       
       case "codespace":
-        redirectUri = "https://humble-space-telegram-gpvg45vjxqv3vpv9-5173.app.github.dev/";
+        redirectUri = "https://automatic-space-yodel-4rpxjgp5w9ph7qjx-5173.app.github.dev/";
         break;
 
       case "production":
