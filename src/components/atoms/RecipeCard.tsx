@@ -52,7 +52,7 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
 
           {description && (
             <div>
-              <p className="text-xs">{truncatedDescription}</p>
+              <p className="text-sm">{truncatedDescription}</p>
             </div>
           )}
 
