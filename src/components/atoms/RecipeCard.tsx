@@ -44,7 +44,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
         <div className="p-2">
           <div className="flex justify-end">
-            <div className="flex gap-1 absolute top-1">{renderStars()}</div>
+            <div className="flex gap-1 absolute top-1 bg-card rounded-full px-1 py-[1px]">{renderStars()}</div>
           </div>
 
           <div className="flex justify-between">
