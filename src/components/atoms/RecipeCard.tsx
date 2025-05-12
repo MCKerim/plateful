@@ -45,7 +45,7 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
 
         <div className="p-2">
           <div className="flex justify-between">
-            <h1 className="font-bold text-lg">{name}</h1>
+            <h1 className="font-bold text-lg leading-tight">{name} dwad dawdwdawd dawdwadwa da wd</h1>
 
             <div className="flex gap-1">{renderStars()}</div>
           </div>
