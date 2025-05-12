@@ -24,6 +24,10 @@ export default function SignUp() {
         redirectUri = "https://automatic-space-yodel-4rpxjgp5w9ph7qjx-5173.app.github.dev/";
         break;
 
+      case "preview":
+        redirectUri = "https://plateful-git-staging-mckerims-projects.vercel.app";
+        break;
+
       case "production":
         redirectUri = "https://www.plateful.cloud/";
         break;

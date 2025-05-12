@@ -1,9 +1,10 @@
 import { NavLink } from "react-router";
 import { Card } from "../ui/card";
 import StarIcon from "@mui/icons-material/Star";
-import StarHalfIcon from '@mui/icons-material/StarHalf';
+import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TagPill from "./TagPill";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 type Props = {
   id: number;
@@ -23,8 +24,7 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
     for (let i = 0; i < 5; i++) {
       if (i < 3) {
         stars.push(<StarIcon key={i} fontSize="small" />);
-      }
-      else if (i === 3) {
+      } else if (i === 3) {
         stars.push(<StarHalfIcon key={i} fontSize="small" />);
       } else {
         stars.push(<StarBorderIcon key={i} fontSize="small" />);
@@ -41,16 +41,14 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
             "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           }
           alt="Recipe"
-          className="h-full w-full rounded-md object-cover"
+          className="h-full w-full object-cover"
         />
 
         <div className="p-2">
           <div className="flex justify-between">
             <h1 className="font-bold text-lg">{name}</h1>
 
-            <div className="flex gap-1">
-              {renderStars()}
-            </div>
+            <div className="flex gap-1">{renderStars()}</div>
           </div>
 
           {description && (
