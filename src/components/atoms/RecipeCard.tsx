@@ -45,9 +45,7 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
 
         <div className="p-2">
           <div className="flex justify-between">
-            <h1 className="font-bold text-lg leading-tight">
-              {name}
-            </h1>
+            <h1 className="font-bold text-lg leading-tight">{name}</h1>
 
             <div className="flex gap-1">{renderStars()}</div>
           </div>
@@ -60,13 +58,8 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">
-              <TagPill name="Vegan" color="bg-green-100 text-green-800" />
-              <TagPill
-                name="Gluten-Free"
-                color="bg-orange-100 text-orange-800"
-              />
-              <TagPill name="Keto" color="bg-purple-100 text-purple-800" />
-              <TagPill name="Paleo" color="bg-blue-100 text-blue-800" />
+              <TagPill name="Vegan" color="green" />
+              <TagPill name="Gluten-Free" color="orange" />
             </div>
 
             <div className="italic text-sm">vor 2 Tagen</div>
