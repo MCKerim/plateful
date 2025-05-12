@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import { Card } from "../ui/card";
 import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from '@mui/icons-material/StarHalf';
 import StarBorderIcon from "@mui/icons-material/StarBorder";
