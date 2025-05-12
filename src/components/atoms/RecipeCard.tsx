@@ -13,13 +13,18 @@ type Props = {
 export default function RecipeCard({ id, name }: Readonly<Props>) {
   function renderStars() {
     const stars = [];
+
+    const starStyles = {
+      fontSize: "16px",
+    };
+
     for (let i = 0; i < 5; i++) {
       if (i < 3) {
-        stars.push(<StarIcon key={i} fontSize="small" />);
+        stars.push(<StarIcon key={i} style={starStyles} />);
       } else if (i === 3) {
-        stars.push(<StarHalfIcon key={i} fontSize="small" />);
+        stars.push(<StarHalfIcon key={i} style={starStyles} />);
       } else {
-        stars.push(<StarBorderIcon key={i} fontSize="small" />);
+        stars.push(<StarBorderIcon key={i} style={starStyles} />);
       }
     }
     return stars;
@@ -27,7 +32,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
-      <Card>
+      <Card className="relative">
         <img
           src={
             "https://img.chefkoch-cdn.de/rezepte/393031127655461/bilder/1585337/crop-642x428/spaghetti-bolognese.jpg"
@@ -37,10 +42,12 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
         />
 
         <div className="p-2">
+          <div className="flex justify-end">
+            <div className="flex gap-1 absolute top-1">{renderStars()}</div>
+          </div>
+
           <div className="flex justify-between">
             <h1 className="font-bold text-lg leading-tight">{name}</h1>
-
-            <div className="flex gap-1">{renderStars()}</div>
           </div>
 
           <div className="flex justify-between mt-2">
