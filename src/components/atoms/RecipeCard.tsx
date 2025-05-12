@@ -1,5 +1,9 @@
 import { NavLink } from "react-router";
 import { Card, CardDescription, CardHeader, CardTitle } from "../ui/card";
+import StarIcon from "@mui/icons-material/Star";
+import StarHalfIcon from '@mui/icons-material/StarHalf';
+import StarBorderIcon from "@mui/icons-material/StarBorder";
+import TagPill from "./TagPill";
 
 type Props = {
   id: number;
@@ -14,6 +18,21 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
       ? description.slice(0, MAX_DESCRIPTION_SIZE) + "..."
       : description;
 
+  function renderStars() {
+    const stars = [];
+    for (let i = 0; i < 5; i++) {
+      if (i < 3) {
+        stars.push(<StarIcon key={i} fontSize="small" />);
+      }
+      else if (i === 3) {
+        stars.push(<StarHalfIcon key={i} fontSize="small" />);
+      } else {
+        stars.push(<StarBorderIcon key={i} fontSize="small" />);
+      }
+    }
+    return stars;
+  }
+
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
       <Card>
@@ -25,23 +44,33 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
           className="h-full w-full rounded-md object-cover"
         />
 
-        <div>
-          <div className="flex justify-between bg-blue-400">
+        <div className="p-2">
+          <div className="flex justify-between">
             <h1 className="font-bold text-lg">{name}</h1>
 
-            <div>Stars</div>
+            <div className="flex gap-1">
+              {renderStars()}
+            </div>
           </div>
 
           {description && (
-            <div className="bg-orange-400">
+            <div>
               <p className="text-xs">{truncatedDescription}</p>
             </div>
           )}
 
-          <div className="flex justify-between bg-red-400">
-            <div>Tags</div>
+          <div className="flex justify-between mt-2">
+            <div className="flex gap-1">
+              <TagPill name="Vegan" color="bg-green-100 text-green-800" />
+              <TagPill
+                name="Gluten-Free"
+                color="bg-orange-100 text-orange-800"
+              />
+              <TagPill name="Keto" color="bg-purple-100 text-purple-800" />
+              <TagPill name="Paleo" color="bg-blue-100 text-blue-800" />
+            </div>
 
-            <div>vor 2 Tagen</div>
+            <div className="italic text-sm">vor 2 Tagen</div>
           </div>
         </div>
       </Card>

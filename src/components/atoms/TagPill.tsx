@@ -1,0 +1,12 @@
+type Props = {
+  name: string;
+  color: string;
+};
+
+export default function TagPill({ name, color }: Readonly<Props>) {
+  return (
+    <div className={`rounded-full px-2 py-1 text-xs font-semibold ${color}`}>
+      {name}
+    </div>
+  );
+}
