@@ -4,6 +4,7 @@ import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TagPill from "./TagPill";
+import { CalendarDays } from "lucide-react";
 
 type Props = {
   id: number;
@@ -56,7 +57,11 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
               <TagPill name="Gluten-Free" color="orange" />
             </div>
 
-            <div className="italic text-sm">vor 2 Tagen</div>
+            <div className="flex gap-1 items-center">
+              <p className="italic text-sm">vor 2 Tagen</p>
+
+              <CalendarDays size={16} />
+            </div>
           </div>
         </div>
       </Card>
