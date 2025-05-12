@@ -126,7 +126,7 @@ export default function Discover() {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2 items-center">
+      <div className="flex flex-col gap-4 items-center">
         {searchResults.map((recipe, index) => (
           <RecipeCard
             key={index}

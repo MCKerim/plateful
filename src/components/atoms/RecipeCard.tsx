@@ -37,15 +37,17 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
       <Card>
         <img
           src={
-            "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+            "https://img.chefkoch-cdn.de/rezepte/393031127655461/bilder/1585337/crop-642x428/spaghetti-bolognese.jpg"
           }
           alt="Recipe"
-          className="h-full w-full object-cover"
+          className="h-32 w-full object-cover"
         />
 
         <div className="p-2">
           <div className="flex justify-between">
-            <h1 className="font-bold text-lg leading-tight">{name} dwad dawdwdawd dawdwadwa da wd</h1>
+            <h1 className="font-bold text-lg leading-tight">
+              {name}
+            </h1>
 
             <div className="flex gap-1">{renderStars()}</div>
           </div>
