@@ -50,11 +50,14 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
             <div className="flex gap-1">{renderStars()}</div>
           </div>
 
+          {/* No description needed anymore
           {description && (
             <div>
               <p className="text-sm">{truncatedDescription}</p>
             </div>
           )}
+
+          */}
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">
