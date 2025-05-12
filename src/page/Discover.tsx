@@ -132,7 +132,6 @@ export default function Discover() {
             key={index}
             id={recipe.id}
             name={recipe.recipeName}
-            description={recipe.description}
           />
         ))}
 

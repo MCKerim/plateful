@@ -8,16 +8,9 @@ import TagPill from "./TagPill";
 type Props = {
   id: number;
   name: string;
-  description: string;
 };
 
-export default function RecipeCard({ id, name, description }: Readonly<Props>) {
-  const MAX_DESCRIPTION_SIZE = 55;
-  const truncatedDescription =
-    description.length > MAX_DESCRIPTION_SIZE
-      ? description.slice(0, MAX_DESCRIPTION_SIZE) + "..."
-      : description;
-
+export default function RecipeCard({ id, name }: Readonly<Props>) {
   function renderStars() {
     const stars = [];
     for (let i = 0; i < 5; i++) {
@@ -49,15 +42,6 @@ export default function RecipeCard({ id, name, description }: Readonly<Props>) {
 
             <div className="flex gap-1">{renderStars()}</div>
           </div>
-
-          {/* No description needed anymore
-          {description && (
-            <div>
-              <p className="text-sm">{truncatedDescription}</p>
-            </div>
-          )}
-
-          */}
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">
