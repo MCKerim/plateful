@@ -4,7 +4,6 @@ import StarIcon from "@mui/icons-material/Star";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TagPill from "./TagPill";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 type Props = {
   id: number;
