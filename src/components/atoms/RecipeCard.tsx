@@ -31,15 +31,22 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
     return stars;
   }
 
+  function renderTagPills() {
+    const tags: string[] = [];
+    return tags.map((tag, index) => (
+      <TagPill key={index} name={tag} color="green" />
+    ));
+  }
+
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
       <Card className="relative">
         <img
           src={
-            "https://img.chefkoch-cdn.de/rezepte/393031127655461/bilder/1585337/crop-642x428/spaghetti-bolognese.jpg"
+            "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           }
           alt="Recipe"
-          className="h-32 w-full object-cover"
+          className="h-32 w-full object-cover border-b-4 border-background"
         />
 
         <div className="p-2">
@@ -53,12 +60,11 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">
-              <TagPill name="Vegan" color="green" />
-              <TagPill name="Gluten-Free" color="orange" />
+              {renderTagPills()}
             </div>
 
             <div className="flex gap-1 items-center">
-              <p className="italic text-sm">vor 2 Tagen</p>
+              <p className="italic text-sm">Noch nie geplant</p>
 
               <CalendarDays size={16} />
             </div>
