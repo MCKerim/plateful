@@ -8,11 +8,7 @@ import { Link } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-} from "../components/ui/card";
+import { Card, CardDescription, CardHeader } from "../components/ui/card";
 
 type Recipe = {
   id: number;
@@ -94,35 +90,33 @@ export default function Discover() {
           `• ${t("recipeWithCount", { count: searchResults.length })}`}
       </h1>
 
-      <div className="w-full max-w-lg bg-background mb-2">
-        <div className="flex w-full items-center gap-2">
-          <Input
-            className="w-full"
-            type="text"
-            placeholder={t("discover.enterRecipeName")}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+      <div className="w-full max-w-lg mb-2 flex items-center gap-2 sticky top-16 z-10">
+        <Input
+          className="w-full"
+          type="text"
+          placeholder={t("discover.enterRecipeName")}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
 
-          {searchTerm && (
-            <Button variant="outline" onClick={() => setSearchTerm("")}>
-              <Delete />
-            </Button>
-          )}
-
-          <Button asChild>
-            <Link
-              to={
-                "/recipe/add" +
-                (searchTerm.trim() !== ""
-                  ? `?recipeNameFromSearch=${searchTerm.trim()}`
-                  : "")
-              }
-            >
-              <Plus />
-            </Link>
+        {searchTerm && (
+          <Button variant="outline" onClick={() => setSearchTerm("")}>
+            <Delete />
           </Button>
-        </div>
+        )}
+
+        <Button asChild>
+          <Link
+            to={
+              "/recipe/add" +
+              (searchTerm.trim() !== ""
+                ? `?recipeNameFromSearch=${searchTerm.trim()}`
+                : "")
+            }
+          >
+            <Plus />
+          </Link>
+        </Button>
       </div>
 
       <div className="flex flex-col gap-4 items-center">
