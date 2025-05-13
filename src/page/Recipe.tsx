@@ -232,9 +232,9 @@ export default function Recipe() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost">
-              <MoreVertIcon />
-            </Button>
+              <div className="text-[20px] cursor-pointer">
+                <MoreVertIcon fontSize="inherit" />
+              </div>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent>
