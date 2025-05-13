@@ -42,7 +42,7 @@ function App() {
     <Routes>
       <Route path="/signup" element={<SignUp />} />
 
-      <Route path="/" element={ifLoggedIn(<ShoppingList />)} />
+      <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 
       <Route path="/settings" element={ifLoggedIn(<Settings />)} />
       <Route path="/household" element={ifLoggedIn(<Household />)} />
