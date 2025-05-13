@@ -13,7 +13,7 @@ export default function Header() {
           <h1 className="font-bold text-2xl">Plateful</h1>
 
           <NavLink to="/settings">
-            <Button variant="outline" size="icon">
+            <Button variant="ghost" size="icon">
               <Settings />
             </Button>
           </NavLink>
