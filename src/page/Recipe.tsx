@@ -11,6 +11,14 @@ import { useTranslation } from "react-i18next";
 import { Pencil, Trash2, Link } from "lucide-react";
 import { format } from "date-fns";
 import RatingModal from "@/components/atoms/RatingModal";
+import MoreVertIcon from "@mui/icons-material/MoreVert";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 type RecipeItem = {
   id: number;
@@ -25,7 +33,7 @@ export default function Recipe() {
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
-  
+
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
@@ -36,33 +44,36 @@ export default function Recipe() {
       const { data, error } = await supabase.storage
         .from("recipeimages")
         .list(`recipe_${params.recipeId}/`);
-  
+
       if (error) {
         console.error("Error fetching images: ", error);
         return;
       }
-  
+
       if (data) {
         const urls = await Promise.all(
           data.map(async (file) => {
             const { data: signedUrlData, error: signedUrlError } =
               await supabase.storage
                 .from("recipeimages")
-                .createSignedUrl(`recipe_${params.recipeId}/${file.name}`, 3600);
-  
+                .createSignedUrl(
+                  `recipe_${params.recipeId}/${file.name}`,
+                  3600
+                );
+
             if (signedUrlError) {
               console.error("Error creating signed URL: ", signedUrlError);
               return null;
             }
-  
+
             return signedUrlData?.signedUrl;
           })
         );
-  
+
         setImageUrls(urls.filter((url) => url !== null) as string[]);
       }
     }
-  
+
     getAllRecipeImages();
   }, [params.recipeId]);
 
@@ -71,7 +82,7 @@ export default function Recipe() {
       prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
     );
   }
-  
+
   function handlePreviousImage() {
     setCurrentImageIndex((prevIndex) =>
       prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
@@ -216,7 +227,35 @@ export default function Recipe() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold">{recipe?.name}</h1>
+      <div className="flex justify-between">
+        <h1 className="text-2xl font-bold">{recipe?.name}</h1>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost">
+              <MoreVertIcon />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent>
+            <DropdownMenuGroup>
+              <NavLink to={`/recipe/edit/${recipe?.id}`}>
+                <DropdownMenuItem>
+                  <Pencil />
+
+                  {t("common.edit")}
+                </DropdownMenuItem>
+              </NavLink>
+
+              <DropdownMenuItem onClick={deleteRecipe}>
+                <Trash2 />
+
+                <span>{t("common.delete")}</span>
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
 
       <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
         <img
@@ -231,15 +270,15 @@ export default function Recipe() {
       </AspectRatio>
 
       {imageUrls.length > 1 && (
-      <div className="flex justify-between mt-2">
-        <Button variant="secondary" onClick={handlePreviousImage}>
-          Previous
-        </Button>
-        <Button variant="secondary" onClick={handleNextImage}>
-          Next
-        </Button>
-      </div>
-    )}
+        <div className="flex justify-between mt-2">
+          <Button variant="secondary" onClick={handlePreviousImage}>
+            Previous
+          </Button>
+          <Button variant="secondary" onClick={handleNextImage}>
+            Next
+          </Button>
+        </div>
+      )}
 
       {recipeItems.length > 0 && (
         <>
@@ -296,22 +335,6 @@ export default function Recipe() {
       <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
         {recipe?.description}
       </p>
-
-      <div className="flex gap-2 w-full mt-11">
-        <NavLink
-          to={`/recipe/edit/${recipe?.id}`}
-          className={buttonVariants({ variant: "secondary" }) + " w-full"}
-        >
-          <Pencil />
-
-          {t("common.edit")}
-        </NavLink>
-
-        <Button className="w-full" variant="destructive" onClick={deleteRecipe}>
-          <Trash2 />
-          {t("common.delete")}
-        </Button>
-      </div>
     </Layout>
   );
 }
