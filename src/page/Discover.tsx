@@ -128,23 +128,17 @@ export default function Discover() {
 
       <div className="flex flex-col gap-4 items-center">
         {searchResults.map((recipe, index) => (
-          <RecipeCard
-            key={index}
-            id={recipe.id}
-            name={recipe.recipeName}
-          />
+          <RecipeCard key={index} id={recipe.id} name={recipe.recipeName} />
         ))}
 
         {searchResults.length === 0 && (
           <Card className="w-full">
             <CardHeader>
-              <CardTitle>
+              <h1 className="font-bold text-lg leading-tight">
                 {t("discover.nothingFound")}
-              </CardTitle>
+              </h1>
 
-              <CardDescription>
-                {t("discover.addNewViaPlus")}
-              </CardDescription>
+              <CardDescription>{t("discover.addNewViaPlus")}</CardDescription>
             </CardHeader>
           </Card>
         )}
