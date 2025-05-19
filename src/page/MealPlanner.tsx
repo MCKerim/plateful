@@ -13,6 +13,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
+import { useAppDispatch, useAppSelector } from "@/hooks";
+import { decrement, increment, selectCount } from "@/userSlice";
 
 type MealPlannerItem = {
   id: number;
@@ -25,6 +27,8 @@ type MealPlannerItem = {
 
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
+  const dispatch = useAppDispatch();
+  const count = useAppSelector(selectCount);
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
 
@@ -157,6 +161,10 @@ export default function MealPlanner() {
 
   return (
     <Layout>
+      <button onClick={() => dispatch(decrement())}>decrement</button>
+      <div>{count}</div>
+      <button onClick={() => dispatch(increment())}>increment</button>
+
       <RatingModal
         showTriggerButton={false}
         ref={ratingModalRef}
