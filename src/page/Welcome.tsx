@@ -13,6 +13,7 @@ export default function Welcome() {
   return (
     <div
       className="flex flex-col items-center justify-evenly h-screen"
+      style={{ backgroundColor: "#abff9b" }}
     >
       <h1 className="text-4xl font-bold mb-4">Welcome to Plateful!</h1>
 

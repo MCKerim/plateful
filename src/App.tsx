@@ -19,6 +19,7 @@ import {
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
 import Welcome from "./page/Welcome";
+import ValueScreen from "./page/ValueScreen";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -95,9 +96,9 @@ function App() {
     <Routes>
       <Route path="/welcome" element={<Welcome />} />
 
-
-
       <Route path="/signup" element={<SignUp />} />
+
+      <Route path="/value" element={<ValueScreen />} />
 
       <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 

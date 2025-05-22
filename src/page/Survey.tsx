@@ -1,18 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { NavLink } from "react-router";
 
-export default function ValueScreen() {
+export default function Survey() {
   return (
     <div
       className="flex flex-col items-center justify-evenly h-screen"
     >
-      <h1 className="text-4xl font-bold mb-4">Import Recipes</h1>
+      <h1 className="text-4xl font-bold mb-4">Are you vegetarian?</h1>
 
-      <p>Use our AI-powered tool to import recipes from any website!</p>
+      <p>No</p>
 
 
       <NavLink to="/signup">
-        <Button>Next</Button>
+        <Button>Yes</Button>
+        <Button>No</Button>
       </NavLink>
     </div>
   );
