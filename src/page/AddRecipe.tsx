@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -20,6 +22,8 @@ export default function AddRecipe() {
 
   const params = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const householdId = useAppSelector(selectHouseholdId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -144,7 +148,7 @@ export default function AddRecipe() {
       // Insert new recipe
       const { data, error } = await supabase
         .from("recipes")
-        .insert([{ name: title, description, link }])
+        .insert([{ name: title, description, link, household_id: householdId }])
         .select();
 
       if (!error && data) {
