@@ -13,8 +13,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
-import { useAppDispatch, useAppSelector } from "@/hooks";
-import { decrement, increment, selectCount } from "@/userSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { decrement, increment, selectCount } from "@/redux/slices/userSlice";
 
 type MealPlannerItem = {
   id: number;

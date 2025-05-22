@@ -6,7 +6,7 @@ import { BrowserRouter } from "react-router";
 import App from "./App.tsx";
 import { ThemeProvider } from "./components/atoms/theme-provider.tsx";
 import "./i18n.ts";
-import { store } from "./store.ts";
+import { store } from "./redux/store.ts";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
