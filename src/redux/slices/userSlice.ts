@@ -1,13 +1,13 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+import { User } from "@/types/exportedDatabaseTypes.types";
 
-export interface UserState {
-  value: number;
+interface UserState {
+  user: User | null;
 }
-
 const initialState: UserState = {
-  value: 0,
+  user: null,
 };
 
 export const userSlice = createSlice({
@@ -15,20 +15,14 @@ export const userSlice = createSlice({
   initialState,
 
   reducers: {
-    increment: (state) => {
-      state.value += 1;
-    },
-    decrement: (state) => {
-      state.value -= 1;
-    },
-    incrementByAmount: (state, action: PayloadAction<number>) => {
-      state.value += action.payload;
+    setUser: (state, action: PayloadAction<User | null>) => {
+      state.user = action.payload;
     },
   },
 });
 
-export const { increment, decrement, incrementByAmount } = userSlice.actions;
+export const { setUser } = userSlice.actions;
 
 export default userSlice.reducer;
 
-export const selectCount = (state: RootState) => state.user.value;
+export const selectUser = (state: RootState) => state.user.user;

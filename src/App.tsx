@@ -12,8 +12,12 @@ import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
 import Household from "./page/Household";
 import InvitePage from "./page/InvitePage";
+import { useAppDispatch } from "./redux/hooks";
+import { setUser } from "./redux/slices/userSlice";
 
 function App() {
+  const dispatch = useAppDispatch();
+
   const [session, setSession] = useState<Session | null>(null);
 
   async function updateSession(session: Session | null) {
@@ -27,12 +31,12 @@ function App() {
         .single();
       if (error) {
         console.error("Error fetching user data:", error);
-        // null
+        dispatch(setUser(null));
       } else {
-        console.log("User data:", data);
+        dispatch(setUser(data));
       }
     } else {
-      // null
+      dispatch(setUser(null));
     }
   }
 
