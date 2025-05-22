@@ -14,6 +14,7 @@ import Household from "./page/Household";
 import InvitePage from "./page/InvitePage";
 import { useAppDispatch } from "./redux/hooks";
 import { setUser } from "./redux/slices/userSlice";
+import { setHousehold } from "./redux/slices/householdSlice";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -24,19 +25,40 @@ function App() {
     setSession(session);
 
     if (session?.user) {
-      const { data, error } = await supabase
+      const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*")
         .eq("id", session.user.id)
         .single();
-      if (error) {
-        console.error("Error fetching user data:", error);
+
+      if (userError) {
+        console.error("Error fetching user data:", userError);
         dispatch(setUser(null));
+        dispatch(setHousehold(null));
       } else {
-        dispatch(setUser(data));
+        dispatch(setUser(userData));
+
+        // Household laden, falls household_id vorhanden
+        if (userData?.household_id) {
+          const { data: householdData, error: householdError } = await supabase
+            .from("household")
+            .select("*")
+            .eq("id", userData.household_id)
+            .single();
+
+          if (householdError) {
+            console.error("Error fetching household data:", householdError);
+            dispatch(setHousehold(null));
+          } else {
+            dispatch(setHousehold(householdData));
+          }
+        } else {
+          dispatch(setHousehold(null));
+        }
       }
     } else {
       dispatch(setUser(null));
+      dispatch(setHousehold(null));
     }
   }
 
