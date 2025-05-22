@@ -111,6 +111,7 @@ export type Database = {
           created_at: string
           days: number
           daysEaten: number
+          household_id: number
           id: number
           owner_id: string
           planned_date: string | null
@@ -120,6 +121,7 @@ export type Database = {
           created_at?: string
           days?: number
           daysEaten?: number
+          household_id?: number
           id?: number
           owner_id?: string
           planned_date?: string | null
@@ -129,12 +131,20 @@ export type Database = {
           created_at?: string
           days?: number
           daysEaten?: number
+          household_id?: number
           id?: number
           owner_id?: string
           planned_date?: string | null
           recipe_id?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "meal_planning_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "meal_planning_recipe_id_fkey"
             columns: ["recipe_id"]

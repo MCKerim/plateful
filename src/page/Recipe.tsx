@@ -19,6 +19,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
 
 type RecipeItem = {
   id: number;
@@ -29,6 +31,8 @@ type RecipeItem = {
 export default function Recipe() {
   const { t } = useTranslation();
   const params = useParams();
+
+  const householdId = useAppSelector(selectHouseholdId);
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
@@ -175,6 +179,7 @@ export default function Recipe() {
       recipe_id: id,
       planned_date: newDate?.toISOString(),
       days: newDays,
+      household_id: householdId,
     });
 
     if (error) {
