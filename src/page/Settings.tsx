@@ -5,9 +5,13 @@ import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 import { useEffect } from "react";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/slices/userSlice";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
+
+  const user = useAppSelector(selectUser);
 
   useEffect(() => {
     // Benutzeridentifikation mit Canny
@@ -119,7 +123,11 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.dangerZone")}</h2>
+          <h2 className="border-b">
+            {t("settings.dangerZone")}
+          </h2>
+
+          {user?.email}
 
           <Button variant="destructive" onClick={signOut}>
             {t("settings.signOut")}
