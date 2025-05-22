@@ -16,18 +16,38 @@ import InvitePage from "./page/InvitePage";
 function App() {
   const [session, setSession] = useState<Session | null>(null);
 
+  async function updateSession(session: Session | null) {
+    setSession(session);
+
+    if (session?.user) {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("id", session.user.id)
+        .single();
+      if (error) {
+        console.error("Error fetching user data:", error);
+        // null
+      } else {
+        console.log("User data:", data);
+      }
+    } else {
+      // null
+    }
+  }
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    let isMounted = true;
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
+    const { data: { subscription } = { subscription: undefined } } =
+      supabase.auth.onAuthStateChange((_event, session) => {
+        if (isMounted) updateSession(session);
+      });
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMounted = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   function ifLoggedIn(page: JSX.Element) {
