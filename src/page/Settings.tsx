@@ -79,7 +79,7 @@ export default function Settings() {
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.household")}</h2>
 
-          <NavLink to="/household">
+          <NavLink to="/householdSettings">
             <Button variant="secondary" className="w-full">
               {t("settings.manageYourHousehold")}
             </Button>

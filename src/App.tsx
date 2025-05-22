@@ -10,11 +10,14 @@ import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
-import Household from "./page/Household";
+import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
 import { useAppDispatch } from "./redux/hooks";
 import { setUser } from "./redux/slices/userSlice";
-import { setHousehold } from "./redux/slices/householdSlice";
+import {
+  setHousehold,
+  setHouseholdMembers,
+} from "./redux/slices/householdSlice";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -27,38 +30,41 @@ function App() {
     if (session?.user) {
       const { data: userData, error: userError } = await supabase
         .from("users")
-        .select("*")
+        .select("*, household:household_id(*)")
         .eq("id", session.user.id)
         .single();
 
       if (userError) {
         console.error("Error fetching user data:", userError);
+
         dispatch(setUser(null));
         dispatch(setHousehold(null));
+        dispatch(setHouseholdMembers(null));
       } else {
         dispatch(setUser(userData));
+        dispatch(setHousehold(userData.household ?? null));
 
-        // Household laden, falls household_id vorhanden
-        if (userData?.household_id) {
-          const { data: householdData, error: householdError } = await supabase
-            .from("household")
-            .select("*")
-            .eq("id", userData.household_id)
-            .single();
-
-          if (householdError) {
-            console.error("Error fetching household data:", householdError);
-            dispatch(setHousehold(null));
-          } else {
-            dispatch(setHousehold(householdData));
-          }
-        } else {
-          dispatch(setHousehold(null));
+        if (!userData.household_id) {
+          return;
         }
+
+        // get household members
+        const { data: membersData, error: membersError } = await supabase
+          .from("users")
+          .select("id, email")
+          .eq("household_id", userData.household_id);
+
+        if (membersError) {
+          console.error("Error fetching household members:", membersError);
+          return;
+        }
+
+        dispatch(setHouseholdMembers(membersData));
       }
     } else {
       dispatch(setUser(null));
       dispatch(setHousehold(null));
+      dispatch(setHouseholdMembers(null));
     }
   }
 
@@ -91,7 +97,10 @@ function App() {
       <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 
       <Route path="/settings" element={ifLoggedIn(<Settings />)} />
-      <Route path="/household" element={ifLoggedIn(<Household />)} />
+      <Route
+        path="/householdSettings"
+        element={ifLoggedIn(<HouseholdSettings />)}
+      />
       <Route path="/invite/:token" element={ifLoggedIn(<InvitePage />)} />
 
       <Route path="/shoppinglist" element={ifLoggedIn(<ShoppingList />)} />
