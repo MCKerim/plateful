@@ -7,6 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import supabase from "@/utils/supabase";
+import { NavLink } from "react-router";
 
 export default function SignUp() {
   const signUp = async () => {
@@ -61,6 +62,10 @@ export default function SignUp() {
               </svg>
               Login with Google
             </Button>
+
+            <NavLink to="/value">
+              <Button variant="outline" className="w-full mt-2">Skip</Button>
+            </NavLink>
           </CardContent>
 
           <CardFooter>

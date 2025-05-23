@@ -20,6 +20,7 @@ import {
 } from "./redux/slices/householdSlice";
 import Welcome from "./page/onboarding/Welcome";
 import ValueScreen from "./page/onboarding/ValueScreen";
+import Survey from "./page/onboarding/Survey";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -99,6 +100,8 @@ function App() {
       <Route path="/signup" element={<SignUp />} />
 
       <Route path="/value" element={<ValueScreen />} />
+
+      <Route path="/survey" element={<Survey />} />
 
       <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 
