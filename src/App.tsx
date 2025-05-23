@@ -5,7 +5,7 @@ import Discover from "./page/Discover";
 import Bookmarks from "./page/Bookmarks";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
-import SignUp from "./page/SignUp";
+import SignUp from "./page/onboarding/SignUp";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
@@ -18,8 +18,8 @@ import {
   setHousehold,
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
-import Welcome from "./page/Welcome";
-import ValueScreen from "./page/ValueScreen";
+import Welcome from "./page/onboarding/Welcome";
+import ValueScreen from "./page/onboarding/ValueScreen";
 
 function App() {
   const dispatch = useAppDispatch();
