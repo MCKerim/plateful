@@ -8,7 +8,7 @@ import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
-import { format } from "date-fns";
+import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 
 type Props = {
   id: number;
@@ -113,14 +113,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
             <div className="flex gap-1 items-center">
               <p className="italic text-sm">
-                {lastMealPlan
-                  ? lastMealPlan.daysEaten < lastMealPlan.days
-                    ? "Aktuell geplant"
-                    : `${format(
-                        new Date(lastMealPlan.created_at),
-                        "dd.MM.yyyy"
-                      )}`
-                  : "Noch nie geplant"}
+                {getMealPlanStatus(lastMealPlan)}
               </p>
 
               <CalendarDays size={16} />

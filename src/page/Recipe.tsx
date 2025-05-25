@@ -9,7 +9,7 @@ import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2, Link } from "lucide-react";
-import { format } from "date-fns";
+import { CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import {
@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 
 type RecipeItem = {
   id: number;
@@ -238,9 +239,9 @@ export default function Recipe() {
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-              <div className="text-[20px] cursor-pointer">
-                <MoreVertIcon fontSize="inherit" />
-              </div>
+            <div className="text-[20px] cursor-pointer">
+              <MoreVertIcon fontSize="inherit" />
+            </div>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent>
@@ -312,16 +313,11 @@ export default function Recipe() {
         </>
       )}
 
-      <p className="mt-4">
-        {lastMealPlan
-          ? lastMealPlan.daysEaten < lastMealPlan.days
-            ? "Aktuell geplant"
-            : `Zuletzt geplant am ${format(
-                new Date(lastMealPlan.created_at),
-                "dd.MM.yyyy"
-              )}`
-          : "Noch nie geplant"}
-      </p>
+      <div className="flex gap-1 items-center justify-end">
+        <p className="italic text-sm">{getMealPlanStatus(lastMealPlan)}</p>
+
+        <CalendarDays size={16} />
+      </div>
 
       {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
 
