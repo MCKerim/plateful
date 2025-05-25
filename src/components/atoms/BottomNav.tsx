@@ -13,7 +13,11 @@ export default function BottomNav() {
         <Separator className="mb-2" />
 
         <div className="flex justify-between w-full gap-1 px-2">
-          <BottomNavButton label={t("bottomNav.list")} icon={<ScrollText />} link="/" />
+          <BottomNavButton
+            label={t("bottomNav.list")}
+            icon={<ScrollText />}
+            link="/shoppinglist"
+          />
 
           <BottomNavButton
             label={t("bottomNav.planner")}
