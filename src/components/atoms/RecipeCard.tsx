@@ -7,6 +7,8 @@ import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
+import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
+import { format } from "date-fns";
 
 type Props = {
   id: number;
@@ -15,6 +17,7 @@ type Props = {
 
 export default function RecipeCard({ id, name }: Readonly<Props>) {
   const [averageRating, setAverageRating] = useState<number | null>(null);
+  const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
 
   useEffect(() => {
     supabase
@@ -23,10 +26,33 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
       .eq("recipe_id", id)
       .then((response) => {
         if (response.data) {
-          const totalStars = response.data.reduce((acc, rating) => acc + rating.stars, 0);
+          const totalStars = response.data.reduce(
+            (acc, rating) => acc + rating.stars,
+            0
+          );
           setAverageRating(totalStars / response.data.length);
         }
       });
+  }, [id]);
+
+  useEffect(() => {
+    async function getMealPlanningInfo() {
+      const { data } = await supabase
+        .from("meal_planning")
+        .select("*")
+        .eq("recipe_id", id)
+        .order("created_at", { ascending: false })
+        .limit(1);
+
+      if (data && data.length > 0) {
+        const latestPlan = data[0];
+        setLastMealPlan(latestPlan);
+      } else {
+        setLastMealPlan(null);
+      }
+    }
+
+    getMealPlanningInfo();
   }, [id]);
 
   function renderStars() {
@@ -72,7 +98,9 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
         <div className="p-2">
           <div className="flex justify-end">
-            <div className="flex gap-1 absolute top-1 bg-card rounded-full px-1 py-[1px]">{renderStars()}</div>
+            <div className="flex gap-1 absolute top-1 bg-card rounded-full px-1 py-[1px]">
+              {renderStars()}
+            </div>
           </div>
 
           <div className="flex justify-between">
@@ -80,12 +108,19 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
           </div>
 
           <div className="flex justify-between mt-2">
-            <div className="flex gap-1">
-              {renderTagPills()}
-            </div>
+            <div className="flex gap-1">{renderTagPills()}</div>
 
             <div className="flex gap-1 items-center">
-              <p className="italic text-sm">Noch nie geplant</p>
+              <p className="italic text-sm">
+                {lastMealPlan
+                  ? lastMealPlan.daysEaten < lastMealPlan.days
+                    ? "Aktuell geplant"
+                    : `${format(
+                        new Date(lastMealPlan.created_at),
+                        "dd.MM.yyyy"
+                      )}`
+                  : "Noch nie geplant"}
+              </p>
 
               <CalendarDays size={16} />
             </div>

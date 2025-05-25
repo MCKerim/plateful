@@ -217,7 +217,8 @@ export default function Recipe() {
         .from("meal_planning")
         .select("*")
         .eq("recipe_id", recipeId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: false })
+        .limit(1);
 
       if (data && data.length > 0) {
         const latestPlan = data[0];
