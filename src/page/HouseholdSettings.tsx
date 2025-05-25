@@ -8,7 +8,15 @@ import {
   selectHousehold,
   selectHouseholdMembers,
 } from "@/redux/slices/householdSlice";
-import { CircleMinus, Pencil, Trash2, Link, QrCode, House } from "lucide-react";
+import {
+  CircleMinus,
+  Pencil,
+  Trash2,
+  Link,
+  Plus,
+  House,
+  UserRoundPlus,
+} from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -125,7 +133,9 @@ export default function HouseholdSettings() {
 
       <Dialog>
         <DialogTrigger>
-          <Button className="w-full">Mitglied einladen</Button>
+          <Button className="w-full">
+            <UserRoundPlus /> Mitglied einladen
+          </Button>
         </DialogTrigger>
 
         <DialogContent className="sm:max-w-[425px]">
@@ -138,7 +148,7 @@ export default function HouseholdSettings() {
               value="https://reactjs.org/"
               size={256}
               imageSettings={{
-                src: "https://reactjs.org/logo-og.png",
+                src: "/logo.png",
                 height: 64,
                 width: 64,
                 excavate: true,
