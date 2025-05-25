@@ -5,6 +5,8 @@ import StarHalfIcon from "@mui/icons-material/StarHalf";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
+import { useEffect, useState } from "react";
+import supabase from "@/utils/supabase";
 
 type Props = {
   id: number;
@@ -12,6 +14,21 @@ type Props = {
 };
 
 export default function RecipeCard({ id, name }: Readonly<Props>) {
+  const [averageRating, setAverageRating] = useState<number | null>(null);
+
+  useEffect(() => {
+    supabase
+      .from("recipe_ratings")
+      .select("stars")
+      .eq("recipe_id", id)
+      .then((response) => {
+        if (response.data) {
+          const totalStars = response.data.reduce((acc, rating) => acc + rating.stars, 0);
+          setAverageRating(totalStars / response.data.length);
+        }
+      });
+  }, [id]);
+
   function renderStars() {
     const stars = [];
 
@@ -19,10 +36,14 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
       fontSize: "16px",
     };
 
+    if (averageRating === null) {
+      return <p>Loading...</p>; // or a placeholder
+    }
+
     for (let i = 0; i < 5; i++) {
-      if (i < 3) {
+      if (i < Math.floor(averageRating || 0)) {
         stars.push(<StarIcon key={i} style={starStyles} />);
-      } else if (i === 3) {
+      } else if (i < averageRating) {
         stars.push(<StarHalfIcon key={i} style={starStyles} />);
       } else {
         stars.push(<StarBorderIcon key={i} style={starStyles} />);
