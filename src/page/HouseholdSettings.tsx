@@ -27,6 +27,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
+import { Input } from "@/components/ui/input";
 
 export default function HouseholdSettings() {
   const user = useAppSelector(selectUser);
@@ -145,7 +146,7 @@ export default function HouseholdSettings() {
 
           <DialogDescription className="flex flex-col py-4 gap-4 items-center">
             <QRCodeSVG
-              value="https://reactjs.org/"
+              value="https://www.plateful.cloud/"
               size={256}
               imageSettings={{
                 src: "/logo.png",
@@ -158,6 +159,12 @@ export default function HouseholdSettings() {
             <Button onClick={createInvite} className="w-full mt-4">
               <Link size={16} /> Link teilen
             </Button>
+
+            <div className="flex gap-2 w-full">
+              <Input placeholder="E-Mail-Adresse" />
+
+              <Button>Senden</Button>
+            </div>
           </DialogDescription>
         </DialogContent>
       </Dialog>
