@@ -62,12 +62,13 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
       fontSize: "16px",
     };
 
-    if (averageRating === null) {
-      return <p>Loading...</p>; // or a placeholder
-    }
-
     for (let i = 0; i < 5; i++) {
-      if (i < Math.floor(averageRating || 0)) {
+      if (averageRating === null) {
+        stars.push(<StarBorderIcon key={i} style={starStyles} />);
+        continue;
+      }
+
+      if (i < Math.floor(averageRating)) {
         stars.push(<StarIcon key={i} style={starStyles} />);
       } else if (i < averageRating) {
         stars.push(<StarHalfIcon key={i} style={starStyles} />);
