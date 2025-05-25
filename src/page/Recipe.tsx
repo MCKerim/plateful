@@ -32,6 +32,7 @@ type RecipeItem = {
 export default function Recipe() {
   const { t } = useTranslation();
   const params = useParams();
+  const navigate = useNavigate();
 
   const householdId = useAppSelector(selectHouseholdId);
 
@@ -41,8 +42,6 @@ export default function Recipe() {
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function getAllRecipeImages() {
@@ -75,7 +74,7 @@ export default function Recipe() {
           })
         );
 
-        setImageUrls(urls.filter((url) => url !== null) as string[]);
+        setImageUrls(urls.filter((url) => url !== null));
       }
     }
 
