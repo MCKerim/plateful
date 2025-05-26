@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { House } from "lucide-react";
+import { Donut, House, Newspaper, Map, LogOut } from "lucide-react";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -104,6 +104,8 @@ export default function Settings() {
             target="blank"
           >
             <Button variant="secondary" className="w-full">
+              <Donut />
+
               {t("settings.suggestFeatureOrReportBug")}
             </Button>
           </NavLink>
@@ -114,6 +116,8 @@ export default function Settings() {
             target="blank"
           >
             <Button variant="secondary" className="w-full">
+              <Newspaper />
+
               {t("settings.whatsNew")}
             </Button>
           </NavLink>
@@ -124,6 +128,8 @@ export default function Settings() {
             target="blank"
           >
             <Button variant="secondary" className="w-full">
+              <Map />
+
               {t("settings.viewRoadmap")}
             </Button>
           </NavLink>
