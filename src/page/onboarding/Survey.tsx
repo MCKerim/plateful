@@ -42,7 +42,7 @@ export default function Survey() {
           </Button>
         </NavLink>
 
-        <NavLink to="/" className="w-full">
+        <NavLink to="/createHousehold" className="w-full">
           <Button className="w-full">Next</Button>
         </NavLink>
       </div>

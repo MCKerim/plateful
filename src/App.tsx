@@ -22,6 +22,7 @@ import Welcome from "./page/onboarding/Welcome";
 import ValueScreen from "./page/onboarding/ValueScreen";
 import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
+import InviteMembers from "./page/onboarding/InviteMembers";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -105,6 +106,8 @@ function App() {
       <Route path="/survey" element={<Survey />} />
 
       <Route path="/createhousehold" element={<CreateHousehold />} />
+
+      <Route path="/inviteMembers" element={<InviteMembers />} />
 
       <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 

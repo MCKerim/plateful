@@ -2,42 +2,61 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useState } from "react";
+import { useNavigate } from "react-router";
 
 export default function CreateHousehold() {
+  const navigate = useNavigate();
+  const [householdName, setHouseholdName] = useState("");
+
+  function handleCreateHousehold() {
+    const trimmedName = householdName.trim();
+    if (!trimmedName) {
+      alert("Bitte gib einen Namen für deinen Haushalt ein.");
+      return;
+    }
+    console.log("Haushalt erstellt:", trimmedName);
+
+    setHouseholdName("");
+    navigate("/inviteMembers");
+  }
+
   return (
-    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10">
-      <h1 className="text-4xl font-bold mb-4 text-center">
-        Erstelle dein Haushalt
-      </h1>
+    <div className="flex flex-col h-full w-full max-w-xs mx-auto py-10 gap-10">
+      <h1 className="text-4xl font-bold mb-4 text-center">Dein Haushalt</h1>
 
       <p>
-        Lade deine Familie oder Freunde ein, um gemeinsam zu kochen und zu
-        planen.
+        Speicher gemeinsame Rezepte, planne eure Mahlzeiten und viel mehr! Nur
+        eine Person pro Haushalt muss bezahlen.
       </p>
 
-      <div className="grid w-full items-center gap-2">
-        <Label htmlFor="name">Geb deinem Zuhasue ein name</Label>
+      <div className="flex flex-col gap-4 w-full">
+        <div className="grid w-full items-center gap-2">
+          <Label htmlFor="name">Wie soll euer Haushalt heißen?</Label>
 
-        <Input type="text" id="name" placeholder="Familie" />
+          <Input
+            type="text"
+            id="name"
+            placeholder="z.B. Familie Müller"
+            value={householdName}
+            onChange={(e) => setHouseholdName(e.target.value)}
+          />
+        </div>
+
+        <Button className="w-full" onClick={handleCreateHousehold}>
+          Haushalt erstellen
+        </Button>
       </div>
 
-      <div>
-        <Button className="w-full">Familie/Freunde einladen</Button>
+      <div className="flex flex-col gap-4 w-full">
+        <Separator>
+          <p className="italic">oder</p>
+        </Separator>
 
-        <p className="text-muted-foreground text-sm">
-          Geht auch noch später, müssen nichts bezahlen
-        </p>
+        <Button className="w-full" variant="secondary">
+          Bestehendem Haushalt beitreten
+        </Button>
       </div>
-
-      <Button className="w-full">Weiter</Button>
-
-      <Separator className="my-2">
-        <p className="italic">oder</p>
-      </Separator>
-
-      <Button className="w-full" variant="secondary">
-        Trete einem Haushalt bei
-      </Button>
     </div>
   );
 }
