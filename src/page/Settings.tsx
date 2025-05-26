@@ -7,6 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
+import { House } from "lucide-react";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -79,8 +80,14 @@ export default function Settings() {
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b">{t("settings.household")}</h2>
 
+          <p className="text-sm">
+            Nutze Plateful mit deinen Freunden oder deiner Familie!
+          </p>
+
           <NavLink to="/householdSettings">
             <Button variant="secondary" className="w-full">
+              <House />
+
               {t("settings.manageYourHousehold")}
             </Button>
           </NavLink>
@@ -123,9 +130,7 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">
-            {t("settings.dangerZone")}
-          </h2>
+          <h2 className="border-b">{t("settings.dangerZone")}</h2>
 
           {user?.email}
 
