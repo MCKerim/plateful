@@ -12,9 +12,10 @@ import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
-import { useAppDispatch } from "./redux/hooks";
+import { useAppDispatch, useAppSelector } from "./redux/hooks";
 import { setUser } from "./redux/slices/userSlice";
 import {
+  selectHouseholdId,
   setHousehold,
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
@@ -24,11 +25,13 @@ import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
 import InviteMembers from "./page/onboarding/InviteMembers";
 import JoinHousehold from "./page/onboarding/JoinHousehold";
+import { isLastDayOfMonth } from "date-fns";
 
 function App() {
   const dispatch = useAppDispatch();
 
   const [session, setSession] = useState<Session | null>(null);
+  const householdId = useAppSelector(selectHouseholdId);
 
   async function updateSession(session: Session | null) {
     setSession(session);
@@ -88,9 +91,21 @@ function App() {
     };
   }, []);
 
-  function ifLoggedIn(page: JSX.Element) {
-    if (session) {
-      return page;
+  function isLoggedIn(): Boolean {
+    return !!session;
+  }
+
+  function hasHousehold(): Boolean {
+    return !!householdId;
+  }
+
+  function routeToCorrectPage(page: JSX.Element) {
+    if (isLoggedIn()) {
+      if (hasHousehold()) {
+        return page;
+      } else {
+        return <CreateHousehold />;
+      }
     } else {
       return <SignUp />;
     }
@@ -98,39 +113,65 @@ function App() {
 
   return (
     <Routes>
+      {/* Onboarding */}
       <Route path="/welcome" element={<Welcome />} />
 
       <Route path="/signup" element={<SignUp />} />
 
-      <Route path="/value" element={<ValueScreen />} />
+      <Route
+        path="/value"
+        element={isLoggedIn() ? <ValueScreen /> : <SignUp />}
+      />
 
-      <Route path="/survey" element={<Survey />} />
+      <Route path="/survey" element={isLoggedIn() ? <Survey /> : <SignUp />} />
 
-      <Route path="/createhousehold" element={<CreateHousehold />} />
+      <Route
+        path="/createhousehold"
+        element={isLoggedIn() ? <CreateHousehold /> : <SignUp />}
+      />
 
-      <Route path="/inviteMembers" element={<InviteMembers />} />
+      <Route
+        path="/inviteMembers"
+        element={isLoggedIn() ? <InviteMembers /> : <SignUp />}
+      />
 
-      <Route path="/joinHousehold" element={<JoinHousehold />} />
+      <Route
+        path="/joinHousehold"
+        element={isLoggedIn() ? <JoinHousehold /> : <SignUp />}
+      />
 
-      <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
+      {/* Main Routes */}
+      <Route path="/" element={routeToCorrectPage(<MealPlanner />)} />
 
-      <Route path="/settings" element={ifLoggedIn(<Settings />)} />
+      <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
       <Route
         path="/householdSettings"
-        element={ifLoggedIn(<HouseholdSettings />)}
+        element={routeToCorrectPage(<HouseholdSettings />)}
       />
-      <Route path="/invite/:token" element={ifLoggedIn(<InvitePage />)} />
+      <Route
+        path="/invite/:token"
+        element={routeToCorrectPage(<InvitePage />)}
+      />
 
-      <Route path="/shoppinglist" element={ifLoggedIn(<ShoppingList />)} />
-      <Route path="/mealplanner" element={ifLoggedIn(<MealPlanner />)} />
-      <Route path="/discover" element={ifLoggedIn(<Discover />)} />
-      <Route path="/bookmarks" element={ifLoggedIn(<Bookmarks />)} />
+      <Route
+        path="/shoppinglist"
+        element={routeToCorrectPage(<ShoppingList />)}
+      />
+      <Route
+        path="/mealplanner"
+        element={routeToCorrectPage(<MealPlanner />)}
+      />
+      <Route path="/discover" element={routeToCorrectPage(<Discover />)} />
+      <Route path="/bookmarks" element={routeToCorrectPage(<Bookmarks />)} />
 
-      <Route path="/recipe/:recipeId" element={ifLoggedIn(<Recipe />)} />
-      <Route path="/recipe/add" element={ifLoggedIn(<AddRecipe />)} />
+      <Route
+        path="/recipe/:recipeId"
+        element={routeToCorrectPage(<Recipe />)}
+      />
+      <Route path="/recipe/add" element={routeToCorrectPage(<AddRecipe />)} />
       <Route
         path="/recipe/edit/:recipeId"
-        element={ifLoggedIn(<AddRecipe />)}
+        element={routeToCorrectPage(<AddRecipe />)}
       />
     </Routes>
   );
