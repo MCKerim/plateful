@@ -1,11 +1,36 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { NavLink } from "react-router";
+import { useNavigate } from "react-router";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/slices/userSlice";
+import supabase from "@/utils/supabase";
 
 const DIET_OPTIONS = ["Vegan", "Vegetarian", "Halal", "Kosher", "other"];
 
 export default function Survey() {
+  const user = useAppSelector(selectUser);
+  const navigate = useNavigate();
+
   const [selected, setSelected] = useState<string[]>([]);
+
+  async function completeSurvey() {
+    if (!user) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("users")
+      .update({ has_completed_survey: true })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Error updating user:", error);
+      alert("An error occurred while saving your progress. Please try again.");
+      return;
+    }
+
+    navigate("/createhousehold");
+  }
 
   const handleSelect = (option: string) => {
     setSelected((prev) =>
@@ -36,15 +61,13 @@ export default function Survey() {
       </div>
 
       <div className="w-full flex gap-2">
-        <NavLink to="/value" className="w-1/2">
-          <Button variant="secondary" className="w-full">
-            Back
-          </Button>
-        </NavLink>
+        <Button variant="secondary" className="w-1/2">
+          Back
+        </Button>
 
-        <NavLink to="/createHousehold" className="w-full">
-          <Button className="w-full">Next</Button>
-        </NavLink>
+        <Button className="w-full" onClick={completeSurvey}>
+          Next
+        </Button>
       </div>
     </div>
   );

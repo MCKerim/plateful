@@ -13,7 +13,7 @@ import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
 import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { setUser } from "./redux/slices/userSlice";
+import { selectUser, setUser } from "./redux/slices/userSlice";
 import {
   selectHouseholdId,
   setHousehold,
@@ -32,6 +32,7 @@ function App() {
 
   const [session, setSession] = useState<Session | null>(null);
   const householdId = useAppSelector(selectHouseholdId);
+  const user = useAppSelector(selectUser);
 
   async function updateSession(session: Session | null) {
     setSession(session);
@@ -92,15 +93,15 @@ function App() {
   }, []);
 
   function isLoggedIn(): boolean {
-    return session?.user !== undefined && session?.user !== null;
+    return user !== null;
   }
 
   function hasSeenValueScreens(): boolean {
-    return true;
+    return user?.has_seen_value_screens ?? false;
   }
 
   function hasCompletedSurvey(): boolean {
-    return true;
+    return user?.has_completed_survey ?? false;
   }
 
   function hasHousehold(): boolean {
@@ -141,12 +142,7 @@ function App() {
         }
       />
 
-      <Route
-        path="/inviteMembers"
-        element={
-          <InviteMembers />
-        }
-      />
+      <Route path="/inviteMembers" element={<InviteMembers />} />
 
       <Route
         path="/joinHousehold"
