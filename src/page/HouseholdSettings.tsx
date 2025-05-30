@@ -2,11 +2,12 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
 import { v4 as uuidv4 } from "uuid";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import {
   selectHousehold,
   selectHouseholdMembers,
+  setHousehold,
 } from "@/redux/slices/householdSlice";
 import {
   CircleMinus,
@@ -29,6 +30,7 @@ import { QRCodeSVG } from "qrcode.react";
 import { Input } from "@/components/ui/input";
 
 export default function HouseholdSettings() {
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const household = useAppSelector(selectHousehold);
   const householdMembers = useAppSelector(selectHouseholdMembers);
@@ -88,6 +90,27 @@ export default function HouseholdSettings() {
       await navigator.clipboard.writeText(inviteLink);
       alert("Link wurde kopiert!");
     }
+  }
+
+  function leaveHousehold() {
+    if (!household || !user?.household_id) {
+      return;
+    }
+
+    supabase
+      .from("users")
+      .update({ household_id: null })
+      .eq("id", user.id)
+      .then(({ error }) => {
+        if (error) {
+          console.error("Fehler beim Verlassen des Haushalts:", error);
+          alert(
+            "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut."
+          );
+        } else {
+          dispatch(setHousehold(null));
+        }
+      });
   }
 
   if (!household) {
@@ -174,11 +197,11 @@ export default function HouseholdSettings() {
         Join other
       </Button>
 
-      <Button variant="destructive" onClick={createInvite}>
+      <Button variant="destructive" onClick={leaveHousehold}>
         Leave Household
       </Button>
 
-      <Button variant="destructive" onClick={createInvite}>
+      <Button variant="destructive" onClick={leaveHousehold}>
         <Trash2 size={16} /> Delete Household
       </Button>
     </Layout>
