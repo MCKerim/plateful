@@ -32,4 +32,4 @@ export default householdSlice.reducer;
 
 export const selectHousehold = (state: RootState) => state.household.household;
 export const selectHouseholdMembers = (state: RootState) => state.household.members;
-export const selectHouseholdId = (state: RootState) => state.household.household?.id;
+export const selectHouseholdId = (state: RootState) => state.household.household?.id ?? null;

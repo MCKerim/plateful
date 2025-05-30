@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Route, Routes, Navigate } from "react-router";
 import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Discover from "./page/Discover";
@@ -25,33 +25,7 @@ import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
 import InviteMembers from "./page/onboarding/InviteMembers";
 import JoinHousehold from "./page/onboarding/JoinHousehold";
-
-// Pure function for testing
-export function routeToCorrectPagePure(
-  page: JSX.Element,
-  isLoggedIn: () => boolean,
-  hasSeenValueScreens: () => boolean,
-  hasCompletedSurvey: () => boolean,
-  hasHousehold: () => boolean
-) {
-  if (isLoggedIn()) {
-    if (hasSeenValueScreens()) {
-      if (hasCompletedSurvey()) {
-        if (hasHousehold()) {
-          return page;
-        } else {
-          return <CreateHousehold />;
-        }
-      } else {
-        return <Survey />;
-      }
-    } else {
-      return <ValueScreen />;
-    }
-  } else {
-    return <SignUp />;
-  }
-}
+import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -118,19 +92,19 @@ function App() {
   }, []);
 
   function isLoggedIn(): boolean {
-    return !!session;
+    return session?.user !== undefined && session?.user !== null;
   }
 
   function hasSeenValueScreens(): boolean {
-    return false;
+    return true;
   }
 
   function hasCompletedSurvey(): boolean {
-    return false;
+    return true;
   }
 
   function hasHousehold(): boolean {
-    return !!householdId;
+    return householdId !== null;
   }
 
   function routeToCorrectPage(page: JSX.Element) {
@@ -146,30 +120,39 @@ function App() {
   return (
     <Routes>
       {/* Onboarding */}
-      <Route path="/" element={<Welcome />} />
-
-      <Route path="/signup" element={<SignUp />} />
-
       <Route
-        path="/value"
-        element={isLoggedIn() ? <ValueScreen /> : <SignUp />}
+        path="/"
+        element={isLoggedIn() ? <Navigate to="/mealplanner" /> : <Welcome />}
       />
 
-      <Route path="/survey" element={isLoggedIn() ? <Survey /> : <SignUp />} />
+      <Route
+        path="/signup"
+        element={isLoggedIn() ? <Navigate to="/mealplanner" /> : <SignUp />}
+      />
+
+      <Route path="/value" element={<ValueScreen />} />
+
+      <Route path="/survey" element={<Survey />} />
 
       <Route
         path="/createhousehold"
-        element={isLoggedIn() ? <CreateHousehold /> : <SignUp />}
+        element={
+          hasHousehold() ? <Navigate to="/mealplanner" /> : <CreateHousehold />
+        }
       />
 
       <Route
         path="/inviteMembers"
-        element={isLoggedIn() ? <InviteMembers /> : <SignUp />}
+        element={
+          hasHousehold() ? <Navigate to="/mealplanner" /> : <InviteMembers />
+        }
       />
 
       <Route
         path="/joinHousehold"
-        element={isLoggedIn() ? <JoinHousehold /> : <SignUp />}
+        element={
+          hasHousehold() ? <Navigate to="/mealplanner" /> : <JoinHousehold />
+        }
       />
 
       {/* Main Routes */}
