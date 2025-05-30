@@ -47,7 +47,7 @@ export default function SignUp() {
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">
-              Login with or create an account
+              Login to Plateful
             </CardTitle>
           </CardHeader>
 
@@ -65,7 +65,7 @@ export default function SignUp() {
 
           <CardFooter>
             <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-              By clicking continue, you agree to our{" "}
+              By continuing, you agree to our{" "}
               <a href="#">Terms of Service</a> and{" "}
               <a href="#">Privacy Policy</a>.
             </div>

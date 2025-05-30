@@ -26,6 +26,7 @@ import CreateHousehold from "./page/onboarding/CreateHousehold";
 import InviteMembers from "./page/onboarding/InviteMembers";
 import JoinHousehold from "./page/onboarding/JoinHousehold";
 import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
+import NotFound from "./page/NotFound";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -210,6 +211,8 @@ function App() {
         path="/recipe/edit/:recipeId"
         element={routeToCorrectPage(<AddRecipe />)}
       />
+      {/* 404 Not Found Route */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
