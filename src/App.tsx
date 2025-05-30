@@ -163,7 +163,7 @@ function App() {
       />
       <Route
         path="/invite/:token"
-        element={routeToCorrectPage(<InvitePage />)}
+        element={isLoggedIn() ? <InvitePage /> : <SignUp />}
       />
 
       <Route

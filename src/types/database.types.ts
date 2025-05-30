@@ -121,7 +121,7 @@ export type Database = {
           created_at?: string
           days?: number
           daysEaten?: number
-          household_id?: number
+          household_id: number
           id?: number
           owner_id?: string
           planned_date?: string | null
@@ -340,18 +340,24 @@ export type Database = {
         Row: {
           created_at: string
           email: string
+          has_completed_survey: boolean
+          has_seen_value_screens: boolean
           household_id: number | null
           id: string
         }
         Insert: {
           created_at?: string
           email: string
+          has_completed_survey?: boolean
+          has_seen_value_screens?: boolean
           household_id?: number | null
           id?: string
         }
         Update: {
           created_at?: string
           email?: string
+          has_completed_survey?: boolean
+          has_seen_value_screens?: boolean
           household_id?: number | null
           id?: string
         }
