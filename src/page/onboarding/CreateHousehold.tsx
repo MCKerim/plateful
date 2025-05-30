@@ -2,23 +2,56 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/slices/userSlice";
+import supabase from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 
 export default function CreateHousehold() {
   const navigate = useNavigate();
+  const user = useAppSelector(selectUser);
+
   const [householdName, setHouseholdName] = useState("");
 
-  function handleCreateHousehold() {
+  async function handleCreateHousehold() {
+    if (!user) {
+      return;
+    }
+
     const trimmedName = householdName.trim();
     if (!trimmedName) {
       alert("Bitte gib einen Namen für deinen Haushalt ein.");
       return;
     }
-    console.log("Haushalt erstellt:", trimmedName);
 
-    setHouseholdName("");
-    navigate("/inviteMembers");
+    const { data, error } = await supabase
+      .from("household")
+      .insert({ name: trimmedName })
+      .select();
+
+    if (error || !data) {
+      alert("Fehler beim Erstellen des Haushalts: " + error?.message);
+      return;
+    }
+
+    if (data) {
+      setHouseholdName("");
+
+      // set household id for user
+      const { error: updateError } = await supabase
+        .from("users")
+        .update({ household_id: data[0].id })
+        .eq("id", user.id);
+
+      if (updateError) {
+        alert(
+          "Fehler beim Aktualisieren des Haushalts: " + updateError.message
+        );
+        return;
+      }
+      navigate("/inviteMembers");
+    }
   }
 
   return (
@@ -54,7 +87,9 @@ export default function CreateHousehold() {
         </Separator>
 
         <NavLink to="/joinHousehold" className="w-full">
-          <Button className="w-full" variant="secondary">Bestehendem Haushalt beitreten</Button>
+          <Button className="w-full" variant="secondary">
+            Bestehendem Haushalt beitreten
+          </Button>
         </NavLink>
       </div>
     </div>

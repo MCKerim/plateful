@@ -144,7 +144,7 @@ function App() {
       <Route
         path="/inviteMembers"
         element={
-          hasHousehold() ? <Navigate to="/mealplanner" /> : <InviteMembers />
+          <InviteMembers />
         }
       />
 
