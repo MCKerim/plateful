@@ -25,7 +25,33 @@ import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
 import InviteMembers from "./page/onboarding/InviteMembers";
 import JoinHousehold from "./page/onboarding/JoinHousehold";
-import { isLastDayOfMonth } from "date-fns";
+
+// Pure function for testing
+export function routeToCorrectPagePure(
+  page: JSX.Element,
+  isLoggedIn: () => boolean,
+  hasSeenValueScreens: () => boolean,
+  hasCompletedSurvey: () => boolean,
+  hasHousehold: () => boolean
+) {
+  if (isLoggedIn()) {
+    if (hasSeenValueScreens()) {
+      if (hasCompletedSurvey()) {
+        if (hasHousehold()) {
+          return page;
+        } else {
+          return <CreateHousehold />;
+        }
+      } else {
+        return <Survey />;
+      }
+    } else {
+      return <ValueScreen />;
+    }
+  } else {
+    return <SignUp />;
+  }
+}
 
 function App() {
   const dispatch = useAppDispatch();
@@ -91,30 +117,36 @@ function App() {
     };
   }, []);
 
-  function isLoggedIn(): Boolean {
+  function isLoggedIn(): boolean {
     return !!session;
   }
 
-  function hasHousehold(): Boolean {
+  function hasSeenValueScreens(): boolean {
+    return false;
+  }
+
+  function hasCompletedSurvey(): boolean {
+    return false;
+  }
+
+  function hasHousehold(): boolean {
     return !!householdId;
   }
 
   function routeToCorrectPage(page: JSX.Element) {
-    if (isLoggedIn()) {
-      if (hasHousehold()) {
-        return page;
-      } else {
-        return <CreateHousehold />;
-      }
-    } else {
-      return <SignUp />;
-    }
+    return routeToCorrectPagePure(
+      page,
+      isLoggedIn,
+      hasSeenValueScreens,
+      hasCompletedSurvey,
+      hasHousehold
+    );
   }
 
   return (
     <Routes>
       {/* Onboarding */}
-      <Route path="/welcome" element={<Welcome />} />
+      <Route path="/" element={<Welcome />} />
 
       <Route path="/signup" element={<SignUp />} />
 
@@ -141,8 +173,6 @@ function App() {
       />
 
       {/* Main Routes */}
-      <Route path="/" element={routeToCorrectPage(<MealPlanner />)} />
-
       <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
       <Route
         path="/householdSettings"
