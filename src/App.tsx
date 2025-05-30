@@ -92,6 +92,34 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!user?.id) return;
+
+    // Subscribe to realtime changes for the current user in the users table
+    const userSubscription = supabase
+      .channel("public:users")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "users",
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          // Refetch user data and update Redux state
+          supabase.auth.getSession().then(({ data: { session } }) => {
+            updateSession(session);
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(userSubscription);
+    };
+  }, [user?.id]);
+
   function isLoggedIn(): boolean {
     return user !== null;
   }

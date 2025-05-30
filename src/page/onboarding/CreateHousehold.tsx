@@ -50,6 +50,7 @@ export default function CreateHousehold() {
         );
         return;
       }
+      
       navigate("/inviteMembers");
     }
   }
