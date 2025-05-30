@@ -23,6 +23,7 @@ import ValueScreen from "./page/onboarding/ValueScreen";
 import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
 import InviteMembers from "./page/onboarding/InviteMembers";
+import JoinHousehold from "./page/onboarding/JoinHousehold";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -108,6 +109,8 @@ function App() {
       <Route path="/createhousehold" element={<CreateHousehold />} />
 
       <Route path="/inviteMembers" element={<InviteMembers />} />
+
+      <Route path="/joinHousehold" element={<JoinHousehold />} />
 
       <Route path="/" element={ifLoggedIn(<MealPlanner />)} />
 

@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 export default function CreateHousehold() {
   const navigate = useNavigate();
@@ -53,9 +53,9 @@ export default function CreateHousehold() {
           <p className="italic">oder</p>
         </Separator>
 
-        <Button className="w-full" variant="secondary">
-          Bestehendem Haushalt beitreten
-        </Button>
+        <NavLink to="/joinHousehold" className="w-full">
+          <Button className="w-full" variant="secondary">Bestehendem Haushalt beitreten</Button>
+        </NavLink>
       </div>
     </div>
   );
