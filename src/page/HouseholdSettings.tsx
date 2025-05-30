@@ -27,13 +27,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { QRCodeSVG } from "qrcode.react";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function HouseholdSettings() {
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const household = useAppSelector(selectHousehold);
   const householdMembers = useAppSelector(selectHouseholdMembers);
+
+  const [inviteLink, setInviteLink] = useState("");
 
   async function removeMember(memberId: string) {
     if (!household || !user?.household_id) {
@@ -72,9 +75,18 @@ export default function HouseholdSettings() {
       },
     ]);
 
-    if (error) throw error;
+    if (error) {
+      alert(
+        "Fehler beim Erstellen des Einladungslinks. Bitte versuche es später erneut. " +
+          error.message
+      );
+      return;
+    }
 
-    const inviteLink = `${window.location.origin}/invite/${token}`;
+    setInviteLink(`${window.location.origin}/invite/${token}`);
+  }
+
+  async function shareInviteLink() {
     if (navigator.share) {
       try {
         await navigator.share({
@@ -87,8 +99,24 @@ export default function HouseholdSettings() {
       }
     } else {
       // Fallback, z.B. Link kopieren
+      alert(
+        "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
+      );
+      await copyInviteLink();
+    }
+  }
+
+  async function copyInviteLink() {
+    if (!inviteLink) {
+      return;
+    }
+
+    try {
       await navigator.clipboard.writeText(inviteLink);
-      alert("Link wurde kopiert!");
+      alert("Einladungslink wurde in die Zwischenablage kopiert!");
+    } catch (err) {
+      console.error("Fehler beim Kopieren des Links:", err);
+      alert("Fehler beim Kopieren des Links. Bitte versuche es später erneut.");
     }
   }
 
@@ -156,7 +184,7 @@ export default function HouseholdSettings() {
 
       <Dialog>
         <DialogTrigger>
-          <Button className="w-full">
+          <Button className="w-full" onClick={createInvite}>
             <UserRoundPlus /> Mitglied einladen
           </Button>
         </DialogTrigger>
@@ -166,36 +194,48 @@ export default function HouseholdSettings() {
             <DialogTitle>Scanne den QR-Code oder teile den Link</DialogTitle>
           </DialogHeader>
 
-          <DialogDescription className="flex flex-col py-4 gap-4 items-center">
-            <QRCodeSVG
-              value="https://www.plateful.cloud/"
-              size={256}
-              imageSettings={{
-                src: "/logo.png",
-                height: 64,
-                width: 64,
-                excavate: true,
-              }}
-            />
+          {inviteLink ? (
+            <DialogDescription className="flex flex-col py-4 gap-4 items-center">
+              <QRCodeSVG
+                value={inviteLink}
+                size={256}
+                imageSettings={{
+                  src: "/logo.png",
+                  height: 64,
+                  width: 64,
+                  excavate: true,
+                }}
+              />
 
-            <Button onClick={createInvite} className="w-full mt-4">
-              <Link size={16} /> Link teilen
-            </Button>
+              <div className="flex gap-2 w-full">
+                <Button
+                  onClick={copyInviteLink}
+                  className="w-full mt-4"
+                  variant={"secondary"}
+                >
+                  <Link size={16} /> Link kopieren
+                </Button>
 
-            <div className="flex gap-2 w-full">
-              <Input placeholder="E-Mail-Adresse" />
+                <Button onClick={shareInviteLink} className="w-full mt-4">
+                  <Link size={16} /> Link teilen
+                </Button>
+              </div>
+            </DialogDescription>
+          ) : (
+            <DialogDescription className="flex flex-col py-4 gap-4 items-center">
+              <Skeleton className="h-[256px] w-[256px] rounded-md" />
 
-              <Button>Senden</Button>
-            </div>
-          </DialogDescription>
+              <div className="flex gap-2 w-full">
+                <Skeleton className="h-10 w-full mt-4" />
+
+                <Skeleton className="h-10 w-full mt-4" />
+              </div>
+            </DialogDescription>
+          )}
         </DialogContent>
       </Dialog>
 
       <Separator className="my-2" />
-
-      <Button variant="secondary" onClick={createInvite}>
-        Join other
-      </Button>
 
       <Button variant="destructive" onClick={leaveHousehold}>
         Leave Household

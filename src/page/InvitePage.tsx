@@ -31,7 +31,6 @@ export default function InvitePage() {
         .from("invites")
         .select("*, household(*)")
         .eq("token", token)
-        .eq("used", false)
         .limit(1);
 
       if (error || !invites || invites.length === 0) {
@@ -63,16 +62,19 @@ export default function InvitePage() {
       .update({ used: true, used_by: currentUserId })
       .eq("id", invite.id);
 
-    navigate("/household");
+    navigate("/householdSettings");
   }
 
   return (
     <Layout>
       <p>Du wurdest zu folgendem Haushalt eingeladen:</p>
+
       <p className="w-full text-center">
         <strong>"{household?.name}"</strong>
       </p>
+
       <Button onClick={updateHousehold}>Dem Haushalt beitreten</Button>
+
       <NavLink to="/">
         <Button variant="destructive" className="w-full">
           Nicht beitreten
