@@ -28,6 +28,9 @@
     --destructive: #CB5E52;
     --destructive-foreground: #FAF9F5;
 
+    --plateful: #A9BC85;
+    --plateful-foreground: #1B1602;
+
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
     --ring: 240 10% 3.9%;
@@ -55,6 +58,10 @@
     --accent-foreground: #151410;
     --destructive: #AD4034;
     --destructive-foreground: #FDF8E3;
+
+    --plateful: #677A43;
+    --plateful-foreground: #FDF8E3;
+
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
     --ring: 240 4.9% 83.9%;

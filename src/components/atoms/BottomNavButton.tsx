@@ -17,20 +17,25 @@ export default function BottomNavButton({
   function getIcon() {
     switch (icon) {
       case "bookmark":
-        return <Bookmark strokeWidth={active ? 2.25 : 2} />;
+        return <Bookmark strokeWidth={active ? 2.5 : 2} />;
       case "bookOpenText":
-        return <BookOpenText strokeWidth={active ? 2.25 : 2} />;
+        return <BookOpenText strokeWidth={active ? 2.5 : 2} />;
       case "calendarDays":
-        return <CalendarDays strokeWidth={active ? 2.25 : 2} />;
+        return <CalendarDays strokeWidth={active ? 2.5 : 2} />;
       case "scrollText":
-        return <ScrollText strokeWidth={active ? 2.25 : 2} />;
+        return <ScrollText strokeWidth={active ? 2.5 : 2} />;
       default:
         return null;
     }
   }
 
   return (
-    <NavLink to={link} className="w-full align-middle items-center">
+    <NavLink
+      to={link}
+      className={
+        "w-full align-middle items-center " + (active && "text-plateful")
+      }
+    >
       <div className="w-full flex justify-center font-bold">{getIcon()}</div>
 
       <p
