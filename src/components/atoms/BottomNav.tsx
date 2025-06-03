@@ -1,10 +1,10 @@
 import { Separator } from "../ui/separator";
-import { Bookmark, BookOpenText, CalendarDays, ScrollText } from "lucide-react";
 import BottomNavButton from "./BottomNavButton";
 import { useTranslation } from "react-i18next";
 
 export default function BottomNav() {
   const { t } = useTranslation();
+
   return (
     <>
       <div style={{ height: "100px" }}></div>
@@ -15,26 +15,33 @@ export default function BottomNav() {
         <div className="flex justify-between w-full gap-1 px-2">
           <BottomNavButton
             label={t("bottomNav.list")}
-            icon={<ScrollText />}
+            icon="scrollText"
             link="/shoppinglist"
+            active={window.location.pathname.startsWith("/shoppinglist")}
           />
 
           <BottomNavButton
             label={t("bottomNav.planner")}
-            icon={<CalendarDays />}
+            icon="calendarDays"
             link="/mealplanner"
+            active={window.location.pathname.startsWith("/mealplanner")}
           />
 
           <BottomNavButton
             label={t("bottomNav.recipes")}
-            icon={<BookOpenText />}
+            icon="bookOpenText"
             link="/discover"
+            active={
+              window.location.pathname.startsWith("/discover") ||
+              window.location.pathname.startsWith("/recipe")
+            }
           />
 
           <BottomNavButton
             label={t("bottomNav.home")}
-            icon={<Bookmark />}
+            icon="bookmark"
             link="/bookmarks"
+            active={window.location.pathname.startsWith("/bookmarks")}
           />
         </div>
       </div>
