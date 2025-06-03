@@ -6,7 +6,7 @@ import Bookmarks from "./page/Bookmarks";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/SignUp";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
@@ -30,14 +30,10 @@ import NotFound from "./page/NotFound";
 
 function App() {
   const dispatch = useAppDispatch();
-
-  const [session, setSession] = useState<Session | null>(null);
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
 
   async function updateSession(session: Session | null) {
-    setSession(session);
-
     if (session?.user) {
       const { data: userData, error: userError } = await supabase
         .from("users")
@@ -107,7 +103,7 @@ function App() {
           table: "users",
           filter: `id=eq.${user.id}`,
         },
-        (payload) => {
+        () => {
           // Refetch user data and update Redux state
           supabase.auth.getSession().then(({ data: { session } }) => {
             updateSession(session);

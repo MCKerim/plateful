@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map, LogOut } from "lucide-react";
+import { Donut, House, Newspaper, Map } from "lucide-react";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();

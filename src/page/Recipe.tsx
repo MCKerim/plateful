@@ -175,6 +175,10 @@ export default function Recipe() {
   }
 
   async function planRecipe(id: number, newDate: Date | null, newDays: number) {
+    if (!householdId) {
+      return;
+    }
+
     const { error } = await supabase.from("meal_planning").insert({
       recipe_id: id,
       planned_date: newDate?.toISOString(),
