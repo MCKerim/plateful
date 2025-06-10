@@ -1,5 +1,6 @@
 //import AddRecipeItemMenu from "@/components/atoms/AddRecipeItemMenu";
 //import ShoppingItem from "@/components/atoms/ShoppingItem";
+import { ImagePicker } from "@/components/atoms/ImagePicker";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -215,6 +216,11 @@ export default function AddRecipe() {
       </h1>
 
       <div className="grid w-full items-center gap-5">
+        <ImagePicker onImageSelected={(file, previewUrl) => {
+          console.log("Selected file:", file);
+          console.log("Preview URL:", previewUrl);
+        }} />
+
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
 
