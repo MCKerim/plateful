@@ -110,7 +110,7 @@ export default function AddRecipe() {
         const { data: signedUrlData } = await supabase.storage
           .from("recipeimages")
           .createSignedUrl(`recipe_${recipeId}/${files[0].name}`, 3600);
-        setImagePreview(signedUrlData?.signedUrl || "");
+        setImagePreview(signedUrlData?.signedUrl ?? "");
         setImageSupabaseUrl(`recipe_${recipeId}/${files[0].name}`);
       } else {
         setImagePreview("");
@@ -143,7 +143,7 @@ export default function AddRecipe() {
     setImageUploading(true);
     const fileExt = file.name.split('.').pop();
     // Use recipe id if editing, otherwise use 'new' (will be replaced after insert)
-    const recipeIdForPath = params.recipeId || 'temp';
+    const recipeIdForPath = params.recipeId ?? 'temp';
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `recipe_${recipeIdForPath}/${fileName}`;
     const { error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
@@ -172,7 +172,7 @@ export default function AddRecipe() {
     setImageFile(compressedFile);
     setImagePreview(previewUrl);
     const path = await uploadToSupabase(compressedFile);
-    setImageSupabaseUrl(path || "");
+    setImageSupabaseUrl(path ?? "");
   }
 
   async function handleDeleteImage() {
