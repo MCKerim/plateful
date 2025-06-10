@@ -9,7 +9,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import supabase from "@/utils/supabase";
-import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
@@ -147,7 +146,7 @@ export default function AddRecipe() {
     const recipeIdForPath = params.recipeId || 'temp';
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `recipe_${recipeIdForPath}/${fileName}`;
-    const { data, error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
+    const { error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
       alert("Upload failed: " + error.message);
