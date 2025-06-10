@@ -18,6 +18,7 @@ type Props = {
 export default function RecipeCard({ id, name }: Readonly<Props>) {
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     supabase
@@ -53,6 +54,23 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
     }
 
     getMealPlanningInfo();
+  }, [id]);
+
+  useEffect(() => {
+    async function fetchImage() {
+      const { data, error } = await supabase.storage
+        .from("recipeimages")
+        .list(`recipe_${id}/`);
+      if (!error && data && data.length > 0) {
+        const { data: signedUrlData } = await supabase.storage
+          .from("recipeimages")
+          .createSignedUrl(`recipe_${id}/${data[0].name}`, 3600);
+        setImageUrl(signedUrlData?.signedUrl || null);
+      } else {
+        setImageUrl(null);
+      }
+    }
+    fetchImage();
   }, [id]);
 
   function renderStars() {
@@ -91,6 +109,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
       <Card className="relative">
         <img
           src={
+            imageUrl ||
             "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           }
           alt="Recipe"
