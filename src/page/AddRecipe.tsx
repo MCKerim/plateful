@@ -13,6 +13,7 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import imageCompression from 'browser-image-compression';
 
 /*type RecipeItem = {
   itemName: string;
@@ -162,9 +163,16 @@ export default function AddRecipe() {
       setImageSupabaseUrl("");
       return;
     }
-    setImageFile(file);
+    // Compress and resize the image before upload
+    const compressedFile = await imageCompression(file, {
+      maxWidthOrHeight: 900, // Good for recipe images
+      maxSizeMB: 0.5, // Target max file size (MB)
+      useWebWorker: true,
+      initialQuality: 0.85,
+    });
+    setImageFile(compressedFile);
     setImagePreview(previewUrl);
-    const path = await uploadToSupabase(file);
+    const path = await uploadToSupabase(compressedFile);
     setImageSupabaseUrl(path || "");
   }
 
