@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import supabase from "@/utils/supabase";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
@@ -30,6 +31,10 @@ export default function AddRecipe() {
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
   //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [imageSupabaseUrl, setImageSupabaseUrl] = useState<string>("");
+  const [imageUploading, setImageUploading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -86,22 +91,33 @@ export default function AddRecipe() {
     async function getRecipe(): Promise<boolean> {
       if (!params.recipeId) return false;
       const recipeId = parseInt(params.recipeId);
-
       const { data } = await supabase
         .from("recipes")
         .select("*")
         .eq("id", recipeId);
-
       if (!data || data.length === 0) {
         return false;
       }
-
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
+      // Fetch image from storage
+      const { data: files, error } = await supabase.storage
+        .from("recipeimages")
+        .list(`recipe_${recipeId}/`);
+      if (!error && files && files.length > 0) {
+        // Get signed URL for the first image
+        const { data: signedUrlData } = await supabase.storage
+          .from("recipeimages")
+          .createSignedUrl(`recipe_${recipeId}/${files[0].name}`, 3600);
+        setImagePreview(signedUrlData?.signedUrl || "");
+        setImageSupabaseUrl(`recipe_${recipeId}/${files[0].name}`);
+      } else {
+        setImagePreview("");
+        setImageSupabaseUrl("");
+      }
       return true;
     }
-
     getRecipe().then((hasFound) => {
       if (hasFound) return;
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
@@ -123,6 +139,44 @@ export default function AddRecipe() {
     setRecipeItems(newItems);
   }*/
 
+  async function uploadToSupabase(file: File) {
+    setImageUploading(true);
+    const fileExt = file.name.split('.').pop();
+    // Use recipe id if editing, otherwise use 'new' (will be replaced after insert)
+    const recipeIdForPath = params.recipeId || 'temp';
+    const fileName = `${Date.now()}.${fileExt}`;
+    const filePath = `recipe_${recipeIdForPath}/${fileName}`;
+    const { data, error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
+    setImageUploading(false);
+    if (error) {
+      alert("Upload failed: " + error.message);
+      return null;
+    }
+    return filePath;
+  }
+
+  async function handleImageSelected(file: File | undefined, previewUrl: string) {
+    if (!file) {
+      setImageFile(null);
+      setImagePreview("");
+      setImageSupabaseUrl("");
+      return;
+    }
+    setImageFile(file);
+    setImagePreview(previewUrl);
+    const path = await uploadToSupabase(file);
+    setImageSupabaseUrl(path || "");
+  }
+
+  async function handleDeleteImage() {
+    if (imageSupabaseUrl) {
+      await supabase.storage.from("recipeimages").remove([imageSupabaseUrl]);
+    }
+    setImageFile(null);
+    setImagePreview("");
+    setImageSupabaseUrl("");
+  }
+
   async function saveRecipe() {
     if (title === "") {
       alert("Please fill in all fields.");
@@ -137,9 +191,12 @@ export default function AddRecipe() {
         .update({ name: title, description, link })
         .eq("id", recipeId)
         .select();
-
       if (!error && data) {
-        //await saveRecipeItems(recipeId);
+        // If a new image was uploaded, move it to the correct folder if needed
+        if (imageFile && imageSupabaseUrl && imageSupabaseUrl.includes('temp')) {
+          const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split('/').pop()}`;
+          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+        }
         navigate(`/recipe/${recipeId}`);
       } else {
         console.error(error);
@@ -151,9 +208,12 @@ export default function AddRecipe() {
         .from("recipes")
         .insert([{ name: title, description, link, household_id: householdId }])
         .select();
-
       if (!error && data) {
-        //await saveRecipeItems(data[0].id);
+        // If an image was uploaded, move it to the correct folder with the new recipe id
+        if (imageFile && imageSupabaseUrl) {
+          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl.split('/').pop()}`;
+          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+        }
         navigate(`/recipe/${data[0].id}`)
       } else {
         console.error(error);
@@ -216,10 +276,12 @@ export default function AddRecipe() {
       </h1>
 
       <div className="grid w-full items-center gap-5">
-        <ImagePicker onImageSelected={(file, previewUrl) => {
-          console.log("Selected file:", file);
-          console.log("Preview URL:", previewUrl);
-        }} />
+        <ImagePicker
+          onImageSelected={handleImageSelected}
+          onDeleteImage={handleDeleteImage}
+          previewUrl={imagePreview}
+          uploading={imageUploading}
+        />
 
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>

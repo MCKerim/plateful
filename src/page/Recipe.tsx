@@ -199,6 +199,15 @@ export default function Recipe() {
       return;
     }
 
+    // Delete all images from storage for this recipe
+    const { data: files, error: listError } = await supabase.storage
+      .from("recipeimages")
+      .list(`recipe_${recipe.id}/`);
+    if (!listError && files && files.length > 0) {
+      const paths = files.map((file) => `recipe_${recipe.id}/${file.name}`);
+      await supabase.storage.from("recipeimages").remove(paths);
+    }
+
     const { error } = await supabase
       .from("recipes")
       .delete()
