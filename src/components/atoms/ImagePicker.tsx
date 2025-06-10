@@ -1,7 +1,8 @@
 import React, { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { AspectRatio } from "../ui/aspect-ratio";
 
 interface ImagePickerProps {
   onImageSelected: (file: File, previewUrl: string) => void;
@@ -15,6 +16,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -29,39 +31,45 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
     fileInputRef.current?.click();
   };
 
-  const handleTakePhoto = async () => {
-    try {
-      const photo = await Camera.getPhoto({
-        quality: 80,
-        allowEditing: false,
-        resultType: CameraResultType.DataUrl,
-        source: CameraSource.Camera,
-      });
-
-      if (photo?.dataUrl) {
-        // Convert dataUrl to File
-        const res = await fetch(photo.dataUrl);
-        const blob = await res.blob();
-        const file = new File([blob], "photo.jpg", { type: blob.type });
-        setPreview(photo.dataUrl);
-        onImageSelected(file, photo.dataUrl);
-      }
-    } catch (err) {
-      alert("Could not access camera");
-    }
+  const handleDeleteImage = () => {
+    setPreview(null);
+    // Optionally, notify parent that image is removed
+    onImageSelected(undefined as any, "");
   };
 
   return (
-    <Card className="flex flex-col items-center gap-4 p-4">
-      <div className="flex gap-2">
-        <Button type="button" onClick={handleButtonClick} variant="outline">
+    <Card className="flex flex-col items-center gap-2 p-2">
+      {preview && (
+        <div className="relative mb-2">
+          <img
+            src={preview}
+            alt="Preview"
+            className="rounded-md object-cover w-full max-h-48"
+          />
+
+          <Button
+            type="button"
+            onClick={handleDeleteImage}
+            variant="destructive"
+            size="icon"
+            className="absolute -top-1 -right-1 w-7 h-7 rounded-full p-0 flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+            aria-label="Delete image"
+          >
+            <DeleteIcon fontSize="small" />
+          </Button>
+        </div>
+      )}
+
+      {!preview && (
+        <Button
+          type="button"
+          onClick={handleButtonClick}
+          variant="outline"
+          className="w-full"
+        >
           Choose Image
         </Button>
-
-        <Button type="button" onClick={handleTakePhoto} variant="secondary">
-          Take Photo
-        </Button>
-      </div>
+      )}
 
       <input
         ref={fileInputRef}
@@ -70,14 +78,6 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         className="hidden"
         onChange={handleFileChange}
       />
-
-      {preview && (
-        <img
-          src={preview}
-          alt="Preview"
-          className="mt-4 rounded-lg object-cover w-32 h-32 border"
-        />
-      )}
     </Card>
   );
 };
