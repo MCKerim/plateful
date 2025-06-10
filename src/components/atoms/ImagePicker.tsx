@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { AspectRatio } from "../ui/aspect-ratio";
 
 interface ImagePickerProps {
   onImageSelected: (file: File, previewUrl: string) => void;
