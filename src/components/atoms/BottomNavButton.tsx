@@ -1,9 +1,9 @@
 import { NavLink } from "react-router";
-import { Album, Book, Bookmark, BookMarked, BookOpenText, CalendarDays, House, ScrollText, Search } from "lucide-react";
+import { Book, BookOpen, BookOpenText, Calendar, House, List, ReceiptText, Search } from "lucide-react";
 
 type Props = {
   label: string;
-  icon: "bookmark" | "bookOpenText" | "calendarDays" | "scrollText" | "house" | "search" | "bookMarked";
+  icon: "home" | "explore" | "cookbook" | "planner" | "lists";
   link: string;
   active?: boolean;
 };
@@ -14,22 +14,20 @@ export default function BottomNavButton({
   link,
   active = false,
 }: Readonly<Props>) {
+  const ICON_SIZE = 22;
+  
   function getIcon() {
     switch (icon) {
-      case "house":
-        return <House strokeWidth={active ? 2.5 : 2} />;
-      case "search":
-        return <Search strokeWidth={active ? 2.5 : 2} />;
-      case "bookMarked":
-        return <BookMarked strokeWidth={active ? 2.5 : 2} />;
-      case "bookmark":
-        return <Bookmark strokeWidth={active ? 2.5 : 2} />;
-      case "bookOpenText":
-        return <BookOpenText strokeWidth={active ? 2.5 : 2} />;
-      case "calendarDays":
-        return <CalendarDays strokeWidth={active ? 2.5 : 2} />;
-      case "scrollText":
-        return <ScrollText strokeWidth={active ? 2.5 : 2} />;
+      case "home":
+        return <House size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
+      case "explore":
+        return <Search size={ICON_SIZE} strokeWidth={active ? 3 : 1.5}  />;
+      case "cookbook":
+        return <BookOpen size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
+      case "planner":
+        return <Calendar size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
+      case "lists":
+        return <List size={ICON_SIZE} strokeWidth={active ? 3 : 1.5} />;
       default:
         return null;
     }
@@ -39,14 +37,14 @@ export default function BottomNavButton({
     <NavLink
       to={link}
       className={
-        "w-full align-middle items-center " + (active && "text-plateful")
+        "w-full align-middle items-center " + (!active && "text-gray-500")
       }
     >
-      <div className="w-full flex justify-center font-bold">{getIcon()}</div>
+      <div className="w-full flex justify-center">{getIcon()}</div>
 
       <p
         className={
-          "w-full text-center text-sm " + (active ? "font-bold" : "font-medium")
+          "w-full text-center text-xs mt-1 " + (active ? "font-bold" : "")
         }
       >
         {label}

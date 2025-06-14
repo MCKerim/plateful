@@ -9,27 +9,25 @@ export default function BottomNav() {
     <>
       <div style={{ height: "100px" }}></div>
 
-      <div className="w-full max-w-lg fixed bottom-0 pb-2 bg-background z-20">
-        <Separator className="mb-2" />
-
+      <div className="w-full max-w-lg fixed bottom-0 py-2 bg-secondary z-20 rounded-t-2xl">
         <div className="flex justify-between w-full gap-1 px-2">
           <BottomNavButton
             label={t("bottomNav.home")}
-            icon="house"
+            icon="home"
             link="/home"
             active={window.location.pathname.startsWith("/home")}
           />
 
           <BottomNavButton
             label={t("bottomNav.explore")}
-            icon="search"
+            icon="explore"
             link="/explore"
             active={window.location.pathname.startsWith("/explore")}
           />
 
           <BottomNavButton
             label={t("bottomNav.cookbook")}
-            icon="bookMarked"
+            icon="cookbook"
             link="/cookbook"
             active={
               window.location.pathname.startsWith("/cookbook") ||
@@ -39,14 +37,14 @@ export default function BottomNav() {
 
           <BottomNavButton
             label={t("bottomNav.planner")}
-            icon="calendarDays"
+            icon="planner"
             link="/planner"
             active={window.location.pathname.startsWith("/planner")}
           />
 
           <BottomNavButton
             label={t("bottomNav.list")}
-            icon="scrollText"
+            icon="lists"
             link="/lists"
             active={window.location.pathname.startsWith("/lists")}
           />
