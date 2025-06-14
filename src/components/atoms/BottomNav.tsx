@@ -1,4 +1,3 @@
-import { Separator } from "../ui/separator";
 import BottomNavButton from "./BottomNavButton";
 import { useTranslation } from "react-i18next";
 

@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { Book, BookOpen, BookOpenText, Calendar, House, List, ReceiptText, Search } from "lucide-react";
+import { BookOpen, Calendar, House, List, Search } from "lucide-react";
 
 type Props = {
   label: string;
