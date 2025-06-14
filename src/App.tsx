@@ -119,19 +119,19 @@ function App() {
   }, [user?.id]);
 
   function isLoggedIn(): boolean {
-    return true;
+    return user !== null;
   }
 
   function hasSeenValueScreens(): boolean {
-    return true;
+    return user?.has_seen_value_screens ?? false;
   }
 
   function hasCompletedSurvey(): boolean {
-    return true;
+    return user?.has_completed_survey ?? false;
   }
 
   function hasHousehold(): boolean {
-    return true;
+    return householdId !== null;
   }
 
   function routeToCorrectPage(page: JSX.Element) {

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router";
+import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";

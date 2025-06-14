@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/accordion";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import { CommingSoon } from "@/components/ui/commingSoonOverlay";
-import { useTranslation } from "react-i18next";
 
 type ShoppingListItem = {
   id: number;
@@ -21,8 +20,6 @@ type ShoppingListItem = {
 };
 
 export default function ShoppingList() {
-  const { t } = useTranslation();
-
   const [items, setItems] = useState<ShoppingListItem[]>([]);
 
   useEffect(() => {
