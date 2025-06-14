@@ -1,9 +1,9 @@
 import { NavLink } from "react-router";
-import { Bookmark, BookOpenText, CalendarDays, ScrollText } from "lucide-react";
+import { Album, Book, Bookmark, BookMarked, BookOpenText, CalendarDays, House, ScrollText, Search } from "lucide-react";
 
 type Props = {
   label: string;
-  icon: "bookmark" | "bookOpenText" | "calendarDays" | "scrollText";
+  icon: "bookmark" | "bookOpenText" | "calendarDays" | "scrollText" | "house" | "search" | "bookMarked";
   link: string;
   active?: boolean;
 };
@@ -16,6 +16,12 @@ export default function BottomNavButton({
 }: Readonly<Props>) {
   function getIcon() {
     switch (icon) {
+      case "house":
+        return <House strokeWidth={active ? 2.5 : 2} />;
+      case "search":
+        return <Search strokeWidth={active ? 2.5 : 2} />;
+      case "bookMarked":
+        return <BookMarked strokeWidth={active ? 2.5 : 2} />;
       case "bookmark":
         return <Bookmark strokeWidth={active ? 2.5 : 2} />;
       case "bookOpenText":

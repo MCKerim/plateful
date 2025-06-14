@@ -14,34 +14,41 @@ export default function BottomNav() {
 
         <div className="flex justify-between w-full gap-1 px-2">
           <BottomNavButton
-            label={t("bottomNav.list")}
-            icon="scrollText"
-            link="/shoppinglist"
-            active={window.location.pathname.startsWith("/shoppinglist")}
+            label={t("bottomNav.home")}
+            icon="house"
+            link="/home"
+            active={window.location.pathname.startsWith("/home")}
           />
 
           <BottomNavButton
-            label={t("bottomNav.planner")}
-            icon="calendarDays"
-            link="/mealplanner"
-            active={window.location.pathname.startsWith("/mealplanner")}
-          />
-
-          <BottomNavButton
-            label={t("bottomNav.recipes")}
-            icon="bookOpenText"
-            link="/discover"
+            label={t("bottomNav.explore")}
+            icon="search"
+            link="/explore"
             active={
-              window.location.pathname.startsWith("/discover") ||
+              window.location.pathname.startsWith("/explore") ||
               window.location.pathname.startsWith("/recipe")
             }
           />
 
           <BottomNavButton
-            label={t("bottomNav.home")}
-            icon="bookmark"
-            link="/bookmarks"
-            active={window.location.pathname.startsWith("/bookmarks")}
+            label={t("bottomNav.cookbook")}
+            icon="bookMarked"
+            link="/cookbook"
+            active={window.location.pathname.startsWith("/cookbook")}
+          />
+
+          <BottomNavButton
+            label={t("bottomNav.planner")}
+            icon="calendarDays"
+            link="/planner"
+            active={window.location.pathname.startsWith("/planner")}
+          />
+
+          <BottomNavButton
+            label={t("bottomNav.list")}
+            icon="scrollText"
+            link="/lists"
+            active={window.location.pathname.startsWith("/lists")}
           />
         </div>
       </div>

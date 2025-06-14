@@ -60,12 +60,12 @@
     }
   },
   "bottomNav": {
-    "list": "Liste",
+    "home": "Startseite",
+    "explore": "Erkunden",
+    "cookbook": "Kochbuch",
     "planner": "Planer",
-    "recipes": "Rezepte",
-    "home": "Home"
+    "list": "Liste"
   },
-
 
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",

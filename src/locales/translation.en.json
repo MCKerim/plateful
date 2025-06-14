@@ -60,10 +60,11 @@
     }
   },
   "bottomNav": {
-    "list": "List",
-    "planner": "Planner",
-    "recipes": "Recipes",
-    "home": "Home"
+    "home": "Home",
+    "explore": "Explore",
+    "cookbook": "Cookbook",
+    "planner": "Planer",
+    "list": "List"
   },
 
   "ingredients": "Ingredients",

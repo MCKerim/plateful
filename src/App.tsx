@@ -148,12 +148,12 @@ function App() {
       {/* Onboarding */}
       <Route
         path="/"
-        element={isLoggedIn() ? <Navigate to="/mealplanner" /> : <Welcome />}
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />}
       />
 
       <Route
         path="/signup"
-        element={isLoggedIn() ? <Navigate to="/mealplanner" /> : <SignUp />}
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
 
       <Route path="/value" element={<ValueScreen />} />
@@ -163,7 +163,7 @@ function App() {
       <Route
         path="/createhousehold"
         element={
-          hasHousehold() ? <Navigate to="/mealplanner" /> : <CreateHousehold />
+          hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />
         }
       />
 
@@ -172,7 +172,7 @@ function App() {
       <Route
         path="/joinHousehold"
         element={
-          hasHousehold() ? <Navigate to="/mealplanner" /> : <JoinHousehold />
+          hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />
         }
       />
 
@@ -188,15 +188,15 @@ function App() {
       />
 
       <Route
-        path="/shoppinglist"
+        path="/lists"
         element={routeToCorrectPage(<ShoppingList />)}
       />
       <Route
-        path="/mealplanner"
+        path="/planner"
         element={routeToCorrectPage(<MealPlanner />)}
       />
-      <Route path="/discover" element={routeToCorrectPage(<Discover />)} />
-      <Route path="/bookmarks" element={routeToCorrectPage(<Bookmarks />)} />
+      <Route path="/explore" element={routeToCorrectPage(<Discover />)} />
+      <Route path="/cookbook" element={routeToCorrectPage(<Discover />)} />
 
       <Route
         path="/recipe/:recipeId"
