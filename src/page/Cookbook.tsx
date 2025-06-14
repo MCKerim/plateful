@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
-import { Link } from "react-router";
+import { Link, NavLink, useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";
@@ -18,6 +18,7 @@ type Recipe = {
 
 export default function Cookbook() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -81,6 +82,17 @@ export default function Cookbook() {
 
     setSearchResults(matchedRecipes);
   };
+
+  function handleAddRecipe() {
+    const path =
+      "/recipe/add" +
+      (searchTerm.trim() !== ""
+        ? `?recipeNameFromSearch=${searchTerm.trim()}`
+        : "");
+
+    navigate(path);
+  }
+
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
@@ -98,20 +110,14 @@ export default function Cookbook() {
             <Delete />
           </Button>
         )}
-
-        <Button asChild>
-          <Link
-            to={
-              "/recipe/add" +
-              (searchTerm.trim() !== ""
-                ? `?recipeNameFromSearch=${searchTerm.trim()}`
-                : "")
-            }
-          >
-            <Plus />
-          </Link>
-        </Button>
       </div>
+
+      <button
+        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-plateful text-background flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
+        onClick={handleAddRecipe}
+      >
+        <Plus size={34} />
+      </button>
 
       <div className="flex flex-col gap-4 items-center">
         {searchResults.map((recipe, index) => (
