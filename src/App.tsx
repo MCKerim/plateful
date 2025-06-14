@@ -1,8 +1,6 @@
 import { Route, Routes, Navigate } from "react-router";
 import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
-import Discover from "./page/Discover";
-import Bookmarks from "./page/Bookmarks";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/SignUp";
@@ -27,6 +25,9 @@ import InviteMembers from "./page/onboarding/InviteMembers";
 import JoinHousehold from "./page/onboarding/JoinHousehold";
 import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
 import NotFound from "./page/NotFound";
+import Home from "./page/Home";
+import Explore from "./page/Explore";
+import Cookbook from "./page/Cookbook";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -195,8 +196,9 @@ function App() {
         path="/planner"
         element={routeToCorrectPage(<MealPlanner />)}
       />
-      <Route path="/explore" element={routeToCorrectPage(<Discover />)} />
-      <Route path="/cookbook" element={routeToCorrectPage(<Discover />)} />
+      <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
+      <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
+      <Route path="/home" element={routeToCorrectPage(<Home />)} />
 
       <Route
         path="/recipe/:recipeId"

@@ -347,7 +347,7 @@ export default function AddRecipe() {
       <div className="flex gap-2 w-full mt-11">
         <Button asChild className="w-full" variant="secondary">
           <Link
-            to={params.recipeId ? `/recipe/${params.recipeId}` : "/discover"}
+            to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}
           >
             {t("common.cancel")}
           </Link>

@@ -114,7 +114,7 @@ export default function ShoppingList() {
     <Layout>
       <CommingSoon />
 
-      <h1 className="text-2xl">{t("shoppingList.title")}</h1>
+      <h1 className="text-2xl">{t("list.title")}</h1>
 
       {items.filter((shoppingListItem) => !shoppingListItem.bought).length ===
         0 && (

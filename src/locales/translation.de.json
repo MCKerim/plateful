@@ -7,7 +7,7 @@
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar..."
   },
-  "shoppingList": {
+  "list": {
     "title": "Einkaufsliste"
   },
   "mealPlanner": {
@@ -15,8 +15,8 @@
     "selectNumberOfDays": "Wähle die anzahl der Tage aus",
     "alreadyEaten": "Bereits gegessen"
   },
-  "discover": {
-    "title": "Entdecke Rezepte",
+  "cookbook": {
+    "title": "Kochbuch",
     "enterRecipeName": "Rezeptname eingeben...",
     "nothingFound": "Nichts gefunden...",
     "addNewViaPlus": "...füge über das '+' ein neues Rezept hinzu!"
@@ -35,8 +35,11 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de"
   },
-  "bookmarks": {
-    "title": "Lesezeichen"
+  "home": {
+    "title": "Startseite"
+  },
+  "explore": {
+    "title": "Erkunden"
   },
   "settings": {
     "title": "Einstellungen",

@@ -24,17 +24,17 @@ export default function BottomNav() {
             label={t("bottomNav.explore")}
             icon="search"
             link="/explore"
-            active={
-              window.location.pathname.startsWith("/explore") ||
-              window.location.pathname.startsWith("/recipe")
-            }
+            active={window.location.pathname.startsWith("/explore")}
           />
 
           <BottomNavButton
             label={t("bottomNav.cookbook")}
             icon="bookMarked"
             link="/cookbook"
-            active={window.location.pathname.startsWith("/cookbook")}
+            active={
+              window.location.pathname.startsWith("/cookbook") ||
+              window.location.pathname.startsWith("/recipe")
+            }
           />
 
           <BottomNavButton

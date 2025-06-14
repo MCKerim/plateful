@@ -16,7 +16,7 @@ type Recipe = {
   description: string;
 };
 
-export default function Discover() {
+export default function Cookbook() {
   const { t } = useTranslation();
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -85,7 +85,7 @@ export default function Discover() {
   return (
     <Layout>
       <h1 className="text-2xl mb-2">
-        {t("discover.title")}{" "}
+        {t("cookbook.title")}{" "}
         {searchResults.length > 0 &&
           `• ${t("recipeWithCount", { count: searchResults.length })}`}
       </h1>
@@ -94,7 +94,7 @@ export default function Discover() {
         <Input
           className="w-full"
           type="text"
-          placeholder={t("discover.enterRecipeName")}
+          placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
@@ -128,10 +128,10 @@ export default function Discover() {
           <Card className="w-full">
             <CardHeader>
               <h1 className="font-bold text-lg leading-tight">
-                {t("discover.nothingFound")}
+                {t("cookbook.nothingFound")}
               </h1>
 
-              <CardDescription>{t("discover.addNewViaPlus")}</CardDescription>
+              <CardDescription>{t("cookbook.addNewViaPlus")}</CardDescription>
             </CardHeader>
           </Card>
         )}

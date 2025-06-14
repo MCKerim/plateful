@@ -217,7 +217,7 @@ export default function Recipe() {
       console.error("Error while deleting recipe: ", error);
       alert("Error while deleting recipe");
     } else {
-      navigate("/discover");
+      navigate("/cookbook");
     }
   }
 

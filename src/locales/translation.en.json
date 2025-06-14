@@ -7,7 +7,7 @@
     "save": "Save",
     "commingSoon": "Comming soon..."
   },
-  "shoppingList": {
+  "list": {
     "title": "Shopping list"
   },
   "mealPlanner": {
@@ -15,8 +15,8 @@
     "selectNumberOfDays": "Select the number of days",
     "alreadyEaten": "Already eaten"
   },
-  "discover": {
-    "title": "Discover recipes",
+  "cookbook": {
+    "title": "Cookbook",
     "enterRecipeName": "Enter recipe name...",
     "nothingFound": "Nothing found...",
     "addNewViaPlus": "...add a new recipe via the '+' button!"
@@ -35,8 +35,11 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com"
   },  
-  "bookmarks": {
-    "title": "Bookmarks"
+  "home": {
+    "title": "Home"
+  },
+  "explore": {
+    "title": "Explore"
   },
   "settings": {
     "title": "Settings",
