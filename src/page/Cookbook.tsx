@@ -98,7 +98,7 @@ export default function Cookbook() {
     <Layout>
       <div className="w-full max-w-lg flex my-1 items-center gap-2 sticky top-14 mb-2 z-10">
         <Input
-          className="w-full"
+          className="w-full rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}

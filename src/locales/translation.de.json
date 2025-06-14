@@ -17,7 +17,7 @@
   },
   "cookbook": {
     "title": "Kochbuch",
-    "enterRecipeName": "Rezeptname eingeben...",
+    "enterRecipeName": "Rezept suchen...",
     "nothingFound": "Nichts gefunden...",
     "addNewViaPlus": "...füge über das '+' ein neues Rezept hinzu!"
   },
