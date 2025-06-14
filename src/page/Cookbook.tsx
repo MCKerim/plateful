@@ -84,13 +84,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <h1 className="text-2xl mb-2">
-        {t("cookbook.title")}{" "}
-        {searchResults.length > 0 &&
-          `• ${t("recipeWithCount", { count: searchResults.length })}`}
-      </h1>
-
-      <div className="w-full max-w-lg mb-2 flex items-center gap-2 sticky top-16 z-10">
+      <div className="w-full max-w-lg flex my-1 items-center gap-2 sticky top-14 mb-2 z-10">
         <Input
           className="w-full"
           type="text"
