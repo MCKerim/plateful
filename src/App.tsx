@@ -4,7 +4,7 @@ import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/SignUp";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
@@ -28,13 +28,17 @@ import NotFound from "./page/NotFound";
 import Home from "./page/Home";
 import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
+import LoadingScreen from "./components/atoms/LoadingScreen";
 
 function App() {
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
+  const [loading, setLoading] = useState(true);
 
   async function updateSession(session: Session | null) {
+    setLoading(true);
+
     if (session?.user) {
       const { data: userData, error: userError } = await supabase
         .from("users")
@@ -53,6 +57,7 @@ function App() {
         dispatch(setHousehold(userData.household ?? null));
 
         if (!userData.household_id) {
+          setLoading(false);
           return;
         }
 
@@ -64,6 +69,7 @@ function App() {
 
         if (membersError) {
           console.error("Error fetching household members:", membersError);
+          setLoading(false);
           return;
         }
 
@@ -74,8 +80,11 @@ function App() {
       dispatch(setHousehold(null));
       dispatch(setHouseholdMembers(null));
     }
+
+    setLoading(false);
   }
 
+  // Subscribe to auth state changes
   useEffect(() => {
     let isMounted = true;
 
@@ -90,10 +99,10 @@ function App() {
     };
   }, []);
 
+  // Subscribe to realtime changes for the current user in the users table
   useEffect(() => {
     if (!user?.id) return;
 
-    // Subscribe to realtime changes for the current user in the users table
     const userSubscription = supabase
       .channel("public:users")
       .on(
@@ -142,6 +151,10 @@ function App() {
       hasCompletedSurvey,
       hasHousehold
     );
+  }
+
+  if (loading) {
+    return <LoadingScreen />;
   }
 
   return (
