@@ -7,7 +7,8 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map } from "lucide-react";
+import { Donut, House, Newspaper, Map, Globe, User, ExternalLink } from "lucide-react";
+import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -50,7 +51,7 @@ export default function Settings() {
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.language")}</h2>
+          <h2 className="border-b font-medium">{t("settings.language")}</h2>
 
           <div className="w-full flex gap-2">
             <Button
@@ -72,13 +73,13 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.appearance")}</h2>
+          <h2 className="border-b font-medium">{t("settings.appearance")}</h2>
 
           <ModeToggle />
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.household")}</h2>
+          <h2 className="border-b font-medium">{t("settings.household")}</h2>
 
           <p className="text-sm">
             Nutze Plateful mit deinen Freunden oder deiner Familie!
@@ -94,7 +95,7 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.supportFeedback")}</h2>
+          <h2 className="border-b font-medium">{t("settings.supportFeedback")}</h2>
 
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
@@ -133,10 +134,48 @@ export default function Settings() {
               {t("settings.viewRoadmap")}
             </Button>
           </NavLink>
+
+          <NavLink
+            data-canny-link
+            to="https://plateful.canny.io"
+            target="blank"
+          >
+            <Button variant="secondary" className="w-full">
+              <Map />
+
+              Über Uns
+            </Button>
+          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b">{t("settings.dangerZone")}</h2>
+          <h2 className="border-b font-medium">About</h2>
+
+          <p className="text-sm">
+            Plateful is built by Kerim Ismail. Have feedback or want to connect? Reach out below!
+          </p>
+
+          <div className="flex justify-evenly py-2">
+            <NavLink to="https://kblanks.com/" target="_blank">
+              <Globe size={24} />
+            </NavLink>
+
+            <NavLink to="https://www.threads.com/@kblanks_com" target="_blank">
+              <FaThreads size={24} />
+            </NavLink>
+
+            <NavLink to="https://www.instagram.com/KBlanks_com" target="_blank">
+              <FaInstagram size={24} />
+            </NavLink>
+
+            <NavLink to="https://www.tiktok.com/@KBlanks.com" target="_blank">
+              <FaTiktok size={24} />
+            </NavLink>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
+          <h2 className="border-b font-medium">{t("settings.dangerZone")}</h2>
 
           {user?.email}
 
