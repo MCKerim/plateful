@@ -190,7 +190,7 @@ export default function Recipe() {
       console.error("Error while planning recipe: ", error);
       alert("Error while planning recipe");
     } else {
-      navigate("/mealplanner");
+      navigate("/planner");
     }
   }
 
