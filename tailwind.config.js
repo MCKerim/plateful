@@ -72,10 +72,20 @@ export default {
             height: "0",
           },
         },
+        "bounce-high": {
+          "0%, 100%": {
+            animationTimingFunction: "ease-out",
+          },
+          "50%": {
+            transform: "translateY(-15px)",
+            animationTimingFunction: "ease-in",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "bounce-high": "bounce-high 1s infinite",
       },
     },
   },
