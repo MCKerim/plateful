@@ -134,18 +134,6 @@ export default function Settings() {
               {t("settings.viewRoadmap")}
             </Button>
           </NavLink>
-
-          <NavLink
-            data-canny-link
-            to="https://plateful.canny.io"
-            target="blank"
-          >
-            <Button variant="secondary" className="w-full">
-              <Map />
-
-              Über Uns
-            </Button>
-          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
