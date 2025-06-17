@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 
 type MealPlannerItem = {
   id: number;
@@ -187,6 +188,21 @@ export default function MealPlanner() {
               </div>
             ))}
           </>
+        )}
+
+        {!loading && plannedItems
+          .filter((item) => {
+            return item.days > item.daysEaten;
+          }).length === 0 && (
+          <Card className="w-full">
+            <CardHeader>
+              <h1 className="font-bold text-lg leading-tight">
+                Nichts geplant...
+              </h1>
+
+              <CardDescription>...plane Rezepte für die nächsten Tage</CardDescription>
+            </CardHeader>
+          </Card>
         )}
 
         {plannedItems
