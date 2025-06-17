@@ -9,6 +9,7 @@ import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";
 import { Card, CardDescription, CardHeader } from "../components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Recipe = {
   id: number;
@@ -23,6 +24,7 @@ export default function Cookbook() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getRecipes();
@@ -49,6 +51,7 @@ export default function Cookbook() {
     if (!data) {
       setRecipes(newRecipes);
       setSearchResults(newRecipes);
+      setLoading(false);
       return;
     }
 
@@ -60,8 +63,10 @@ export default function Cookbook() {
       };
       newRecipes.push(newRecipe);
     });
+
     setRecipes(newRecipes);
     setSearchResults(newRecipes);
+    setLoading(false);
   }
 
   const fuse = new Fuse(recipes, {
@@ -120,11 +125,23 @@ export default function Cookbook() {
       </button>
 
       <div className="flex flex-col gap-4 items-center">
+        {loading && (
+          <>
+            {[...Array(4)].map((_, i) => (
+              <div className="w-full max-w-lg" key={`skeleton_${i}`}>
+                <Skeleton className="h-[128px] rounded-t-lg rounded-b-none mb-1" />
+
+                <Skeleton className="h-[66.5px] rounded-b-lg rounded-t-none" />
+              </div>
+            ))}
+          </>
+        )}
+
         {searchResults.map((recipe, index) => (
           <RecipeCard key={index} id={recipe.id} name={recipe.recipeName} />
         ))}
 
-        {searchResults.length === 0 && (
+        {!loading && searchResults.length === 0 && (
           <Card className="w-full">
             <CardHeader>
               <h1 className="font-bold text-lg leading-tight">
