@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map, Globe, User, ExternalLink } from "lucide-react";
+import { Donut, House, Newspaper, Map, Globe } from "lucide-react";
 import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
 
 export default function Settings() {
