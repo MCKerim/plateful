@@ -13,6 +13,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type MealPlannerItem = {
   id: number;
@@ -27,6 +28,7 @@ export default function MealPlanner() {
   const { t, i18n } = useTranslation();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -36,6 +38,8 @@ export default function MealPlanner() {
   }, []);
 
   async function getMealPlannerItems() {
+    setLoading(true);
+
     const { data } = await supabase
       .from("meal_planning")
       .select(
@@ -53,6 +57,7 @@ export default function MealPlanner() {
 
     if (!data) {
       setPlannedItems(newItems);
+      setLoading(false);
       return;
     }
 
@@ -73,6 +78,7 @@ export default function MealPlanner() {
     //.filter((item) => item.date >= twoDaysAgo)
 
     setPlannedItems(newItems);
+    setLoading(false);
   }
 
   async function deletePlannedItem(id: number) {
@@ -171,6 +177,18 @@ export default function MealPlanner() {
       <Separator />
 
       <div className="flex flex-col gap-2.5">
+        {loading && (
+          <>
+            {[...Array(4)].map((_, i) => (
+              <div className="w-full max-w-lg h-[90px] flex" key={`skeleton_${i}`}>
+                <Skeleton className="min-w-[70px] mr-1 h-full rounded-l-lg rounded-r-none" />
+
+                <Skeleton className="w-[100%] h-full rounded-r-lg rounded-l-none mb-1" />
+              </div>
+            ))}
+          </>
+        )}
+
         {plannedItems
           .filter((item) => {
             return item.days > item.daysEaten;
