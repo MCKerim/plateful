@@ -181,7 +181,10 @@ export default function MealPlanner() {
         {loading && (
           <>
             {[...Array(4)].map((_, i) => (
-              <div className="w-full max-w-lg h-[90px] flex" key={`skeleton_${i}`}>
+              <div
+                className="w-full max-w-lg h-[90px] flex"
+                key={`skeleton_${i}`}
+              >
                 <Skeleton className="min-w-[70px] mr-1 h-full rounded-l-lg rounded-r-none" />
 
                 <Skeleton className="w-[100%] h-full rounded-r-lg rounded-l-none mb-1" />
@@ -190,20 +193,22 @@ export default function MealPlanner() {
           </>
         )}
 
-        {!loading && plannedItems
-          .filter((item) => {
+        {!loading &&
+          plannedItems.filter((item) => {
             return item.days > item.daysEaten;
           }).length === 0 && (
-          <Card className="w-full">
-            <CardHeader>
-              <h1 className="font-bold text-lg leading-tight">
-                Nichts geplant...
-              </h1>
+            <Card className="w-full">
+              <CardHeader>
+                <h1 className="font-bold text-lg leading-tight">
+                  Nichts geplant...
+                </h1>
 
-              <CardDescription>...plane Rezepte für die nächsten Tage</CardDescription>
-            </CardHeader>
-          </Card>
-        )}
+                <CardDescription>
+                  ...plane Rezepte für die nächsten Tage
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          )}
 
         {plannedItems
           .filter((item) => {
