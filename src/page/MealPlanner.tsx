@@ -184,7 +184,7 @@ export default function MealPlanner() {
           <AccordionTrigger>
             <div className="flex gap-1 items-center">
               <CalendarOff size={20} />
-              Ohne Datum
+              Ohne Datum - {getNotPlannedItems().length}
             </div>
           </AccordionTrigger>
 
