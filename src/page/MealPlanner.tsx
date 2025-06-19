@@ -6,6 +6,13 @@ import { format, isSameDay, isToday } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 import MealPlannerAdd from "@/components/atoms/MealPlannerAdd";
 import { getWeekdays } from "@/lib/dateHelper";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import { CalendarOff } from "lucide-react";
 
 type MealPlannerItem = {
   id: number;
@@ -172,32 +179,39 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
-      <div>
-        <p className="font-semibold">Lager</p>
-
-        <div className="overflow-x-auto py-2 flex gap-3 scrollbar-hide">
-          {getNotPlannedItems().map((item) => (
-            <div key={item.id} className="min-w-[400px]">
-              <MealPlannerItem
-                id={item.id}
-                recipeId={item.recipeId}
-                recipeName={item.recipeName}
-                date={item.planned_date}
-                days={item.days}
-                daysEaten={item.daysEaten}
-                setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                onDeleteDate={(id) => deletePlannedItem(id)}
-                onUpdateDate={(id, newDate, newDays) =>
-                  updatePlannedItemDate(id, newDate, newDays)
-                }
-                onRecipeEaten={(id) => {
-                  setDaysEaten(id, item.daysEaten + 1);
-                }}
-              />
+      <Accordion type="single" defaultValue="item-1" collapsible>
+        <AccordionItem value="item-1">
+          <AccordionTrigger>
+            <div className="flex gap-1 items-center">
+              <CalendarOff size={20} />
+              Ohne Datum
             </div>
-          ))}
-        </div>
-      </div>
+          </AccordionTrigger>
+
+          <AccordionContent className="overflow-x-auto py-2 flex gap-3 no-scrollbar">
+            {getNotPlannedItems().map((item) => (
+              <div key={item.id} className="min-w-[400px]">
+                <MealPlannerItem
+                  id={item.id}
+                  recipeId={item.recipeId}
+                  recipeName={item.recipeName}
+                  date={item.planned_date}
+                  days={item.days}
+                  daysEaten={item.daysEaten}
+                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                  onDeleteDate={(id) => deletePlannedItem(id)}
+                  onUpdateDate={(id, newDate, newDays) =>
+                    updatePlannedItemDate(id, newDate, newDays)
+                  }
+                  onRecipeEaten={(id) => {
+                    setDaysEaten(id, item.daysEaten + 1);
+                  }}
+                />
+              </div>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <div className="flex flex-col gap-2.5">
         {getWeekdays().map((day) => (
