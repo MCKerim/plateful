@@ -179,7 +179,7 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
-      <Accordion type="single" defaultValue="item-1" collapsible>
+      <Accordion type="single" defaultValue="item-1" collapsible className="bg-background sticky top-11">
         <AccordionItem value="item-1">
           <AccordionTrigger>
             <div className="flex gap-1 items-center">
@@ -229,6 +229,39 @@ export default function MealPlanner() {
           </div>
         ))}
       </div>
+
+      <Accordion type="single" defaultValue="item-1" collapsible className="bg-background fixed bottom-16">
+        <AccordionItem value="item-1">
+          <AccordionTrigger>
+            <div className="flex gap-1 items-center">
+              Maybie
+            </div>
+          </AccordionTrigger>
+
+          <AccordionContent className="overflow-x-auto py-2 flex gap-3 no-scrollbar">
+            {getNotPlannedItems().map((item) => (
+              <div key={item.id} className="min-w-[400px]">
+                <MealPlannerItem
+                  id={item.id}
+                  recipeId={item.recipeId}
+                  recipeName={item.recipeName}
+                  date={item.planned_date}
+                  days={item.days}
+                  daysEaten={item.daysEaten}
+                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                  onDeleteDate={(id) => deletePlannedItem(id)}
+                  onUpdateDate={(id, newDate, newDays) =>
+                    updatePlannedItemDate(id, newDate, newDays)
+                  }
+                  onRecipeEaten={(id) => {
+                    setDaysEaten(id, item.daysEaten + 1);
+                  }}
+                />
+              </div>
+            ))}
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </Layout>
   );
 }
