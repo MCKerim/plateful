@@ -94,16 +94,12 @@ export default function MealPlannerItem({
         variant="outline"
         onClick={eat}
       >
-        {Array.from({ length: days }, (_, index) => (
+        {Array.from({ length: 1 }, (_, index) => (
           <>
             {index < daysEaten ? (
               <NoMealsIcon style={{ fontSize: 24 }} />
             ) : (
               <RestaurantIcon style={{ fontSize: 24 }} />
-            )}
-
-            {index < days - 1 && (
-              <span className="h-full border-r-2 rounded-full border-foreground"></span>
             )}
           </>
         ))}

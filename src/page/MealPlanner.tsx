@@ -2,32 +2,21 @@ import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import supabase from "@/utils/supabase";
-import { Separator } from "../components/ui/separator";
-import { format, addDays } from "date-fns";
-import { useTranslation } from "react-i18next";
-import { de, enUS } from "date-fns/locale";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { format, isSameDay, isToday } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import MealPlannerAdd from "@/components/atoms/MealPlannerAdd";
+import { getWeekdays } from "@/lib/dateHelper";
 
 type MealPlannerItem = {
   id: number;
   recipeId: number;
   recipeName: string;
-  date: Date;
+  planned_date: Date | null;
   days: number;
   daysEaten: number;
 };
 
 export default function MealPlanner() {
-  const { t, i18n } = useTranslation();
-
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,7 +55,7 @@ export default function MealPlanner() {
       const newItem: MealPlannerItem = {
         id: item.id,
         recipeId: item.recipes?.id ?? 1,
-        date: new Date(item.planned_date ?? ""),
+        planned_date: item.planned_date ? new Date(item.planned_date) : null,
         recipeName: item.recipes?.name ?? "no name",
         days: item.days,
         daysEaten: item.daysEaten,
@@ -114,31 +103,6 @@ export default function MealPlanner() {
     }
   }
 
-  function plannedDays() {
-    const sumDaysPlanned = plannedItems.reduce(
-      (accumulator, currentItem) => accumulator + currentItem.days,
-      0
-    );
-
-    const sumDaysEaten = plannedItems.reduce(
-      (accumulator, currentItem) => accumulator + currentItem.daysEaten,
-      0
-    );
-
-    return sumDaysPlanned - sumDaysEaten;
-  }
-
-  function getPlannedRangeFormatted() {
-    const currentLanguage = i18n.language;
-    const locale = currentLanguage === "de" ? de : enUS;
-
-    return `${format(new Date(), "EEEE, dd.MM", { locale })} - ${format(
-      addDays(new Date(), plannedDays()),
-      "EEEE, dd.MM",
-      { locale }
-    )}`;
-  }
-
   async function setDaysEaten(id: number, newDaysEaten: number) {
     const { error } = await supabase
       .from("meal_planning")
@@ -162,6 +126,44 @@ export default function MealPlanner() {
     ratingModalRef.current?.open();
   }
 
+  function getMealPlannerItemByPlannedDate(plannedDate: Date) {
+    return plannedItems.find(
+      (item) => item.planned_date && isSameDay(item.planned_date, plannedDate)
+    );
+  }
+
+  function renderCorrectItem(plannedDate: Date) {
+    const item = getMealPlannerItemByPlannedDate(plannedDate);
+
+    if (item) {
+      return (
+        <MealPlannerItem
+          id={item.id}
+          recipeId={item.recipeId}
+          recipeName={item.recipeName}
+          date={item.planned_date}
+          days={item.days}
+          daysEaten={item.daysEaten}
+          setDaysEaten={(days) => setDaysEaten(item.id, days)}
+          onDeleteDate={(id) => deletePlannedItem(id)}
+          onUpdateDate={(id, newDate, newDays) =>
+            updatePlannedItemDate(id, newDate, newDays)
+          }
+          onRecipeEaten={(id) => {
+            setDaysEaten(id, item.daysEaten + 1);
+          }}
+        />
+      );
+    }
+    return <MealPlannerAdd onClick={() => {}} />;
+  }
+
+  function getNotPlannedItems() {
+    return plannedItems.filter((item) => {
+      return item.planned_date === null;
+    });
+  }
+
   return (
     <Layout>
       <RatingModal
@@ -170,96 +172,49 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
-      <p className="w-full text-center">
-        {t("dayWithCount", { count: plannedDays() })} •{" "}
-        {getPlannedRangeFormatted()}
-      </p>
+      <div>
+        <p className="font-semibold">Lager</p>
 
-      <Separator />
-
-      <div className="flex flex-col gap-2.5">
-        {loading && (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div
-                className="w-full max-w-lg h-[90px] flex"
-                key={`skeleton_${i}`}
-              >
-                <Skeleton className="min-w-[70px] mr-1 h-full rounded-l-lg rounded-r-none" />
-
-                <Skeleton className="w-[100%] h-full rounded-r-lg rounded-l-none mb-1" />
-              </div>
-            ))}
-          </>
-        )}
-
-        {!loading &&
-          plannedItems.filter((item) => {
-            return item.days > item.daysEaten;
-          }).length === 0 && (
-            <Card className="w-full">
-              <CardHeader>
-                <h1 className="font-bold text-lg leading-tight">
-                  Nichts geplant...
-                </h1>
-
-                <CardDescription>
-                  ...plane Rezepte für die nächsten Tage
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          )}
-
-        {plannedItems
-          .filter((item) => {
-            return item.days > item.daysEaten;
-          })
-          .map((item) => (
-            <MealPlannerItem
-              key={item.id}
-              id={item.id}
-              recipeId={item.recipeId}
-              recipeName={item.recipeName}
-              date={item.date}
-              days={item.days}
-              daysEaten={item.daysEaten}
-              setDaysEaten={(days) => setDaysEaten(item.id, days)}
-              onDeleteDate={deletePlannedItem}
-              onUpdateDate={updatePlannedItemDate}
-              onRecipeEaten={showRateRecipeModal}
-            />
+        <div className="overflow-x-auto py-2 flex gap-3 scrollbar-hide">
+          {getNotPlannedItems().map((item) => (
+            <div key={item.id} className="min-w-[400px]">
+              <MealPlannerItem
+                id={item.id}
+                recipeId={item.recipeId}
+                recipeName={item.recipeName}
+                date={item.planned_date}
+                days={item.days}
+                daysEaten={item.daysEaten}
+                setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                onDeleteDate={(id) => deletePlannedItem(id)}
+                onUpdateDate={(id, newDate, newDays) =>
+                  updatePlannedItemDate(id, newDate, newDays)
+                }
+                onRecipeEaten={(id) => {
+                  setDaysEaten(id, item.daysEaten + 1);
+                }}
+              />
+            </div>
           ))}
+        </div>
       </div>
 
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>{t("mealPlanner.alreadyEaten")}</AccordionTrigger>
+      <div className="flex flex-col gap-2.5">
+        {getWeekdays().map((day) => (
+          <div key={format(day, "EEE - dd.MM")}>
+            <p
+              className={
+                "px-2 mb-1 font-semibold rounded-full w-fit " +
+                (isToday(day) ? "bg-plateful " : "")
+              }
+            >
+              {format(day, "EEE - dd.MM")}
+            </p>
 
-          <AccordionContent className="flex flex-col gap-2.5">
-            {plannedItems
-              .filter((item) => {
-                return item.days <= item.daysEaten;
-              })
-              .reverse()
-              .slice(0, 10)
-              .map((item) => (
-                <MealPlannerItem
-                  key={item.id}
-                  id={item.id}
-                  recipeId={item.recipeId}
-                  recipeName={item.recipeName}
-                  date={item.date}
-                  days={item.days}
-                  daysEaten={item.daysEaten}
-                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                  onDeleteDate={deletePlannedItem}
-                  onUpdateDate={updatePlannedItemDate}
-                  onRecipeEaten={showRateRecipeModal}
-                />
-              ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+            {renderCorrectItem(day)}
+          </div>
+        ))}
+      </div>
     </Layout>
   );
 }

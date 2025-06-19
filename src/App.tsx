@@ -207,7 +207,7 @@ function App() {
       />
       <Route
         path="/planner"
-        element={routeToCorrectPage(<MealPlanner />)}
+        element={<MealPlanner />}
       />
       <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
