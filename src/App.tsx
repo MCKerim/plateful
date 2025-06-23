@@ -17,7 +17,7 @@ import {
   setHousehold,
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
-import Welcome from "./page/onboarding/Welcome";
+import Welcome from "./page/onboarding/welcome/Welcome";
 import ValueScreen from "./page/onboarding/ValueScreen";
 import Survey from "./page/onboarding/Survey";
 import CreateHousehold from "./page/onboarding/CreateHousehold";
