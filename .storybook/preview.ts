@@ -1,6 +1,9 @@
 import type { Preview } from '@storybook/react-vite'
+import { withRouter } from 'storybook-addon-remix-react-router';
+import '../src/index.css';
 
 const preview: Preview = {
+  decorators: [withRouter],
   parameters: {
     controls: {
       matchers: {
