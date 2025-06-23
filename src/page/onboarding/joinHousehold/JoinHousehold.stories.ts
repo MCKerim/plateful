@@ -1,13 +1,12 @@
-import Welcome from '@/page/onboarding/welcome/Welcome';
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import JoinHousehold from './JoinHousehold';
 
 const meta = {
-  title: 'Onboarding/Welcome',
-  component: Welcome,
+  component: JoinHousehold,
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof Welcome>;
+} satisfies Meta<typeof JoinHousehold>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

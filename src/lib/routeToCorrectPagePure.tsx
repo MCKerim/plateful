@@ -1,4 +1,4 @@
-import SignUp from "@/page/onboarding/SignUp";
+import SignUp from "@/page/onboarding/signUp/SignUp";
 import { Navigate } from "react-router";
 
 export function routeToCorrectPagePure(

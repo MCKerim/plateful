@@ -3,7 +3,7 @@ import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
-import SignUp from "./page/onboarding/SignUp";
+import SignUp from "./page/onboarding/signUp/SignUp";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import supabase from "./utils/supabase";
@@ -18,11 +18,11 @@ import {
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
 import Welcome from "./page/onboarding/welcome/Welcome";
-import ValueScreen from "./page/onboarding/ValueScreen";
-import Survey from "./page/onboarding/Survey";
-import CreateHousehold from "./page/onboarding/CreateHousehold";
-import InviteMembers from "./page/onboarding/InviteMembers";
-import JoinHousehold from "./page/onboarding/JoinHousehold";
+import ValueScreen from "./page/onboarding/valueScreen/ValueScreen";
+import Survey from "./page/onboarding/survey/Survey";
+import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
+import InviteMembers from "./page/onboarding/inviteMembers/InviteMembers";
+import JoinHousehold from "./page/onboarding/joinHousehold/JoinHousehold";
 import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
 import NotFound from "./page/NotFound";
 import Home from "./page/Home";
