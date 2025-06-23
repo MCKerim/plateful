@@ -12,7 +12,6 @@ const config: StorybookConfig = {
     "@storybook/addon-a11y",
     "@storybook/addon-vitest",
     "storybook-addon-remix-react-router",
-    "addon-redux",
   ],
   "framework": {
     "name": "@storybook/react-vite",
