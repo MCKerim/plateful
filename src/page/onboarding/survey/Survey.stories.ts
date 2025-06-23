@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import Survey from './Survey';
 
 const meta = {
+  title: "Page/Onboarding/Survey",
   component: Survey,
   parameters: {
     layout: 'fullscreen',

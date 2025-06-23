@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import SignUp from './SignUp';
 
 const meta = {
+  title: "Page/Onboarding/SignUp",
   component: SignUp,
   parameters: {
     layout: 'fullscreen',

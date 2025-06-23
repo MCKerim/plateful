@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import ValueScreen from './ValueScreen';
 
 const meta = {
+  title: "Page/Onboarding/ValueScreen",
   component: ValueScreen,
   parameters: {
     layout: 'fullscreen',

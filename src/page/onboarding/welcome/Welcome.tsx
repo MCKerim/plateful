@@ -23,8 +23,8 @@ export default function Welcome() {
         {featureItem("Plan your meals and your shopping list")}
       </div>
 
-      <NavLink to="/signup">
-        <Button>Get Started!</Button>
+      <NavLink to="/signup" className={"w-full max-w-sm"}>
+        <Button className="w-full">Get Started!</Button>
       </NavLink>
     </div>
   );
