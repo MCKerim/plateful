@@ -15,7 +15,7 @@ export default function Welcome() {
       className="flex flex-col items-center justify-evenly h-screen"
       style={{ backgroundColor: "#abff9b" }}
     >
-      <h1 className="text-4xl font-bold mb-4">Welcome to Plateful!</h1>
+      <h1 className="text-4xl font-bold mb-4">Congratulations, smart food planning starts now!</h1>
 
       <div className="flex flex-col gap-2">
         {featureItem("AI Recipes")}
@@ -24,7 +24,7 @@ export default function Welcome() {
       </div>
 
       <NavLink to="/signup" className={"w-full max-w-sm"}>
-        <Button className="w-full">Get Started!</Button>
+        <Button className="w-full rounded-full">Get Started!</Button>
       </NavLink>
     </div>
   );

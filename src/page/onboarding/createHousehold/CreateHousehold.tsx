@@ -57,10 +57,12 @@ export default function CreateHousehold() {
 
   return (
     <div className="flex flex-col h-full w-full max-w-xs mx-auto py-10 gap-10">
-      <h1 className="text-4xl font-bold mb-4 text-center">Dein Haushalt</h1>
+      <h1 className="text-4xl font-bold mb-4 text-center">
+        Erstelle deinen Haushalt
+      </h1>
 
       <p>
-        Speicher gemeinsame Rezepte, planne eure Mahlzeiten und viel mehr! Nur
+        Teile Rezepte und plannt gemeinsam Mahlzeiten in eurem Haushalt. Nur
         eine Person pro Haushalt muss bezahlen.
       </p>
 
