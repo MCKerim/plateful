@@ -42,10 +42,6 @@ export default function ImportRecipes() {
       url: "https://logo.clearbit.com/facebook.com",
       name: "Facebook",
     },
-    {
-      url: "https://logo.clearbit.com/twitter.com",
-      name: "Twitter",
-    },
   ];
 
   useEffect(() => {
@@ -74,7 +70,7 @@ export default function ImportRecipes() {
       }, 3000);
     };
 
-    const interval = setInterval(addIcon, 1000);
+    const interval = setInterval(addIcon, 800);
     return () => clearInterval(interval);
   }, []);
 
@@ -96,8 +92,9 @@ export default function ImportRecipes() {
 
     navigate("/survey");
   }
+
   return (
-    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10 px-4 relative overflow-hidden gap-4">
+    <div className="flex flex-col items-center justify-center h-screen max-w-screen overflow-hidden gap-4">
       {/* Flying app icons */}
       {animatedIcons.map((icon) => (
         <div
@@ -118,26 +115,27 @@ export default function ImportRecipes() {
       ))}
 
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-2">
-          Import Recipes <br />
-          <span className="italic text-2xl">from everywhere</span>
+        <h1 className="text-4xl font-bold">
+          Speichere Rezepte
         </h1>
 
-        <p className="text-gray-600">Just Share with Plateful!</p>
+        <p className="italic text-2xl font-semibold">von überall</p>
+
+        <p className="text-gray-600">Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!</p>
       </div>
 
       {/* Phone Screen Mockup */}
-      <div className="h-full bg-gray-900 rounded-[2.2rem] p-2 shadow-2xl relative z-20">
+      <div className="bg-gray-900 rounded-[2.2rem] p-2 shadow-2xl">
         <img
           src="/importRecipesScreenshot.jpg"
           alt="Mobile app interface screenshot"
-          className="object-cover rounded-[1.8rem]"
+          className="object-cover rounded-[1.8rem] h-[32rem]"
         />
       </div>
 
-      <div className="w-full">
-        <Button className="w-full rounded-full" onClick={completeValueScreen}>
-          Got it!
+      <div className="w-full px-8">
+        <Button className="w-full rounded-full text-xl" onClick={completeValueScreen}>
+          Weiter
         </Button>
       </div>
     </div>
