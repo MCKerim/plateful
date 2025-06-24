@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import ValueScreen from './ValueScreen';
+import ImportRecipes from './ImportRecipes';
 
 const meta = {
-  title: "Page/Onboarding/Value Screens/ValueScreen",
-  component: ValueScreen,
+  title: "Page/Onboarding/Value Screens/ImportRecipes",
+  component: ImportRecipes,
   parameters: {
     layout: 'fullscreen',
   },
-} satisfies Meta<typeof ValueScreen>;
+} satisfies Meta<typeof ImportRecipes>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

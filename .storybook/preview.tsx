@@ -21,7 +21,7 @@ const preview: Preview = {
     },
     options: {
       storySort: {
-        order: ["Page", ["Onboarding", ["Welcome", "SignUp", "ValueScreen",  "Survey", "CreateHousehold", "InviteMembers", "JoinHousehold"]]],
+        order: ["Page", ["Onboarding", ["Welcome", "SignUp", "Value Screens", "Survey", "CreateHousehold", "InviteMembers", "JoinHousehold"]]],
       }
     },
     a11y: {
