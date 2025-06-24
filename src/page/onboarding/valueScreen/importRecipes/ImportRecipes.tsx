@@ -94,7 +94,7 @@ export default function ImportRecipes() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen max-w-screen overflow-hidden gap-4">
+    <div className="relative flex flex-col items-center justify-center h-screen max-w-screen overflow-hidden gap-4">
       {/* Flying app icons */}
       {animatedIcons.map((icon) => (
         <div
