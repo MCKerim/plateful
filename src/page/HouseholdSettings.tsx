@@ -199,12 +199,6 @@ export default function HouseholdSettings() {
               <QRCodeSVG
                 value={inviteLink}
                 size={256}
-                imageSettings={{
-                  src: "/logo.png",
-                  height: 64,
-                  width: 64,
-                  excavate: true,
-                }}
               />
 
               <div className="flex gap-2 w-full">

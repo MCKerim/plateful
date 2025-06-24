@@ -15,12 +15,6 @@ export default function InviteMembers() {
         <QRCodeSVG
           value="https://www.plateful.cloud/"
           size={256}
-          imageSettings={{
-            src: "/logo.png",
-            height: 64,
-            width: 64,
-            excavate: true,
-          }}
         />
 
         <Button className="w-full mt-4">
