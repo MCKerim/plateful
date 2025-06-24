@@ -29,6 +29,7 @@ import Home from "./page/Home";
 import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import LoadingScreen from "./components/atoms/LoadingScreen";
+import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -170,7 +171,7 @@ function App() {
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
 
-      <Route path="/value" element={<ValueScreen />} />
+      <Route path="/value" element={<ImportRecipes />} />
 
       <Route path="/survey" element={<Survey />} />
 

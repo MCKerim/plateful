@@ -8,73 +8,73 @@ import "./ImportRecipes.css";
 
 export default function ImportRecipes() {
   const user = useAppSelector(selectUser);
-  const navigate = useNavigate();  const [animatedIcons, setAnimatedIcons] = useState<Array<{
-    id: number;
-    iconUrl: string;
-    appName: string;
-    startX: number;
-    startY: number;
-    delay: number;
-  }>>([]);
+  const navigate = useNavigate();
+  const [animatedIcons, setAnimatedIcons] = useState<
+    Array<{
+      id: number;
+      iconUrl: string;
+      appName: string;
+      side: "left" | "right";
+      yPosition: number;
+      delay: number;
+    }>
+  >([]);
 
   // Real app icons that will fly into the phone
   const appIcons = [
-    { 
-      url: 'https://logo.clearbit.com/tiktok.com',
-      name: 'TikTok'
+    {
+      url: "https://logo.clearbit.com/tiktok.com",
+      name: "TikTok",
     },
-    { 
-      url: 'https://logo.clearbit.com/instagram.com',
-      name: 'Instagram'
+    {
+      url: "https://logo.clearbit.com/instagram.com",
+      name: "Instagram",
     },
-    { 
-      url: 'https://logo.clearbit.com/pinterest.com',
-      name: 'Pinterest'
+    {
+      url: "https://logo.clearbit.com/pinterest.com",
+      name: "Pinterest",
     },
-    { 
-      url: 'https://logo.clearbit.com/youtube.com',
-      name: 'YouTube'
+    {
+      url: "https://logo.clearbit.com/youtube.com",
+      name: "YouTube",
     },
-    { 
-      url: 'https://logo.clearbit.com/facebook.com',
-      name: 'Facebook'
+    {
+      url: "https://logo.clearbit.com/facebook.com",
+      name: "Facebook",
     },
-    { 
-      url: 'https://logo.clearbit.com/twitter.com',
-      name: 'Twitter'
+    {
+      url: "https://logo.clearbit.com/twitter.com",
+      name: "Twitter",
     },
-    { 
-      url: 'https://logo.clearbit.com/reddit.com',
-      name: 'Reddit'
-    },
-    { 
-      url: 'https://logo.clearbit.com/allrecipes.com',
-      name: 'AllRecipes'
-    }
   ];
+
   useEffect(() => {
     const createIcon = () => {
       const selectedApp = appIcons[Math.floor(Math.random() * appIcons.length)];
+      const side: "left" | "right" = Math.random() > 0.5 ? "left" : "right";
+      const phoneCenter = window.innerHeight / 2; // Approximate phone center
+      const randomOffset = (Math.random() - 0.5) * 300; // Random offset around center
+
       return {
         id: Date.now(),
         iconUrl: selectedApp.url,
         appName: selectedApp.name,
-        startX: Math.random() * window.innerWidth,
-        startY: Math.random() * window.innerHeight,
+        side: side,
+        yPosition: phoneCenter + randomOffset,
         delay: 0,
       };
     };
 
     const addIcon = () => {
       const icon = createIcon();
-      setAnimatedIcons(prev => [...prev, icon]);
-      
+      setAnimatedIcons((prev) => [...prev, icon]);
+
       setTimeout(() => {
-        setAnimatedIcons(prev => prev.filter(item => item.id !== icon.id));
+        setAnimatedIcons((prev) => prev.filter((item) => item.id !== icon.id));
       }, 3000);
     };
 
-    const interval = setInterval(addIcon, 1500);
+    const interval = setInterval(addIcon, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -97,44 +97,39 @@ export default function ImportRecipes() {
     navigate("/survey");
   }
   return (
-    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10 px-4 relative overflow-hidden">      {/* Flying app icons */}
+    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10 px-4 relative overflow-hidden gap-4">
+      {/* Flying app icons */}
       {animatedIcons.map((icon) => (
         <div
           key={icon.id}
-          className="flying-icon"
+          className={`flying-icon from-${icon.side}`}
           style={{
-            left: `${icon.startX}px`,
-            top: `${icon.startY}px`,
+            left: icon.side === "left" ? "20px" : "calc(100% - 80px)",
+            top: `${icon.yPosition}px`,
             animationDelay: `${icon.delay}ms`,
           }}
         >
-          <img 
-            src={icon.iconUrl} 
+          <img
+            src={icon.iconUrl}
             alt={icon.appName}
-            className="w-8 h-8 rounded-lg shadow-lg"
-            onError={(e) => {
-              // Fallback to a generic icon if the image fails to load
-              e.currentTarget.src = 'https://via.placeholder.com/32x32/4F46E5/white?text=📱';
-            }}
+            className="w-16 h-16 rounded-xl shadow-lg"
           />
         </div>
       ))}
 
       <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">
+        <h1 className="text-4xl font-bold mb-2">
           Import Recipes <br />
           <span className="italic text-2xl">from everywhere</span>
         </h1>
 
-        <p className="text-gray-600 mb-8">
-          Just Share to Plateful from any app, and we'll save it for you.
-        </p>
+        <p className="text-gray-600">Just Share with Plateful!</p>
       </div>
 
       {/* Phone Screen Mockup */}
-      <div className="w-64 bg-gray-900 rounded-[2.2rem] p-2 shadow-2xl relative z-20">
+      <div className="h-full bg-gray-900 rounded-[2.2rem] p-2 shadow-2xl relative z-20">
         <img
-          src="/importRecipesScreenshot.png"
+          src="/importRecipesScreenshot.jpg"
           alt="Mobile app interface screenshot"
           className="object-cover rounded-[1.8rem]"
         />
