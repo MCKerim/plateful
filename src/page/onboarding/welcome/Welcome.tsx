@@ -4,27 +4,38 @@ import { NavLink } from "react-router";
 export default function Welcome() {
   function featureItem(text: string) {
     return (
-      <div className="border-2 border-primary rounded-lg py-2 px-4">
-        <p>{text}</p>
+      <div className="text-md font-semibold rounded-lg py-2 px-4">
+        <p>- {text}</p>
       </div>
     );
   }
 
   return (
     <div
-      className="flex flex-col items-center justify-evenly h-screen"
+      className="flex flex-col items-center justify-evenly h-screen px-4"
       style={{ backgroundColor: "#abff9b" }}
     >
-      <h1 className="text-4xl font-bold mb-4">Congratulations, smart food planning starts now!</h1>
+      <div className="text-center text-4xl font-bold mb-4">
+        <h1 className="text-4xl">
+          Congratulations, <br />
+        </h1>
 
-      <div className="flex flex-col gap-2">
-        {featureItem("AI Recipes")}
+        <h2 className="text-xl">smart food planning starts now!</h2>
+      </div>
+
+      <div className="flex flex-col">
+        {featureItem("Create recipes with AI")}
         {featureItem("Import from everywhere")}
         {featureItem("Plan your meals and your shopping list")}
       </div>
 
-      <NavLink to="/signup" className={"w-full max-w-sm"}>
-        <Button className="w-full rounded-full">Get Started!</Button>
+      <NavLink
+        to="/signup"
+        className={"w-full max-w-sm shadow-lg shadow-primary/20"}
+      >
+        <Button className="w-full rounded-full h-12 font-semibold text-base">
+          Get Started!
+        </Button>
       </NavLink>
     </div>
   );
