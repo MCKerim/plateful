@@ -30,6 +30,7 @@ import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import LoadingScreen from "./components/atoms/LoadingScreen";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
+import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 
 function App() {
   const dispatch = useAppDispatch();

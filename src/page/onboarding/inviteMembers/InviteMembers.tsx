@@ -1,36 +1,26 @@
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Link } from "lucide-react";
-import { QRCodeSVG } from "qrcode.react";
-import { NavLink } from "react-router";
+import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
+import InviteLink from "@/components/ui/inviteLink/InviteLink";
+import { useNavigate } from "react-router";
 
 export default function InviteMembers() {
+  const navigate = useNavigate();
+
+  async function completeScreen() {
+    navigate("/");
+  }
+
   return (
-    <div className="flex flex-col h-full w-full max-w-xs mx-auto py-10 gap-10">
-      <h1 className="text-4xl font-bold mb-4 text-center">
-        Lade Freunde oder Familie ein
-      </h1>
+    <OnboardingLayout nextButtonLabel="Fertig!" onNext={completeScreen}>
+      <div className="text-center">
+        <h1 className="text-3xl font-bold">Füge Mitglieder hinzu</h1>
 
-      <div className="flex flex-col gap-4 w-full">
-        <QRCodeSVG
-          value="https://www.plateful.cloud/"
-          size={256}
-        />
-
-        <Button className="w-full mt-4">
-          <Link size={16} /> Link teilen
-        </Button>
-
-        <div className="flex gap-2 w-full">
-          <Input placeholder="E-Mail-Adresse" />
-
-          <Button>Senden</Button>
-        </div>
-
-        <NavLink to="/" className="w-full">
-          <Button className="w-full">Weiter</Button>
-        </NavLink>
+        <p className="text-gray-600 max-w-sm mt-2">
+          Lade Freunde oder Familie in dein Haushalt ein. Scanne dazu den
+          QR-Code oder teile den Link.
+        </p>
       </div>
-    </div>
+
+      <InviteLink />
+    </OnboardingLayout>
   );
 }

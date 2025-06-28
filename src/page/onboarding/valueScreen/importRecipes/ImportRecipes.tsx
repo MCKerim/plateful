@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
@@ -7,6 +6,7 @@ import { useEffect, useState } from "react";
 import "./ImportRecipes.css";
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
+import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 
 export default function ImportRecipes() {
   const user = useAppSelector(selectUser);
@@ -51,7 +51,7 @@ export default function ImportRecipes() {
       const selectedApp = appIcons[Math.floor(Math.random() * appIcons.length)];
       const side: "left" | "right" = Math.random() > 0.5 ? "left" : "right";
       const phoneCenter = window.innerHeight / 2; // Approximate phone center
-      const randomOffset = (Math.random() - 0.5) * 300; // Random offset around center
+      const randomOffset = ((Math.random() - 0.5) * 200) - 100; // Random offset around center
 
       return {
         id: Date.now(),
@@ -72,7 +72,7 @@ export default function ImportRecipes() {
       }, 3000);
     };
 
-    const interval = setInterval(addIcon, 800);
+    const interval = setInterval(addIcon, 2000);
     return () => clearInterval(interval);
   }, []);
 
@@ -96,7 +96,7 @@ export default function ImportRecipes() {
   }
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-screen px-4 py-10 overflow-hidden">
+    <OnboardingLayout onNext={completeValueScreen}>
       {/* Flying app icons */}
       {animatedIcons.map((icon) => (
         <div
@@ -111,7 +111,7 @@ export default function ImportRecipes() {
           <img
             src={icon.iconUrl}
             alt={icon.appName}
-            className="w-16 h-16 rounded-xl shadow-lg"
+            className="w-12 h-12 rounded-xl shadow-lg"
           />
         </div>
       ))}
@@ -120,18 +120,13 @@ export default function ImportRecipes() {
         <h1 className="text-4xl font-bold">Speichere Rezepte</h1>
 
         <h2 className="italic text-2xl font-semibold">von überall</h2>
-
-        <p className="text-gray-600 max-w-sm mt-2">
-          Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit
-          Plateful!
-        </p>
       </div>
 
       <PhoneMockup screenshotUrl="/importRecipesScreenshot.jpg" />
 
-      <div className="w-full max-w-sm">
-        <OnboardingButton label="Weiter" onClick={completeValueScreen} />
-      </div>
-    </div>
+      <p className="text-gray-600 max-w-sm text-center">
+        Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!
+      </p>
+    </OnboardingLayout>
   );
 }

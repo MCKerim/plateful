@@ -1,3 +1,4 @@
+import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,25 +51,29 @@ export default function CreateHousehold() {
         );
         return;
       }
-      
+
       navigate("/inviteMembers");
     }
   }
 
   return (
-    <div className="flex flex-col h-full w-full max-w-xs mx-auto py-10 gap-10">
-      <h1 className="text-4xl font-bold mb-4 text-center">
-        Erstelle deinen Haushalt
-      </h1>
+    <OnboardingLayout
+      nextButtonLabel="Haushalt erstellen"
+      onNext={handleCreateHousehold}
+    >
+      <div className="text-center">
+        <h1 className="text-4xl font-bold">Erstelle dein Haushalt</h1>
+      </div>
 
-      <p>
-        Teile Rezepte und plannt gemeinsam Mahlzeiten in eurem Haushalt. Nur
-        eine Person pro Haushalt muss bezahlen.
-      </p>
+      <div className="flex flex-col gap-4 w-full max-w-sm mx-auto">
+        <p className="text-gray-600 text-justify mb-8">
+          Teile Rezepte und plannt gemeinsam Mahlzeiten in eurem Haushalt.{" "}
+          <br />
+          Nur eine Person pro Haushalt muss bezahlen.
+        </p>
 
-      <div className="flex flex-col gap-4 w-full">
         <div className="grid w-full items-center gap-2">
-          <Label htmlFor="name">Wie soll euer Haushalt heißen?</Label>
+          <Label htmlFor="name">Wie soll dein Haushalt heißen?</Label>
 
           <Input
             type="text"
@@ -79,14 +84,8 @@ export default function CreateHousehold() {
           />
         </div>
 
-        <Button className="w-full" onClick={handleCreateHousehold}>
-          Haushalt erstellen
-        </Button>
-      </div>
-
-      <div className="flex flex-col gap-4 w-full">
         <Separator>
-          <p className="italic">oder</p>
+          <p className="italic">Ihr habt schon ein Haushalt?</p>
         </Separator>
 
         <NavLink to="/joinHousehold" className="w-full">
@@ -95,6 +94,6 @@ export default function CreateHousehold() {
           </Button>
         </NavLink>
       </div>
-    </div>
+    </OnboardingLayout>
   );
 }

@@ -8,7 +8,7 @@ export default function PhoneMockup({ screenshotUrl }: Readonly<Props>) {
       <img
         src={screenshotUrl}
         alt="Mobile app interface screenshot"
-        className="object-cover rounded-[1.8rem] h-[32rem]"
+        className="object-cover rounded-[1.8rem] h-[28rem]"
       />
     </div>
   );
