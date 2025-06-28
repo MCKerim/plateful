@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
+import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 
-const DIET_OPTIONS = ["Vegan", "Vegetarian", "Halal", "Kosher", "other"];
+const DIET_OPTIONS = ["Vegan", "Vegetarisch", "Halal", "Kosher", "Sonstiges"];
 
 export default function Survey() {
   const user = useAppSelector(selectUser);
@@ -41,34 +41,12 @@ export default function Survey() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10">
-      <h1 className="text-4xl font-bold mb-4 text-center">
-        Do you follow a specific diet?
-      </h1>
-
-      <div className="flex flex-col gap-4 w-full">
-        <p className="text-sm text-muted-foreground">Select all that apply:</p>
-        {DIET_OPTIONS.map((option) => (
-          <Button
-            key={option}
-            className="w-full"
-            variant={selected.includes(option) ? "default" : "outline"}
-            onClick={() => handleSelect(option)}
-          >
-            {option}
-          </Button>
-        ))}
-      </div>
-
-      <div className="w-full flex gap-2">
-        <Button variant="secondary" className="w-1/2">
-          Back
-        </Button>
-
-        <Button className="w-full" onClick={completeSurvey}>
-          Next
-        </Button>
-      </div>
-    </div>
+    <SurveyLayout
+      question="Verfolgst du eine spezielle Diät?"
+      answers={DIET_OPTIONS}
+      selected={selected}
+      handleSelect={handleSelect}
+      onComplete={completeSurvey}
+    />
   );
 }
