@@ -101,20 +101,15 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="w-full max-w-lg flex my-1 items-center gap-2 sticky top-14 mb-2 z-10">
+      <div className="w-full my-1 sticky top-14 mb-2 z-10">
         <Input
           className="w-full rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onDelete={() => setSearchTerm("")}
         />
-
-        {searchTerm && (
-          <Button variant="outline" onClick={() => setSearchTerm("")}>
-            <Delete />
-          </Button>
-        )}
       </div>
 
       <button
