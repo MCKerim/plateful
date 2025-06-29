@@ -4,7 +4,6 @@ import supabase from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import "./ImportRecipes.css";
-import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 

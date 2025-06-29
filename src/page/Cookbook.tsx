@@ -1,13 +1,12 @@
 import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
-import { Delete, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Card, CardDescription, CardHeader } from "../components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 

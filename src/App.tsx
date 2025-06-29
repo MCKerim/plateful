@@ -18,7 +18,6 @@ import {
   setHouseholdMembers,
 } from "./redux/slices/householdSlice";
 import Welcome from "./page/onboarding/welcome/Welcome";
-import ValueScreen from "./page/onboarding/valueScreen/ValueScreen";
 import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
 import InviteMembers from "./page/onboarding/inviteMembers/InviteMembers";
@@ -30,7 +29,6 @@ import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import LoadingScreen from "./components/atoms/LoadingScreen";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
-import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 
 function App() {
   const dispatch = useAppDispatch();

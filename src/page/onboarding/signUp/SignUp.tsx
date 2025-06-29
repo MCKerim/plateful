@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 import supabase from "@/utils/supabase";
 
