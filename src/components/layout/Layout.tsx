@@ -2,7 +2,7 @@ import BottomNav from "../atoms/BottomNav";
 import Header from "../atoms/Header";
 
 type Props = {
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export default function Layout({ children }: Readonly<Props>) {
