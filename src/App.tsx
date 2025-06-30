@@ -29,6 +29,7 @@ import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import LoadingScreen from "./components/atoms/LoadingScreen";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
+import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -170,7 +171,8 @@ function App() {
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
 
-      <Route path="/value" element={<ImportRecipes />} />
+      <Route path="/values/1" element={<ImportRecipes />} />
+      <Route path="/values/2" element={<MealPlanningValue />} />
 
       <Route path="/survey" element={<Survey />} />
 
@@ -201,14 +203,8 @@ function App() {
         element={isLoggedIn() ? <InvitePage /> : <SignUp />}
       />
 
-      <Route
-        path="/lists"
-        element={routeToCorrectPage(<ShoppingList />)}
-      />
-      <Route
-        path="/planner"
-        element={routeToCorrectPage(<MealPlanner />)}
-      />
+      <Route path="/lists" element={routeToCorrectPage(<ShoppingList />)} />
+      <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
       <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
       <Route path="/home" element={routeToCorrectPage(<Home />)} />

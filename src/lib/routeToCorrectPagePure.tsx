@@ -20,7 +20,7 @@ export function routeToCorrectPagePure(
         return <Navigate to="/survey" />;
       }
     } else {
-      return <Navigate to="/value" />;
+      return <Navigate to="/values/1" />;
     }
   } else {
     return <SignUp />;

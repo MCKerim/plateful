@@ -1,6 +1,3 @@
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import "./ImportRecipes.css";
@@ -8,7 +5,6 @@ import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 
 export default function ImportRecipes() {
-  const user = useAppSelector(selectUser);
   const navigate = useNavigate();
   const [animatedIcons, setAnimatedIcons] = useState<
     Array<{
@@ -50,7 +46,7 @@ export default function ImportRecipes() {
       const selectedApp = appIcons[Math.floor(Math.random() * appIcons.length)];
       const side: "left" | "right" = Math.random() > 0.5 ? "left" : "right";
       const phoneCenter = window.innerHeight / 2; // Approximate phone center
-      const randomOffset = ((Math.random() - 0.5) * 200) - 100; // Random offset around center
+      const randomOffset = (Math.random() - 0.5) * 200 - 100; // Random offset around center
 
       return {
         id: Date.now(),
@@ -75,27 +71,8 @@ export default function ImportRecipes() {
     return () => clearInterval(interval);
   }, []);
 
-  async function completeValueScreen() {
-    if (!user) {
-      return;
-    }
-
-    const { error } = await supabase
-      .from("users")
-      .update({ has_seen_value_screens: true })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Error updating user:", error);
-      alert("An error occurred while saving your progress. Please try again.");
-      return;
-    }
-
-    navigate("/survey");
-  }
-
   return (
-    <OnboardingLayout onNext={completeValueScreen}>
+    <OnboardingLayout onNext={() => navigate("/values/2")}>
       {/* Flying app icons */}
       {animatedIcons.map((icon) => (
         <div
