@@ -1,7 +1,10 @@
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 import supabase from "@/utils/supabase";
+import { useTranslation } from "react-i18next";
 
 export default function SignUp() {
+  const { t } = useTranslation();
+
   const signUp = async () => {
     const environment = import.meta.env.VITE_NODE_ENV;
 
@@ -37,21 +40,20 @@ export default function SignUp() {
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
-        <h1 className="text-5xl font-bold mb-2">Plateful</h1>
+        <h1 className="text-5xl font-bold mb-2">{t("signup.title")}</h1>
 
         <p className="text-sm text-muted-foreground italic">
-          The Meal Planner for casual people
+          {t("signup.subtitle")}
         </p>
       </div>
 
       <div className="w-full max-w-sm flex flex-col gap-3">
         <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
-          By continuing, you agree to our <a href="#">Terms of Service</a> and{" "}
-          <a href="#">Privacy Policy</a>.
+          {t("signup.termsAndConditions")}
         </div>
 
         <OnboardingButton
-          label="Continue with Google"
+          label={t("signup.continueWithGoogle")}
           onClick={signUp}
           icon={
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">

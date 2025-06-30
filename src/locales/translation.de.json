@@ -7,6 +7,17 @@
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar..."
   },
+  "signup": {
+    "title": "Plateful",
+    "subtitle": "Der Essensplaner für entspannte Menschen",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "termsAndConditions" : "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
+  },
+  "welcome": {
+    "title": "Glückwunsch,",
+    "subtitle": "smarte Essensplanung beginnt jetzt!",
+    "nextButton": "Jetzt Loslegen!"
+  },
   "list": {
     "title": "Einkaufsliste"
   },
