@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
@@ -10,6 +10,8 @@ const DIET_OPTIONS = ["Vegan", "Vegetarisch", "Halal", "Kosher", "Sonstiges"];
 export default function Survey() {
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
+  const params = useParams<{ questionId: string }>();
+  const questionId = params.questionId ?? "1";
 
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -42,7 +44,7 @@ export default function Survey() {
 
   return (
     <SurveyLayout
-      question="Verfolgst du eine spezielle Diät?"
+      question={"Verfolgst du eine spezielle Diät?" + questionId}
       answers={DIET_OPTIONS}
       selected={selected}
       handleSelect={handleSelect}

@@ -171,10 +171,12 @@ function App() {
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
 
+      <Route path="/values" element={<ImportRecipes />} />
       <Route path="/values/1" element={<ImportRecipes />} />
       <Route path="/values/2" element={<MealPlanningValue />} />
 
       <Route path="/survey" element={<Survey />} />
+      <Route path="/survey/:questionId" element={<Survey />} />
 
       <Route
         path="/createhousehold"
