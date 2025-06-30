@@ -15,6 +15,10 @@ export default function Survey() {
 
   const [selected, setSelected] = useState<string[]>([]);
 
+  function onPrevious() {
+    navigate(`/survey/${parseInt(questionId) - 1}`);
+  }
+
   async function completeSurvey() {
     if (!user) {
       return;
@@ -48,6 +52,7 @@ export default function Survey() {
       answers={DIET_OPTIONS}
       selected={selected}
       handleSelect={handleSelect}
+      onPrevious={questionId !== "1" ? onPrevious : undefined}
       onComplete={completeSurvey}
     />
   );

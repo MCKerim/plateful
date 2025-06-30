@@ -5,6 +5,7 @@ type Props = {
   answers: string[];
   selected?: string[];
   handleSelect: (option: string) => void;
+  onPrevious?: () => void;
   onComplete: () => void;
 };
 
@@ -13,6 +14,7 @@ export default function SurveyLayout({
   answers,
   selected,
   handleSelect,
+  onPrevious,
   onComplete,
 }: Readonly<Props>) {
   return (
@@ -21,8 +23,8 @@ export default function SurveyLayout({
 
       <div className="flex flex-col gap-4 w-full">
         <p className="text-xs text-muted-foreground">
-          Bitte wähle alle Optionen aus, die auf dich zutreffen. Du
-          kannst später jederzeit deine Einstellungen ändern.
+          Bitte wähle alle Optionen aus, die auf dich zutreffen. Du kannst
+          später jederzeit deine Einstellungen ändern.
         </p>
 
         {answers.map((option) => (
@@ -38,9 +40,11 @@ export default function SurveyLayout({
       </div>
 
       <div className="w-full flex gap-2">
-        <Button variant="secondary" className="w-1/2">
-          Zurück
-        </Button>
+        {onPrevious && (
+          <Button variant="secondary" className="w-1/2" onClick={onPrevious}>
+            Zurück
+          </Button>
+        )}
 
         <Button className="w-full" onClick={onComplete}>
           Weiter
