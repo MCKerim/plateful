@@ -9,6 +9,7 @@ import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 export default function Survey() {
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
+
   const params = useParams<{ questionId: string }>();
   const questionId = parseQuestionId();
 
@@ -67,8 +68,10 @@ export default function Survey() {
 
   return (
     <SurveyLayout
-      question={SURVEY_QUESTIONS[questionId - 1].question}
-      answers={SURVEY_QUESTIONS[questionId - 1].options}
+      questionNumber={questionId}
+      maxQuestionNumber={SURVEY_QUESTIONS.length}
+      question={SURVEY_QUESTIONS[questionId - 1].questionKey}
+      answers={SURVEY_QUESTIONS[questionId - 1].optionKeys}
       selected={selected}
       handleSelect={handleSelect}
       onPrevious={hasPrevious() ? goToPrevious : undefined}

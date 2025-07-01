@@ -2,29 +2,39 @@ import { SurveyQuestionType } from "./QuestionType";
 
 export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
   {
-    question: "Verfolgst du eine spezielle Diät?",
-    options: [
-      "Vegan",
-      "Vegetarisch",
-      "Halal",
-      "Kosher",
-      "Sonstiges",
+    questionKey: "question1",
+    optionKeys: [
+      "option1",
+      "option2",
+      "option3",
+      "option4",
     ]
   },
   {
-    question: "Magst du Fisch?",
-    options: [
-      "Ja",
-      "Nein",
+    questionKey: "question2",
+    optionKeys: [
+      "option1",
+      "option2",
+      "option3",
+      "option4",
     ]
   },
   {
-    question: "Woher kennst du die App?",
-    options: [
-      "Tik Tok",
-      "Internet",
-      "Play Store",
-      "Anderes",
+    questionKey: "question3",
+    optionKeys: [
+      "option1",
+      "option2",
+      "option3",
+      "option4",
+    ]
+  },
+  {
+    questionKey: "question4",
+    optionKeys: [
+      "option1",
+      "option2",
+      "option3",
+      "option4",
     ]
   }
 ];

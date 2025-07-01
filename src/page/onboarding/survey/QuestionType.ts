@@ -1,4 +1,4 @@
 export type SurveyQuestionType = {
-  question: string;
-  options: string[]
+  questionKey: string;
+  optionKeys: string[];
 }

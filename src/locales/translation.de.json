@@ -88,5 +88,36 @@
   "dayWithCount_other": "{{count}} Tage",
 
   "recipeWithCount_one": "{{count}} Rezept",
-  "recipeWithCount_other": "{{count}} Rezepte"
+  "recipeWithCount_other": "{{count}} Rezepte",
+
+  "questions": {
+    "question1": {
+      "question": "Wie oft kochst du?",
+      "option1": "Täglich",
+      "option2": "Mehrmals pro Woche",
+      "option3": "Wöchentlich",
+      "option4": "Selten"
+    },
+    "question2": {
+      "question": "Welche Art von Gerichten kochst du am liebsten?",
+      "option1": "Vegetarisch",
+      "option2": "Vegan",
+      "option3": "Fleischgerichte",
+      "option4": "Fischgerichte"
+    },
+    "question3": {
+      "question": "Wie wichtig ist dir die Zubereitungszeit?",
+      "option1": "Sehr wichtig",
+      "option2": "Wichtig",
+      "option3": "Nicht so wichtig",
+      "option4": "Unwichtig"
+    },
+    "question4": {
+      "question": "Welche Küche bevorzugst du?",
+      "option1": "Italienisch",
+      "option2": "Asiatisch",
+      "option3": "Mexikanisch",
+      "option4": "Deutsch"
+    }
+  }
 }
