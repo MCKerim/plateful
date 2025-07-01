@@ -28,16 +28,6 @@ export default function Survey() {
     );
   };
 
-  function hasPrevious(): boolean {
-    return questionId !== 1;
-  }
-
-  function goToPrevious() {
-    if (hasPrevious()) {
-      navigate(`/survey/${questionId - 1}`);
-    }
-  }
-
   function goToNext() {
     if (questionId === SURVEY_QUESTIONS.length) {
       completeSurvey();
@@ -74,7 +64,6 @@ export default function Survey() {
       answers={SURVEY_QUESTIONS[questionId - 1].optionKeys}
       selected={selected}
       handleSelect={handleSelect}
-      onPrevious={hasPrevious() ? goToPrevious : undefined}
       onComplete={goToNext}
     />
   );

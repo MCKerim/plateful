@@ -9,7 +9,6 @@ type Props = {
   answers: string[];
   selected?: string[];
   handleSelect: (option: string) => void;
-  onPrevious?: () => void;
   onComplete: () => void;
 };
 
@@ -20,7 +19,6 @@ export default function SurveyLayout({
   answers,
   selected,
   handleSelect,
-  onPrevious,
   onComplete,
 }: Readonly<Props>) {
   const { t } = useTranslation();
@@ -39,8 +37,8 @@ export default function SurveyLayout({
         {answers.map((option) => (
           <Button
             key={option}
-            className="w-full"
-            variant={selected?.includes(option) ? "default" : "outline"}
+            className="w-full rounded-lg"
+            variant={selected?.includes(option) ? "default" : "secondary"}
             onClick={() => handleSelect(option)}
           >
             {t(`questions.${question}.${option}`)}
@@ -48,17 +46,12 @@ export default function SurveyLayout({
         ))}
       </div>
 
-      <div className="w-full flex gap-2">
-        {onPrevious && (
-          <Button variant="secondary" className="w-1/2" onClick={onPrevious}>
-            Zurück
-          </Button>
-        )}
-
-        <Button className="w-full" onClick={onComplete}>
-          Weiter
-        </Button>
-      </div>
+      <Button
+        className="w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20"
+        onClick={onComplete}
+      >
+        Weiter
+      </Button>
     </div>
   );
 }
