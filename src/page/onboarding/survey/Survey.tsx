@@ -4,19 +4,46 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
-
-const DIET_OPTIONS = ["Vegan", "Vegetarisch", "Halal", "Kosher", "Sonstiges"];
+import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 
 export default function Survey() {
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
   const params = useParams<{ questionId: string }>();
-  const questionId = params.questionId ?? "1";
+  const questionId = parseQuestionId();
 
   const [selected, setSelected] = useState<string[]>([]);
 
-  function onPrevious() {
-    navigate(`/survey/${parseInt(questionId) - 1}`);
+  function parseQuestionId() {
+    const id = parseInt(params.questionId ?? "1", 10);
+    return isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
+  }
+
+  const handleSelect = (option: string) => {
+    setSelected((prev) =>
+      prev.includes(option)
+        ? prev.filter((item) => item !== option)
+        : [...prev, option]
+    );
+  };
+
+  function hasPrevious(): boolean {
+    return questionId !== 1;
+  }
+
+  function goToPrevious() {
+    if (hasPrevious()) {
+      navigate(`/survey/${questionId - 1}`);
+    }
+  }
+
+  function goToNext() {
+    if (questionId === SURVEY_QUESTIONS.length) {
+      completeSurvey();
+      return;
+    }
+
+    navigate(`/survey/${questionId + 1}`);
   }
 
   async function completeSurvey() {
@@ -38,22 +65,14 @@ export default function Survey() {
     navigate("/createhousehold");
   }
 
-  const handleSelect = (option: string) => {
-    setSelected((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
-  };
-
   return (
     <SurveyLayout
-      question={"Verfolgst du eine spezielle Diät?" + questionId}
-      answers={DIET_OPTIONS}
+      question={SURVEY_QUESTIONS[questionId - 1].question}
+      answers={SURVEY_QUESTIONS[questionId - 1].options}
       selected={selected}
       handleSelect={handleSelect}
-      onPrevious={questionId !== "1" ? onPrevious : undefined}
-      onComplete={completeSurvey}
+      onPrevious={hasPrevious() ? goToPrevious : undefined}
+      onComplete={goToNext}
     />
   );
 }
