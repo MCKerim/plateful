@@ -28,6 +28,30 @@ export default function Survey() {
     );
   };
 
+  async function onComplete() {
+    if (!user) {
+      return;
+    }
+
+    if (selected.length === 0) {
+      alert("Please select at least one option before proceeding.");
+      return;
+    }
+
+    await supabase.from("survey_answears").insert([
+      {
+        question_id: SURVEY_QUESTIONS[questionId - 1].questionKey,
+        user_id: user.id,
+        selected_options_ids: selected.join(","),
+        question_number: questionId,
+      },
+    ]);
+
+    setSelected([]);
+
+    goToNext();
+  }
+
   function goToNext() {
     if (questionId === SURVEY_QUESTIONS.length) {
       completeSurvey();
@@ -64,7 +88,7 @@ export default function Survey() {
       answers={SURVEY_QUESTIONS[questionId - 1].optionKeys}
       selected={selected}
       handleSelect={handleSelect}
-      onComplete={goToNext}
+      onComplete={onComplete}
     />
   );
 }
