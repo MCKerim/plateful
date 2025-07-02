@@ -8,7 +8,8 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option2",
       "option3",
       "option4",
-    ]
+    ],
+    type: "single",
   },
   {
     questionKey: "question2",
@@ -17,7 +18,8 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option2",
       "option3",
       "option4",
-    ]
+    ],
+    type: "multiple",
   },
   {
     questionKey: "question3",
@@ -26,7 +28,8 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option2",
       "option3",
       "option4",
-    ]
+    ],
+    type: "single",
   },
   {
     questionKey: "question4",
@@ -35,6 +38,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option2",
       "option3",
       "option4",
-    ]
+    ],
+    type: "multiple",
   }
 ];

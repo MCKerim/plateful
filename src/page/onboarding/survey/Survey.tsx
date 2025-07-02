@@ -21,11 +21,16 @@ export default function Survey() {
   }
 
   const handleSelect = (option: string) => {
-    setSelected((prev) =>
-      prev.includes(option)
-        ? prev.filter((item) => item !== option)
-        : [...prev, option]
-    );
+    const question = SURVEY_QUESTIONS[questionId - 1];
+    if (question.type === "single") {
+      setSelected([option]);
+    } else {
+      setSelected((prev) =>
+        prev.includes(option)
+          ? prev.filter((item) => item !== option)
+          : [...prev, option]
+      );
+    }
   };
 
   async function onComplete() {
