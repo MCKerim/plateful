@@ -179,7 +179,12 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
-      <Accordion type="single" defaultValue="item-1" collapsible className="bg-background sticky top-11">
+      <Accordion
+        type="single"
+        defaultValue="item-1"
+        collapsible
+        className="bg-background sticky top-11"
+      >
         <AccordionItem value="item-1">
           <AccordionTrigger>
             <div className="flex gap-1 items-center">
@@ -230,12 +235,15 @@ export default function MealPlanner() {
         ))}
       </div>
 
-      <Accordion type="single" defaultValue="item-1" collapsible className="bg-background fixed bottom-16">
+      <Accordion
+        type="single"
+        defaultValue="item-1"
+        collapsible
+        className="bg-background fixed bottom-16 w-full"
+      >
         <AccordionItem value="item-1">
           <AccordionTrigger>
-            <div className="flex gap-1 items-center">
-              Maybie
-            </div>
+            <div className="flex gap-1 items-center">Maybie</div>
           </AccordionTrigger>
 
           <AccordionContent className="overflow-x-auto py-2 flex gap-3 no-scrollbar">
