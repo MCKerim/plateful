@@ -2,7 +2,14 @@ import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import supabase from "@/utils/supabase";
-import { format, isSameDay, isToday } from "date-fns";
+import {
+  format,
+  isSameDay,
+  isToday,
+  addWeeks,
+  subWeeks,
+  isSameWeek,
+} from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 import MealPlannerAdd from "@/components/atoms/MealPlannerAdd";
 import { getWeekdays } from "@/lib/dateHelper";
@@ -12,7 +19,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { CalendarOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { CalendarOff, ChevronLeft, ChevronRight } from "lucide-react";
 
 type MealPlannerItem = {
   id: number;
@@ -26,6 +34,7 @@ type MealPlannerItem = {
 export default function MealPlanner() {
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -133,6 +142,18 @@ export default function MealPlanner() {
     ratingModalRef.current?.open();
   }
 
+  function goToPreviousWeek() {
+    setCurrentWeek((prevWeek) => subWeeks(prevWeek, 1));
+  }
+
+  function goToNextWeek() {
+    setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
+  }
+
+  function goToCurrentWeek() {
+    setCurrentWeek(new Date());
+  }
+
   function getMealPlannerItemByPlannedDate(plannedDate: Date) {
     return plannedItems.find(
       (item) => item.planned_date && isSameDay(item.planned_date, plannedDate)
@@ -179,11 +200,52 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
+      {/* Week Navigation */}
+      <div className="flex items-center justify-between bg-background sticky top-11 py-1 px-2 border-b">
+        <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+          <ChevronLeft size={20} />
+        </Button>
+
+        <div className="flex flex-col items-center">
+          <h2 className="font-semibold text-lg">
+            {isSameWeek(currentWeek, new Date())
+              ? "Diese Woche"
+              : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+              ? "Nächste Woche"
+              : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+              ? "Letzte Woche"
+              : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
+                  getWeekdays(currentWeek)[6],
+                  "dd.MM"
+                )}`}
+          </h2>
+
+          {!isSameWeek(currentWeek, new Date()) && (
+            <Button
+              variant="link"
+              size="sm"
+              onClick={goToCurrentWeek}
+              className="h-auto p-0 text-xs text-muted-foreground"
+            >
+              Zur aktuellen Woche
+            </Button>
+          )}
+
+          {isSameWeek(currentWeek, new Date()) && (
+            <div className="h-[16px]"></div>
+          )}
+        </div>
+
+        <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+          <ChevronRight size={20} />
+        </Button>
+      </div>
+
       <Accordion
         type="single"
         defaultValue="item-1"
         collapsible
-        className="bg-background sticky top-11"
+        className="bg-background"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>
@@ -219,7 +281,7 @@ export default function MealPlanner() {
       </Accordion>
 
       <div className="flex flex-col gap-2.5">
-        {getWeekdays().map((day) => (
+        {getWeekdays(currentWeek).map((day) => (
           <div key={format(day, "EEE - dd.MM")}>
             <p
               className={
