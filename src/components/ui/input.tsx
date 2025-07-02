@@ -4,11 +4,12 @@ import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 export interface InputProps extends React.ComponentProps<"input"> {
-  onDelete?: () => void
+  onDelete?: () => void;
+  showDeleteButton?: boolean;
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, onDelete, ...props }, ref) => {
+  ({ className, type, onDelete, showDeleteButton, ...props }, ref) => {
     if (onDelete) {
       return (
         <div className="relative">
@@ -22,13 +23,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
 
-          <button
-            type="button"
-            onClick={onDelete}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          { showDeleteButton &&
+            
+            <button
+              type="button"
+              onClick={onDelete}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          }
         </div>
       )
     }

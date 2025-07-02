@@ -106,6 +106,7 @@ export default function Cookbook() {
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
+          showDeleteButton={searchTerm.length > 0}
           onChange={(e) => setSearchTerm(e.target.value)}
           onDelete={() => setSearchTerm("")}
         />

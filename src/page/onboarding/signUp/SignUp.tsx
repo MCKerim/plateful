@@ -32,7 +32,7 @@ export default function SignUp() {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${redirectUri}/values/1`,
+        redirectTo: redirectUri,
       },
     });
   };
