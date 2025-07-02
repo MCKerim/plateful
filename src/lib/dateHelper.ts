@@ -37,21 +37,20 @@ export function toWeekday(date: Date): string {
   return prefix + dayAsWord + formattedDate;
 }
 
-// Returns an array of 2 weeks from last Monday to over next Sunday in format "Mo - dd.MM"
-export function getWeekdays(): Date[] {
+// Returns an array of 1 week from Monday to Sunday (7 days total) for the week containing the given date
+export function getWeekdays(date: Date = new Date()): Date[] {
   const weekdays = [];
-  const today = new Date();
-  const dayOfWeek = today.getDay();
+  const dayOfWeek = date.getDay();
 
-  // Calculate last Monday (if today is Monday, it's today)
-  const lastMonday = new Date(today);
-  lastMonday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
+  // Calculate Monday of the week containing the given date
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - ((dayOfWeek + 6) % 7));
 
-  const nextSunday = new Date(today);
-  nextSunday.setDate(lastMonday.getDate() + 6);
-
-  for (let d = new Date(lastMonday); d <= nextSunday; d.setDate(d.getDate() + 1)) {
-    weekdays.push(new Date(d)); // push a copy, not the same object
+  // Generate exactly 7 days starting from Monday
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    weekdays.push(day);
   }
 
   return weekdays;

@@ -2,7 +2,6 @@ import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
@@ -10,12 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Delete, Plus } from "lucide-react";
 import { Card, CardDescription, CardHeader } from "../components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-
-type Recipe = {
-  id: number;
-  recipeName: string;
-  description: string;
-};
+import { getRecipes, type Recipe } from "@/utils/recipeHelpers";
 
 export default function Cookbook() {
   const { t } = useTranslation();
@@ -27,45 +21,17 @@ export default function Cookbook() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getRecipes();
+    loadRecipes();
   }, []);
 
   useEffect(() => {
     handleSearch();
   }, [searchTerm]);
 
-  async function getRecipes() {
-    const { data } = await supabase
-      .from("recipes")
-      .select(
-        `
-      id,
-      name,
-      description
-    `
-      )
-      .order("created_at", { ascending: true });
-
-    const newRecipes: Recipe[] = [];
-
-    if (!data) {
-      setRecipes(newRecipes);
-      setSearchResults(newRecipes);
-      setLoading(false);
-      return;
-    }
-
-    data.forEach((recipe) => {
-      const newRecipe: Recipe = {
-        id: recipe.id,
-        recipeName: recipe.name,
-        description: recipe.description ?? "",
-      };
-      newRecipes.push(newRecipe);
-    });
-
-    setRecipes(newRecipes);
-    setSearchResults(newRecipes);
+  async function loadRecipes() {
+    const fetchedRecipes = await getRecipes();
+    setRecipes(fetchedRecipes);
+    setSearchResults(fetchedRecipes);
     setLoading(false);
   }
 
