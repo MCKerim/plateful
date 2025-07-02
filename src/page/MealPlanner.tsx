@@ -245,7 +245,7 @@ export default function MealPlanner() {
         type="single"
         defaultValue="item-1"
         collapsible
-        className="bg-background"
+        className="bg-background sticky top-24"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>
@@ -280,7 +280,7 @@ export default function MealPlanner() {
         </AccordionItem>
       </Accordion>
 
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-2.5 mb-32">
         {getWeekdays(currentWeek).map((day) => (
           <div key={format(day, "EEE - dd.MM")}>
             <p
