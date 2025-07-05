@@ -40,7 +40,14 @@ export default function SignUp() {
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
-        <h1 className="text-5xl font-bold mb-2">{t("signup.title")}</h1>
+        <h1
+          className="text-7xl font-bold"
+          style={{
+            fontFamily: "Modak",
+          }}
+        >
+          {t("signup.title")}
+        </h1>
 
         <p className="text-sm text-muted-foreground italic">
           {t("signup.subtitle")}

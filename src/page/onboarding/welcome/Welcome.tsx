@@ -10,8 +10,10 @@ export default function Welcome() {
       className="flex flex-col items-center h-screen px-4 py-10"
       style={{ backgroundColor: "#abff9b" }}
     >
-      <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center gap-2">
-        <h1 className="text-5xl font-bold">{t("welcome.title")}</h1>
+      <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
+        <h1 className="text-6xl" style={{
+            fontFamily: "Modak",
+          }}>{t("welcome.title")}</h1>
 
         <h2 className="italic text-xl font-semibold">
           {t("welcome.subtitle")}
