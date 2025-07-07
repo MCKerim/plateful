@@ -11,9 +11,14 @@ export default function Welcome() {
       style={{ backgroundColor: "#abff9b" }}
     >
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
-        <h1 className="text-6xl" style={{
+        <h1
+          className="text-5xl"
+          style={{
             fontFamily: "Modak",
-          }}>{t("welcome.title")}</h1>
+          }}
+        >
+          {t("welcome.title")}
+        </h1>
 
         <h2 className="italic text-xl font-semibold">
           {t("welcome.subtitle")}

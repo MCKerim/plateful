@@ -119,7 +119,7 @@ export default function Cookbook() {
         <Plus size={34} />
       </button>
 
-      <div className="flex flex-col gap-4 items-center">
+      <div className="grid grid-cols-2 gap-4">
         {loading && (
           <>
             {[...Array(4)].map((_, i) => (
