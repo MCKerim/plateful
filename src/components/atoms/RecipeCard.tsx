@@ -124,14 +124,14 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
           </div>
 
           <div className="flex justify-between">
-            <h1 className="font-bold text-lg leading-tight">{name}</h1>
+            <h1 className="font-bold text-md leading-tight line-clamp-2">{name}</h1>
           </div>
 
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">{renderTagPills()}</div>
 
             <div className="flex gap-1 items-center">
-              <p className="italic text-sm">
+              <p className="italic text-xs">
                 {getMealPlanStatus(lastMealPlan)}
               </p>
 
