@@ -132,8 +132,8 @@ export default function Cookbook() {
           </>
         )}
 
-        {searchResults.map((recipe, index) => (
-          <RecipeCard key={index} id={recipe.id} name={recipe.recipeName} />
+        {searchResults.map((recipe) => (
+          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
         ))}
 
         {!loading && searchResults.length === 0 && (
