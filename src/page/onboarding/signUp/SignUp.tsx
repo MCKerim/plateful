@@ -1,9 +1,15 @@
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
+import { useRive } from '@rive-app/react-canvas';
 
 export default function SignUp() {
   const { t } = useTranslation();
+
+  const { RiveComponent } = useRive({
+    src: "public/plateful-character.riv",
+    artboard: "Fly-In",
+  });
 
   const signUp = async () => {
     const environment = import.meta.env.VITE_NODE_ENV;
@@ -53,6 +59,8 @@ export default function SignUp() {
           {t("signup.subtitle")}
         </p>
       </div>
+
+      <RiveComponent />
 
       <div className="w-full max-w-sm flex flex-col gap-3">
         <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
