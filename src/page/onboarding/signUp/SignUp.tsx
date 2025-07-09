@@ -8,7 +8,7 @@ export default function SignUp() {
   const { t } = useTranslation();
 
   const { rive, RiveComponent } = useRive({
-    src: "public/plateful-character.riv",
+    src: "/plateful-character.riv",
     artboard: "Fly-In",
     autoplay: false,
   });
