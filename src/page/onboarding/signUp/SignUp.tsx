@@ -2,10 +2,12 @@ import OnboardingButton from "@/components/ui/onboarding/onboardingButton/Onboar
 import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from '@rive-app/react-canvas';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import CircleTransition from "@/components/atoms/CircleTransition";
 
 export default function SignUp() {
   const { t } = useTranslation();
+  const [showTransition, setShowTransition] = useState(true);
 
   const { rive, RiveComponent } = useRive({
     src: "/plateful-character.riv",
@@ -22,6 +24,10 @@ export default function SignUp() {
 
     return () => clearTimeout(timer);
   }, [rive]);
+
+  const handleTransitionComplete = () => {
+    setShowTransition(false);
+  };
 
   const replayAnimation = () => {
     if (rive) {
@@ -63,8 +69,15 @@ export default function SignUp() {
   };
 
   return (
-    <div className="flex flex-col items-center h-screen px-4 py-10">
-      <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
+    <>
+      <CircleTransition 
+        isVisible={showTransition} 
+        onComplete={handleTransitionComplete}
+        duration={1.2}
+      />
+      
+      <div className="flex flex-col items-center h-screen px-4 py-10">
+        <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
         <h1
           className="text-7xl font-bold"
           style={{
@@ -99,6 +112,7 @@ export default function SignUp() {
           }
         />
       </div>
-    </div>
+      </div>
+    </>
   );
 }
