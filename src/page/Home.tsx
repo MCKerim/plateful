@@ -1,3 +1,4 @@
+import ChatbotFAB from "@/components/atoms/ChatbotFAB";
 import Layout from "@/components/layout/Layout";
 import { CommingSoon } from "@/components/ui/commingSoonOverlay";
 import { useAppSelector } from "@/redux/hooks";
@@ -20,6 +21,8 @@ export default function Home() {
       <p className="mt-2 italic text-muted-foreground">
         Viel Spaß beim Kochen
       </p>
+
+      <ChatbotFAB />
 
       <CommingSoon />
     </Layout>
