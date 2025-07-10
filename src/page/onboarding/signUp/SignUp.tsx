@@ -42,7 +42,7 @@ export default function SignUp() {
     let redirectUri;
     switch (environment) {
       case "development":
-        redirectUri = "http://localhost:5173/";
+        redirectUri = "http://192.168.178.140:5173/";
         break;
 
       case "codespace":

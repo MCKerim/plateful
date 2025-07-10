@@ -211,7 +211,7 @@ function App() {
       <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
       <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
-      <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
+      <Route path="/chatbot" element={<Chatbot />} />
       <Route path="/home" element={routeToCorrectPage(<Home />)} />
 
       <Route
