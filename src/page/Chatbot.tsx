@@ -1,10 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { Send, Bot, User } from "lucide-react";
-import { Button } from "../components/ui/button";
+import { Bot } from "lucide-react";
 import { Input } from "../components/ui/input";
-import { Card } from "../components/ui/card";
-import { Separator } from "../components/ui/separator";
 import Layout from "../components/layout/Layout";
+import supabase from "../utils/supabase";
 
 interface Message {
   id: string;
@@ -49,18 +47,38 @@ export default function Chatbot() {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot response (replace with actual API call)
-    setTimeout(() => {
+    try {
+      // Call the Supabase edge function
+      const { data, error } = await supabase.functions.invoke('chatbot');
+
+      if (error) {
+        throw error;
+      }
+
+      console.log('Chatbot response:', data);
+
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content:
-          "Thanks for your message! I'm still learning, but I'd love to help you with cooking and meal planning. What specific recipe or cooking question do you have?",
+        content: data?.message || "Sorry, I encountered an error. Please try again.",
         sender: "bot",
         timestamp: new Date(),
       };
+      
       setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Error calling chatbot function:', error);
+      
+      const errorMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        sender: "bot",
+        timestamp: new Date(),
+      };
+      
+      setMessages((prev) => [...prev, errorMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
