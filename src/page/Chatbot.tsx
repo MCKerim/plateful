@@ -49,7 +49,9 @@ export default function Chatbot() {
 
     try {
       // Call the Supabase edge function
-      const { data, error } = await supabase.functions.invoke('chatbot');
+      const { data, error } = await supabase.functions.invoke('chatbot', {
+        body: { name: inputValue },
+      });
 
       if (error) {
         throw error;
