@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Bot } from "lucide-react";
 import { Input } from "../components/ui/input";
 import Layout from "../components/layout/Layout";
+import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";
 
 interface Message {
@@ -43,31 +44,34 @@ export default function Chatbot() {
 
     try {
       // Call the Supabase edge function
-      const { data, error } = await supabase.functions.invoke('chatbot', {
+      const { data, error } = await supabase.functions.invoke("chatbot", {
         body: { messages: updatedMessages },
       });
 
       if (error) {
-        console.error('Message: ', error.message);
+        console.error("Message: ", error.message);
         throw error;
       }
 
-      console.log('Chatbot response:', data);
+      console.log("Chatbot response:", data);
 
       const botMessage: Message = {
-        content: data?.message.content || "Sorry, I encountered an error. Please try again.",
+        content:
+          data?.message.content ||
+          "Sorry, I encountered an error. Please try again.",
         role: data?.message.role || "assistant",
       };
-      
+
       setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error calling chatbot function:', error);
-      
+      console.error("Error calling chatbot function:", error);
+
       const errorMessage: Message = {
-        content: "Sorry, I'm having trouble connecting right now. Please try again later.",
+        content:
+          "Sorry, I'm having trouble connecting right now. Please try again later.",
         role: "assistant",
       };
-      
+
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsTyping(false);
@@ -115,7 +119,14 @@ export default function Chatbot() {
                       : "bg-muted"
                   }`}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  {message.role === "user" ? (
+                    <p className="text-sm">{message.content}</p>
+                  ) : (
+                    <MarkdownRenderer
+                      content={message.content}
+                      className="text-sm"
+                    />
+                  )}
                 </div>
               </div>
             </div>
