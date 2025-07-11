@@ -5,20 +5,16 @@ import Layout from "../components/layout/Layout";
 import supabase from "../utils/supabase";
 
 interface Message {
-  id: string;
+  role: "user" | "assistant" | "system";
   content: string;
-  sender: "user" | "bot";
-  timestamp: Date;
 }
 
 export default function Chatbot() {
   const [messages, setMessages] = useState<Message[]>([
     {
-      id: "1",
       content:
         "Hello! I'm your Plateful cooking assistant. How can I help you today? I can help with recipes, meal planning, cooking tips, and more!",
-      sender: "bot",
-      timestamp: new Date(),
+      role: "assistant",
     },
   ]);
   const [inputValue, setInputValue] = useState("");
@@ -37,33 +33,30 @@ export default function Chatbot() {
     if (!inputValue.trim()) return;
 
     const userMessage: Message = {
-      id: Date.now().toString(),
       content: inputValue,
-      sender: "user",
-      timestamp: new Date(),
+      role: "user",
     };
-
-    setMessages((prev) => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setInputValue("");
     setIsTyping(true);
 
     try {
       // Call the Supabase edge function
       const { data, error } = await supabase.functions.invoke('chatbot', {
-        body: { name: inputValue },
+        body: { messages: updatedMessages },
       });
 
       if (error) {
+        console.error('Message: ', error.message);
         throw error;
       }
 
       console.log('Chatbot response:', data);
 
       const botMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        content: data?.message || "Sorry, I encountered an error. Please try again.",
-        sender: "bot",
-        timestamp: new Date(),
+        content: data?.message.content || "Sorry, I encountered an error. Please try again.",
+        role: data?.message.role || "assistant",
       };
       
       setMessages((prev) => [...prev, botMessage]);
@@ -71,10 +64,8 @@ export default function Chatbot() {
       console.error('Error calling chatbot function:', error);
       
       const errorMessage: Message = {
-        id: (Date.now() + 1).toString(),
         content: "Sorry, I'm having trouble connecting right now. Please try again later.",
-        sender: "bot",
-        timestamp: new Date(),
+        role: "assistant",
       };
       
       setMessages((prev) => [...prev, errorMessage]);
@@ -104,22 +95,22 @@ export default function Chatbot() {
 
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {messages.map((message) => (
+          {messages.map((message, index) => (
             <div
-              key={message.id}
+              key={index}
               className={`flex ${
-                message.sender === "user" ? "justify-end" : "justify-start"
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
               <div
                 className={`flex items-start gap-2 max-w-[80%] ${
-                  message.sender === "user" ? "flex-row-reverse" : "flex-row"
+                  message.role === "user" ? "flex-row-reverse" : "flex-row"
                 }`}
               >
                 {/* Message Bubble */}
                 <div
                   className={`rounded-lg px-4 py-2 ${
-                    message.sender === "user"
+                    message.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   }`}
