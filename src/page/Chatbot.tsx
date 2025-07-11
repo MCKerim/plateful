@@ -107,8 +107,8 @@ export default function Chatbot() {
               }`}
             >
               <div
-                className={`flex items-start gap-2 max-w-[80%] ${
-                  message.role === "user" ? "flex-row-reverse" : "flex-row"
+                className={`flex items-start gap-2 ${
+                  message.role === "user" ? "flex-row-reverse max-w-[80%]" : "flex-row w-full"
                 }`}
               >
                 {/* Message Bubble */}
