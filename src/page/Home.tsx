@@ -1,4 +1,3 @@
-import ChatbotFAB from "@/components/atoms/ChatbotFAB";
 import Layout from "@/components/layout/Layout";
 import { CommingSoon } from "@/components/ui/commingSoonOverlay";
 import { useAppSelector } from "@/redux/hooks";
