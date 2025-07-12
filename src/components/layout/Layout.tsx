@@ -3,9 +3,10 @@ import Header from "../atoms/Header";
 
 type Props = {
   children?: React.ReactNode;
+  hideBottomNav?: boolean;
 };
 
-export default function Layout({ children }: Readonly<Props>) {
+export default function Layout({ children, hideBottomNav = false }: Readonly<Props>) {
   return (
     <div className="w-full max-w-lg flex flex-col items-center m-auto">
       <Header />
@@ -14,7 +15,7 @@ export default function Layout({ children }: Readonly<Props>) {
         {children}
       </div>
 
-      <BottomNav />
+      {!hideBottomNav && <BottomNav />}
     </div>
   );
 }

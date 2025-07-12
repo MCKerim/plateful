@@ -20,6 +20,7 @@ export default function Chatbot() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isInputFocused, setIsInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -86,7 +87,7 @@ export default function Chatbot() {
   };
 
   return (
-    <Layout>
+    <Layout hideBottomNav={isInputFocused}>
       {/* Chat Header */}
       <div className="flex items-center mb-4">
         <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
@@ -152,13 +153,15 @@ export default function Chatbot() {
       </div>
 
       {/* Input Area */}
-      <div className="w-full max-w-lg fixed bottom-20 z-10 pr-8">
+      <div className={`w-full max-w-lg fixed z-10 pr-8 ${isInputFocused ? 'bottom-4' : 'bottom-20'}`}>
         <Textarea
           className="w-full rounded-xl flex-1"
           placeholder="Ask me about recipes or cooking tips..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
+          onFocus={() => setIsInputFocused(true)}
+          onBlur={() => setIsInputFocused(false)}
           disabled={isTyping}
           onSubmit={handleSendMessage}
         />
