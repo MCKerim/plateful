@@ -75,6 +75,7 @@
   },
   "bottomNav": {
     "home": "Home",
+    "chatbot": "AI-Chef",
     "explore": "Explore",
     "cookbook": "Cookbook",
     "planner": "Planer",

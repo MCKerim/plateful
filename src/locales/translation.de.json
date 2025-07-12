@@ -75,6 +75,7 @@
   },
   "bottomNav": {
     "home": "Startseite",
+    "chatbot": "KI-Koch",
     "explore": "Erkunden",
     "cookbook": "Kochbuch",
     "planner": "Planer",

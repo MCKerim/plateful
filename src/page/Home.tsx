@@ -18,11 +18,7 @@ export default function Home() {
         </h1>
       </div>
 
-      <p className="mt-2 italic text-muted-foreground">
-        Viel Spaß beim Kochen
-      </p>
-
-      <ChatbotFAB />
+      <p className="mt-2 italic text-muted-foreground">Viel Spaß beim Kochen</p>
 
       <CommingSoon />
     </Layout>

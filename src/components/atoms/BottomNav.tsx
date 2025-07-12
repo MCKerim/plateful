@@ -18,10 +18,10 @@ export default function BottomNav() {
           />
 
           <BottomNavButton
-            label={t("bottomNav.explore")}
-            icon="explore"
-            link="/explore"
-            active={window.location.pathname.startsWith("/explore")}
+            label={t("bottomNav.chatbot")}
+            icon="chatbot"
+            link="/chatbot"
+            active={window.location.pathname.startsWith("/chatbot")}
           />
 
           <BottomNavButton
