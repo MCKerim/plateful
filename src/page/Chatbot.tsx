@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Bot } from "lucide-react";
-import { Input } from "../components/ui/input";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";
+import { Textarea } from "@/components/ui/textarea";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -87,80 +87,80 @@ export default function Chatbot() {
 
   return (
     <Layout>
-      <div className="flex flex-col h-[calc(100vh-140px)] w-full">
-        {/* Chat Header */}
-        <div className="flex items-center mb-4">
-          <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-            <Bot className="w-5 h-5 text-primary" />
-          </div>
-
-          <h2 className="font-bold text-lg">Cooking Assistant</h2>
+      {/* Chat Header */}
+      <div className="flex items-center mb-4">
+        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+          <Bot className="w-5 h-5 text-primary" />
         </div>
 
-        {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-          {messages.map((message, index) => (
+        <h2 className="font-bold text-lg">Cooking Assistant</h2>
+      </div>
+
+      {/* Messages Container */}
+      <div className="flex-1 overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div
-              key={index}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
+              className={`flex items-start gap-2 ${
+                message.role === "user"
+                  ? "flex-row-reverse max-w-[80%]"
+                  : "flex-row w-full"
               }`}
             >
+              {/* Message Bubble */}
               <div
-                className={`flex items-start gap-2 ${
-                  message.role === "user" ? "flex-row-reverse max-w-[80%]" : "flex-row w-full"
+                className={`rounded-lg px-4 py-2 ${
+                  message.role === "user"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
                 }`}
               >
-                {/* Message Bubble */}
-                <div
-                  className={`rounded-lg px-4 py-2 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  {message.role === "user" ? (
-                    <p className="text-sm">{message.content}</p>
-                  ) : (
-                    <MarkdownRenderer
-                      content={message.content}
-                      className="text-sm"
-                    />
-                  )}
+                {message.role === "user" ? (
+                  <p className="text-sm">{message.content}</p>
+                ) : (
+                  <MarkdownRenderer
+                    content={message.content}
+                    className="text-sm"
+                  />
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {/* Typing Indicator */}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="flex items-start gap-2 max-w-[80%]">
+              <div className="bg-muted rounded-lg px-4 py-2">
+                <div className="flex space-x-1">
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-100"></div>
+                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-200"></div>
                 </div>
               </div>
             </div>
-          ))}
+          </div>
+        )}
 
-          {/* Typing Indicator */}
-          {isTyping && (
-            <div className="flex justify-start">
-              <div className="flex items-start gap-2 max-w-[80%]">
-                <div className="bg-muted rounded-lg px-4 py-2">
-                  <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-100"></div>
-                    <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-200"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+        <div ref={messagesEndRef} />
+      </div>
 
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Input Area */}
-        <Input
-          className="w-full rounded-full flex-1"
-          type="text"
+      {/* Input Area */}
+      <div className="w-full max-w-lg fixed bottom-20 z-10 pr-8">
+        <Textarea
+          className="w-full rounded-xl flex-1"
           placeholder="Ask me about recipes or cooking tips..."
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={isTyping}
           onSubmit={handleSendMessage}
-          showSubmitButton
         />
       </div>
     </Layout>
