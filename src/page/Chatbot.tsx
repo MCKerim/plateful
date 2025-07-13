@@ -3,7 +3,7 @@ import { Bot } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -11,16 +11,9 @@ interface Message {
 }
 
 export default function Chatbot() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      content:
-        "Hello! I'm your Plateful cooking assistant. How can I help you today? I can help with recipes, meal planning, cooking tips, and more!",
-      role: "assistant",
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [isInputFocused, setIsInputFocused] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -87,18 +80,20 @@ export default function Chatbot() {
   };
 
   return (
-    <Layout hideBottomNav={isInputFocused}>
-      {/* Chat Header */}
-      <div className="flex items-center mb-4">
-        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-          <Bot className="w-5 h-5 text-primary" />
-        </div>
+    <Layout>
+      {/* Chat BG */}
+      {messages.length === 0 && (
+        <div className="w-full absolute gap-2 flex justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
+          <div className="flex items-center justify-center pb-2">
+            <Bot className="w-8 h-8 text-primary" />
+          </div>
 
-        <h2 className="font-bold text-lg">Cooking Assistant</h2>
-      </div>
+          <h2 className="font-bold text-xl">Wie kann ich dir helfen?</h2>
+        </div>
+      )}
 
       {/* Messages Container */}
-      <div className="flex-1 overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {messages.map((message, index) => (
           <div
             key={index}
@@ -153,15 +148,15 @@ export default function Chatbot() {
       </div>
 
       {/* Input Area */}
-      <div className={`w-full max-w-lg fixed z-10 pr-8 ${isInputFocused ? 'bottom-4' : 'bottom-20'}`}>
-        <Textarea
-          className="w-full rounded-xl flex-1"
-          placeholder="Ask me about recipes or cooking tips..."
+      <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
+        <Input
+          type="text"
+          className="w-full rounded-full flex-1"
+          showSubmitButton
+          placeholder="Frag mich nach Rezepten oder Tipps!"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}
-          onFocus={() => setIsInputFocused(true)}
-          onBlur={() => setIsInputFocused(false)}
           disabled={isTyping}
           onSubmit={handleSendMessage}
         />
