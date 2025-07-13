@@ -3,7 +3,11 @@ import { Separator } from "../ui/separator";
 import { Button } from "../ui/button";
 import { NavLink } from "react-router";
 
-export default function Header() {
+type Props = {
+  buttons?: React.ReactNode;
+}
+
+export default function Header({ buttons }: Readonly<Props>) {
   return (
     <>
       <div style={{ height: "54px" }}></div>
@@ -12,11 +16,15 @@ export default function Header() {
         <div className="flex justify-between w-full items-center px-2">
           <h1 className="font-bold text-xl">Plateful</h1>
 
-          <NavLink to="/settings">
-            <Button variant="ghost" size="icon">
-              <Settings />
-            </Button>
-          </NavLink>
+          <div className="flex gap-2">
+            {buttons}
+
+            <NavLink to="/settings">
+              <Button variant="ghost" size="icon">
+                <Settings />
+              </Button>
+            </NavLink>
+          </div>
         </div>
 
         <Separator />

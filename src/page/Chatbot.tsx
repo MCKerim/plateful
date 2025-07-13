@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot } from "lucide-react";
+import { Bot, RotateCcw } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface Message {
   role: "user" | "assistant" | "system";
@@ -79,8 +80,20 @@ export default function Chatbot() {
     }
   };
 
+  const handleResetChat = () => {
+    setMessages([]);
+    setInputValue("");
+    setIsTyping(false);
+  };
+
   return (
-    <Layout>
+    <Layout
+      headerButtons={
+        <Button onClick={handleResetChat} variant="ghost" size="icon">
+          <RotateCcw />
+        </Button>
+      }
+    >
       {/* Chat BG */}
       {messages.length === 0 && (
         <div className="w-full absolute gap-2 flex justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
