@@ -5,14 +5,15 @@ import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-
-interface Message {
-  role: "user" | "assistant" | "system";
-  content: string;
-}
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { useNavigate } from "react-router";
 
 export default function Chatbot() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const navigate = useNavigate();
+  const householdId = useAppSelector(selectHouseholdId);
+
+  const [messages, setMessages] = useState<any[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -23,12 +24,13 @@ export default function Chatbot() {
 
   useEffect(() => {
     scrollToBottom();
+    console.log("Messages updated:", messages);
   }, [messages]);
 
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    const userMessage: Message = {
+    const userMessage: any = {
       content: inputValue,
       role: "user",
     };
@@ -50,18 +52,16 @@ export default function Chatbot() {
 
       console.log("Chatbot response:", data);
 
-      const botMessage: Message = {
-        content:
-          data?.message.content ||
-          "Sorry, I encountered an error. Please try again.",
-        role: data?.message.role || "assistant",
-      };
+      const newMessages: any[] = [];
+      data.newMessages.forEach((msg: any) => {
+        newMessages.push(msg);
+      });
 
-      setMessages((prev) => [...prev, botMessage]);
+      setMessages([...updatedMessages, ...newMessages]);
     } catch (error) {
       console.error("Error calling chatbot function:", error);
 
-      const errorMessage: Message = {
+      const errorMessage: any = {
         content:
           "Sorry, I'm having trouble connecting right now. Please try again later.",
         role: "assistant",
@@ -86,6 +86,23 @@ export default function Chatbot() {
     setIsTyping(false);
   };
 
+  async function saveSuggestedRecipe(functionArguments: any) {
+    const { title, description } = JSON.parse(functionArguments);
+
+    // Insert new recipe
+    const { data, error } = await supabase
+      .from("recipes")
+      .insert([{ name: title, description, link: null, household_id: householdId }])
+      .select();
+
+    if (!error && data) {
+      navigate(`/recipe/${data[0].id}`);
+    } else {
+      console.error(error);
+      alert("An error occurred. Please try again.");
+    }
+  }
+
   return (
     <Layout
       headerButtons={
@@ -107,7 +124,11 @@ export default function Chatbot() {
 
       {/* Messages Container */}
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {messages.map((message, index) => (
+        {messages.filter(
+          (message) => {
+            return !(message.role === "tool")
+          }
+        ).map((message, index) => (
           <div
             key={index}
             className={`flex ${
@@ -129,13 +150,27 @@ export default function Chatbot() {
                     : "bg-muted"
                 }`}
               >
-                {message.role === "user" ? (
+                {message.role === "user" && (
                   <p className="text-sm">{message.content}</p>
-                ) : (
+                )}
+
+                {message.role === "assistant" && (
                   <MarkdownRenderer
                     content={message.content}
                     className="text-sm"
                   />
+                )}
+
+                {message.role === "assistant" && message.tool_calls !== undefined && (
+                  <Button
+                    onClick={() =>
+                      saveSuggestedRecipe(
+                        message.tool_calls[0].function.arguments
+                      )
+                    }
+                  >
+                    Rezept speichern
+                  </Button>
                 )}
               </div>
             </div>
