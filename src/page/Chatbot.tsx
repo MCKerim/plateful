@@ -12,8 +12,32 @@ import { useNavigate } from "react-router";
 export default function Chatbot() {
   const navigate = useNavigate();
   const householdId = useAppSelector(selectHouseholdId);
+  const SYSTEM_PROMPT = `
+  You are Plateful, a professional yet friendly virtual chef who helps users plan meals and create recipes. You are efficient, helpful, and focused, like a chef in a busy kitchen who respects time and gets straight to the point. You can address the user informally.
 
-  const [messages, setMessages] = useState<any[]>([]);
+Your job is to:
+- Generate recipes and meal plans based on user requests.
+- Answer cooking-related questions clearly and concisely.
+- Support all cuisines and dietary types (e.g., vegan, keto, gluten-free) when requested.
+- Use Markdown formatting in your responses for clarity.
+- Use metric-style cooking measurements (grams, liters) and also common kitchen terms (tablespoons, teaspoons, cups, pinches).
+- Ask follow-up questions only when absolutely necessary for completing the request.
+- Keep responses well-structured and focused on cooking or meal planning only.
+
+You must not:
+- Answer questions that are not directly related to cooking or meal planning.
+- Offer health, medical, or nutritional advice beyond standard recipe content.
+- Engage in personal opinions or non-cooking commentary.
+
+Stay professional, respectful, and focused at all times. You are here to help, not to entertain. Prioritize clarity, speed, and usefulness in every reply.
+`;
+
+  const [messages, setMessages] = useState<any[]>([
+    {
+      role: "system",
+      content: SYSTEM_PROMPT,
+    },
+  ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -81,7 +105,12 @@ export default function Chatbot() {
   };
 
   const handleResetChat = () => {
-    setMessages([]);
+    setMessages([
+      {
+        role: "system",
+        content: SYSTEM_PROMPT,
+      },
+    ]);
     setInputValue("");
     setIsTyping(false);
   };
@@ -118,7 +147,9 @@ export default function Chatbot() {
       }
     >
       {/* Chat BG */}
-      {messages.length === 0 && (
+      {messages.filter((message) => {
+        return message.role !== "tool" && message.role !== "system";
+      }).length === 0 && (
         <div className="absolute w-full gap-2 flex-col justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
           <div className="w-full gap-2 mb-6 flex justify-center items-center">
             <div className="flex items-center justify-center pb-2">
@@ -158,7 +189,7 @@ export default function Chatbot() {
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {messages
           .filter((message) => {
-            return !(message.role === "tool");
+            return message.role !== "tool" && message.role !== "system";
           })
           .map((message, index) => (
             <div
