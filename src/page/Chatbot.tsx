@@ -86,13 +86,19 @@ export default function Chatbot() {
     setIsTyping(false);
   };
 
+  function handleMessageSuggestionButton(suggestion: string) {
+    setInputValue(suggestion);
+  }
+
   async function saveSuggestedRecipe(functionArguments: any) {
     const { title, description } = JSON.parse(functionArguments);
 
     // Insert new recipe
     const { data, error } = await supabase
       .from("recipes")
-      .insert([{ name: title, description, link: null, household_id: householdId }])
+      .insert([
+        { name: title, description, link: null, household_id: householdId },
+      ])
       .select();
 
     if (!error && data) {
@@ -113,69 +119,96 @@ export default function Chatbot() {
     >
       {/* Chat BG */}
       {messages.length === 0 && (
-        <div className="w-full absolute gap-2 flex justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
-          <div className="flex items-center justify-center pb-2">
-            <Bot className="w-8 h-8 text-primary" />
+        <div className="absolute w-full gap-2 flex-col justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
+          <div className="w-full gap-2 mb-6 flex justify-center items-center">
+            <div className="flex items-center justify-center pb-2">
+              <Bot className="w-8 h-8 text-primary" />
+            </div>
+
+            <h2 className="font-bold text-xl">Wie kann ich dir helfen?</h2>
           </div>
 
-          <h2 className="font-bold text-xl">Wie kann ich dir helfen?</h2>
+          <div className="flex flex-col items-center gap-2">
+            <Button
+              className="rounded-full"
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                handleMessageSuggestionButton("Erstelle ein gesundes Rezept")
+              }
+            >
+              Erstelle ein gesundes Rezept
+            </Button>
+
+            <Button
+              className="rounded-full"
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                handleMessageSuggestionButton("Erstelle ein schnelles Rezept")
+              }
+            >
+              Erstelle ein schnelles Rezept
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Messages Container */}
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-        {messages.filter(
-          (message) => {
-            return !(message.role === "tool")
-          }
-        ).map((message, index) => (
-          <div
-            key={index}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
-          >
+        {messages
+          .filter((message) => {
+            return !(message.role === "tool");
+          })
+          .map((message, index) => (
             <div
-              className={`flex items-start gap-2 ${
-                message.role === "user"
-                  ? "flex-row-reverse max-w-[80%]"
-                  : "flex-row w-full"
+              key={index}
+              className={`flex ${
+                message.role === "user" ? "justify-end" : "justify-start"
               }`}
             >
-              {/* Message Bubble */}
               <div
-                className={`rounded-lg px-4 py-2 ${
+                className={`flex items-start gap-2 ${
                   message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                    ? "flex-row-reverse max-w-[80%]"
+                    : "flex-row w-full"
                 }`}
               >
-                {message.role === "user" && (
-                  <p className="text-sm">{message.content}</p>
-                )}
+                {/* Message Bubble */}
+                <div
+                  className={`rounded-lg px-4 py-2 ${
+                    message.role === "user"
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-muted"
+                  }`}
+                >
+                  {message.role === "user" && (
+                    <p className="text-sm">{message.content}</p>
+                  )}
 
-                {message.role === "assistant" && (
-                  <MarkdownRenderer
-                    content={message.content}
-                    className="text-sm"
-                  />
-                )}
+                  {message.role === "assistant" && (
+                    <MarkdownRenderer
+                      content={message.content}
+                      className="text-sm"
+                    />
+                  )}
 
-                {message.role === "assistant" && message.tool_calls !== undefined && (
-                  <Button
-                    onClick={() =>
-                      saveSuggestedRecipe(
-                        message.tool_calls[0].function.arguments
-                      )
-                    }
-                  >
-                    Rezept speichern
-                  </Button>
-                )}
+                  {message.role === "assistant" &&
+                    message.tool_calls !== undefined && (
+                      <Button
+                        onClick={() =>
+                          saveSuggestedRecipe(
+                            message.tool_calls[0].function.arguments
+                          )
+                        }
+                      >
+                        Rezept speichern
+                      </Button>
+                    )}
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
 
         {/* Typing Indicator */}
         {isTyping && (
