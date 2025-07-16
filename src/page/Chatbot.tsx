@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import supabase from "../utils/supabase";

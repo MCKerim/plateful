@@ -163,6 +163,14 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
+          <h2 className="border-b font-medium">Version</h2>
+
+          <p className="text-sm">
+            v0.0.0
+          </p>
+        </div>
+
+        <div className="flex flex-col gap-2 border p-2 rounded-lg">
           <h2 className="border-b font-medium">{t("settings.dangerZone")}</h2>
 
           {user?.email}
