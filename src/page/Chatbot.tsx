@@ -171,16 +171,29 @@ Stay professional, respectful, and focused at all times. You are here to help, n
               Erstelle ein gesundes Rezept
             </Button>
 
-            <Button
-              className="rounded-full"
-              variant="secondary"
-              size="sm"
-              onClick={() =>
-                handleMessageSuggestionButton("Erstelle ein schnelles Rezept")
-              }
-            >
-              Erstelle ein schnelles Rezept
-            </Button>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Button
+                className="rounded-full"
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  handleMessageSuggestionButton("Erstelle ein schnelles Rezept")
+                }
+              >
+                ein schnelles Rezept
+              </Button>
+
+              <Button
+                className="rounded-full"
+                variant="secondary"
+                size="sm"
+                onClick={() =>
+                  handleMessageSuggestionButton("Erstelle ein günstiges Rezept")
+                }
+              >
+                ein günstiges Rezept
+              </Button>
+            </div>
           </div>
         </div>
       )}
