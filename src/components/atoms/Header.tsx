@@ -25,7 +25,7 @@ export default function Header({ buttons }: Readonly<Props>) {
 
             {environment === "preview" && (
               <div className="text-xs font-bold bg-primary text-primary-foreground py-0.5 px-2 rounded-full">
-                Staging
+                Preview
               </div>
             )}
 
