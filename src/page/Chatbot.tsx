@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useNavigate } from "react-router";
+import Rive from "@rive-app/react-canvas";
 
 export default function Chatbot() {
   const navigate = useNavigate();
@@ -150,12 +151,12 @@ Stay professional, respectful, and focused at all times. You are here to help, n
       {messages.filter((message) => {
         return message.role !== "tool" && message.role !== "system";
       }).length === 0 && (
-        <div className="absolute w-full gap-2 flex-col justify-center items-center top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/4 -z-10">
-          <div className="w-full gap-2 mb-6 flex justify-center items-center">
-            <div className="flex items-center justify-center pb-2">
-              <Bot className="w-8 h-8 text-primary" />
-            </div>
+        <div className="absolute w-full gap-2 flex-col justify-center items-center left-1/2 -translate-x-1/2 -z-10">
+          <div className="w-full h-[200px] mx-auto">
+              <Rive src="/plateful-character.riv" />
+          </div>
 
+          <div className="w-full gap-2 mb-6 flex justify-center items-center">
             <h2 className="font-bold text-xl">Wie kann ich dir helfen?</h2>
           </div>
 
