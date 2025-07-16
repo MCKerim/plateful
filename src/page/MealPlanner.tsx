@@ -15,6 +15,7 @@ import {
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import Rive from "@rive-app/react-canvas";
 
 type MealPlannerItem = {
   id: number;
@@ -170,12 +171,18 @@ export default function MealPlanner() {
         recipeId={recipeToRate}
       />
 
-      <p className="w-full text-center">
-        {t("dayWithCount", { count: plannedDays() })} •{" "}
-        {getPlannedRangeFormatted()}
-      </p>
+      {plannedItems.filter((item) => {
+        return item.days > item.daysEaten;
+      }).length > 0 && (
+        <>
+          <p className="w-full text-center">
+            {t("dayWithCount", { count: plannedDays() })} •{" "}
+            {getPlannedRangeFormatted()}
+          </p>
 
-      <Separator />
+          <Separator />
+        </>
+      )}
 
       <div className="flex flex-col gap-2.5">
         {loading && (
@@ -197,17 +204,15 @@ export default function MealPlanner() {
           plannedItems.filter((item) => {
             return item.days > item.daysEaten;
           }).length === 0 && (
-            <Card className="w-full">
-              <CardHeader>
-                <h1 className="font-bold text-lg leading-tight">
-                  Nichts geplant...
-                </h1>
+            <div className="w-full flex flex-col justify-center items-center mt-10 gap-2">
+              <div className="w-full h-[80px] mx-auto">
+                <Rive src="/plateful-character.riv" artboard="Sad" />
+              </div>
 
-                <CardDescription>
-                  ...plane Rezepte für die nächsten Tage
-                </CardDescription>
-              </CardHeader>
-            </Card>
+              <p className="flex justify-center font-bold">
+                Keine Rezepte geplant...
+              </p>
+            </div>
           )}
 
         {plannedItems

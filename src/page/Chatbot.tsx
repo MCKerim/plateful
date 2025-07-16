@@ -153,7 +153,7 @@ Stay professional, respectful, and focused at all times. You are here to help, n
       }).length === 0 && (
         <div className="absolute w-full gap-2 flex-col justify-center items-center left-1/2 -translate-x-1/2 -z-10">
           <div className="w-full h-[200px] mx-auto">
-              <Rive src="/plateful-character.riv" />
+              <Rive src="/plateful-character.riv" artboard="Fly-In" />
           </div>
 
           <div className="w-full gap-2 mb-6 flex justify-center items-center">

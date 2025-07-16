@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Card, CardDescription, CardHeader } from "../components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import Rive from "@rive-app/react-canvas";
 
 type Recipe = {
   id: number;
@@ -135,19 +136,19 @@ export default function Cookbook() {
         {searchResults.map((recipe) => (
           <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
         ))}
-
-        {!loading && searchResults.length === 0 && (
-          <Card className="w-full">
-            <CardHeader>
-              <h1 className="font-bold text-lg leading-tight">
-                {t("cookbook.nothingFound")}
-              </h1>
-
-              <CardDescription>{t("cookbook.addNewViaPlus")}</CardDescription>
-            </CardHeader>
-          </Card>
-        )}
       </div>
+
+      {!loading && searchResults.length === 0 && (
+        <div className="w-full flex flex-col justify-center items-center mt-10 gap-2">
+          <div className="w-full h-[80px] mx-auto">
+            <Rive src="/plateful-character.riv" artboard="Sad" />
+          </div>
+
+          <p className="flex justify-center font-bold">
+            Keine Rezepte gefunden...
+          </p>
+        </div>
+      )}
     </Layout>
   );
 }
