@@ -7,7 +7,6 @@ import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
-import { Card, CardDescription, CardHeader } from "../components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import Rive from "@rive-app/react-canvas";
 
@@ -144,7 +143,7 @@ export default function Cookbook() {
             <Rive src="/plateful-character.riv" artboard="Sad" />
           </div>
 
-          <p className="flex justify-center font-bold">
+          <p className="flex justify-center font-bold italic">
             Keine Rezepte gefunden...
           </p>
         </div>

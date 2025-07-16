@@ -22,6 +22,7 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
+import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 
 type RecipeItem = {
   id: number;
@@ -346,9 +347,10 @@ export default function Recipe() {
 
       <RatingModal recipeId={recipe?.id} />
 
-      <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
-        {recipe?.description}
-      </p>
+      <MarkdownRenderer
+        content={recipe?.description || ""}
+        className="font-medium"
+      />
     </Layout>
   );
 }

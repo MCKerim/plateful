@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardDescription, CardHeader } from "@/components/ui/card";
 import Rive from "@rive-app/react-canvas";
 
 type MealPlannerItem = {
@@ -209,7 +208,7 @@ export default function MealPlanner() {
                 <Rive src="/plateful-character.riv" artboard="Sad" />
               </div>
 
-              <p className="flex justify-center font-bold">
+              <p className="flex justify-center font-bold italic">
                 Keine Rezepte geplant...
               </p>
             </div>
