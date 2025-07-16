@@ -5,16 +5,36 @@ import { NavLink } from "react-router";
 
 type Props = {
   buttons?: React.ReactNode;
-}
+};
 
 export default function Header({ buttons }: Readonly<Props>) {
+  const environment = import.meta.env.VITE_NODE_ENV;
+
   return (
     <>
       <div style={{ height: "54px" }}></div>
 
       <div className="w-full max-w-lg fixed top-0 pt-1 bg-background z-20">
         <div className="flex justify-between w-full items-center px-2">
-          <h1 className="font-bold text-xl">Plateful</h1>
+          <div className="flex items-center gap-1">
+            <h1 className="font-bold text-xl">Plateful</h1>
+
+            <div className="text-xs font-bold bg-plateful text-primary-foreground py-0.5 px-2 rounded-full">
+              Beta
+            </div>
+
+            {environment === "preview" && (
+              <div className="text-xs font-bold bg-primary text-primary-foreground py-0.5 px-2 rounded-full">
+                Staging
+              </div>
+            )}
+
+            {environment === "development" && (
+              <div className="text-xs font-bold bg-primary text-primary-foreground py-0.5 px-2 rounded-full">
+                Development
+              </div>
+            )}
+          </div>
 
           <div className="flex gap-2">
             {buttons}
