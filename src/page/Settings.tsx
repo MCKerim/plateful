@@ -12,8 +12,9 @@ import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
-
   const user = useAppSelector(selectUser);
+
+  const environment = import.meta.env.VITE_NODE_ENV;
 
   useEffect(() => {
     // Benutzeridentifikation mit Canny
@@ -95,7 +96,9 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.supportFeedback")}</h2>
+          <h2 className="border-b font-medium">
+            {t("settings.supportFeedback")}
+          </h2>
 
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
@@ -140,7 +143,8 @@ export default function Settings() {
           <h2 className="border-b font-medium">About</h2>
 
           <p className="text-sm">
-            Plateful is built by Kerim Ismail. Have feedback or want to connect? Reach out below!
+            Plateful is built by Kerim Ismail. Have feedback or want to connect?
+            Reach out below!
           </p>
 
           <div className="flex justify-evenly py-2">
@@ -166,7 +170,9 @@ export default function Settings() {
           <h2 className="border-b font-medium">Version</h2>
 
           <p className="text-sm">
-            v0.0.0
+            v0.0.0 <span>- Beta </span>
+            {environment === "preview" && <span>- Preview </span>}
+            {environment === "development" && <span>- Development </span>}
           </p>
         </div>
 
