@@ -277,7 +277,7 @@ export default function Recipe() {
         </DropdownMenu>
       </div>
 
-      <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
+      <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
             imageUrls.length > 0
@@ -294,6 +294,7 @@ export default function Recipe() {
           <Button variant="secondary" onClick={handlePreviousImage}>
             Previous
           </Button>
+
           <Button variant="secondary" onClick={handleNextImage}>
             Next
           </Button>
