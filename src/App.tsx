@@ -32,6 +32,7 @@ import LoadingScreen from "./components/atoms/LoadingScreen";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
 import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
+import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValue";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -175,7 +176,8 @@ function App() {
 
       <Route path="/values" element={<ImportRecipes />} />
       <Route path="/values/1" element={<ImportRecipes />} />
-      <Route path="/values/2" element={<MealPlanningValue />} />
+      <Route path="/values/2" element={<ChatbotValue />} />
+      <Route path="/values/3" element={<MealPlanningValue />} />
 
       <Route path="/survey" element={<SurveyStart />} />
       <Route path="/survey/:questionId" element={<Survey />} />
