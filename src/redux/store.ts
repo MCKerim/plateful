@@ -2,11 +2,13 @@ import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./slices/userSlice";
 import householdReducer from "./slices/householdSlice";
+import chatbotReducer from "./slices/chatbotSlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     household: householdReducer,
+    chatbot: chatbotReducer,
   },
 });
 
