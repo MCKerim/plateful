@@ -183,37 +183,30 @@ export default function MealPlanner() {
         </>
       )}
 
-      <div className="flex flex-col gap-2.5">
-        {loading && (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div
-                className="w-full max-w-lg h-[90px] flex"
-                key={`skeleton_${i}`}
-              >
-                <Skeleton className="min-w-[70px] mr-1 h-full rounded-l-lg rounded-r-none" />
+      {loading && (
+        <div className="flex space-x-2 justify-center items-center w-full flex-1">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high"></div>
+        </div>
+      )}
 
-                <Skeleton className="w-[100%] h-full rounded-r-lg rounded-l-none mb-1" />
-              </div>
-            ))}
-          </>
+      {!loading &&
+        plannedItems.filter((item) => {
+          return item.days > item.daysEaten;
+        }).length === 0 && (
+          <div className="w-full flex flex-col justify-center items-center gap-2 flex-1">
+            <div className="w-full h-[80px] mx-auto">
+              <Rive src="/plateful-character.riv" artboard="Sad" />
+            </div>
+
+            <p className="flex justify-center font-bold italic">
+              Keine Rezepte geplant...
+            </p>
+          </div>
         )}
 
-        {!loading &&
-          plannedItems.filter((item) => {
-            return item.days > item.daysEaten;
-          }).length === 0 && (
-            <div className="w-full flex flex-col justify-center items-center mt-10 gap-2">
-              <div className="w-full h-[80px] mx-auto">
-                <Rive src="/plateful-character.riv" artboard="Sad" />
-              </div>
-
-              <p className="flex justify-center font-bold italic">
-                Keine Rezepte geplant...
-              </p>
-            </div>
-          )}
-
+      <div className="flex flex-col gap-2.5">
         {plannedItems
           .filter((item) => {
             return item.days > item.daysEaten;

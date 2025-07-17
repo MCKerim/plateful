@@ -121,15 +121,11 @@ export default function Cookbook() {
 
       <div className="grid grid-cols-2 gap-4">
         {loading && (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div className="w-full max-w-lg" key={`skeleton_${i}`}>
-                <Skeleton className="h-[128px] rounded-t-lg rounded-b-none mb-1" />
-
-                <Skeleton className="h-[66.5px] rounded-b-lg rounded-t-none" />
-              </div>
-            ))}
-          </>
+          <div className="flex space-x-2 justify-center items-center w-full flex-1">
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
+            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high"></div>
+          </div>
         )}
 
         {searchResults.map((recipe) => (
