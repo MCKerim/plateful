@@ -120,18 +120,18 @@ export default function Cookbook() {
       </button>
 
       <div className="grid grid-cols-2 gap-4">
-        {loading && (
+        {searchResults.map((recipe) => (
+          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
+        ))}
+      </div>
+
+      {loading && (
           <div className="flex space-x-2 justify-center items-center w-full flex-1">
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high"></div>
           </div>
         )}
-
-        {searchResults.map((recipe) => (
-          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
-        ))}
-      </div>
 
       {!loading && searchResults.length === 0 && (
         <div className="w-full flex flex-col justify-center items-center mt-10 gap-2">
