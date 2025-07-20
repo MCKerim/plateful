@@ -314,8 +314,8 @@ export default function AddRecipe() {
         return;
       }
 
-      setTitle(data.title || "");
-      setDescription(data.title || "");
+      setTitle(data.title.trim().substring(0, 90) || "");
+      setDescription(data.title.trim() || "");
 
       const file = await urlToFile(data.thumbnail_url, "tiktok-preview.jpg");
       if (!file) {
@@ -360,12 +360,13 @@ export default function AddRecipe() {
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
 
-          <Input
-            type="text"
+          <Textarea
             id="title"
             placeholder={t("addRecipe.namePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            enterKeyHint="next"
+            rows={1}
           />
         </div>
 
@@ -373,10 +374,11 @@ export default function AddRecipe() {
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
 
           <Textarea
-            placeholder={t("addRecipe.descriptionPlaceholder")}
             id="message"
+            placeholder={t("addRecipe.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            enterKeyHint="enter"
           />
         </div>
 
@@ -389,6 +391,7 @@ export default function AddRecipe() {
             placeholder={t("addRecipe.linkPlaceholder")}
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            autoComplete="off"
           />
 
           <Button variant="secondary" onClick={importRecipeData}>

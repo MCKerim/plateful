@@ -8,6 +8,15 @@ export interface InputProps extends React.ComponentProps<"input"> {
   onSubmit?: () => void;
   showDeleteButton?: boolean;
   showSubmitButton?: boolean;
+  autoComplete?: "on" | "off";
+  enterKeyHint?:
+    | "enter"
+    | "done"
+    | "go"
+    | "next"
+    | "previous"
+    | "search"
+    | "send";
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
@@ -19,73 +28,70 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       showDeleteButton,
       onSubmit,
       showSubmitButton,
+      enterKeyHint,
       ...props
     },
     ref
   ) => {
-    if (onSubmit) {
-      return (
-        <div className="relative">
-          <input
-            type={type}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-              className
-            )}
-            ref={ref}
-            {...props}
-          />
+    // Common input classes
+    const baseInputClasses =
+      "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm";
 
-          {showSubmitButton && (
-            <button
-              type="button"
-              onClick={onSubmit}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          )}
-        </div>
-      );
-    }
+    // Add right padding when there's an action button
+    const inputClasses = cn(
+      baseInputClasses,
+      (onSubmit || onDelete) && "pr-10",
+      className
+    );
 
-    if (onDelete) {
-      return (
-        <div className="relative">
-          <input
-            type={type}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 pr-10 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-              className
-            )}
-            ref={ref}
-            {...props}
-          />
+    // Common button classes
+    const buttonClasses =
+      "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors";
 
-          {showDeleteButton && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-          )}
-        </div>
-      );
-    }
+    // Render action button based on type
+    const renderActionButton = () => {
+      if (onSubmit && showSubmitButton) {
+        return (
+          <button type="button" onClick={onSubmit} className={buttonClasses}>
+            <Send className="w-4 h-4" />
+          </button>
+        );
+      }
 
-    return (
+      if (onDelete && showDeleteButton) {
+        return (
+          <button type="button" onClick={onDelete} className={buttonClasses}>
+            <X className="h-4 w-4" />
+          </button>
+        );
+      }
+
+      return null;
+    };
+
+    const inputElement = (
       <input
         type={type}
-        className={cn(
-          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm",
-          className
-        )}
+        className={inputClasses}
+        autoComplete={props.autoComplete || "off"}
+        enterKeyHint={enterKeyHint}
         ref={ref}
         {...props}
       />
     );
+
+    // If there's an action button, wrap in relative container
+    if (onSubmit || onDelete) {
+      return (
+        <div className="relative">
+          {inputElement}
+          {renderActionButton()}
+        </div>
+      );
+    }
+
+    // Return plain input if no actions
+    return inputElement;
   }
 );
 Input.displayName = "Input";
