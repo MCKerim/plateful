@@ -43,6 +43,7 @@ export default function AddRecipe() {
   const searchTitle = searchParams.get("title");
   const searchText = searchParams.get("text");
 
+  // Extract shared data from URL or text
   useEffect(() => {
     /*
     nimmt url aus url
@@ -88,9 +89,11 @@ export default function AddRecipe() {
     extractSharedData();
   }, [searchUrl, searchTitle, searchText]);
 
+  // Fetch recipe data if editing
   useEffect(() => {
     async function getRecipe(): Promise<boolean> {
       if (!params.recipeId) return false;
+
       const recipeId = parseInt(params.recipeId);
       const { data } = await supabase
         .from("recipes")
@@ -102,10 +105,12 @@ export default function AddRecipe() {
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
+
       // Fetch image from storage
       const { data: files, error } = await supabase.storage
         .from("recipeimages")
         .list(`recipe_${recipeId}/`);
+
       if (!error && files && files.length > 0) {
         // Get signed URL for the first image
         const { data: signedUrlData } = await supabase.storage
@@ -119,6 +124,7 @@ export default function AddRecipe() {
       }
       return true;
     }
+
     getRecipe().then((hasFound) => {
       if (hasFound) return;
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
@@ -386,7 +392,7 @@ export default function AddRecipe() {
           />
 
           <Button variant="secondary" onClick={importRecipeData}>
-            Importiere Rezept
+            Importiere Rezept Daten
           </Button>
         </div>
 
