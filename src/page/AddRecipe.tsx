@@ -314,8 +314,8 @@ export default function AddRecipe() {
         return;
       }
 
-      setTitle(data.title || "");
-      setDescription(data.title || "");
+      setTitle(data.title.trim().substring(0, 90) || "");
+      setDescription(data.title.trim() || "");
 
       const file = await urlToFile(data.thumbnail_url, "tiktok-preview.jpg");
       if (!file) {
@@ -389,6 +389,7 @@ export default function AddRecipe() {
             placeholder={t("addRecipe.linkPlaceholder")}
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            autoComplete="off"
           />
 
           <Button variant="secondary" onClick={importRecipeData}>
