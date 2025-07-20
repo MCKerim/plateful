@@ -366,6 +366,7 @@ export default function AddRecipe() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             enterKeyHint="next"
+            rows={1}
           />
         </div>
 
