@@ -360,12 +360,12 @@ export default function AddRecipe() {
         <div className="grid w-full items-center gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
 
-          <Input
-            type="text"
+          <Textarea
             id="title"
             placeholder={t("addRecipe.namePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            enterKeyHint="next"
           />
         </div>
 
@@ -373,10 +373,11 @@ export default function AddRecipe() {
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
 
           <Textarea
-            placeholder={t("addRecipe.descriptionPlaceholder")}
             id="message"
+            placeholder={t("addRecipe.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            enterKeyHint="enter"
           />
         </div>
 
