@@ -12,7 +12,8 @@ import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
+import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 
 /*type RecipeItem = {
   itemName: string;
@@ -141,12 +142,14 @@ export default function AddRecipe() {
 
   async function uploadToSupabase(file: File) {
     setImageUploading(true);
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     // Use recipe id if editing, otherwise use 'new' (will be replaced after insert)
-    const recipeIdForPath = params.recipeId ?? 'temp';
+    const recipeIdForPath = params.recipeId ?? "temp";
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `recipe_${recipeIdForPath}/${fileName}`;
-    const { error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
+    const { error } = await supabase.storage
+      .from("recipeimages")
+      .upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
       alert("Upload failed: " + error.message);
@@ -155,13 +158,17 @@ export default function AddRecipe() {
     return filePath;
   }
 
-  async function handleImageSelected(file: File | undefined, previewUrl: string) {
+  async function handleImageSelected(
+    file: File | undefined,
+    previewUrl: string
+  ) {
     if (!file) {
       setImageFile(null);
       setImagePreview("");
       setImageSupabaseUrl("");
       return;
     }
+
     // Compress and resize the image before upload
     const compressedFile = await imageCompression(file, {
       maxWidthOrHeight: 900, // Good for recipe images
@@ -200,9 +207,17 @@ export default function AddRecipe() {
         .select();
       if (!error && data) {
         // If a new image was uploaded, move it to the correct folder if needed
-        if (imageFile && imageSupabaseUrl && imageSupabaseUrl.includes('temp')) {
-          const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split('/').pop()}`;
-          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+        if (
+          imageFile &&
+          imageSupabaseUrl &&
+          imageSupabaseUrl.includes("temp")
+        ) {
+          const newPath = `recipe_${recipeId}/${imageSupabaseUrl
+            .split("/")
+            .pop()}`;
+          await supabase.storage
+            .from("recipeimages")
+            .move(imageSupabaseUrl, newPath);
         }
         navigate(`/recipe/${recipeId}`);
       } else {
@@ -218,10 +233,14 @@ export default function AddRecipe() {
       if (!error && data) {
         // If an image was uploaded, move it to the correct folder with the new recipe id
         if (imageFile && imageSupabaseUrl) {
-          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl.split('/').pop()}`;
-          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl
+            .split("/")
+            .pop()}`;
+          await supabase.storage
+            .from("recipeimages")
+            .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${data[0].id}`)
+        navigate(`/recipe/${data[0].id}`);
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -276,6 +295,48 @@ export default function AddRecipe() {
     }
   }*/
 
+  async function importRecipeData() {
+    if (!link) {
+      alert("Please enter a link.");
+      return;
+    }
+
+    try {
+      const data = await getTikTokPreview(link);
+      if (!data) {
+        alert("Failed to fetch TikTok preview. Please check the link.");
+        return;
+      }
+
+      setTitle(data.title || "");
+      setDescription(data.title || "");
+
+      const file = await urlToFile(data.thumbnail_url, "tiktok-preview.jpg");
+      if (!file) {
+        alert("Failed to convert TikTok preview image to file.");
+        return;
+      }
+
+      const compressedFile = await imageCompression(file, {
+        maxWidthOrHeight: 900,
+        maxSizeMB: 0.5,
+        useWebWorker: true,
+        initialQuality: 0.85,
+      });
+
+      setImageFile(compressedFile);
+      setImagePreview(data.thumbnail_url); // Use the original preview URL for display
+
+      const path = await uploadToSupabase(compressedFile);
+      setImageSupabaseUrl(path ?? "");
+    } catch (error) {
+      console.error("Error importing TikTok recipe data:", error);
+      alert(
+        "An error occurred while importing the recipe data. Please try again."
+      );
+    }
+  }
+
   return (
     <Layout>
       <h1 className="text-2xl font-bold mb-10">
@@ -323,6 +384,10 @@ export default function AddRecipe() {
             value={link}
             onChange={(e) => setLink(e.target.value)}
           />
+
+          <Button variant="secondary" onClick={importRecipeData}>
+            Importiere Rezept
+          </Button>
         </div>
 
         {/*<div className="w-full flex gap-2 flex-col">
