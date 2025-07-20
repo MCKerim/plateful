@@ -7,7 +7,6 @@ import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import Rive from "@rive-app/react-canvas";
 
 type Recipe = {

@@ -13,7 +13,6 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
-import { Skeleton } from "@/components/ui/skeleton";
 import Rive from "@rive-app/react-canvas";
 
 type MealPlannerItem = {
