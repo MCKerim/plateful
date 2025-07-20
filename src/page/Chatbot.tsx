@@ -129,7 +129,7 @@ export default function Chatbot() {
     >
       {/* Chat BG */}
       {visibleMessages.length === 0 && (
-        <div className="absolute w-full gap-2 flex-col justify-center items-center left-1/2 -translate-x-1/2 -z-10">
+        <div className="absolute w-full gap-2 flex-col justify-center items-center left-1/2 -translate-x-1/2">
           <div className="w-full h-[200px] mx-auto">
               <Rive src="/plateful-character.riv" artboard="Fly-In" />
           </div>
