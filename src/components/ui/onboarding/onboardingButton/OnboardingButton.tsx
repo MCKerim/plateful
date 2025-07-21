@@ -9,7 +9,7 @@ type Props = {
 export default function OnboardingButton({ label, onClick, icon }: Readonly<Props>) {
   return (
     <Button
-      className="w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20"
+      className="w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20 bg-primary"
       onClick={onClick}
     >
       {icon}
