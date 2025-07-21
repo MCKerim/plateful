@@ -7,7 +7,7 @@ export default function Welcome() {
 
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10 bg-accent">
-      <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-accent-foreground">
+      <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-primary-foreground">
         <h1
           className="text-5xl"
           style={{
@@ -23,7 +23,7 @@ export default function Welcome() {
       </div>
 
       <NavLink to="/signup" className={"w-full max-w-sm"}>
-        <OnboardingButton label={t("welcome.nextButton")} />
+        <OnboardingButton label={t("welcome.nextButton")} isStart />
       </NavLink>
     </div>
   );
