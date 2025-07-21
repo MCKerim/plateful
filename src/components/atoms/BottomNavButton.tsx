@@ -45,7 +45,7 @@ export default function BottomNavButton({
     <NavLink
       to={link}
       className={`w-full align-middle items-center transition-colors duration-700 ease-out ${
-        active ? "text-primary" : "text-muted-foreground"
+        active ? "text-secondary-foreground" : "text-muted-foreground"
       }`}
     >
       <div className="w-full flex justify-center">{getIcon()}</div>

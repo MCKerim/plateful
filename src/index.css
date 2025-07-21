@@ -13,7 +13,7 @@
   :root {
     --background-color: #FAF9F5;
     --primary-color: #1B1602;
-    --secondary-color: #4f4f4f;
+    --secondary-color: #EDECE8;
     --accent-color: #ff9d00;
 
     --background: var(--background-color);
@@ -23,12 +23,12 @@
     --secondary: var(--secondary-color);
     --secondary-foreground: var(--primary-color);
     --accent: var(--accent-color);
-    --accent-foreground: var(--primary-color);
+    --accent-foreground: var(--background-color);
     
     --card: #EDECE8;
-    --card-foreground: #1B1602;
+    --card-foreground: var(--primary-color);
     --popover: #EDECE8;
-    --popover-foreground: #1B1602;    
+    --popover-foreground: var(--primary-color);
     --muted: #E3E2DE;
     --muted-foreground: #8f8f8f;
     --destructive: #CB5E52;
@@ -47,7 +47,7 @@
   .dark {
     --background-color: #1B1602;
     --primary-color: #FAF9F5;
-    --secondary-color: #4f4f4f;
+    --secondary-color: #EDECE8;
     --accent-color: #ff9d00;
 
     --background: var(--background-color);
@@ -60,9 +60,9 @@
     --accent-foreground: var(--primary-color);
 
     --card: #151410;
-    --card-foreground: #FDF8E3;
+    --card-foreground: var(--primary-color);
     --popover: #0A0905;
-    --popover-foreground: #FDF8E3;
+    --popover-foreground: var(--primary-color);
     --muted: #36332B;
     --muted-foreground: #8a867d;
     --destructive: #AD4034;

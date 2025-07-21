@@ -79,7 +79,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         className="hidden"
         onChange={handleFileChange}
       />
-      {uploading && <div className="text-xs text-gray-500">Uploading...</div>}
+      {uploading && <div className="text-xs text-muted-foreground">Uploading...</div>}
     </Card>
   );
 };

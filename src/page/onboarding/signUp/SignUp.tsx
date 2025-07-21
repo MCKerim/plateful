@@ -75,7 +75,7 @@ export default function SignUp() {
         <RiveComponent onClick={replayAnimation} />
 
         <div className="w-full max-w-sm flex flex-col gap-3">
-          <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary  ">
+          <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
             {t("signup.termsAndConditions")}
           </div>
 

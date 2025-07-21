@@ -19,7 +19,7 @@ export default function Header({ buttons }: Readonly<Props>) {
           <div className="flex items-center gap-1">
             <h1 className="font-bold text-xl">Plateful</h1>
 
-            <div className="text-xs font-bold bg-plateful text-primary-foreground py-0.5 px-2 rounded-full">
+            <div className="text-xs font-bold bg-accent text-accent-foreground py-0.5 px-2 rounded-full">
               Beta
             </div>
 

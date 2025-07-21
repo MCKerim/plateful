@@ -31,7 +31,7 @@ export default function CircleTransition({
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 bg-black"
+      className="fixed inset-0 z-50 bg-primary"
       style={{
         maskImage: "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
         WebkitMaskImage: "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
