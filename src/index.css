@@ -45,9 +45,9 @@
     --radius: 0.5rem;
   }
   .dark {
-    --background-color: #1B1602;
-    --primary-color: #FAF9F5;
-    --secondary-color: #EDECE8;
+    --background-color: #0A0905;
+    --primary-color: #FDF8E3;
+    --secondary-color: #151410;
     --accent-color: #ff9d00;
 
     --background: var(--background-color);
