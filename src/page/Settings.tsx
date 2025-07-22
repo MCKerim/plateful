@@ -167,13 +167,25 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">Version</h2>
+          <h2 className="border-b font-medium">Info</h2>
 
           <p className="text-sm">
             v0.0.0 <span>- Beta </span>
             {environment === "preview" && <span>- Preview </span>}
             {environment === "development" && <span>- Development </span>}
           </p>
+
+          <NavLink to="/privacy">
+            <Button variant="secondary" className="w-full">
+              Datenschutz
+            </Button>
+          </NavLink>
+
+          <NavLink to="/terms">
+            <Button variant="secondary" className="w-full">
+              AGB
+            </Button>
+          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 border p-2 rounded-lg">

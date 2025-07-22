@@ -33,6 +33,8 @@ import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRec
 import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
 import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValue";
+import Privacy from "./page/Privacy";
+import TermsOfService from "./page/TermsOfService";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -163,6 +165,12 @@ function App() {
 
   return (
     <Routes>
+      {/* Privacy Policy */}
+      <Route path="/privacy" element={<Privacy />} />
+
+      {/* Terms of Service */}
+      <Route path="/terms" element={<TermsOfService />} />
+
       {/* Onboarding */}
       <Route
         path="/"
