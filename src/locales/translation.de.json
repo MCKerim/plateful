@@ -47,7 +47,8 @@
     "linkPlaceholder": "https://www.tomaten-suppe.de"
   },
   "home": {
-    "title": "Startseite"
+    "title": "Startseite",
+    "enjoyCooking": "Viel Spaß beim Kochen!"
   },
   "explore": {
     "title": "Erkunden"

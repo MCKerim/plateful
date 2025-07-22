@@ -47,7 +47,8 @@
     "linkPlaceholder": "https://www.tomato-soup.com"
   },  
   "home": {
-    "title": "Home"
+    "title": "Home",
+    "enjoyCooking": "Enjoy cooking!"
   },
   "explore": {
     "title": "Explore"
