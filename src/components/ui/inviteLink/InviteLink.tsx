@@ -82,10 +82,10 @@ export default function InviteLink() {
   }
 
   return inviteLink ? (
-    <div className="flex flex-col py-4 gap-4 items-center">
+    <div className="flex flex-col items-center gap-4 py-4">
       <QRCodeSVG value={inviteLink} size={256} />
 
-      <div className="flex gap-2 w-full">
+      <div className="flex w-full gap-2">
         <Button
           onClick={copyInviteLink}
           className="w-full mt-4"
@@ -100,13 +100,13 @@ export default function InviteLink() {
       </div>
     </div>
   ) : (
-    <div className="flex flex-col py-4 gap-4 items-center">
+    <div className="flex flex-col items-center gap-4 py-4">
       <Skeleton className="h-[256px] w-[256px] rounded-md" />
 
-      <div className="flex gap-2 w-full">
-        <Skeleton className="h-10 w-full mt-4" />
+      <div className="flex w-full gap-2">
+        <Skeleton className="w-full h-10 mt-4" />
 
-        <Skeleton className="h-10 w-full mt-4" />
+        <Skeleton className="w-full h-10 mt-4" />
       </div>
     </div>
   );

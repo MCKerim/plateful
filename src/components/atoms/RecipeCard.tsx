@@ -110,7 +110,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
         <img
           src={imageUrl || "/no-img.jpg"}
           alt="Recipe"
-          className="h-32 w-full object-cover border-b-4 border-background dark:brightness-75"
+          className="object-cover w-full h-32 border-b-4 border-background dark:brightness-75"
         />
 
         <div className="p-2">
@@ -121,7 +121,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
           </div>
 
           <div className="flex justify-between">
-            <h1 className="font-bold text-md leading-tight line-clamp-2">
+            <h1 className="font-bold leading-tight text-md line-clamp-2">
               {name}
             </h1>
           </div>
@@ -129,8 +129,8 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
           <div className="flex justify-between mt-2">
             <div className="flex gap-1">{renderTagPills()}</div>
 
-            <div className="flex gap-1 items-center">
-              <p className="italic text-xs">
+            <div className="flex items-center gap-1">
+              <p className="text-xs italic">
                 {getMealPlanStatus(lastMealPlan)}
               </p>
 

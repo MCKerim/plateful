@@ -74,9 +74,7 @@ export default function MealPlannerItem({
   return (
     <Card className="h-[90px] flex items-center">
       <img
-        src={
-          imageUrl || "/no-img.jpg"
-        }
+        src={imageUrl || "/no-img.jpg"}
         alt="Spaghetti"
         className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75"
       />

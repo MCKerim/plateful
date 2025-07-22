@@ -71,7 +71,7 @@ export default function PlanDialog({
           <DialogTitle>{t("mealPlanner.selectNumberOfDays")}</DialogTitle>
         </DialogHeader>
 
-        <DialogDescription className="flex flex-col py-4 gap-4">
+        <DialogDescription className="flex flex-col gap-4 py-4">
           <div className="flex gap-2">
             <Button
               className="w-full"

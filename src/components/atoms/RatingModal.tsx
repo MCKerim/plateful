@@ -83,8 +83,8 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
             <DialogTitle>Wie hat es dir geschmeckt?</DialogTitle>
           </DialogHeader>
 
-          <DialogDescription className="flex flex-col py-4 gap-4">
-            <div className="flex gap-2 justify-between px-6">
+          <DialogDescription className="flex flex-col gap-4 py-4">
+            <div className="flex justify-between gap-2 px-6">
               {Array.from({ length: 5 }, (_, index) => {
                 const starValue = index + 1;
 
@@ -100,7 +100,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
               })}
             </div>
 
-            <div className="grid w-full items-center gap-2">
+            <div className="grid items-center w-full gap-2">
               <Label htmlFor="note">Anmerkungen</Label>
 
               <Textarea

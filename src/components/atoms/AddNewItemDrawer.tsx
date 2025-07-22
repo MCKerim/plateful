@@ -68,7 +68,7 @@ export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
           <DrawerDescription>To Kerims shopping List</DrawerDescription>
         </DrawerHeader>
         <DrawerFooter>
-          <div className="flex flex-col space-y-2 mt-4">
+          <div className="flex flex-col mt-4 space-y-2">
             <div className="grid w-full items-center gap-1.5">
               <Label htmlFor="itemInput">Item name</Label>
               <Input

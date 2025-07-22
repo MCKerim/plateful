@@ -8,27 +8,27 @@ interface MarkdownRendererProps {
 
 // Custom components for markdown rendering with proper types
 const CustomParagraph = (props: any) => (
-  <p className="mb-2 last:mb-0 leading-relaxed text-primary">{props.children}</p>
+  <p className="mb-2 leading-relaxed last:mb-0 text-primary">{props.children}</p>
 );
 
 const CustomH1 = (props: any) => (
-  <h1 className="text-lg font-semibold mb-2 text-primary">{props.children}</h1>
+  <h1 className="mb-2 text-lg font-semibold text-primary">{props.children}</h1>
 );
 
 const CustomH2 = (props: any) => (
-  <h2 className="text-base font-semibold mb-2 text-primary">{props.children}</h2>
+  <h2 className="mb-2 text-base font-semibold text-primary">{props.children}</h2>
 );
 
 const CustomH3 = (props: any) => (
-  <h3 className="text-sm font-semibold mb-1 text-primary">{props.children}</h3>
+  <h3 className="mb-1 text-sm font-semibold text-primary">{props.children}</h3>
 );
 
 const CustomUL = (props: any) => (
-  <ul className="list-disc pl-4 mb-2 space-y-1 text-primary">{props.children}</ul>
+  <ul className="pl-4 mb-2 space-y-1 list-disc text-primary">{props.children}</ul>
 );
 
 const CustomOL = (props: any) => (
-  <ol className="list-decimal pl-4 mb-2 space-y-1 text-primary ">{props.children}</ol>
+  <ol className="pl-4 mb-2 space-y-1 list-decimal text-primary ">{props.children}</ol>
 );
 
 const CustomLI = (props: any) => (
@@ -45,14 +45,14 @@ const CustomCode = (props: any) => {
     );
   }
   return (
-    <code className="block bg-muted/50 p-2 rounded text-xs font-mono overflow-x-auto">
+    <code className="block p-2 overflow-x-auto font-mono text-xs rounded bg-muted/50">
       {props.children}
     </code>
   );
 };
 
 const CustomBlockquote = (props: any) => (
-  <blockquote className="border-l-4 border-muted pl-4 italic my-2 text-primary">
+  <blockquote className="pl-4 my-2 italic border-l-4 border-muted text-primary">
     {props.children}
   </blockquote>
 );
@@ -68,7 +68,7 @@ const CustomEm = (props: any) => (
 const CustomA = (props: any) => (
   <a 
     href={props.href} 
-    className="text-primary underline hover:no-underline"
+    className="underline text-primary hover:no-underline"
     target="_blank"
     rel="noopener noreferrer"
   >

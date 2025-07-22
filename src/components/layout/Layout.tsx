@@ -8,10 +8,10 @@ type Props = {
 
 export default function Layout({ children, headerButtons }: Readonly<Props>) {
   return (
-    <div className="w-full max-w-lg flex flex-col items-center m-auto min-h-screen">
+    <div className="flex flex-col items-center w-full max-w-lg min-h-screen m-auto">
       <Header buttons={headerButtons} />
 
-      <div className="w-full flex gap-2 flex-col px-4 flex-1">
+      <div className="flex flex-col flex-1 w-full gap-2 px-4">
         {children}
       </div>
 

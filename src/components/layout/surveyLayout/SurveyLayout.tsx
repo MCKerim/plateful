@@ -24,16 +24,16 @@ export default function SurveyLayout({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-between h-screen w-screen max-w-xs mx-auto py-10">
-      <div className="flex flex-col gap-8 w-full">
+    <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">
+      <div className="flex flex-col w-full gap-8">
         <Progress value={(questionNumber / maxQuestionNumber) * 100} />
 
-        <h1 className="text-3xl font-bold mb-4 text-center">
+        <h1 className="mb-4 text-3xl font-bold text-center">
           {t(`questions.${question}.question`)}
         </h1>
       </div>
 
-      <div className="flex flex-col gap-4 w-full">
+      <div className="flex flex-col w-full gap-4">
         {answers.map((option) => (
           <Button
             key={option}
@@ -47,7 +47,7 @@ export default function SurveyLayout({
       </div>
 
       <Button
-        className="w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20"
+        className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
         onClick={onComplete}
       >
         Weiter

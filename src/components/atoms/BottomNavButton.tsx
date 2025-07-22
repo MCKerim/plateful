@@ -48,7 +48,7 @@ export default function BottomNavButton({
         active ? "text-secondary-foreground" : "text-muted-foreground"
       }`}
     >
-      <div className="w-full flex justify-center">{getIcon()}</div>
+      <div className="flex justify-center w-full">{getIcon()}</div>
 
       <p
         className={
