@@ -83,7 +83,7 @@ export default function Settings() {
           <h2 className="border-b font-medium">{t("settings.household")}</h2>
 
           <p className="text-sm">
-            Nutze Plateful mit deinen Freunden oder deiner Familie!
+            {t("settings.householdDescription")}
           </p>
 
           <NavLink to="/householdSettings">
@@ -143,8 +143,7 @@ export default function Settings() {
           <h2 className="border-b font-medium">About</h2>
 
           <p className="text-sm">
-            Plateful is built by Kerim Ismail. Have feedback or want to connect?
-            Reach out below!
+            {t("settings.aboutDescription")}
           </p>
 
           <div className="flex justify-evenly py-2">
@@ -177,13 +176,13 @@ export default function Settings() {
 
           <NavLink to="/privacy">
             <Button variant="secondary" className="w-full">
-              Datenschutz
+              {t("settings.privacyPolicy")}
             </Button>
           </NavLink>
 
           <NavLink to="/terms">
             <Button variant="secondary" className="w-full">
-              AGB
+              {t("settings.termsOfService")}
             </Button>
           </NavLink>
         </div>

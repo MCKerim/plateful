@@ -57,6 +57,7 @@
     "language": "Sprache",
     "appearance": "Darstellung",
     "household": "Haushalt",
+    "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
     "manageYourHousehold": "Verwalte dein Haushalt",
   
     "supportFeedback": "Support & Feedback",
@@ -65,7 +66,12 @@
     "whatsNew": "Neuigkeiten Entdecken",
     "viewRoadmap": "Roadmap ansehen",
 
-    "dangerZone": "Account",
+    "aboutDescription": "Plateful wurde von Kerim Ismail entwickelt. Hast du Feedback oder möchtest Kontakt aufnehmen? Dann schreibe mir unten!",
+
+    "privacyPolicy": "Datenschutz",
+    "termsOfService": "AGB",
+
+    "dangerZone": "Konto",
     "signOut": "Abmelden",
     "modeToggle": {
       "light": "Hell",

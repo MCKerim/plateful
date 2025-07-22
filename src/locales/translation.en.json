@@ -57,6 +57,8 @@
     "language": "Language",
     "appearance": "Appearance",
     "household": "Household",
+    "householdDescription": "Use Plateful with your friends or family!",
+
     "manageYourHousehold": "Manage your household",
 
     "supportFeedback": "Support & Feedback",
@@ -64,6 +66,11 @@
     "suggestFeatureOrReportBug": "Suggest a feature or report a bug",
     "whatsNew": "Discover what's new",
     "viewRoadmap": "View our roadmap",
+
+    "aboutDescription": "Plateful is built by Kerim Ismail. Have feedback or want to connect? Reach out below!",
+
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
 
     "dangerZone": "Account",
     "signOut": "Sign out",
