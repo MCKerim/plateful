@@ -285,7 +285,7 @@ export default function Recipe() {
               : "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           }
           alt="Recipe"
-          className="h-full w-full rounded-md object-cover"
+          className="object-cover w-full h-full rounded-md"
         />
       </AspectRatio>
 
@@ -303,7 +303,7 @@ export default function Recipe() {
 
       {recipeItems.length > 0 && (
         <>
-          <h2 className="text-md font-bold mt-2">Ingredients</h2>
+          <h2 className="mt-2 font-bold text-md">Ingredients</h2>
 
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
@@ -327,8 +327,8 @@ export default function Recipe() {
         </>
       )}
 
-      <div className="flex gap-1 items-center justify-end">
-        <p className="italic text-sm">{getMealPlanStatus(lastMealPlan)}</p>
+      <div className="flex items-center justify-end gap-1">
+        <p className="text-sm">{getMealPlanStatus(lastMealPlan)}</p>
 
         <CalendarDays size={16} />
       </div>
