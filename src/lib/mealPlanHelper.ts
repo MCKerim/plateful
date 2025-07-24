@@ -1,8 +1,8 @@
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 
 export function getMealPlanStatus(lastMealPlan: MealPlanning | null): string {
-  if (!lastMealPlan) return "Noch nie geplant";
-  if (lastMealPlan.daysEaten < lastMealPlan.days) return "Aktuell geplant";
+  if (!lastMealPlan) return "-";
+  if (lastMealPlan.daysEaten < lastMealPlan.days) return "Geplant";
 
   const now = new Date();
   const createdAt = new Date(lastMealPlan.created_at);
@@ -11,5 +11,5 @@ export function getMealPlanStatus(lastMealPlan: MealPlanning | null): string {
 
   if (diffInDays === 0) return "Heute";
   if (diffInDays === 1) return "Gestern";
-  return `vor ${diffInDays} Tagen`;
+  return `${diffInDays} Tage`;
 }
