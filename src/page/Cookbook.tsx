@@ -99,7 +99,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="w-full my-1 sticky top-14 mb-2 z-10">
+      <div className="sticky z-10 w-full my-1 mb-2 top-14">
         <Input
           className="w-full rounded-full"
           type="text"
@@ -118,27 +118,27 @@ export default function Cookbook() {
         <Plus size={34} />
       </button>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-2">
         {searchResults.map((recipe) => (
           <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
         ))}
       </div>
 
       {loading && (
-          <div className="flex space-x-2 justify-center items-center w-full flex-1">
+          <div className="flex items-center justify-center flex-1 w-full space-x-2">
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
             <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high"></div>
+            <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
           </div>
         )}
 
       {!loading && searchResults.length === 0 && (
-        <div className="w-full flex flex-col justify-center items-center mt-10 gap-2">
+        <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
           <div className="w-full h-[80px] mx-auto">
             <Rive src="/plateful-character.riv" artboard="Sad" />
           </div>
 
-          <p className="flex justify-center font-bold italic">
+          <p className="flex justify-center italic font-bold">
             Keine Rezepte gefunden...
           </p>
         </div>
