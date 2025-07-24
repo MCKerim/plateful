@@ -40,9 +40,29 @@ export default function Recipe() {
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!params.recipeId) return;
+    const recipeId = parseInt(params.recipeId);
+
+    supabase
+      .from("recipe_ratings")
+      .select("stars")
+      .eq("recipe_id", recipeId)
+      .then((response) => {
+        if (response.data) {
+          const totalStars = response.data.reduce(
+            (acc, rating) => acc + rating.stars,
+            0
+          );
+          setAverageRating(totalStars / response.data.length);
+        }
+      });
+  }, [params.recipeId]);
 
   useEffect(() => {
     async function getAllRecipeImages() {
@@ -335,7 +355,7 @@ export default function Recipe() {
         </div>
 
         <div className="flex items-center gap-0.5">
-          <p className="text-sm">{"-"}</p>
+          <p className="text-sm">{averageRating || "-"}</p>
 
           <StarIcon style={{ fontSize: "16px" }} />
         </div>
