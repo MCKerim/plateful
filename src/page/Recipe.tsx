@@ -8,10 +8,10 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
-import { Pencil, Trash2, Link } from "lucide-react";
-import { CalendarDays } from "lucide-react";
+import { Pencil, Trash2, Link, CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import StarIcon from "@mui/icons-material/Star";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -327,10 +327,18 @@ export default function Recipe() {
         </>
       )}
 
-      <div className="flex items-center justify-end gap-1">
-        <p className="text-sm">{getMealPlanStatus(lastMealPlan)}</p>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-1">
+          <CalendarDays size={16} />
 
-        <CalendarDays size={16} />
+          <p className="text-sm">{getMealPlanStatus(lastMealPlan)}</p>
+        </div>
+
+        <div className="flex items-center gap-0.5">
+          <p className="text-sm">{"-"}</p>
+
+          <StarIcon style={{ fontSize: "16px" }} />
+        </div>
       </div>
 
       {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
