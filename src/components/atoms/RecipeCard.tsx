@@ -81,7 +81,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
 
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
-      <Card className="relative">
+      <Card className="relative bg-transparent border-2 border-solid border-zinc-500">
         <img
           src={imageUrl || "/no-img.jpg"}
           alt="Recipe"
