@@ -229,7 +229,7 @@ export default function Chatbot() {
                         )
                       }
                     >
-                      {t("chatbot.suggestions.saveRecipe")}
+                      {t("chatbot.saveRecipe")}
                     </Button>
                   )}
               </div>
