@@ -82,9 +82,7 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">{t("settings.household")}</h2>
 
-          <p className="text-sm">
-            {t("settings.householdDescription")}
-          </p>
+          <p className="text-sm">{t("settings.householdDescription")}</p>
 
           <NavLink to="/householdSettings">
             <Button variant="secondary" className="w-full">
@@ -143,9 +141,13 @@ export default function Settings() {
           <h2 className="font-medium border-b">About</h2>
 
           <div className="flex items-center gap-2">
-            <img src="/PB.jpg" alt="Plateful Logo" className="w-20 h-20 mb-2 border-2 border-dashed rounded-full border-accent" />
+            <img
+              src="/PB.jpg"
+              alt="Plateful Logo"
+              className="w-20 h-20 mb-2 border-2 border-dashed rounded-full border-accent"
+            />
 
-            <p className="text-sm">
+            <p className="text-sm whitespace-pre-line">
               {t("settings.aboutDescription")}
             </p>
           </div>

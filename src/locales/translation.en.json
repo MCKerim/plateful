@@ -16,7 +16,7 @@
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",
     "continueWithGoogle": "Continue with Google",
-    "termsAndConditions" : "By signing up, you agree to our Terms of Service and Privacy Policy."
+    "termsAndConditions": "By signing up, you agree to our Terms of Service and Privacy Policy."
   },
   "list": {
     "title": "Shopping list"
@@ -45,7 +45,7 @@
     "descriptionPlaceholder": "A delicious dish with tomatoes.",
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com"
-  },  
+  },
   "home": {
     "title": "Home",
     "enjoyCooking": "Enjoy cooking!"
@@ -68,7 +68,7 @@
     "whatsNew": "Discover what's new",
     "viewRoadmap": "View our roadmap",
 
-    "aboutDescription": "Hey, I'm Kerim Ismail, and I designed and built Plateful. Have feedback or want to connect? Reach out below!",
+    "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
 
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",

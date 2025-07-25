@@ -11,7 +11,7 @@
     "title": "Plateful",
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
     "continueWithGoogle": "Mit Google fortfahren",
-    "termsAndConditions" : "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
+    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
   },
   "welcome": {
     "title": "Glückwunsch,",
@@ -60,14 +60,14 @@
     "household": "Haushalt",
     "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
     "manageYourHousehold": "Verwalte dein Haushalt",
-  
+
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "Wir freuen uns auf Ihr Feedback! Teilen Sie Ihre Ideen, melden Sie Fehler oder schlagen Sie neue Funktionen vor.",
     "suggestFeatureOrReportBug": "Feature vorschlagen oder Fehler melden",
     "whatsNew": "Neuigkeiten Entdecken",
     "viewRoadmap": "Roadmap ansehen",
 
-    "aboutDescription": "👋 Hey, ich bin Kerim Ismail und habe Plateful designt und entwickelt. Du hast Feedback oder willst in Kontakt kommen? Dann schreib mir gerne!👇",
+    "aboutDescription": "👋Hey, ich bin Kerim Ismail und habe Plateful designt und entwickelt.\nDu hast Feedback oder willst in Kontakt kommen? Dann schreib mir gerne!👇",
 
     "privacyPolicy": "Datenschutz",
     "termsOfService": "AGB",
