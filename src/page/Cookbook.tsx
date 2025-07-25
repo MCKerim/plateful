@@ -112,7 +112,7 @@ export default function Cookbook() {
       </div>
 
       <button
-        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-background flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
+        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
         onClick={handleAddRecipe}
       >
         <Plus size={34} />
@@ -125,12 +125,12 @@ export default function Cookbook() {
       </div>
 
       {loading && (
-          <div className="flex items-center justify-center flex-1 w-full space-x-2">
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
-            <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
-            <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
-          </div>
-        )}
+        <div className="flex items-center justify-center flex-1 w-full space-x-2">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
+          <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
+        </div>
+      )}
 
       {!loading && searchResults.length === 0 && (
         <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
