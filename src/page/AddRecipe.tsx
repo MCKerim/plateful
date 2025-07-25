@@ -345,11 +345,11 @@ export default function AddRecipe() {
 
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-10">
+      <h1 className="mb-10 text-2xl font-bold">
         {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
       </h1>
 
-      <div className="grid w-full items-center gap-5">
+      <div className="grid items-center w-full gap-5">
         <ImagePicker
           onImageSelected={handleImageSelected}
           onDeleteImage={handleDeleteImage}
@@ -357,7 +357,7 @@ export default function AddRecipe() {
           uploading={imageUploading}
         />
 
-        <div className="grid w-full items-center gap-2">
+        <div className="grid items-center w-full gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
 
           <Textarea
@@ -382,7 +382,7 @@ export default function AddRecipe() {
           />
         </div>
 
-        <div className="grid w-full items-center gap-2">
+        <div className="grid items-center w-full gap-2">
           <Label htmlFor="link">{t("addRecipe.link")}</Label>
 
           <Input
@@ -395,12 +395,12 @@ export default function AddRecipe() {
           />
 
           <Button variant="secondary" onClick={importRecipeData}>
-            Importiere Rezept Daten
+            {t("addRecipe.importRecipeData")}
           </Button>
         </div>
 
-        {/*<div className="w-full flex gap-2 flex-col">
-          <h2 className="text-md font-bold mt-2">{t("ingredients")}</h2>
+        {/*<div className="flex flex-col w-full gap-2">
+          <h2 className="mt-2 font-bold text-md">{t("ingredients")}</h2>
 
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
@@ -418,7 +418,7 @@ export default function AddRecipe() {
         </div>*/}
       </div>
 
-      <div className="flex gap-2 w-full mt-11">
+      <div className="flex w-full gap-2 mt-11">
         <Button asChild className="w-full" variant="secondary">
           <Link
             to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}

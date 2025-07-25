@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
 
 interface ImagePickerProps {
   onImageSelected: (file: File | undefined, previewUrl: string) => void;
@@ -16,6 +17,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   previewUrl,
   uploading,
 }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +71,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           className="w-full"
           disabled={uploading}
         >
-          Choose Image
+          {t("common.selectImage")}
         </Button>
       )}
       <input
@@ -79,7 +81,11 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         className="hidden"
         onChange={handleFileChange}
       />
-      {uploading && <div className="text-xs text-muted-foreground">Uploading...</div>}
+      {uploading && (
+        <div className="text-xs text-muted-foreground">
+          {t("common.uploading")}
+        </div>
+      )}
     </Card>
   );
 };

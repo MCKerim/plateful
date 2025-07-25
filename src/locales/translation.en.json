@@ -5,7 +5,14 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
-    "commingSoon": "Comming soon..."
+    "commingSoon": "Comming soon...",
+    "selectImage": "Select image",
+    "uploading": "Uploading...",
+    "planned": "Planned",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "day": "Day",
+    "days": "Days"
   },
   "welcome": {
     "title": "Congratulations,",
@@ -44,7 +51,8 @@
     "description": "Description",
     "descriptionPlaceholder": "A delicious dish with tomatoes.",
     "link": "Link",
-    "linkPlaceholder": "https://www.tomato-soup.com"
+    "linkPlaceholder": "https://www.tomato-soup.com",
+    "importRecipeData": "Import recipe data"
   },
   "home": {
     "title": "Home",
@@ -86,7 +94,7 @@
     "chatbot": "AI-Chef",
     "explore": "Explore",
     "cookbook": "Cookbook",
-    "planner": "Planer",
+    "planner": "Planner",
     "list": "List"
   },
 

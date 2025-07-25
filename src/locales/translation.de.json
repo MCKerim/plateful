@@ -5,7 +5,14 @@
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "commingSoon": "Demnächst verfügbar..."
+    "commingSoon": "Demnächst verfügbar...",
+    "selectImage": "Bild auswählen",
+    "uploading": "Hochladen...",
+    "planned": "Geplant",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "day": "Tag",
+    "days": "Tage"
   },
   "signup": {
     "title": "Plateful",
@@ -44,7 +51,8 @@
     "description": "Beschreibung",
     "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
     "link": "Link",
-    "linkPlaceholder": "https://www.tomaten-suppe.de"
+    "linkPlaceholder": "https://www.tomaten-suppe.de",
+    "importRecipeData": "Rezeptdaten importieren"
   },
   "home": {
     "title": "Startseite",
