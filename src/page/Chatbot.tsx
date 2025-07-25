@@ -7,26 +7,28 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import { 
-  selectMessages, 
-  selectIsTyping, 
-  selectVisibleMessages, 
-  addMessage, 
-  addMessages, 
-  setIsTyping, 
-  resetChat 
+import {
+  selectMessages,
+  selectIsTyping,
+  selectVisibleMessages,
+  addMessage,
+  addMessages,
+  setIsTyping,
+  resetChat,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
+import { useTranslation } from "react-i18next";
 
 export default function Chatbot() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const messages = useAppSelector(selectMessages);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
-  
+
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -45,7 +47,7 @@ export default function Chatbot() {
       content: inputValue,
       role: "user",
     };
-    
+
     dispatch(addMessage(userMessage));
     setInputValue("");
     dispatch(setIsTyping(true));
@@ -73,8 +75,7 @@ export default function Chatbot() {
       console.error("Error calling chatbot function:", error);
 
       const errorMessage: any = {
-        content:
-          "Sorry, I'm having trouble connecting right now. Please try again later.",
+        content: t("chatbot.errorMessage"),
         role: "assistant",
       };
 
@@ -115,7 +116,7 @@ export default function Chatbot() {
       navigate(`/recipe/${data[0].id}`);
     } else {
       console.error(error);
-      alert("An error occurred. Please try again.");
+      alert(t("chatbot.saveRecipeError"));
     }
   }
 
@@ -129,13 +130,13 @@ export default function Chatbot() {
     >
       {/* Chat BG */}
       {visibleMessages.length === 0 && (
-        <div className="absolute w-full gap-2 flex-col justify-center items-center left-1/2 -translate-x-1/2">
+        <div className="absolute flex-col items-center justify-center w-full gap-2 -translate-x-1/2 left-1/2">
           <div className="w-full h-[200px] mx-auto">
-              <Rive src="/plateful-character.riv" artboard="Fly-In" />
+            <Rive src="/plateful-character.riv" artboard="Fly-In" />
           </div>
 
-          <div className="w-full gap-2 mb-6 flex justify-center items-center">
-            <h2 className="font-bold text-xl">Wie kann ich dir helfen?</h2>
+          <div className="flex items-center justify-center w-full gap-2 mb-6">
+            <h2 className="text-xl font-bold">{t("chatbot.greeting")}</h2>
           </div>
 
           <div className="flex flex-col items-center gap-2">
@@ -144,22 +145,26 @@ export default function Chatbot() {
               variant="secondary"
               size="sm"
               onClick={() =>
-                handleMessageSuggestionButton("Erstelle ein gesundes Rezept")
+                handleMessageSuggestionButton(
+                  t("chatbot.suggestions.suggestion1.text")
+                )
               }
             >
-              Erstelle ein gesundes Rezept
+              {t("chatbot.suggestions.suggestion1.label")}
             </Button>
 
-            <div className="flex flex-wrap gap-2 justify-center">
+            <div className="flex flex-wrap justify-center gap-2">
               <Button
                 className="rounded-full"
                 variant="secondary"
                 size="sm"
                 onClick={() =>
-                  handleMessageSuggestionButton("Erstelle ein schnelles Rezept")
+                  handleMessageSuggestionButton(
+                    t("chatbot.suggestions.suggestion2.text")
+                  )
                 }
               >
-                ein schnelles Rezept
+                {t("chatbot.suggestions.suggestion2.label")}
               </Button>
 
               <Button
@@ -167,10 +172,12 @@ export default function Chatbot() {
                 variant="secondary"
                 size="sm"
                 onClick={() =>
-                  handleMessageSuggestionButton("Erstelle ein günstiges Rezept")
+                  handleMessageSuggestionButton(
+                    t("chatbot.suggestions.suggestion3.text")
+                  )
                 }
               >
-                ein günstiges Rezept
+                {t("chatbot.suggestions.suggestion3.label")}
               </Button>
             </div>
           </div>
@@ -180,64 +187,65 @@ export default function Chatbot() {
       {/* Messages Container */}
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
         {visibleMessages.map((message, index) => (
+          <div
+            key={`${message.role}-${index}`}
+            className={`flex ${
+              message.role === "user" ? "justify-end" : "justify-start"
+            }`}
+          >
             <div
-              key={`${message.role}-${index}`}
-              className={`flex ${
-                message.role === "user" ? "justify-end" : "justify-start"
+              className={`flex items-start gap-2 ${
+                message.role === "user"
+                  ? "flex-row-reverse max-w-[80%]"
+                  : "flex-row w-full"
               }`}
             >
+              {/* Message Bubble */}
               <div
-                className={`flex items-start gap-2 ${
+                className={`rounded-lg px-4 py-2 ${
                   message.role === "user"
-                    ? "flex-row-reverse max-w-[80%]"
-                    : "flex-row w-full"
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-muted"
                 }`}
               >
-                {/* Message Bubble */}
-                <div
-                  className={`rounded-lg px-4 py-2 ${
-                    message.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
-                  }`}
-                >
-                  {message.role === "user" && (
-                    <p className="text-sm">{message.content}</p>
-                  )}
+                {message.role === "user" && (
+                  <p className="text-sm">{message.content}</p>
+                )}
 
-                  {message.role === "assistant" && (
-                    <MarkdownRenderer
-                      content={message.content}
-                      className="text-sm"
-                    />
-                  )}
+                {message.role === "assistant" && (
+                  <MarkdownRenderer
+                    content={message.content}
+                    className="text-sm"
+                  />
+                )}
 
-                  {message.role === "assistant" &&
-                    message.tool_calls && message.tool_calls.length > 0 && (
-                      <Button
-                        onClick={() =>
-                          saveSuggestedRecipe(
-                            message.tool_calls![0].function.arguments
-                          )
-                        }
-                      >
-                        Rezept speichern
-                      </Button>
-                    )}
-                </div>
+                {message.role === "assistant" &&
+                  message.tool_calls &&
+                  message.tool_calls.length > 0 && (
+                    <Button
+                      onClick={() =>
+                        saveSuggestedRecipe(
+                          message.tool_calls![0].function.arguments
+                        )
+                      }
+                    >
+                      {t("chatbot.suggestions.saveRecipe")}
+                    </Button>
+                  )}
               </div>
             </div>
-          ))}
+          </div>
+        ))}
 
         {/* Typing Indicator */}
         {isTyping && (
           <div className="flex justify-start">
             <div className="flex items-start gap-2 max-w-[80%]">
-              <div className="bg-muted rounded-lg px-4 py-2">
+              <div className="px-4 py-2 rounded-lg bg-muted">
                 <div className="flex space-x-1">
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-100"></div>
-                  <div className="w-2 h-2 bg-muted-foreground rounded-full animate-bounce delay-200"></div>
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
+                  <div className="w-2 h-2 delay-100 rounded-full bg-muted-foreground animate-bounce"></div>
+                  <div className="w-2 h-2 delay-200 rounded-full bg-muted-foreground animate-bounce"></div>
                 </div>
               </div>
             </div>
@@ -251,9 +259,9 @@ export default function Chatbot() {
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
         <Input
           type="text"
-          className="w-full rounded-full flex-1"
+          className="flex-1 w-full rounded-full"
           showSubmitButton
-          placeholder="Frag mich nach Rezepten oder Tipps!"
+          placeholder={t("chatbot.inputPlaceholder")}
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           onKeyDown={handleKeyDown}

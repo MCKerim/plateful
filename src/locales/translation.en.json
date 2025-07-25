@@ -89,6 +89,27 @@
       "system": "System"
     }
   },
+  "chatbot": {
+    "greeting": "How can I help you today?",
+    "suggestions": {
+      "suggestion1": {
+        "label": "Create a healthy recipe",
+        "text": "Create a healthy recipe"
+      },
+      "suggestion2": {
+        "label": "a quick recipe",
+        "text": "Create a quick recipe"
+      },
+      "suggestion3": {
+        "label": "a budget-friendly recipe",
+        "text": "Create a budget-friendly recipe"
+      }
+    },
+    "saveRecipe": "Save recipe",
+    "saveRecipeError": "Error saving recipe. Please try again later.",
+    "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
+    "inputPlaceholder": "Ask me about recipes or tips!"
+  },
   "bottomNav": {
     "home": "Home",
     "chatbot": "AI-Chef",

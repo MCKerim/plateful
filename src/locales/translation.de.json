@@ -96,7 +96,27 @@
     "planner": "Planer",
     "list": "Liste"
   },
-
+  "chatbot": {
+    "greeting": "Wie kann ich dir helfen?",
+    "suggestions": {
+      "suggestion1": {
+        "label": "Erstelle ein gesundes Rezept",
+        "text": "Erstelle ein gesundes Rezept"
+      },
+      "suggestion2": {
+        "label": "ein schnelles Rezept",
+        "text": "Erstelle ein schnelles Rezept"
+      },
+      "suggestion3": {
+        "label": "ein günstiges Rezept",
+        "text": "Erstelle ein günstiges Rezept"
+      }
+    },
+    "saveRecipe": "Rezept speichern",
+    "saveRecipeError": "Fehler beim Speichern des Rezepts. Bitte versuche es später erneut.",
+    "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
+    "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
+  },
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",
 
