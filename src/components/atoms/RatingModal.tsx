@@ -15,6 +15,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import supabase from "@/utils/supabase";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   showTriggerButton?: boolean;
@@ -27,6 +28,7 @@ export type RatingModalRef = {
 
 const RatingModal = forwardRef<RatingModalRef, Props>(
   ({ showTriggerButton = true, recipeId }: Readonly<Props>, ref) => {
+    const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Expose the `open` method via the ref
@@ -71,7 +73,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
               {
                 <>
                   <HotelClassIcon />
-                  Bewerten
+                  {t("rating.rate")}
                 </>
               }
             </Button>
@@ -80,7 +82,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Wie hat es dir geschmeckt?</DialogTitle>
+            <DialogTitle>{t("rating.title")}</DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col gap-4 py-4">
@@ -101,11 +103,11 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
             </div>
 
             <div className="grid items-center w-full gap-2">
-              <Label htmlFor="note">Anmerkungen</Label>
+              <Label htmlFor="note">{t("rating.commentLabel")}</Label>
 
               <Textarea
                 id="note"
-                placeholder="Nächstes mal weniger..."
+                placeholder={t("rating.commentPlaceholder")}
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
               />
@@ -113,7 +115,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
           </DialogDescription>
 
           <DialogFooter>
-            <Button onClick={saveButtonPressed}>Speichern</Button>
+            <Button onClick={saveButtonPressed}>{t("rating.submit")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

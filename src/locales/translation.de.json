@@ -117,6 +117,13 @@
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
     "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
   },
+  "rating": {
+    "rate": "Bewerten",
+    "title": "Wie hat es dir geschmeckt?",
+    "commentLabel": "Anmerkungen",
+    "commentPlaceholder": "Dein Kommentar (optional)",
+    "submit": "Speichern"
+  },
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",
 
