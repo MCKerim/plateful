@@ -201,13 +201,13 @@ export default function MealPlanner() {
       />
 
       {/* Week Navigation */}
-      <div className="flex items-center justify-between bg-background sticky top-11 py-1 px-2 border-b">
+      <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11">
         <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
           <ChevronLeft size={20} />
         </Button>
 
         <div className="flex flex-col items-center">
-          <h2 className="font-semibold text-lg">
+          <h2 className="text-lg font-semibold">
             {isSameWeek(currentWeek, new Date())
               ? "Diese Woche"
               : isSameWeek(currentWeek, addWeeks(new Date(), 1))
@@ -241,21 +241,18 @@ export default function MealPlanner() {
         </Button>
       </div>
 
-      <Accordion
+      {/*<Accordion
         type="single"
         defaultValue="item-1"
         collapsible
-        className="bg-background sticky top-24"
+        className="sticky bg-background top-24"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>
-            <div className="flex gap-1 items-center">
-              <CalendarOff size={20} />
-              Ohne Datum - {getNotPlannedItems().length}
-            </div>
+            <div className="flex items-center gap-1">Gemerkt</div>
           </AccordionTrigger>
 
-          <AccordionContent className="overflow-x-auto py-2 flex gap-3 no-scrollbar">
+          <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
             {getNotPlannedItems().map((item) => (
               <div key={item.id} className="min-w-[400px]">
                 <MealPlannerItem
@@ -278,7 +275,7 @@ export default function MealPlanner() {
             ))}
           </AccordionContent>
         </AccordionItem>
-      </Accordion>
+      </Accordion>*/}
 
       <div className="flex flex-col gap-2.5 mb-32">
         {getWeekdays(currentWeek).map((day) => (
@@ -301,14 +298,17 @@ export default function MealPlanner() {
         type="single"
         defaultValue="item-1"
         collapsible
-        className="bg-background fixed bottom-16 w-full"
+        className="fixed w-full bg-background bottom-16"
       >
         <AccordionItem value="item-1">
           <AccordionTrigger>
-            <div className="flex gap-1 items-center">Maybie</div>
+            <div className="flex items-center gap-1">
+              <CalendarOff size={20} /> Ohne Datum -{" "}
+              {getNotPlannedItems().length}
+            </div>
           </AccordionTrigger>
 
-          <AccordionContent className="overflow-x-auto py-2 flex gap-3 no-scrollbar">
+          <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
             {getNotPlannedItems().map((item) => (
               <div key={item.id} className="min-w-[400px]">
                 <MealPlannerItem
