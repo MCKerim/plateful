@@ -9,7 +9,7 @@ import {
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
 import {
   format,
@@ -31,6 +31,19 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+
+  function goToPreviousWeek() {
+    setCurrentWeek((prevWeek) => subWeeks(prevWeek, 1));
+  }
+
+  function goToNextWeek() {
+    setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
+  }
+
+  function goToCurrentWeek() {
+    setCurrentWeek(new Date());
+  }
 
   function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
@@ -83,7 +96,48 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-2">
-          {getWeekdays(new Date()).map((day) => (
+          {/* Week Navigation */}
+          <div className="sticky flex items-center justify-between px-2 pb-2 bg-background">
+            <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+              <ChevronLeft size={20} />
+            </Button>
+
+            <div className="flex flex-col items-center">
+              <h2 className="text-lg font-semibold">
+                {isSameWeek(currentWeek, new Date())
+                  ? "Diese Woche"
+                  : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+                  ? "Nächste Woche"
+                  : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                  ? "Letzte Woche"
+                  : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
+                      getWeekdays(currentWeek)[6],
+                      "dd.MM"
+                    )}`}
+              </h2>
+
+              {!isSameWeek(currentWeek, new Date()) && (
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={goToCurrentWeek}
+                  className="h-auto p-0 text-xs text-muted-foreground"
+                >
+                  Zur aktuellen Woche
+                </Button>
+              )}
+
+              {isSameWeek(currentWeek, new Date()) && (
+                <div className="h-[16px]"></div>
+              )}
+            </div>
+
+            <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+              <ChevronRight size={20} />
+            </Button>
+          </div>
+
+          {getWeekdays(currentWeek).map((day) => (
             <Button
               key={format(day, "EEE - dd.MM")}
               variant="outline"
