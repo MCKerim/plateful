@@ -20,25 +20,51 @@ import {
   isSameWeek,
 } from "date-fns";
 
-export default function WeeklyPlanDialog() {
+type Props = {
+  onFinish: (selectedDates: Date[]) => void;
+};
+
+export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
   const { t } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
+  const [withoutDate, setWithoutDate] = useState(false);
 
   function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
   }
 
   function toggleWeekDate(date: Date) {
-    setSelectedDates((prev) => {
-      if (prev.some((d) => isSameDay(d, date))) {
-        return prev.filter((d) => !isSameDay(d, date));
-      } else {
-        return [...prev, date];
-      }
-    });
+    const updatedDates = selectedDates.some((d) => isSameDay(d, date))
+      ? selectedDates.filter((d) => !isSameDay(d, date))
+      : [...selectedDates, date];
+
+    if (updatedDates.length > 0) {
+      setWithoutDate(false);
+    }
+
+    setSelectedDates(updatedDates);
+  }
+
+  function toggleWithoutDate() {
+    const updatedWithoutDate = !withoutDate;
+    if (updatedWithoutDate) {
+      setSelectedDates([]);
+    }
+
+    setWithoutDate(updatedWithoutDate);
+  }
+
+  function handleFinish() {
+    if (selectedDates.length === 0 && !withoutDate) {
+      alert("Bitte wähle einen Tag aus oder wähle 'Ohne Datum'");
+      return;
+    }
+
+    onFinish(selectedDates);
+    setIsDialogOpen(false);
   }
 
   return (
@@ -53,7 +79,7 @@ export default function WeeklyPlanDialog() {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Wähle Wochentage</DialogTitle>
+          <DialogTitle>Für wann möchtest du das Rezept planen?</DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-2">
@@ -72,9 +98,17 @@ export default function WeeklyPlanDialog() {
             </Button>
           ))}
 
-          <Button variant="secondary">Ohne Datum</Button>
+          <Button
+            variant="secondary"
+            className={withoutDate ? "bg-accent text-accent-foreground" : ""}
+            onClick={toggleWithoutDate}
+          >
+            Ohne Datum
+          </Button>
 
-          <Button className="mt-4">Fertig</Button>
+          <Button className="mt-4" onClick={handleFinish}>
+            Fertig
+          </Button>
         </DialogDescription>
       </DialogContent>
     </Dialog>

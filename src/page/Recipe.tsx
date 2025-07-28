@@ -3,7 +3,7 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
-import { planRecipe as planRecipeHelper, getMealPlanningInfo } from "@/utils/mealPlanHelpers";
+import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
@@ -196,20 +196,6 @@ export default function Recipe() {
     }
   }
 
-  async function planRecipe(id: number, newDate: Date | null, newDays: number) {
-    if (!householdId) {
-      return;
-    }
-
-    const result = await planRecipeHelper(id, householdId, newDate, newDays);
-
-    if (!result.success) {
-      alert(result.error || "Error while planning recipe");
-    } else {
-      navigate("/planner");
-    }
-  }
-
   async function deleteRecipe() {
     if (!recipe) {
       return;
@@ -243,7 +229,7 @@ export default function Recipe() {
       const recipeId = parseInt(params.recipeId);
 
       const result = await getMealPlanningInfo(recipeId);
-      
+
       if (!result.error) {
         setLastMealPlan(result.data);
       } else {
@@ -254,6 +240,27 @@ export default function Recipe() {
 
     fetchMealPlanningInfo();
   }, [params.recipeId]);
+
+  async function finishPlanning(dates: Date[]) {
+    if (!recipe || !householdId) return;
+
+    if (dates.length === 0) {
+      const result = await planRecipe(recipe.id, householdId, null, 1);
+
+      if (!result.success) {
+        alert("Error planning recipe");
+      }
+      return;
+    }
+
+    dates.forEach(async (date) => {
+      const result = await planRecipe(recipe.id, householdId, date, 1);
+
+      if (!result.success) {
+        alert("Error planning recipe");
+      }
+    });
+  }
 
   return (
     <Layout>
@@ -351,7 +358,7 @@ export default function Recipe() {
         </div>
       </div>
 
-      {recipe && <WeeklyPlanDialog />}
+      {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
 
       {recipe?.link && (
         <NavLink
