@@ -8,10 +8,10 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
-import { Pencil, Trash2, Link } from "lucide-react";
-import { CalendarDays } from "lucide-react";
+import { Pencil, Trash2, Link, CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import StarIcon from "@mui/icons-material/Star";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,7 @@ import {
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
+import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 
 type RecipeItem = {
   id: number;
@@ -39,9 +40,29 @@ export default function Recipe() {
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
+  const [averageRating, setAverageRating] = useState<number | null>(null);
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!params.recipeId) return;
+    const recipeId = parseInt(params.recipeId);
+
+    supabase
+      .from("recipe_ratings")
+      .select("stars")
+      .eq("recipe_id", recipeId)
+      .then((response) => {
+        if (response.data) {
+          const totalStars = response.data.reduce(
+            (acc, rating) => acc + rating.stars,
+            0
+          );
+          setAverageRating(totalStars / response.data.length);
+        }
+      });
+  }, [params.recipeId]);
 
   useEffect(() => {
     async function getAllRecipeImages() {
@@ -276,7 +297,7 @@ export default function Recipe() {
         </DropdownMenu>
       </div>
 
-      <AspectRatio ratio={16 / 9} className="bg-muted -z-10">
+      <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
             imageUrls.length > 0
@@ -284,7 +305,7 @@ export default function Recipe() {
               : "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
           }
           alt="Recipe"
-          className="h-full w-full rounded-md object-cover"
+          className="object-cover w-full h-full rounded-md"
         />
       </AspectRatio>
 
@@ -293,6 +314,7 @@ export default function Recipe() {
           <Button variant="secondary" onClick={handlePreviousImage}>
             Previous
           </Button>
+
           <Button variant="secondary" onClick={handleNextImage}>
             Next
           </Button>
@@ -301,7 +323,7 @@ export default function Recipe() {
 
       {recipeItems.length > 0 && (
         <>
-          <h2 className="text-md font-bold mt-2">Ingredients</h2>
+          <h2 className="mt-2 font-bold text-md">Ingredients</h2>
 
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
@@ -325,10 +347,18 @@ export default function Recipe() {
         </>
       )}
 
-      <div className="flex gap-1 items-center justify-end">
-        <p className="italic text-sm">{getMealPlanStatus(lastMealPlan)}</p>
+      <div className="flex justify-between">
+        <div className="flex items-center gap-1">
+          <CalendarDays size={16} />
 
-        <CalendarDays size={16} />
+          <p className="text-sm">{getMealPlanStatus(lastMealPlan, t)}</p>
+        </div>
+
+        <div className="flex items-center gap-0.5">
+          <p className="text-sm">{averageRating || "-"}</p>
+
+          <StarIcon style={{ fontSize: "16px" }} />
+        </div>
       </div>
 
       {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
@@ -346,9 +376,10 @@ export default function Recipe() {
 
       <RatingModal recipeId={recipe?.id} />
 
-      <p className="font-medium" style={{ whiteSpace: "pre-wrap" }}>
-        {recipe?.description}
-      </p>
+      <MarkdownRenderer
+        content={recipe?.description || ""}
+        className="font-medium"
+      />
     </Layout>
   );
 }

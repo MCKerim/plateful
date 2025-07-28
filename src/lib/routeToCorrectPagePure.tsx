@@ -1,4 +1,4 @@
-import SignUp from "@/page/onboarding/SignUp";
+import SignUp from "@/page/onboarding/signUp/SignUp";
 import { Navigate } from "react-router";
 
 export function routeToCorrectPagePure(
@@ -20,7 +20,7 @@ export function routeToCorrectPagePure(
         return <Navigate to="/survey" />;
       }
     } else {
-      return <Navigate to="/value" />;
+      return <Navigate to="/values/1" />;
     }
   } else {
     return <SignUp />;

@@ -1,14 +1,12 @@
 import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
-import { Delete, Plus } from "lucide-react";
-import { Card, CardDescription, CardHeader } from "../components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Plus } from "lucide-react";
+import Rive from "@rive-app/react-canvas";
 import { getRecipes, type Recipe } from "@/utils/recipeHelpers";
 
 export default function Cookbook() {
@@ -67,58 +65,50 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="w-full max-w-lg flex my-1 items-center gap-2 sticky top-14 mb-2 z-10">
+      <div className="sticky z-10 w-full my-1 mb-2 top-14">
         <Input
           className="w-full rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
+          showDeleteButton={searchTerm.length > 0}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onDelete={() => setSearchTerm("")}
         />
-
-        {searchTerm && (
-          <Button variant="outline" onClick={() => setSearchTerm("")}>
-            <Delete />
-          </Button>
-        )}
       </div>
 
       <button
-        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-plateful text-background flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
+        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
         onClick={handleAddRecipe}
       >
         <Plus size={34} />
       </button>
 
-      <div className="flex flex-col gap-4 items-center">
-        {loading && (
-          <>
-            {[...Array(4)].map((_, i) => (
-              <div className="w-full max-w-lg" key={`skeleton_${i}`}>
-                <Skeleton className="h-[128px] rounded-t-lg rounded-b-none mb-1" />
-
-                <Skeleton className="h-[66.5px] rounded-b-lg rounded-t-none" />
-              </div>
-            ))}
-          </>
-        )}
-
-        {searchResults.map((recipe, index) => (
-          <RecipeCard key={index} id={recipe.id} name={recipe.recipeName} />
+      <div className="grid grid-cols-2 gap-2">
+        {searchResults.map((recipe) => (
+          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
         ))}
-
-        {!loading && searchResults.length === 0 && (
-          <Card className="w-full">
-            <CardHeader>
-              <h1 className="font-bold text-lg leading-tight">
-                {t("cookbook.nothingFound")}
-              </h1>
-
-              <CardDescription>{t("cookbook.addNewViaPlus")}</CardDescription>
-            </CardHeader>
-          </Card>
-        )}
       </div>
+
+      {loading && (
+        <div className="flex items-center justify-center flex-1 w-full space-x-2">
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
+          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
+          <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
+        </div>
+      )}
+
+      {!loading && searchResults.length === 0 && (
+        <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
+          <div className="w-full h-[80px] mx-auto">
+            <Rive src="/plateful-character.riv" artboard="Sad" />
+          </div>
+
+          <p className="flex justify-center italic font-bold">
+            Keine Rezepte gefunden...
+          </p>
+        </div>
+      )}
     </Layout>
   );
 }

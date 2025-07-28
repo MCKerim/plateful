@@ -1,14 +1,13 @@
 import { NavLink } from "react-router";
 import { Card } from "../ui/card";
 import StarIcon from "@mui/icons-material/Star";
-import StarHalfIcon from "@mui/icons-material/StarHalf";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
 import supabase from "@/utils/supabase";
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   id: number;
@@ -16,9 +15,12 @@ type Props = {
 };
 
 export default function RecipeCard({ id, name }: Readonly<Props>) {
+  const { t } = useTranslation();
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const TAGS: string[] = [];
 
   useEffect(() => {
     supabase
@@ -73,69 +75,43 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
     fetchImage();
   }, [id]);
 
-  function renderStars() {
-    const stars = [];
-
-    const starStyles = {
-      fontSize: "16px",
-    };
-
-    for (let i = 0; i < 5; i++) {
-      if (averageRating === null) {
-        stars.push(<StarBorderIcon key={i} style={starStyles} />);
-        continue;
-      }
-
-      if (i < Math.floor(averageRating)) {
-        stars.push(<StarIcon key={i} style={starStyles} />);
-      } else if (i < averageRating) {
-        stars.push(<StarHalfIcon key={i} style={starStyles} />);
-      } else {
-        stars.push(<StarBorderIcon key={i} style={starStyles} />);
-      }
-    }
-    return stars;
-  }
-
   function renderTagPills() {
-    const tags: string[] = [];
-    return tags.map((tag, index) => (
+    return TAGS.map((tag, index) => (
       <TagPill key={index} name={tag} color="green" />
     ));
   }
 
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
-      <Card className="relative">
+      <Card className="relative bg-transparent border-2">
         <img
-          src={
-            imageUrl ||
-            "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
-          }
+          src={imageUrl || "/no-img.jpg"}
           alt="Recipe"
-          className="h-32 w-full object-cover border-b-4 border-background"
+          className="object-cover w-full h-32 border-b-4 border-background dark:brightness-75"
         />
 
-        <div className="p-2">
-          <div className="flex justify-end">
-            <div className="flex gap-1 absolute top-1 bg-card rounded-full px-1 py-[1px]">
-              {renderStars()}
-            </div>
+        <div className="flex flex-col justify-between gap-2 p-2">
+          <div className="flex justify-between">
+            <h1 className="font-bold leading-tight text-md line-clamp-2">
+              {name}
+            </h1>
           </div>
+
+          {TAGS.length > 0 && (
+            <div className="flex gap-1">{renderTagPills()}</div>
+          )}
 
           <div className="flex justify-between">
-            <h1 className="font-bold text-lg leading-tight">{name}</h1>
-          </div>
-
-          <div className="flex justify-between mt-2">
-            <div className="flex gap-1">{renderTagPills()}</div>
-
-            <div className="flex gap-1 items-center">
-              <p className="italic text-sm">
-                {getMealPlanStatus(lastMealPlan)}
-              </p>
-
+            <div className="flex items-center gap-1">
               <CalendarDays size={16} />
+
+              <p className="text-xs">{getMealPlanStatus(lastMealPlan, t)}</p>
+            </div>
+
+            <div className="flex items-center">
+              <p className="text-xs">{averageRating || "-"}</p>
+
+              <StarIcon style={{ fontSize: "16px" }} />
             </div>
           </div>
         </div>

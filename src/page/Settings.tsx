@@ -12,8 +12,9 @@ import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
-
   const user = useAppSelector(selectUser);
+
+  const environment = import.meta.env.VITE_NODE_ENV;
 
   useEffect(() => {
     // Benutzeridentifikation mit Canny
@@ -50,10 +51,10 @@ export default function Settings() {
       <h1 className="text-2xl">{t("settings.title")}</h1>
 
       <div className="flex flex-col gap-6">
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.language")}</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.language")}</h2>
 
-          <div className="w-full flex gap-2">
+          <div className="flex w-full gap-2">
             <Button
               className="w-full"
               variant={i18n.language === "en" ? "default" : "secondary"}
@@ -72,18 +73,16 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.appearance")}</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.appearance")}</h2>
 
           <ModeToggle />
         </div>
 
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.household")}</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.household")}</h2>
 
-          <p className="text-sm">
-            Nutze Plateful mit deinen Freunden oder deiner Familie!
-          </p>
+          <p className="text-sm">{t("settings.householdDescription")}</p>
 
           <NavLink to="/householdSettings">
             <Button variant="secondary" className="w-full">
@@ -94,8 +93,10 @@ export default function Settings() {
           </NavLink>
         </div>
 
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.supportFeedback")}</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">
+            {t("settings.supportFeedback")}
+          </h2>
 
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
@@ -136,14 +137,22 @@ export default function Settings() {
           </NavLink>
         </div>
 
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">About</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">About</h2>
 
-          <p className="text-sm">
-            Plateful is built by Kerim Ismail. Have feedback or want to connect? Reach out below!
-          </p>
+          <div className="flex items-center gap-2">
+            <img
+              src="/PB.jpg"
+              alt="Plateful Logo"
+              className="w-20 h-20 mb-2 border-2 border-dashed rounded-full border-accent"
+            />
 
-          <div className="flex justify-evenly py-2">
+            <p className="text-sm whitespace-pre-line">
+              {t("settings.aboutDescription")}
+            </p>
+          </div>
+
+          <div className="flex py-2 justify-evenly">
             <NavLink to="https://kblanks.com/" target="_blank">
               <Globe size={24} />
             </NavLink>
@@ -162,8 +171,30 @@ export default function Settings() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border p-2 rounded-lg">
-          <h2 className="border-b font-medium">{t("settings.dangerZone")}</h2>
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">Info</h2>
+
+          <p className="text-sm">
+            v0.0.0 <span>- Beta </span>
+            {environment === "preview" && <span>- Preview </span>}
+            {environment === "development" && <span>- Development </span>}
+          </p>
+
+          <NavLink to="/privacy">
+            <Button variant="secondary" className="w-full">
+              {t("settings.privacyPolicy")}
+            </Button>
+          </NavLink>
+
+          <NavLink to="/terms">
+            <Button variant="secondary" className="w-full">
+              {t("settings.termsOfService")}
+            </Button>
+          </NavLink>
+        </div>
+
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.dangerZone")}</h2>
 
           {user?.email}
 

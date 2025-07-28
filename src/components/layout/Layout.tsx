@@ -2,15 +2,16 @@ import BottomNav from "../atoms/BottomNav";
 import Header from "../atoms/Header";
 
 type Props = {
-  children: React.ReactNode;
+  headerButtons?: React.ReactNode;
+  children?: React.ReactNode;
 };
 
-export default function Layout({ children }: Readonly<Props>) {
+export default function Layout({ children, headerButtons }: Readonly<Props>) {
   return (
-    <div className="w-full max-w-lg flex flex-col items-center m-auto">
-      <Header />
+    <div className="flex flex-col items-center w-full max-w-lg min-h-screen m-auto">
+      <Header buttons={headerButtons} />
 
-      <div className="w-full flex gap-2 flex-col px-4">
+      <div className="flex flex-col flex-1 w-full gap-2 px-4">
         {children}
       </div>
 

@@ -5,7 +5,25 @@
     "delete": "Löschen",
     "cancel": "Abbrechen",
     "save": "Speichern",
-    "commingSoon": "Demnächst verfügbar..."
+    "commingSoon": "Demnächst verfügbar...",
+    "selectImage": "Bild auswählen",
+    "uploading": "Hochladen...",
+    "planned": "Geplant",
+    "today": "Heute",
+    "yesterday": "Gestern",
+    "day": "Tag",
+    "days": "Tage"
+  },
+  "signup": {
+    "title": "Plateful",
+    "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
+    "continueWithGoogle": "Mit Google fortfahren",
+    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
+  },
+  "welcome": {
+    "title": "Glückwunsch,",
+    "subtitle": "smarte Essensplanung beginnt jetzt!",
+    "nextButton": "Jetzt Loslegen!"
   },
   "list": {
     "title": "Einkaufsliste"
@@ -33,10 +51,12 @@
     "description": "Beschreibung",
     "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
     "link": "Link",
-    "linkPlaceholder": "https://www.tomaten-suppe.de"
+    "linkPlaceholder": "https://www.tomaten-suppe.de",
+    "importRecipeData": "Rezeptdaten importieren"
   },
   "home": {
-    "title": "Startseite"
+    "title": "Startseite",
+    "enjoyCooking": "Viel Spaß beim Kochen!"
   },
   "explore": {
     "title": "Erkunden"
@@ -46,15 +66,21 @@
     "language": "Sprache",
     "appearance": "Darstellung",
     "household": "Haushalt",
+    "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
     "manageYourHousehold": "Verwalte dein Haushalt",
-  
+
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "Wir freuen uns auf Ihr Feedback! Teilen Sie Ihre Ideen, melden Sie Fehler oder schlagen Sie neue Funktionen vor.",
     "suggestFeatureOrReportBug": "Feature vorschlagen oder Fehler melden",
     "whatsNew": "Neuigkeiten Entdecken",
     "viewRoadmap": "Roadmap ansehen",
 
-    "dangerZone": "Account",
+    "aboutDescription": "👋Hey, ich bin Kerim Ismail und habe Plateful designt und entwickelt.\nDu hast Feedback oder willst in Kontakt kommen? Dann schreib mir gerne!👇",
+
+    "privacyPolicy": "Datenschutz",
+    "termsOfService": "AGB",
+
+    "dangerZone": "Konto",
     "signOut": "Abmelden",
     "modeToggle": {
       "light": "Hell",
@@ -64,12 +90,40 @@
   },
   "bottomNav": {
     "home": "Startseite",
+    "chatbot": "KI-Koch",
     "explore": "Erkunden",
     "cookbook": "Kochbuch",
     "planner": "Planer",
     "list": "Liste"
   },
-
+  "chatbot": {
+    "greeting": "Wie kann ich dir helfen?",
+    "suggestions": {
+      "suggestion1": {
+        "label": "Erstelle ein gesundes Rezept",
+        "text": "Erstelle ein gesundes Rezept"
+      },
+      "suggestion2": {
+        "label": "ein schnelles Rezept",
+        "text": "Erstelle ein schnelles Rezept"
+      },
+      "suggestion3": {
+        "label": "ein günstiges Rezept",
+        "text": "Erstelle ein günstiges Rezept"
+      }
+    },
+    "saveRecipe": "Rezept speichern",
+    "saveRecipeError": "Fehler beim Speichern des Rezepts. Bitte versuche es später erneut.",
+    "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
+    "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
+  },
+  "rating": {
+    "rate": "Bewerten",
+    "title": "Wie hat es dir geschmeckt?",
+    "commentLabel": "Anmerkungen",
+    "commentPlaceholder": "Dein Kommentar (optional)",
+    "submit": "Speichern"
+  },
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",
 
@@ -77,5 +131,36 @@
   "dayWithCount_other": "{{count}} Tage",
 
   "recipeWithCount_one": "{{count}} Rezept",
-  "recipeWithCount_other": "{{count}} Rezepte"
+  "recipeWithCount_other": "{{count}} Rezepte",
+
+  "questions": {
+    "question1": {
+      "question": "Wie oft kochst du?",
+      "option1": "Täglich",
+      "option2": "Mehrmals pro Woche",
+      "option3": "Wöchentlich",
+      "option4": "Selten"
+    },
+    "question2": {
+      "question": "Welche Art von Gerichten kochst du am liebsten?",
+      "option1": "Vegetarisch",
+      "option2": "Vegan",
+      "option3": "Fleischgerichte",
+      "option4": "Fischgerichte"
+    },
+    "question3": {
+      "question": "Wie wichtig ist dir die Zubereitungszeit?",
+      "option1": "Sehr wichtig",
+      "option2": "Wichtig",
+      "option3": "Nicht so wichtig",
+      "option4": "Unwichtig"
+    },
+    "question4": {
+      "question": "Welche Küche bevorzugst du?",
+      "option1": "Italienisch",
+      "option2": "Asiatisch",
+      "option3": "Mexikanisch",
+      "option4": "Deutsch"
+    }
+  }
 }

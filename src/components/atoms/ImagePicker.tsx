@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
+import { useTranslation } from "react-i18next";
 
 interface ImagePickerProps {
   onImageSelected: (file: File | undefined, previewUrl: string) => void;
@@ -16,6 +17,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   previewUrl,
   uploading,
 }) => {
+  const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -45,7 +47,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           <img
             src={previewUrl}
             alt="Preview"
-            className="rounded-md object-cover w-full max-h-48"
+            className="object-cover w-full rounded-md max-h-48"
           />
           {onDeleteImage && (
             <Button
@@ -53,7 +55,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
               onClick={handleDeleteImage}
               variant="destructive"
               size="icon"
-              className="absolute -top-1 -right-1 w-7 h-7 rounded-full p-0 flex items-center justify-center shadow-md hover:scale-110 transition-transform"
+              className="absolute flex items-center justify-center p-0 transition-transform rounded-full shadow-md -top-1 -right-1 w-7 h-7 hover:scale-110"
               aria-label="Delete image"
               disabled={uploading}
             >
@@ -69,7 +71,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           className="w-full"
           disabled={uploading}
         >
-          Choose Image
+          {t("common.selectImage")}
         </Button>
       )}
       <input
@@ -79,7 +81,11 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         className="hidden"
         onChange={handleFileChange}
       />
-      {uploading && <div className="text-xs text-gray-500">Uploading...</div>}
+      {uploading && (
+        <div className="text-xs text-muted-foreground">
+          {t("common.uploading")}
+        </div>
+      )}
     </Card>
   );
 };

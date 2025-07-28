@@ -12,7 +12,8 @@ import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
+import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 
 /*type RecipeItem = {
   itemName: string;
@@ -42,6 +43,7 @@ export default function AddRecipe() {
   const searchTitle = searchParams.get("title");
   const searchText = searchParams.get("text");
 
+  // Extract shared data from URL or text
   useEffect(() => {
     /*
     nimmt url aus url
@@ -87,9 +89,11 @@ export default function AddRecipe() {
     extractSharedData();
   }, [searchUrl, searchTitle, searchText]);
 
+  // Fetch recipe data if editing
   useEffect(() => {
     async function getRecipe(): Promise<boolean> {
       if (!params.recipeId) return false;
+
       const recipeId = parseInt(params.recipeId);
       const { data } = await supabase
         .from("recipes")
@@ -101,10 +105,12 @@ export default function AddRecipe() {
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
+
       // Fetch image from storage
       const { data: files, error } = await supabase.storage
         .from("recipeimages")
         .list(`recipe_${recipeId}/`);
+
       if (!error && files && files.length > 0) {
         // Get signed URL for the first image
         const { data: signedUrlData } = await supabase.storage
@@ -118,6 +124,7 @@ export default function AddRecipe() {
       }
       return true;
     }
+
     getRecipe().then((hasFound) => {
       if (hasFound) return;
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
@@ -141,12 +148,14 @@ export default function AddRecipe() {
 
   async function uploadToSupabase(file: File) {
     setImageUploading(true);
-    const fileExt = file.name.split('.').pop();
+    const fileExt = file.name.split(".").pop();
     // Use recipe id if editing, otherwise use 'new' (will be replaced after insert)
-    const recipeIdForPath = params.recipeId ?? 'temp';
+    const recipeIdForPath = params.recipeId ?? "temp";
     const fileName = `${Date.now()}.${fileExt}`;
     const filePath = `recipe_${recipeIdForPath}/${fileName}`;
-    const { error } = await supabase.storage.from("recipeimages").upload(filePath, file, { upsert: true });
+    const { error } = await supabase.storage
+      .from("recipeimages")
+      .upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
       alert("Upload failed: " + error.message);
@@ -155,13 +164,17 @@ export default function AddRecipe() {
     return filePath;
   }
 
-  async function handleImageSelected(file: File | undefined, previewUrl: string) {
+  async function handleImageSelected(
+    file: File | undefined,
+    previewUrl: string
+  ) {
     if (!file) {
       setImageFile(null);
       setImagePreview("");
       setImageSupabaseUrl("");
       return;
     }
+
     // Compress and resize the image before upload
     const compressedFile = await imageCompression(file, {
       maxWidthOrHeight: 900, // Good for recipe images
@@ -200,9 +213,17 @@ export default function AddRecipe() {
         .select();
       if (!error && data) {
         // If a new image was uploaded, move it to the correct folder if needed
-        if (imageFile && imageSupabaseUrl && imageSupabaseUrl.includes('temp')) {
-          const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split('/').pop()}`;
-          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+        if (
+          imageFile &&
+          imageSupabaseUrl &&
+          imageSupabaseUrl.includes("temp")
+        ) {
+          const newPath = `recipe_${recipeId}/${imageSupabaseUrl
+            .split("/")
+            .pop()}`;
+          await supabase.storage
+            .from("recipeimages")
+            .move(imageSupabaseUrl, newPath);
         }
         navigate(`/recipe/${recipeId}`);
       } else {
@@ -218,10 +239,14 @@ export default function AddRecipe() {
       if (!error && data) {
         // If an image was uploaded, move it to the correct folder with the new recipe id
         if (imageFile && imageSupabaseUrl) {
-          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl.split('/').pop()}`;
-          await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl
+            .split("/")
+            .pop()}`;
+          await supabase.storage
+            .from("recipeimages")
+            .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${data[0].id}`)
+        navigate(`/recipe/${data[0].id}`);
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -276,13 +301,55 @@ export default function AddRecipe() {
     }
   }*/
 
+  async function importRecipeData() {
+    if (!link) {
+      alert("Please enter a link.");
+      return;
+    }
+
+    try {
+      const data = await getTikTokPreview(link);
+      if (!data) {
+        alert("Failed to fetch TikTok preview. Please check the link.");
+        return;
+      }
+
+      setTitle(data.title.trim().substring(0, 90) || "");
+      setDescription(data.title.trim() || "");
+
+      const file = await urlToFile(data.thumbnail_url, "tiktok-preview.jpg");
+      if (!file) {
+        alert("Failed to convert TikTok preview image to file.");
+        return;
+      }
+
+      const compressedFile = await imageCompression(file, {
+        maxWidthOrHeight: 900,
+        maxSizeMB: 0.5,
+        useWebWorker: true,
+        initialQuality: 0.85,
+      });
+
+      setImageFile(compressedFile);
+      setImagePreview(data.thumbnail_url); // Use the original preview URL for display
+
+      const path = await uploadToSupabase(compressedFile);
+      setImageSupabaseUrl(path ?? "");
+    } catch (error) {
+      console.error("Error importing TikTok recipe data:", error);
+      alert(
+        "An error occurred while importing the recipe data. Please try again."
+      );
+    }
+  }
+
   return (
     <Layout>
-      <h1 className="text-2xl font-bold mb-10">
+      <h1 className="mb-10 text-2xl font-bold">
         {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
       </h1>
 
-      <div className="grid w-full items-center gap-5">
+      <div className="grid items-center w-full gap-5">
         <ImagePicker
           onImageSelected={handleImageSelected}
           onDeleteImage={handleDeleteImage}
@@ -290,15 +357,16 @@ export default function AddRecipe() {
           uploading={imageUploading}
         />
 
-        <div className="grid w-full items-center gap-2">
+        <div className="grid items-center w-full gap-2">
           <Label htmlFor="title">{t("addRecipe.name")}</Label>
 
-          <Input
-            type="text"
+          <Textarea
             id="title"
             placeholder={t("addRecipe.namePlaceholder")}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
+            enterKeyHint="next"
+            rows={1}
           />
         </div>
 
@@ -306,14 +374,15 @@ export default function AddRecipe() {
           <Label htmlFor="message">{t("addRecipe.description")}</Label>
 
           <Textarea
-            placeholder={t("addRecipe.descriptionPlaceholder")}
             id="message"
+            placeholder={t("addRecipe.descriptionPlaceholder")}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
+            enterKeyHint="enter"
           />
         </div>
 
-        <div className="grid w-full items-center gap-2">
+        <div className="grid items-center w-full gap-2">
           <Label htmlFor="link">{t("addRecipe.link")}</Label>
 
           <Input
@@ -322,11 +391,16 @@ export default function AddRecipe() {
             placeholder={t("addRecipe.linkPlaceholder")}
             value={link}
             onChange={(e) => setLink(e.target.value)}
+            autoComplete="off"
           />
+
+          <Button variant="secondary" onClick={importRecipeData}>
+            {t("addRecipe.importRecipeData")}
+          </Button>
         </div>
 
-        {/*<div className="w-full flex gap-2 flex-col">
-          <h2 className="text-md font-bold mt-2">{t("ingredients")}</h2>
+        {/*<div className="flex flex-col w-full gap-2">
+          <h2 className="mt-2 font-bold text-md">{t("ingredients")}</h2>
 
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
@@ -344,7 +418,7 @@ export default function AddRecipe() {
         </div>*/}
       </div>
 
-      <div className="flex gap-2 w-full mt-11">
+      <div className="flex w-full gap-2 mt-11">
         <Button asChild className="w-full" variant="secondary">
           <Link
             to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}

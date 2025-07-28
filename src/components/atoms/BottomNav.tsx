@@ -8,7 +8,7 @@ export default function BottomNav() {
     <>
       <div style={{ height: "100px" }}></div>
 
-      <div className="w-full max-w-lg fixed bottom-0 py-3 bg-secondary z-20 rounded-t-2xl">
+      <div className="fixed bottom-0 z-20 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
         <div className="flex justify-between w-full gap-1 px-2">
           <BottomNavButton
             label={t("bottomNav.home")}
@@ -18,10 +18,10 @@ export default function BottomNav() {
           />
 
           <BottomNavButton
-            label={t("bottomNav.explore")}
-            icon="explore"
-            link="/explore"
-            active={window.location.pathname.startsWith("/explore")}
+            label={t("bottomNav.chatbot")}
+            icon="chatbot"
+            link="/chatbot"
+            active={window.location.pathname.startsWith("/chatbot")}
           />
 
           <BottomNavButton

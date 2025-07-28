@@ -5,7 +5,25 @@
     "delete": "Delete",
     "cancel": "Cancel",
     "save": "Save",
-    "commingSoon": "Comming soon..."
+    "commingSoon": "Comming soon...",
+    "selectImage": "Select image",
+    "uploading": "Uploading...",
+    "planned": "Planned",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "day": "Day",
+    "days": "Days"
+  },
+  "welcome": {
+    "title": "Congratulations,",
+    "subtitle": "smart food planning starts now!",
+    "nextButton": "Get Started!"
+  },
+  "signup": {
+    "title": "Plateful",
+    "subtitle": "Never stare blankly at your fridge again!",
+    "continueWithGoogle": "Continue with Google",
+    "termsAndConditions": "By signing up, you agree to our Terms of Service and Privacy Policy."
   },
   "list": {
     "title": "Shopping list"
@@ -33,10 +51,12 @@
     "description": "Description",
     "descriptionPlaceholder": "A delicious dish with tomatoes.",
     "link": "Link",
-    "linkPlaceholder": "https://www.tomato-soup.com"
-  },  
+    "linkPlaceholder": "https://www.tomato-soup.com",
+    "importRecipeData": "Import recipe data"
+  },
   "home": {
-    "title": "Home"
+    "title": "Home",
+    "enjoyCooking": "Enjoy cooking!"
   },
   "explore": {
     "title": "Explore"
@@ -46,6 +66,8 @@
     "language": "Language",
     "appearance": "Appearance",
     "household": "Household",
+    "householdDescription": "Use Plateful with your friends or family!",
+
     "manageYourHousehold": "Manage your household",
 
     "supportFeedback": "Support & Feedback",
@@ -53,6 +75,11 @@
     "suggestFeatureOrReportBug": "Suggest a feature or report a bug",
     "whatsNew": "Discover what's new",
     "viewRoadmap": "View our roadmap",
+
+    "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
+
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service",
 
     "dangerZone": "Account",
     "signOut": "Sign out",
@@ -62,12 +89,41 @@
       "system": "System"
     }
   },
+  "chatbot": {
+    "greeting": "How can I help you today?",
+    "suggestions": {
+      "suggestion1": {
+        "label": "Create a healthy recipe",
+        "text": "Create a healthy recipe"
+      },
+      "suggestion2": {
+        "label": "a quick recipe",
+        "text": "Create a quick recipe"
+      },
+      "suggestion3": {
+        "label": "a budget-friendly recipe",
+        "text": "Create a budget-friendly recipe"
+      }
+    },
+    "saveRecipe": "Save recipe",
+    "saveRecipeError": "Error saving recipe. Please try again later.",
+    "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
+    "inputPlaceholder": "Ask me about recipes or tips!"
+  },
   "bottomNav": {
     "home": "Home",
+    "chatbot": "AI-Chef",
     "explore": "Explore",
     "cookbook": "Cookbook",
-    "planner": "Planer",
+    "planner": "Planner",
     "list": "List"
+  },
+  "rating": {
+    "rate": "Rate",
+    "title": "How did you like it?",
+    "commentLabel": "Comments",
+    "commentPlaceholder": "Your comment (optional)",
+    "submit": "Save"
   },
 
   "ingredients": "Ingredients",
