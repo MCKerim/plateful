@@ -3,10 +3,10 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import supabase from "@/utils/supabase";
+import { planRecipe as planRecipeHelper, getMealPlanningInfo } from "@/utils/mealPlanHelpers";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
-import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Trash2, Link, CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
@@ -23,6 +23,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
+import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
 
 type RecipeItem = {
   id: number;
@@ -200,16 +201,10 @@ export default function Recipe() {
       return;
     }
 
-    const { error } = await supabase.from("meal_planning").insert({
-      recipe_id: id,
-      planned_date: newDate?.toISOString(),
-      days: newDays,
-      household_id: householdId,
-    });
+    const result = await planRecipeHelper(id, householdId, newDate, newDays);
 
-    if (error) {
-      console.error("Error while planning recipe: ", error);
-      alert("Error while planning recipe");
+    if (!result.success) {
+      alert(result.error || "Error while planning recipe");
     } else {
       navigate("/planner");
     }
@@ -243,26 +238,21 @@ export default function Recipe() {
   }
 
   useEffect(() => {
-    async function getMealPlanningInfo() {
+    async function fetchMealPlanningInfo() {
       if (!params.recipeId) return;
       const recipeId = parseInt(params.recipeId);
 
-      const { data } = await supabase
-        .from("meal_planning")
-        .select("*")
-        .eq("recipe_id", recipeId)
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (data && data.length > 0) {
-        const latestPlan = data[0];
-        setLastMealPlan(latestPlan);
+      const result = await getMealPlanningInfo(recipeId);
+      
+      if (!result.error) {
+        setLastMealPlan(result.data);
       } else {
+        console.error("Error fetching meal planning info:", result.error);
         setLastMealPlan(null);
       }
     }
 
-    getMealPlanningInfo();
+    fetchMealPlanningInfo();
   }, [params.recipeId]);
 
   return (
@@ -361,7 +351,7 @@ export default function Recipe() {
         </div>
       </div>
 
-      {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
+      {recipe && <WeeklyPlanDialog />}
 
       {recipe?.link && (
         <NavLink
