@@ -38,7 +38,7 @@ export default function SignUp() {
 
   const signUp = async () => {
     const currentUrl = window.location.origin;
-    let redirectUri = currentUrl ?? "https://www.plateful.cloud/";
+    let redirectUri = currentUrl ?? "https://app.plateful.cloud/";
 
     await supabase.auth.signInWithOAuth({
       provider: "google",
@@ -57,9 +57,9 @@ export default function SignUp() {
       />
 
       <div className="flex flex-col items-center h-screen px-4 py-10">
-        <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
+        <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
           <h1
-            className="text-7xl font-bold"
+            className="font-bold text-7xl"
             style={{
               fontFamily: "Modak",
             }}
@@ -67,14 +67,14 @@ export default function SignUp() {
             {t("signup.title")}
           </h1>
 
-          <p className="text-sm text-muted-foreground italic">
+          <p className="text-sm italic text-muted-foreground">
             {t("signup.subtitle")}
           </p>
         </div>
 
         <RiveComponent onClick={replayAnimation} />
 
-        <div className="w-full max-w-sm flex flex-col gap-3">
+        <div className="flex flex-col w-full max-w-sm gap-3">
           <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
             {t("signup.termsAndConditions")}
           </div>
