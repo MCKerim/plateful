@@ -267,6 +267,7 @@ export default function Chatbot() {
           onKeyDown={handleKeyDown}
           disabled={isTyping}
           onSubmit={handleSendMessage}
+          maxLength={200}
         />
       </div>
     </Layout>
