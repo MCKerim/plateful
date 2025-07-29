@@ -302,10 +302,10 @@ export default function Recipe() {
           src={
             imageUrls.length > 0
               ? imageUrls[currentImageIndex]
-              : "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
+              : "/no-img.jpg"
           }
           alt="Recipe"
-          className="object-cover w-full h-full rounded-md"
+          className="object-cover w-full h-full rounded-md dark:brightness-75"
         />
       </AspectRatio>
 
