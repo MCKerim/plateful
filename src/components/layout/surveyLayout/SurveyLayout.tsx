@@ -111,7 +111,7 @@ export default function SurveyLayout({
               }}
               transition={{ duration: 0.15 }}
             >
-              Weiter
+              {t("surveyStart.nextButton")}
             </motion.button>
           </Button>
         </motion.div>
