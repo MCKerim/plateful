@@ -134,6 +134,7 @@ export default function Survey() {
       handleSelect={handleSelect}
       onComplete={onComplete}
       showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single"}
+      twoColumns={SURVEY_QUESTIONS[questionId - 1].twoColumns}
     />
   );
 }

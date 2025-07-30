@@ -12,6 +12,7 @@ type Props = {
   handleSelect: (option: string) => void;
   onComplete: () => void;
   showNextButton?: boolean;
+  twoColumns?: boolean;
 };
 
 export default function SurveyLayout({
@@ -23,6 +24,7 @@ export default function SurveyLayout({
   handleSelect,
   onComplete,
   showNextButton = true,
+  twoColumns = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
 
@@ -49,7 +51,9 @@ export default function SurveyLayout({
 
       <motion.div
         key={`answers-${questionNumber}`}
-        className="flex flex-col w-full gap-4"
+        className={`flex w-full gap-4 ${
+          twoColumns ? "grid grid-cols-2" : "flex-col"
+        }`}
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}

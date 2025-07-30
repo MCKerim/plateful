@@ -77,6 +77,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option10",
     ],
     type: "multiple",
+    twoColumns: true,
   },
   {
     questionKey: "question11",
@@ -90,5 +91,6 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option7",
     ],
     type: "multiple",
+    twoColumns: true,
   },
 ];
