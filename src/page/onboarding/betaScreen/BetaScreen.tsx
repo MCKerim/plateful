@@ -5,9 +5,11 @@ import { useState, useEffect } from "react";
 import Rive from "@rive-app/react-canvas";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router";
 
 export default function BetaScreen() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [showAppreciation, setShowAppreciation] = useState(false);
 
   useEffect(() => {
@@ -18,8 +20,12 @@ export default function BetaScreen() {
     return () => clearTimeout(timer);
   }, []);
 
+  const handleNext = () => {
+    navigate("/survey");
+  };
+
   return (
-    <OnboardingLayout nextButtonLabel={t("beta.nextButton")} onNext={() => {}}>
+    <OnboardingLayout nextButtonLabel={t("beta.nextButton")} onNext={handleNext}>
       <div className="space-y-4 text-center">
         {/* Beta Badge */}
         <div className="flex justify-center">
