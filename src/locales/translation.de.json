@@ -135,32 +135,98 @@
 
   "questions": {
     "question1": {
-      "question": "Wie oft kochst du?",
-      "option1": "Täglich",
-      "option2": "Mehrmals pro Woche",
-      "option3": "Wöchentlich",
-      "option4": "Selten"
+      "question": "Was ist dein Ziel?",
+      "option1": "Zeit sparen",
+      "option2": "Gesünder essen",
+      "option3": "Neue Rezepte entdecken",
+      "option4": "Stress beim Essensplanen reduzieren",
+      "option5": "Anderes"
     },
     "question2": {
-      "question": "Welche Art von Gerichten kochst du am liebsten?",
-      "option1": "Vegetarisch",
-      "option2": "Vegan",
-      "option3": "Fleischgerichte",
-      "option4": "Fischgerichte"
+      "question": "Wie alt bist du?",
+      "option1": "Unter 25",
+      "option2": "25-34",
+      "option3": "35-44",
+      "option4": "45-54",
+      "option5": "55+"
     },
     "question3": {
-      "question": "Wie wichtig ist dir die Zubereitungszeit?",
-      "option1": "Sehr wichtig",
-      "option2": "Wichtig",
-      "option3": "Nicht so wichtig",
-      "option4": "Unwichtig"
+      "question": "Welches Geschlecht hast du?",
+      "option1": "Männlich",
+      "option2": "Weiblich",
+      "option3": "Divers"
     },
     "question4": {
-      "question": "Welche Küche bevorzugst du?",
-      "option1": "Italienisch",
-      "option2": "Asiatisch",
-      "option3": "Mexikanisch",
-      "option4": "Deutsch"
+      "question": "Wie hast du von uns erfahren?",
+      "option1": "Google Suche",
+      "option2": "Suche im App Store",
+      "option3": "Empfehlung von Freunden",
+      "option4": "Soziale Medien",
+      "option5": "Andere"
+    },
+    "question5": {
+      "question": "Wo findest du normalerweise Rezepte?",
+      "option1": "Instagram",
+      "option2": "TikTok",
+      "option3": "Facebook",
+      "option4": "Pinterest",
+      "option5": "Kochbücher",
+      "option6": "Rezepte Websites",
+      "option7": "Andere"
+    },
+    "question6": {
+      "question": "Wie organisiert du normalerweise deine Rezepte?",
+      "option1": "In einer App wie Notizen",
+      "option2": "Screenshots oder speichere Bilder",
+      "option3": "Schreibe sie auf",
+      "option4": "In Social Media Apps",
+      "option5": "Ich organisiere sie nicht"
+    },
+    "question7": {
+      "question": "Wie oft kochst du pro Woche?",
+      "option1": "1-2 Mal",
+      "option2": "3-4 Mal",
+      "option3": "5-6 Mal",
+      "option4": "7 Mal oder mehr"
+    },
+    "question8": {
+      "question": "Für wie viele Personen kochst du?",
+      "option1": "1 Person",
+      "option2": "2 Personen",
+      "option3": "3-4 Personen",
+      "option4": "5 oder mehr Personen"
+    },
+    "question9": {
+      "question": "Welche Ernährungsweise bevorzugst du?",
+      "option1": "Vegetarisch",
+      "option2": "Vegan",
+      "option3": "High-Protein",
+      "option4": "Low-Carb",
+      "option5": "Andere",
+      "option6": "Keine"
+    },
+    "question10": {
+      "question": "Allergien & Intoleranzen?",
+      "option1": "Gluten",
+      "option2": "Laktose",
+      "option3": "Nüsse",
+      "option4": "Milch",
+      "option5": "Schalentiere",
+      "option6": "Fruktose",
+      "option7": "Sorbit",
+      "option8": "Fisch",
+      "option9": "Andere",
+      "option10": "Keine"
+    },
+    "question11": {
+      "question": "Sonstige Abneigungen?",
+      "option1": "Pilze",
+      "option2": "Fisch",
+      "option3": "Koriander",
+      "option4": "Schweinefleisch",
+      "option5": "Rosenkohl",
+      "option6": "Ersatzprodukte",
+      "option7": "Keine"
     }
   }
 }

@@ -22,10 +22,12 @@ export default function Survey() {
     return isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
   }
 
-  const handleSelect = (option: string) => {
+  const handleSelect = async (option: string) => {
     const question = SURVEY_QUESTIONS[questionId - 1];
     if (question.type === "single") {
       setSelected([option]);
+      // Auto-advance for single-type questions
+      await handleSingleQuestionComplete(option);
     } else {
       setSelected((prev) =>
         prev.includes(option)
@@ -34,6 +36,32 @@ export default function Survey() {
       );
     }
   };
+
+  async function handleSingleQuestionComplete(selectedOption: string) {
+    if (!user) {
+      return;
+    }
+
+    const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
+    const translatedOption = t(`questions.${QUESTION_KEY}.${selectedOption}`);
+
+    await supabase.from("survey_answears").upsert(
+      [
+        {
+          question: t(`questions.${QUESTION_KEY}.question`),
+          user_id: user.id,
+          selected_options: translatedOption,
+          question_number: questionId,
+        },
+      ],
+      {
+        onConflict: "user_id,question_number",
+      }
+    );
+
+    setSelected([]);
+    goToNext();
+  }
 
   async function onComplete() {
     if (!user) {
@@ -50,17 +78,21 @@ export default function Survey() {
       t(`questions.${QUESTION_KEY}.${option}`)
     );
 
-    await supabase.from("survey_answears").insert([
+    await supabase.from("survey_answears").upsert(
+      [
+        {
+          question: t(`questions.${QUESTION_KEY}.question`),
+          user_id: user.id,
+          selected_options: translatedOptions.join(", "),
+          question_number: questionId,
+        },
+      ],
       {
-        question: t(`questions.${QUESTION_KEY}.question`),
-        user_id: user.id,
-        selected_options: translatedOptions.join(", "),
-        question_number: questionId,
-      },
-    ]);
+        onConflict: "user_id,question_number",
+      }
+    );
 
     setSelected([]);
-
     goToNext();
   }
 
@@ -101,6 +133,7 @@ export default function Survey() {
       selected={selected}
       handleSelect={handleSelect}
       onComplete={onComplete}
+      showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single"}
     />
   );
 }

@@ -10,6 +10,7 @@ type Props = {
   selected?: string[];
   handleSelect: (option: string) => void;
   onComplete: () => void;
+  showNextButton?: boolean;
 };
 
 export default function SurveyLayout({
@@ -20,6 +21,7 @@ export default function SurveyLayout({
   selected,
   handleSelect,
   onComplete,
+  showNextButton = true,
 }: Readonly<Props>) {
   const { t } = useTranslation();
 
@@ -46,12 +48,15 @@ export default function SurveyLayout({
         ))}
       </div>
 
-      <Button
-        className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
-        onClick={onComplete}
-      >
-        Weiter
-      </Button>
+      {showNextButton && (
+        <Button
+          className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+          onClick={onComplete}
+        >
+          Weiter
+        </Button>
+      )}
+      {!showNextButton && <div></div>}
     </div>
   );
 }
