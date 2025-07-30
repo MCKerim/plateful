@@ -35,6 +35,7 @@ import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
 import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValue";
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
+import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -181,6 +182,8 @@ function App() {
         path="/signup"
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
+
+      <Route path="/beta" element={<BetaScreen />} />
 
       <Route path="/values" element={<ImportRecipes />} />
       <Route path="/values/1" element={<ImportRecipes />} />
