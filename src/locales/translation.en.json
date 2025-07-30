@@ -150,7 +150,7 @@
       "option2": "25-34",
       "option3": "35-44",
       "option4": "45-54",
-      "option5": "55+"
+      "option5": "55 or older"
     },
     "question3": {
       "question": "What is your gender?",
@@ -160,8 +160,8 @@
     },
     "question4": {
       "question": "How did you hear about us?",
-      "option1": "Google Search",
-      "option2": "App Store Search",
+      "option1": "Google-Search",
+      "option2": "App Store",
       "option3": "Friend Referral",
       "option4": "Social Media",
       "option5": "Other"
@@ -173,27 +173,28 @@
       "option3": "Facebook",
       "option4": "Pinterest",
       "option5": "Cookbooks",
-      "option6": "Recipe Websites",
-      "option7": "Other"
+      "option6": "Recipe-Websites",
+      "option7": "YouTube",
+      "option8": "Other"
     },
     "question6": {
       "question": "How do you usually organize your recipes?",
-      "option1": "In an app like Notes",
-      "option2": "Screenshots or save images",
-      "option3": "Write them down",
-      "option4": "In Social Media Apps",
+      "option1": "In a Notes app",
+      "option2": "Screenshots or saved images",
+      "option3": "On Paper",
+      "option4": "In Social-Media-Apps",
       "option5": "I don't organize them"
     },
     "question7": {
       "question": "How often do you cook per week?",
       "option1": "1-2 times",
       "option2": "3-4 times",
-      "option3": "5-6 Mal",
-      "option4": "7 Mal oder mehr"
+      "option3": "5-6 times",
+      "option4": "7 times or more"
     },
     "question8": {
       "question": "How many people do you usually cook for?",
-      "option1": "1 person",
+      "option1": "Just me",
       "option2": "2 people",
       "option3": "3-4 people",
       "option4": "5 or more people"

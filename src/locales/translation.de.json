@@ -148,7 +148,7 @@
       "option2": "25-34",
       "option3": "35-44",
       "option4": "45-54",
-      "option5": "55+"
+      "option5": "55 oder älter"
     },
     "question3": {
       "question": "Welches Geschlecht hast du?",
@@ -158,11 +158,11 @@
     },
     "question4": {
       "question": "Wie hast du von uns erfahren?",
-      "option1": "Google Suche",
-      "option2": "Suche im App Store",
+      "option1": "Google-Suche",
+      "option2": "App Store",
       "option3": "Empfehlung von Freunden",
       "option4": "Soziale Medien",
-      "option5": "Andere"
+      "option5": "Anderes"
     },
     "question5": {
       "question": "Wo findest du normalerweise Rezepte?",
@@ -171,15 +171,16 @@
       "option3": "Facebook",
       "option4": "Pinterest",
       "option5": "Kochbücher",
-      "option6": "Rezepte Websites",
-      "option7": "Andere"
+      "option6": "Rezepte-Websites",
+      "option7": "YouTube",
+      "option8": "Anderes"
     },
     "question6": {
       "question": "Wie organisiert du normalerweise deine Rezepte?",
-      "option1": "In einer App wie Notizen",
-      "option2": "Screenshots oder speichere Bilder",
-      "option3": "Schreibe sie auf",
-      "option4": "In Social Media Apps",
+      "option1": "In einer Notizen-App",
+      "option2": "Screenshots oder gespeicherte Bilder",
+      "option3": "Auf Papier",
+      "option4": "In Social-Media-Apps",
       "option5": "Ich organisiere sie nicht"
     },
     "question7": {
@@ -191,7 +192,7 @@
     },
     "question8": {
       "question": "Für wie viele Personen kochst du?",
-      "option1": "1 Person",
+      "option1": "Nur für mich",
       "option2": "2 Personen",
       "option3": "3-4 Personen",
       "option4": "5 oder mehr Personen"
@@ -200,7 +201,7 @@
       "question": "Welche Ernährungsweise bevorzugst du?",
       "option1": "Vegetarisch",
       "option2": "Vegan",
-      "option3": "High-Protein",
+      "option3": "Proteinreich",
       "option4": "Low-Carb",
       "option5": "Andere",
       "option6": "Keine"

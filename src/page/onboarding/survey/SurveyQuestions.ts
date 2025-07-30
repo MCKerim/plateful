@@ -31,6 +31,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option5",
       "option6",
       "option7",
+      "option8",
     ],
     type: "multiple",
   },
