@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
+import { motion, AnimatePresence } from "motion/react";
 
 type Props = {
   questionNumber: number;
@@ -27,36 +28,90 @@ export default function SurveyLayout({
 
   return (
     <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">
-      <div className="flex flex-col w-full gap-8">
+      <motion.div
+        className="flex flex-col w-full gap-8"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <Progress value={(questionNumber / maxQuestionNumber) * 100} />
 
-        <h1 className="mb-4 text-3xl font-bold text-center">
-          {t(`questions.${question}.question`)}
-        </h1>
-      </div>
-
-      <div className="flex flex-col w-full gap-4">
-        {answers.map((option) => (
-          <Button
-            key={option}
-            className="w-full rounded-lg"
-            variant={selected?.includes(option) ? "default" : "secondary"}
-            onClick={() => handleSelect(option)}
-          >
-            {t(`questions.${question}.${option}`)}
-          </Button>
-        ))}
-      </div>
-
-      {showNextButton && (
-        <Button
-          className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
-          onClick={onComplete}
+        <motion.h1
+          key={`question-${questionNumber}`}
+          className="mb-4 text-3xl font-bold text-center"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
         >
-          Weiter
-        </Button>
-      )}
-      {!showNextButton && <div></div>}
+          {t(`questions.${question}.question`)}
+        </motion.h1>
+      </motion.div>
+
+      <motion.div
+        key={`answers-${questionNumber}`}
+        className="flex flex-col w-full gap-4"
+        initial={{ opacity: 0, x: -30 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {answers.map((option, index) => (
+          <motion.div
+            key={`${questionNumber}-${option}`}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{
+              duration: 0.3,
+              delay: index * 0.08,
+              ease: "easeOut",
+            }}
+          >
+            <Button
+              className="w-full rounded-lg"
+              variant={selected?.includes(option) ? "default" : "secondary"}
+              onClick={() => handleSelect(option)}
+              asChild
+            >
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                transition={{ duration: 0.15 }}
+              >
+                {t(`questions.${question}.${option}`)}
+              </motion.button>
+            </Button>
+          </motion.div>
+        ))}
+      </motion.div>
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key="next-button"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="w-full"
+        >
+          <Button
+            className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+            onClick={onComplete}
+            asChild
+            disabled={!showNextButton}
+          >
+            <motion.button
+              whileHover={{ scale: showNextButton ? 1.02 : 1 }}
+              whileTap={{ scale: showNextButton ? 0.98 : 1 }}
+              animate={{ 
+                opacity: showNextButton ? 1 : 0.5,
+                scale: showNextButton ? 1 : 0.98
+              }}
+              transition={{ duration: 0.15 }}
+            >
+              Weiter
+            </motion.button>
+          </Button>
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
