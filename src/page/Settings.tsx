@@ -8,7 +8,12 @@ import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { Donut, House, Newspaper, Map, Globe } from "lucide-react";
-import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
+import {
+  FaInstagram,
+  FaThreads,
+  FaTiktok,
+  FaXTwitter,
+} from "react-icons/fa6";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -155,6 +160,10 @@ export default function Settings() {
           <div className="flex py-2 justify-evenly">
             <NavLink to="https://kblanks.com/" target="_blank">
               <Globe size={24} />
+            </NavLink>
+
+            <NavLink to="https://x.com/MCKerim5" target="_blank">
+              <FaXTwitter size={24} />
             </NavLink>
 
             <NavLink to="https://www.threads.com/@kblanks_com" target="_blank">
