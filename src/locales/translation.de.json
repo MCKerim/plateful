@@ -90,6 +90,11 @@
     "dontHaveHousehold": "Ihr habt noch keinen Haushalt?",
     "createNew": "Erstelle einen neuen Haushalt"
   },
+  "inviteMembers": {
+    "title": "Füge Mitglieder hinzu",
+    "description": "Lade Freunde oder Familie in deinen Haushalt ein. Scanne dazu den QR-Code oder teile den Link.",
+    "nextButton": "Fertig"
+  },
   "list": {
     "title": "Einkaufsliste"
   },

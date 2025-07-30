@@ -84,6 +84,11 @@
     "dontHaveHousehold": "Don't have a household?",
     "createNew": "Create a new household"
   },
+  "inviteMembers": {
+    "title": "Add Members",
+    "description": "Invite friends or family to your household. Scan the QR code or share the link.",
+    "nextButton": "Done"
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",
