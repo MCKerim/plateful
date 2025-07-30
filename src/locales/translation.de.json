@@ -58,6 +58,10 @@
       "description": "Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim Einkaufen!"
     }
   },
+  "surveyStart": {
+    "title": "Lass uns zuerst dein Erlebnis personalisieren",
+    "nextButton": "Weiter"
+  },
   "list": {
     "title": "Einkaufsliste"
   },
