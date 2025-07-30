@@ -37,6 +37,27 @@
     },
     "nextButton": "Los geht's!"
   },
+  "valueScreens": {
+    "importRecipes": {
+      "title": "Speichere Rezepte",
+      "subtitle": "von überall",
+      "description": "Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!"
+    },
+    "chatbot": {
+      "title": "Intelligenter Chatbot",
+      "subtitles": {
+        "mealPlan": "für dein Wochenplan",
+        "recipes": "für Rezepte",
+        "questions": "für Fragen"
+      },
+      "description": "Schreibe worauf du lust hast oder stelle Fragen zum Kochen!"
+    },
+    "mealPlanning": {
+      "title": "Planne Mahlzeiten",
+      "subtitle": "auf die einfache Art",
+      "description": "Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim Einkaufen!"
+    }
+  },
   "list": {
     "title": "Einkaufsliste"
   },

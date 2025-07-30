@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import "./ImportRecipes.css";
 import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
+import { useTranslation } from "react-i18next";
 
 export default function ImportRecipes() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [animatedIcons, setAnimatedIcons] = useState<
     Array<{
@@ -87,21 +89,21 @@ export default function ImportRecipes() {
           <img
             src={icon.iconUrl}
             alt={icon.appName}
-            className="w-12 h-12 rounded-xl shadow-lg"
+            className="w-12 h-12 shadow-lg rounded-xl"
           />
         </div>
       ))}
 
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Speichere Rezepte</h1>
+        <h1 className="text-4xl font-bold">{t("valueScreens.importRecipes.title")}</h1>
 
-        <h2 className="italic text-2xl font-semibold">von überall</h2>
+        <h2 className="text-2xl italic font-semibold">{t("valueScreens.importRecipes.subtitle")}</h2>
       </div>
 
       <PhoneMockup screenshotUrl="/importRecipesScreenshot.jpg" />
 
-      <p className="text-gray-600 max-w-sm text-center">
-        Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!
+      <p className="max-w-sm text-center text-gray-600">
+        {t("valueScreens.importRecipes.description")}
       </p>
     </OnboardingLayout>
   );

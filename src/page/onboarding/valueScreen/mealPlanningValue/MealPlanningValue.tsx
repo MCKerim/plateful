@@ -4,8 +4,10 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
 import { useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export default function MealPlanningValue() {
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
 
@@ -31,16 +33,15 @@ export default function MealPlanningValue() {
   return (
     <OnboardingLayout onNext={completeValueScreen}>
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Planne Mahlzeiten</h1>
+        <h1 className="text-4xl font-bold">{t("valueScreens.mealPlanning.title")}</h1>
 
-        <h2 className="text-2xl italic font-semibold">auf die einfache Art</h2>
+        <h2 className="text-2xl italic font-semibold">{t("valueScreens.mealPlanning.subtitle")}</h2>
       </div>
 
       <PhoneMockup screenshotUrl="/mealplannerScreenshot.jpg" />
 
       <p className="max-w-sm mt-2 text-center text-gray-600">
-        Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim
-        Einkaufen!
+        {t("valueScreens.mealPlanning.description")}
       </p>
     </OnboardingLayout>
   );
