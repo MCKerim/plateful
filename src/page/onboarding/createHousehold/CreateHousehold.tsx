@@ -75,7 +75,7 @@ export default function CreateHousehold() {
 
       <div className="flex flex-col w-full max-w-sm gap-6">
         <div className="mb-6 text-center">
-          <p className="eading-relaxed text-muted-foreground">
+          <p className="font-medium eading-relaxed text-primary">
             {t("createHousehold.description")}
           </p>
         </div>

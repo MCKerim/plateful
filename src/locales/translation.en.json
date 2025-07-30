@@ -77,6 +77,12 @@
       "updateFailed": "Error updating household:"
     }
   },
+  "joinHousehold": {
+    "title": "Join Household",
+    "description": "Have someone send you an invitation link or scan the QR code from a person in your household to join.",
+    "dontHaveHousehold": "Don't have a household?",
+    "createNew": "Create a new household"
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",

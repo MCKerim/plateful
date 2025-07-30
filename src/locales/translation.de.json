@@ -83,6 +83,12 @@
       "updateFailed": "Fehler beim Aktualisieren des Haushalts:"
     }
   },
+  "joinHousehold": {
+    "title": "Haushalt beitreten",
+    "description": "Lass dir einen Einladungslink zuschicken oder scanne den QR-Code einer Person aus deinem Haushalt, um beizutreten.",
+    "dontHaveHousehold": "Ihr habt noch keinen Haushalt?",
+    "createNew": "Erstelle einen neuen Haushalt"
+  },
   "list": {
     "title": "Einkaufsliste"
   },

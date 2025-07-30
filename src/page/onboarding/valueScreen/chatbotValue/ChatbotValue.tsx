@@ -28,10 +28,10 @@ export default function ChatbotValue() {
       <div className="text-center">
         <h1 className="text-4xl font-bold">{t("valueScreens.chatbot.title")}</h1>
 
-        <h2 className="italic text-2xl font-semibold h-8 flex items-center justify-center">
+        <h2 className="flex items-center justify-center h-8 text-2xl italic font-semibold">
           <span 
             key={currentTextIndex}
-            className="inline-block animate-in fade-in-50 slide-in-from-bottom-3 duration-500"
+            className="inline-block duration-500 animate-in fade-in-50 slide-in-from-bottom-3"
           >
             {h2Texts[currentTextIndex]}
           </span>
@@ -40,7 +40,7 @@ export default function ChatbotValue() {
 
       <PhoneMockup screenshotUrl="/chatbotScreenshot.jpg" />
 
-      <p className="text-gray-600 max-w-sm mt-2 text-center">
+      <p className="max-w-sm mt-2 text-center text-gray-600">
         {t("valueScreens.chatbot.description")}
       </p>
     </OnboardingLayout>
