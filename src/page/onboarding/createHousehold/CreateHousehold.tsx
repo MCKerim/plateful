@@ -9,7 +9,6 @@ import supabase from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Users, Home } from "lucide-react";
 
 export default function CreateHousehold() {
   const { t } = useTranslation();
@@ -21,6 +20,11 @@ export default function CreateHousehold() {
 
   async function handleCreateHousehold() {
     if (!user) {
+      return;
+    }
+
+    if (isLoading) {
+      alert(t("createHousehold.errors.loading"));
       return;
     }
 

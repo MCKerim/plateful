@@ -80,7 +80,8 @@
     "errors": {
       "nameRequired": "Bitte gib einen Namen für deinen Haushalt ein.",
       "createFailed": "Fehler beim Erstellen des Haushalts:",
-      "updateFailed": "Fehler beim Aktualisieren des Haushalts:"
+      "updateFailed": "Fehler beim Aktualisieren des Haushalts:",
+      "loading": "Lade, bitte warten..."
     }
   },
   "joinHousehold": {

@@ -74,7 +74,8 @@
     "errors": {
       "nameRequired": "Please enter a name for your household.",
       "createFailed": "Error creating household:",
-      "updateFailed": "Error updating household:"
+      "updateFailed": "Error updating household:",
+      "loading": "Loading, please wait..."
     }
   },
   "joinHousehold": {
