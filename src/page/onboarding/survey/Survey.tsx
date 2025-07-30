@@ -5,8 +5,10 @@ import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
+import { useTranslation } from "react-i18next";
 
 export default function Survey() {
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
 
@@ -43,11 +45,16 @@ export default function Survey() {
       return;
     }
 
+    const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
+    const translatedOptions = selected.map((option) =>
+      t(`questions.${QUESTION_KEY}.${option}`)
+    );
+
     await supabase.from("survey_answears").insert([
       {
-        question_id: SURVEY_QUESTIONS[questionId - 1].questionKey,
+        question: t(`questions.${QUESTION_KEY}.question`),
         user_id: user.id,
-        selected_options_ids: selected.join(","),
+        selected_options: translatedOptions.join(", "),
         question_number: questionId,
       },
     ]);
