@@ -62,6 +62,27 @@
     "title": "Lass uns zuerst dein Erlebnis personalisieren",
     "nextButton": "Weiter"
   },
+  "createHousehold": {
+    "title": "Erstelle deinen Haushalt",
+    "description": "Teile Rezepte und plant gemeinsam Mahlzeiten in eurem Haushalt.",
+    "pricingNote": "Nur eine Person pro Haushalt muss bezahlen.",
+    "features": {
+      "title": "Was euch erwartet:",
+      "sharedRecipes": "Gemeinsame Rezeptsammlung",
+      "sharedLists": "Geteilte Einkaufslisten", 
+      "mealPlanning": "Koordinierte Essensplanung"
+    },
+    "nameLabel": "Wie soll dein Haushalt heißen?",
+    "namePlaceholder": "z.B. Familie Müller",
+    "nextButton": "Haushalt erstellen",
+    "alreadyHaveHousehold": "Ihr habt schon einen Haushalt?",
+    "joinExisting": "Bestehendem Haushalt beitreten",
+    "errors": {
+      "nameRequired": "Bitte gib einen Namen für deinen Haushalt ein.",
+      "createFailed": "Fehler beim Erstellen des Haushalts:",
+      "updateFailed": "Fehler beim Aktualisieren des Haushalts:"
+    }
+  },
   "list": {
     "title": "Einkaufsliste"
   },

@@ -56,6 +56,27 @@
     "title": "Let's personalize your experience first",
     "nextButton": "Continue"
   },
+  "createHousehold": {
+    "title": "Create Your Household",
+    "description": "Share recipes and plan meals together in your household.",
+    "pricingNote": "Only one person per household needs to pay.",
+    "features": {
+      "title": "What to expect:",
+      "sharedRecipes": "Shared recipe collection",
+      "sharedLists": "Shared shopping lists",
+      "mealPlanning": "Coordinated meal planning"
+    },
+    "nameLabel": "What should your household be called?",
+    "namePlaceholder": "e.g. Miller Family",
+    "nextButton": "Create Household",
+    "alreadyHaveHousehold": "Already have a household?",
+    "joinExisting": "Join existing household",
+    "errors": {
+      "nameRequired": "Please enter a name for your household.",
+      "createFailed": "Error creating household:",
+      "updateFailed": "Error updating household:"
+    }
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",

@@ -8,12 +8,16 @@ import { selectUser } from "@/redux/slices/userSlice";
 import supabase from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
+import { Users, Home } from "lucide-react";
 
 export default function CreateHousehold() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
 
   const [householdName, setHouseholdName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   async function handleCreateHousehold() {
     if (!user) {
@@ -22,9 +26,11 @@ export default function CreateHousehold() {
 
     const trimmedName = householdName.trim();
     if (!trimmedName) {
-      alert("Bitte gib einen Namen für deinen Haushalt ein.");
+      alert(t("createHousehold.errors.nameRequired"));
       return;
     }
+
+    setIsLoading(true);
 
     const { data, error } = await supabase
       .from("household")
@@ -32,13 +38,12 @@ export default function CreateHousehold() {
       .select();
 
     if (error || !data) {
-      alert("Fehler beim Erstellen des Haushalts: " + error?.message);
+      alert(t("createHousehold.errors.createFailed") + " " + error?.message);
+      setIsLoading(false);
       return;
     }
 
     if (data) {
-      setHouseholdName("");
-
       // set household id for user
       const { error: updateError } = await supabase
         .from("users")
@@ -47,50 +52,53 @@ export default function CreateHousehold() {
 
       if (updateError) {
         alert(
-          "Fehler beim Aktualisieren des Haushalts: " + updateError.message
+          t("createHousehold.errors.updateFailed") + " " + updateError.message
         );
+        setIsLoading(false);
         return;
       }
 
+      setHouseholdName("");
+      setIsLoading(false);
       navigate("/inviteMembers");
     }
   }
 
   return (
     <OnboardingLayout
-      nextButtonLabel="Haushalt erstellen"
+      nextButtonLabel={t("createHousehold.nextButton")}
       onNext={handleCreateHousehold}
     >
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Erstelle dein Haushalt</h1>
+        <h1 className="text-4xl font-bold">{t("createHousehold.title")}</h1>
       </div>
 
-      <div className="flex flex-col gap-4 w-full max-w-sm mx-auto">
-        <p className="text-gray-600 text-justify mb-8">
-          Teile Rezepte und plannt gemeinsam Mahlzeiten in eurem Haushalt.{" "}
-          <br />
-          Nur eine Person pro Haushalt muss bezahlen.
-        </p>
+      <div className="flex flex-col w-full max-w-sm gap-6">
+        <div className="mb-6 text-center">
+          <p className="eading-relaxed text-muted-foreground">
+            {t("createHousehold.description")}
+          </p>
+        </div>
 
-        <div className="grid w-full items-center gap-2">
-          <Label htmlFor="name">Wie soll dein Haushalt heißen?</Label>
+        <div className="grid items-center w-full gap-2">
+          <Label htmlFor="name">{t("createHousehold.nameLabel")}</Label>
 
           <Input
             type="text"
             id="name"
-            placeholder="z.B. Familie Müller"
+            placeholder={t("createHousehold.namePlaceholder")}
             value={householdName}
             onChange={(e) => setHouseholdName(e.target.value)}
           />
         </div>
 
         <Separator>
-          <p className="italic">Ihr habt schon ein Haushalt?</p>
+          <p className="italic">{t("createHousehold.alreadyHaveHousehold")}</p>
         </Separator>
 
         <NavLink to="/joinHousehold" className="w-full">
           <Button className="w-full" variant="secondary">
-            Bestehendem Haushalt beitreten
+            {t("createHousehold.joinExisting")}
           </Button>
         </NavLink>
       </div>
