@@ -25,6 +25,18 @@
     "subtitle": "smarte Essensplanung beginnt jetzt!",
     "nextButton": "Jetzt Loslegen!"
   },
+  "beta": {
+    "title": "Du bist dabei! 🎉",
+    "badge": "Beta Version",
+    "thankYou": "Danke, dass du dabei bist!",
+    "description": "Deine Erfahrungen werden uns dabei helfen, die beste Kochapp zu entwickeln.",
+    "benefits": {
+      "newFeatures": "Du bekommst alle neuen Features zuerst",
+      "directInput": "Deine Meinung fließt direkt in die Entwicklung ein",
+      "helpImprove": "Du hilfst dabei, Plateful noch besser zu machen"
+    },
+    "nextButton": "Los geht's!"
+  },
   "list": {
     "title": "Einkaufsliste"
   },

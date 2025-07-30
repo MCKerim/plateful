@@ -4,8 +4,10 @@ import { Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import Rive from "@rive-app/react-canvas";
 import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
+import { useTranslation } from "react-i18next";
 
 export default function BetaScreen() {
+  const { t } = useTranslation();
   const [showAppreciation, setShowAppreciation] = useState(false);
 
   useEffect(() => {
@@ -17,7 +19,7 @@ export default function BetaScreen() {
   }, []);
 
   return (
-    <OnboardingLayout nextButtonLabel="Los geht's!" onNext={() => {}}>
+    <OnboardingLayout nextButtonLabel={t("beta.nextButton")} onNext={() => {}}>
       <div className="space-y-4 text-center">
         {/* Beta Badge */}
         <div className="flex justify-center">
@@ -26,11 +28,11 @@ export default function BetaScreen() {
             className="px-4 py-2 text-orange-800 bg-orange-100 border-orange-200"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Beta Version
+            {t("beta.badge")}
           </Badge>
         </div>
 
-        <h1 className="text-4xl font-bold text-accent">Du bist dabei! 🎉</h1>
+        <h1 className="text-4xl font-bold text-accent">{t("beta.title")}</h1>
       </div>
 
       {/* Animated character */}
@@ -50,20 +52,19 @@ export default function BetaScreen() {
           <div className="flex items-center justify-center gap-2 mb-3">
             <RocketLaunchIcon />
             <p className="text-lg font-semibold text-gray-800">
-              Danke, dass du dabei bist!
+              {t("beta.thankYou")}
             </p>
           </div>
 
           <p className="leading-relaxed text-gray-600">
-            Deine Erfahrungen werden uns dabei helfen, die beste Kochapp zu
-            entwickeln.
+            {t("beta.description")}
           </p>
 
           <div className="p-4 mt-6 border border-orange-200 rounded-lg bg-orange-50">
             <ul className="space-y-1 text-sm text-orange-700">
-              <li>• Du bekommst alle neuen Features zuerst</li>
-              <li>• Deine Meinung fließt direkt in die Entwicklung ein</li>
-              <li>• Du hilfst dabei, Plateful noch besser zu machen</li>
+              <li>• {t("beta.benefits.newFeatures")}</li>
+              <li>• {t("beta.benefits.directInput")}</li>
+              <li>• {t("beta.benefits.helpImprove")}</li>
             </ul>
           </div>
         </div>
