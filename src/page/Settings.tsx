@@ -7,13 +7,8 @@ import { NavLink } from "react-router";
 import { useEffect } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map, Globe } from "lucide-react";
-import {
-  FaInstagram,
-  FaThreads,
-  FaTiktok,
-  FaXTwitter,
-} from "react-icons/fa6";
+import { Donut, House, Newspaper, Map, Globe, LogOut } from "lucide-react";
+import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
 
 export default function Settings() {
   const { t, i18n } = useTranslation();
@@ -204,7 +199,7 @@ export default function Settings() {
           {user?.email}
 
           <Button variant="destructive" onClick={signOut}>
-            {t("settings.signOut")}
+            <LogOut size={16} /> {t("settings.signOut")}
           </Button>
         </div>
       </div>

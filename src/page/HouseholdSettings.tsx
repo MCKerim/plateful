@@ -14,6 +14,7 @@ import {
   Trash2,
   House,
   UserRoundPlus,
+  LogOut,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -24,19 +25,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import InviteLink from "@/components/ui/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -172,7 +164,7 @@ export default function HouseholdSettings() {
       <Separator className="my-2" />
 
       <Button variant="destructive" onClick={leaveHousehold}>
-        {t("householdSettings.leaveHousehold")}
+        <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
       </Button>
 
       <Button variant="destructive" onClick={deleteHousehold}>
@@ -180,60 +172,76 @@ export default function HouseholdSettings() {
       </Button>
 
       {/* Leave Household Confirmation Dialog */}
-      <AlertDialog
+      <Dialog
         open={showLeaveConfirmation}
         onOpenChange={setShowLeaveConfirmation}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
               {t("householdSettings.confirmations.leaveHousehold.title")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
+            </DialogTitle>
+
+            <DialogDescription>
               {t("householdSettings.confirmations.leaveHousehold.description")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-2 mt-4">
+            <Button
+              variant="secondary"
+              onClick={() => setShowLeaveConfirmation(false)}
+              className="w-full"
+            >
               {t("householdSettings.confirmations.leaveHousehold.cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+
+            <Button
+              variant="destructive"
               onClick={confirmLeaveHousehold}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="w-full"
             >
               {t("householdSettings.confirmations.leaveHousehold.confirm")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Household Confirmation Dialog */}
-      <AlertDialog
+      <Dialog
         open={showDeleteConfirmation}
         onOpenChange={setShowDeleteConfirmation}
       >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>
               {t("householdSettings.confirmations.deleteHousehold.title")}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
+            </DialogTitle>
+
+            <DialogDescription>
               {t("householdSettings.confirmations.deleteHousehold.description")}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="flex gap-2 mt-4">
+            <Button
+              className="w-full"
+              variant="secondary"
+              onClick={() => setShowDeleteConfirmation(false)}
+            >
               {t("householdSettings.confirmations.deleteHousehold.cancel")}
-            </AlertDialogCancel>
-            <AlertDialogAction
+            </Button>
+
+            <Button
+              variant="destructive"
               onClick={confirmDeleteHousehold}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="w-full"
             >
               {t("householdSettings.confirmations.deleteHousehold.confirm")}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }
