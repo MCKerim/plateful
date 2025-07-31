@@ -200,7 +200,8 @@
     },
     "errors": {
       "removeMemberFailed": "Error removing member. Please try again later.",
-      "leaveHouseholdFailed": "Error leaving household. Please try again later."
+      "leaveHouseholdFailed": "Error leaving household. Please try again later.",
+      "updateNameFailed": "Error updating household name. Please try again later."
     },
     "success": {
       "memberRemoved": "Member successfully removed."

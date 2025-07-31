@@ -199,7 +199,8 @@
     },
     "errors": {
       "removeMemberFailed": "Fehler beim Entfernen des Mitglieds. Bitte versuche es später erneut.",
-      "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut."
+      "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut.",
+      "updateNameFailed": "Fehler beim Aktualisieren des Haushaltsnamens. Bitte versuche es später erneut."
     },
     "success": {
       "memberRemoved": "Mitglied erfolgreich entfernt."

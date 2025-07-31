@@ -1,5 +1,6 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import supabase from "@/utils/supabase";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
@@ -15,6 +16,8 @@ import {
   House,
   UserRoundPlus,
   LogOut,
+  Check,
+  X,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -28,7 +31,6 @@ import {
 import InviteLink from "@/components/ui/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -39,6 +41,8 @@ export default function HouseholdSettings() {
 
   const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [editedName, setEditedName] = useState("");
 
   async function removeMember(memberId: string) {
     if (!household || !user?.household_id) {
@@ -92,6 +96,37 @@ export default function HouseholdSettings() {
     setShowDeleteConfirmation(false);
   }
 
+  function startEditingName() {
+    setEditedName(household?.name || "");
+    setIsEditingName(true);
+  }
+
+  function cancelEditingName() {
+    setIsEditingName(false);
+    setEditedName("");
+  }
+
+  async function saveHouseholdName() {
+    if (!household || !editedName.trim()) {
+      return;
+    }
+
+    const { error } = await supabase
+      .from("household")
+      .update({ name: editedName.trim() })
+      .eq("id", household.id);
+
+    if (error) {
+      console.error("Error updating household name:", error);
+      alert(t("householdSettings.errors.updateNameFailed"));
+    } else {
+      // Update the household in Redux store
+      dispatch(setHousehold({ ...household, name: editedName.trim() }));
+      setIsEditingName(false);
+      setEditedName("");
+    }
+  }
+
   if (!household) {
     return null;
   }
@@ -99,15 +134,45 @@ export default function HouseholdSettings() {
   return (
     <Layout>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-1 gap-2">
           <House />
 
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
-            {household.name}
-          </h1>
+          {isEditingName ? (
+            <div className="flex items-center flex-1 gap-2">
+              <Input
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                className="px-2 py-1 text-2xl font-bold"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    saveHouseholdName();
+                  } else if (e.key === "Escape") {
+                    cancelEditingName();
+                  }
+                }}
+                autoFocus
+              />
+              <Button
+                size="sm"
+                onClick={saveHouseholdName}
+                disabled={!editedName.trim()}
+              >
+                <Check size={16} />
+              </Button>
+              <Button size="sm" variant="outline" onClick={cancelEditingName}>
+                <X size={16} />
+              </Button>
+            </div>
+          ) : (
+            <h1 className="text-2xl font-bold">{household.name}</h1>
+          )}
         </div>
 
-        <Pencil size={16} />
+        {!isEditingName && (
+          <Button size="sm" variant="ghost" onClick={startEditingName}>
+            <Pencil size={16} />
+          </Button>
+        )}
       </div>
 
       <p>
@@ -165,6 +230,10 @@ export default function HouseholdSettings() {
 
       <Button variant="destructive" onClick={leaveHousehold}>
         <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
+      </Button>
+
+      <Button variant="destructive" onClick={deleteHousehold}>
+        <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
       </Button>
 
       {/* Leave Household Confirmation Dialog */}
