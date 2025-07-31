@@ -106,6 +106,12 @@
     "createError": "Fehler beim Erstellen des Einladungslinks. Bitte versuche es später erneut.",
     "shareNotSupported": "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
   },
+  "invitePage": {
+    "invitedTo": "Du wurdest zu folgendem Haushalt eingeladen:",
+    "joinButton": "Dem Haushalt beitreten",
+    "declineButton": "Nicht beitreten",
+    "invalidLink": "Ungültiger oder abgelaufener Link"
+  },
   "list": {
     "title": "Einkaufsliste"
   },

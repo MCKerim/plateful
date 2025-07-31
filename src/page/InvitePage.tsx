@@ -4,10 +4,12 @@ import supabase from "@/utils/supabase";
 import { Household, Invite } from "@/types/exportedDatabaseTypes.types";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
+import { useTranslation } from "react-i18next";
 
 export default function InvitePage() {
   const { token } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const [invite, setInvite] = useState<Invite | null>();
   const [currentUserId, setCurrentUserId] = useState<string>("");
@@ -34,7 +36,7 @@ export default function InvitePage() {
         .limit(1);
 
       if (error || !invites || invites.length === 0) {
-        alert("Ungültiger oder abgelaufener Link");
+        alert(t("invitePage.invalidLink"));
         return;
       }
 
@@ -67,17 +69,17 @@ export default function InvitePage() {
 
   return (
     <Layout>
-      <p>Du wurdest zu folgendem Haushalt eingeladen:</p>
+      <p>{t("invitePage.invitedTo")}</p>
 
       <p className="w-full text-center">
         <strong>"{household?.name}"</strong>
       </p>
 
-      <Button onClick={updateHousehold}>Dem Haushalt beitreten</Button>
+      <Button onClick={updateHousehold}>{t("invitePage.joinButton")}</Button>
 
       <NavLink to="/">
         <Button variant="destructive" className="w-full">
-          Nicht beitreten
+          {t("invitePage.declineButton")}
         </Button>
       </NavLink>
     </Layout>

@@ -100,6 +100,12 @@
     "createError": "Error creating invitation link. Please try again later.",
     "shareNotSupported": "Sharing is not supported in this browser. The link has been copied to clipboard."
   },
+  "invitePage": {
+    "invitedTo": "You have been invited to the following household:",
+    "joinButton": "Join Household",
+    "declineButton": "Don't Join",
+    "invalidLink": "Invalid or expired link"
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",
