@@ -167,10 +167,6 @@ export default function HouseholdSettings() {
         <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
       </Button>
 
-      <Button variant="destructive" onClick={deleteHousehold}>
-        <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
-      </Button>
-
       {/* Leave Household Confirmation Dialog */}
       <Dialog
         open={showLeaveConfirmation}
