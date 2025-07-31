@@ -118,13 +118,13 @@
   "mealPlanner": {
     "title": "Essens Planer",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus",
-    "alreadyEaten": "Bereits gegessen"
+    "alreadyEaten": "Bereits gegessen",
+    "nothingPlanned": "Keine Rezepte geplant..."
   },
   "cookbook": {
     "title": "Kochbuch",
     "enterRecipeName": "Rezept suchen...",
-    "nothingFound": "Nichts gefunden...",
-    "addNewViaPlus": "...füge über das '+' ein neues Rezept hinzu!"
+    "nothingFound": "Keine Rezepte gefunden..."
   },
   "recipe": {
     "toTheRecipe": "Zum Rezept",

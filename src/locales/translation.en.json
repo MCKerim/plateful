@@ -118,13 +118,13 @@
   "mealPlanner": {
     "title": "Meal planner",
     "selectNumberOfDays": "Select the number of days",
-    "alreadyEaten": "Already eaten"
+    "alreadyEaten": "Already eaten",
+    "nothingPlanned": "No recipes planned..."
   },
   "cookbook": {
     "title": "Cookbook",
     "enterRecipeName": "Search recipe...",
-    "nothingFound": "Nothing found...",
-    "addNewViaPlus": "...add a new recipe via the '+' button!"
+    "nothingFound": "No recipes found..."
   },
   "recipe": {
     "toTheRecipe": "To the recipe",

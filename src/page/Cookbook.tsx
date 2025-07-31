@@ -139,7 +139,7 @@ export default function Cookbook() {
           </div>
 
           <p className="flex justify-center italic font-bold">
-            Keine Rezepte gefunden...
+            {t("cookbook.nothingFound")}
           </p>
         </div>
       )}

@@ -183,10 +183,10 @@ export default function MealPlanner() {
       )}
 
       {loading && (
-        <div className="flex space-x-2 justify-center items-center w-full flex-1">
+        <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high"></div>
+          <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
         </div>
       )}
 
@@ -194,13 +194,13 @@ export default function MealPlanner() {
         plannedItems.filter((item) => {
           return item.days > item.daysEaten;
         }).length === 0 && (
-          <div className="w-full flex flex-col justify-center items-center gap-2 flex-1">
+          <div className="flex flex-col items-center justify-center flex-1 w-full gap-2">
             <div className="w-full h-[80px] mx-auto">
               <Rive src="/plateful-character.riv" artboard="Sad" />
             </div>
 
-            <p className="flex justify-center font-bold italic">
-              Keine Rezepte geplant...
+            <p className="flex justify-center italic font-bold">
+              {t("mealPlanner.nothingPlanned")}
             </p>
           </div>
         )}
