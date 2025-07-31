@@ -86,8 +86,19 @@
   },
   "inviteMembers": {
     "title": "Add Members",
-    "description": "Invite friends or family to your household. Scan the QR code or share the link.",
+    "description": "Invite friends or family to your household.",
+    "description2": "Scan the QR code or share the link.",
     "nextButton": "Done"
+  },
+  "inviteLink": {
+    "shareTitle": "Plateful - Cook Together! 🏡",
+    "shareText": "Hey! Let's plan meals and share recipes together. Join my Plateful household:",
+    "copyButton": "Copy Link",
+    "shareButton": "Share Link",
+    "copySuccess": "Invitation link copied to clipboard!",
+    "copyError": "Error copying link. Please try again later.",
+    "createError": "Error creating invitation link. Please try again later.",
+    "shareNotSupported": "Sharing is not supported in this browser. The link has been copied to clipboard."
   },
   "signup": {
     "title": "Plateful",

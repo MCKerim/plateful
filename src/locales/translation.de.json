@@ -92,8 +92,19 @@
   },
   "inviteMembers": {
     "title": "Füge Mitglieder hinzu",
-    "description": "Lade Freunde oder Familie in deinen Haushalt ein. Scanne dazu den QR-Code oder teile den Link.",
-    "nextButton": "Fertig"
+    "description": "Lade Freunde oder Familie in deinen Haushalt ein.",
+    "description2": "Scanne dazu den QR-Code oder teile den Link.",
+    "nextButton": "Fertig!"
+  },
+  "inviteLink": {
+    "shareTitle": "Plateful - Gemeinsam kochen! 🏡",
+    "shareText": "Hey! Lass uns gemeinsam Mahlzeiten planen und Rezepte teilen. Tritt meinem Plateful-Haushalt bei:",
+    "copyButton": "Link kopieren",
+    "shareButton": "Link teilen",
+    "copySuccess": "Einladungslink wurde in die Zwischenablage kopiert!",
+    "copyError": "Fehler beim Kopieren des Links. Bitte versuche es später erneut.",
+    "createError": "Fehler beim Erstellen des Einladungslinks. Bitte versuche es später erneut.",
+    "shareNotSupported": "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
   },
   "list": {
     "title": "Einkaufsliste"

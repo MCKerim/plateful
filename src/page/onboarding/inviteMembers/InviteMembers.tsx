@@ -23,7 +23,10 @@ export default function InviteMembers() {
       <div>
         <p className="max-w-sm mb-12 font-medium text-center text-primary">
           {t("inviteMembers.description")}
+          <br />
+          {t("inviteMembers.description2")}
         </p>
+
         <InviteLink />
       </div>
     </OnboardingLayout>
