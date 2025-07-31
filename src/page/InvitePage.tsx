@@ -5,6 +5,7 @@ import { Household, Invite } from "@/types/exportedDatabaseTypes.types";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
+import { House } from "lucide-react";
 
 export default function InvitePage() {
   const { token } = useParams();
@@ -14,6 +15,7 @@ export default function InvitePage() {
   const [invite, setInvite] = useState<Invite | null>();
   const [currentUserId, setCurrentUserId] = useState<string>("");
   const [household, setHousehold] = useState<Household | null>();
+  const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     const handleInvite = async () => {
@@ -53,35 +55,59 @@ export default function InvitePage() {
       return;
     }
 
-    await supabase
-      .from("users")
-      .update({ household_id: invite.household_id })
-      .eq("id", currentUserId);
+    setIsJoining(true);
 
-    // Markiere Invite als genutzt
-    await supabase
-      .from("invites")
-      .update({ used: true, used_by: currentUserId })
-      .eq("id", invite.id);
+    try {
+      await supabase
+        .from("users")
+        .update({ household_id: invite.household_id })
+        .eq("id", currentUserId);
 
-    navigate("/householdSettings");
+      // Markiere Invite als genutzt
+      await supabase
+        .from("invites")
+        .update({ used: true, used_by: currentUserId })
+        .eq("id", invite.id);
+
+      navigate("/householdSettings");
+    } catch (error) {
+      console.error("Error joining household:", error);
+      setIsJoining(false);
+    }
   }
 
   return (
     <Layout>
-      <p>{t("invitePage.invitedTo")}</p>
+      <div className="flex flex-col items-center justify-center flex-1 h-full max-w-md mx-auto space-y-6 text-center">
+        <div className="mb-16 space-y-2">
+          <div className="flex items-center justify-center">
+            <House className="w-8 h-8" />
+          </div>
+          <p className="font-medium text-primary">
+            {t("invitePage.invitedTo")}
+          </p>
 
-      <p className="w-full text-center">
-        <strong>"{household?.name}"</strong>
-      </p>
+          <h1 className="text-2xl font-bold text-primary">
+            "{household?.name}"
+          </h1>
+        </div>
 
-      <Button onClick={updateHousehold}>{t("invitePage.joinButton")}</Button>
+        <div className="flex flex-col w-full gap-3">
+          <Button
+            onClick={updateHousehold}
+            disabled={isJoining}
+            className="w-full"
+          >
+            {isJoining ? "Joining..." : t("invitePage.joinButton")}
+          </Button>
 
-      <NavLink to="/">
-        <Button variant="destructive" className="w-full">
-          {t("invitePage.declineButton")}
-        </Button>
-      </NavLink>
+          <NavLink to="/" className="w-full">
+            <Button variant="outline" className="w-full" disabled={isJoining}>
+              {t("invitePage.declineButton")}
+            </Button>
+          </NavLink>
+        </div>
+      </div>
     </Layout>
   );
 }
