@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
-import { UserPlus, Home } from "lucide-react";
 
 export default function JoinHousehold() {
   const { t } = useTranslation();

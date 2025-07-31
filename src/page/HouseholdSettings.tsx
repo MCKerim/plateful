@@ -152,6 +152,7 @@ export default function HouseholdSettings() {
                 }}
                 autoFocus
               />
+
               <Button
                 size="sm"
                 onClick={saveHouseholdName}
@@ -159,6 +160,7 @@ export default function HouseholdSettings() {
               >
                 <Check size={16} />
               </Button>
+
               <Button size="sm" variant="outline" onClick={cancelEditingName}>
                 <X size={16} />
               </Button>
