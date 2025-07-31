@@ -158,10 +158,6 @@ export default function Settings() {
           </div>
 
           <div className="flex py-2 justify-evenly">
-            <NavLink to="https://kblanks.com/" target="_blank">
-              <Globe size={24} />
-            </NavLink>
-
             <NavLink to="https://x.com/MCKerim5" target="_blank">
               <FaXTwitter size={24} />
             </NavLink>
