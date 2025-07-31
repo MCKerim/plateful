@@ -12,13 +12,15 @@ export default function Home() {
 
   return (
     <Layout>
-      <div className="flex items-center gap-2">
-        <House />
+      <NavLink to="/householdSettings">
+        <div className="flex items-center gap-2">
+          <House />
 
-        <h1 className="flex items-center gap-2 text-2xl font-bold">
-          {household?.name}
-        </h1>
-      </div>
+          <h1 className="flex items-center gap-2 text-2xl font-bold">
+            {household?.name}
+          </h1>
+        </div>
+      </NavLink>
 
       <p className="mt-2 italic text-muted-foreground">
         {t("home.enjoyCooking")}
