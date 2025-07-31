@@ -176,6 +176,22 @@
       "system": "System"
     }
   },
+  "householdSettings": {
+    "member": "Member",
+    "members": "Members",
+    "you": "You",
+    "inviteMember": "Invite Member",
+    "scanQrOrShareLink": "Scan the QR code or share the link",
+    "leaveHousehold": "Leave Household",
+    "deleteHousehold": "Delete Household",
+    "errors": {
+      "removeMemberFailed": "Error removing member. Please try again later.",
+      "leaveHouseholdFailed": "Error leaving household. Please try again later."
+    },
+    "success": {
+      "memberRemoved": "Member successfully removed."
+    }
+  },
   "chatbot": {
     "greeting": "How can I help you today?",
     "suggestions": {

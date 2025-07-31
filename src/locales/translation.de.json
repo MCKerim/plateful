@@ -175,6 +175,22 @@
       "system": "System"
     }
   },
+  "householdSettings": {
+    "member": "Mitglied",
+    "members": "Mitglieder",
+    "you": "Du",
+    "inviteMember": "Mitglied einladen",
+    "scanQrOrShareLink": "Scanne den QR-Code oder teile den Link",
+    "leaveHousehold": "Haushalt verlassen",
+    "deleteHousehold": "Haushalt löschen",
+    "errors": {
+      "removeMemberFailed": "Fehler beim Entfernen des Mitglieds. Bitte versuche es später erneut.",
+      "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut."
+    },
+    "success": {
+      "memberRemoved": "Mitglied erfolgreich entfernt."
+    }
+  },
   "bottomNav": {
     "home": "Startseite",
     "chatbot": "KI-Koch",
