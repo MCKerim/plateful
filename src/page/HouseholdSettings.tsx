@@ -24,8 +24,19 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import InviteLink from "@/components/ui/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
+import { useState } from "react";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -33,6 +44,9 @@ export default function HouseholdSettings() {
   const user = useAppSelector(selectUser);
   const household = useAppSelector(selectHousehold);
   const householdMembers = useAppSelector(selectHouseholdMembers);
+
+  const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   async function removeMember(memberId: string) {
     if (!household || !user?.household_id) {
@@ -53,6 +67,10 @@ export default function HouseholdSettings() {
   }
 
   function leaveHousehold() {
+    setShowLeaveConfirmation(true);
+  }
+
+  function confirmLeaveHousehold() {
     if (!household || !user?.household_id) {
       return;
     }
@@ -68,7 +86,18 @@ export default function HouseholdSettings() {
         } else {
           dispatch(setHousehold(null));
         }
+        setShowLeaveConfirmation(false);
       });
+  }
+
+  function deleteHousehold() {
+    setShowDeleteConfirmation(true);
+  }
+
+  function confirmDeleteHousehold() {
+    // TODO: Implement delete household functionality
+    // This would typically delete the household and remove all members
+    setShowDeleteConfirmation(false);
   }
 
   if (!household) {
@@ -146,9 +175,65 @@ export default function HouseholdSettings() {
         {t("householdSettings.leaveHousehold")}
       </Button>
 
-      <Button variant="destructive" onClick={leaveHousehold}>
+      <Button variant="destructive" onClick={deleteHousehold}>
         <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
       </Button>
+
+      {/* Leave Household Confirmation Dialog */}
+      <AlertDialog
+        open={showLeaveConfirmation}
+        onOpenChange={setShowLeaveConfirmation}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("householdSettings.confirmations.leaveHousehold.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("householdSettings.confirmations.leaveHousehold.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("householdSettings.confirmations.leaveHousehold.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmLeaveHousehold}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("householdSettings.confirmations.leaveHousehold.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Household Confirmation Dialog */}
+      <AlertDialog
+        open={showDeleteConfirmation}
+        onOpenChange={setShowDeleteConfirmation}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("householdSettings.confirmations.deleteHousehold.title")}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("householdSettings.confirmations.deleteHousehold.description")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>
+              {t("householdSettings.confirmations.deleteHousehold.cancel")}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDeleteHousehold}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {t("householdSettings.confirmations.deleteHousehold.confirm")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }

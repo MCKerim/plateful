@@ -183,6 +183,20 @@
     "scanQrOrShareLink": "Scanne den QR-Code oder teile den Link",
     "leaveHousehold": "Haushalt verlassen",
     "deleteHousehold": "Haushalt löschen",
+    "confirmations": {
+      "leaveHousehold": {
+        "title": "Haushalt verlassen",
+        "description": "Bist du sicher, dass du diesen Haushalt verlassen möchtest? Du benötigst eine Einladung, um wieder beizutreten.",
+        "confirm": "Verlassen",
+        "cancel": "Abbrechen"
+      },
+      "deleteHousehold": {
+        "title": "Haushalt löschen",
+        "description": "Bist du sicher, dass du diesen Haushalt löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden und alle Mitglieder werden entfernt.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      }
+    },
     "errors": {
       "removeMemberFailed": "Fehler beim Entfernen des Mitglieds. Bitte versuche es später erneut.",
       "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut."
