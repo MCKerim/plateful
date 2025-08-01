@@ -100,7 +100,7 @@ export default function ImportRecipes() {
         <h2 className="text-2xl italic font-semibold">{t("valueScreens.importRecipes.subtitle")}</h2>
       </div>
 
-      <PhoneMockup screenshotUrl="/importRecipesScreenshot.jpg" />
+      <PhoneMockup mediaUrl="/import-recipes-recording.mp4" />
 
       <p className="max-w-sm text-center text-gray-600">
         {t("valueScreens.importRecipes.description")}

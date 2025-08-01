@@ -38,7 +38,7 @@ export default function ChatbotValue() {
         </h2>
       </div>
 
-      <PhoneMockup screenshotUrl="/chatbotScreenshot.jpg" />
+      <PhoneMockup mediaUrl="/chatbot-screen-recording.mp4" />
 
       <p className="max-w-sm mt-2 text-center text-gray-600">
         {t("valueScreens.chatbot.description")}

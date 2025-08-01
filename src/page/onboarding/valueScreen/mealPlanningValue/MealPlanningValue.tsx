@@ -38,7 +38,7 @@ export default function MealPlanningValue() {
         <h2 className="text-2xl italic font-semibold">{t("valueScreens.mealPlanning.subtitle")}</h2>
       </div>
 
-      <PhoneMockup screenshotUrl="/mealplannerScreenshot.jpg" />
+      <PhoneMockup mediaUrl="/meal-planner-screenshot.jpg" />
 
       <p className="max-w-sm mt-2 text-center text-gray-600">
         {t("valueScreens.mealPlanning.description")}
