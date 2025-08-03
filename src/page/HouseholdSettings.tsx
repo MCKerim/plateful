@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import {
@@ -33,6 +33,7 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 
 export default function HouseholdSettings() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);

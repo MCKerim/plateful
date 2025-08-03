@@ -2,11 +2,12 @@ import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLay
 import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 
 export default function MealPlanningValue() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();

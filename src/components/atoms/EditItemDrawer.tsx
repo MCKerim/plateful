@@ -11,7 +11,7 @@ import {
 } from "../ui/drawer";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 
 type Props = {
   currentId: number;
@@ -21,6 +21,7 @@ type Props = {
 };
 
 export default function EditItemDrawer({ currentId, currentName, currentAmount, onItemEdited }: Readonly<Props>) {
+  const { supabase } = useSupabase();
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 

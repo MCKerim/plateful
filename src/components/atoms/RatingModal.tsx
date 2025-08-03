@@ -14,8 +14,8 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
+import { useSupabase } from "@/utils/supabase";
 
 type Props = {
   showTriggerButton?: boolean;
@@ -28,6 +28,7 @@ export type RatingModalRef = {
 
 const RatingModal = forwardRef<RatingModalRef, Props>(
   ({ showTriggerButton = true, recipeId }: Readonly<Props>, ref) => {
+    const { supabase } = useSupabase();
     const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 

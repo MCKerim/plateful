@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { ModeToggle } from "@/components/atoms/mode-toggle";
 import { Button } from "@/components/ui/button";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 import { useEffect } from "react";
@@ -11,6 +11,7 @@ import { Donut, House, Newspaper, Map, LogOut } from "lucide-react";
 import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
 
 export default function Settings() {
+  const { supabase } = useSupabase();
   const { t, i18n } = useTranslation();
   const user = useAppSelector(selectUser);
 

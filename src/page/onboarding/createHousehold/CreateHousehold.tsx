@@ -5,12 +5,13 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 
 export default function CreateHousehold() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);

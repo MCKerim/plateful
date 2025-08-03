@@ -2,12 +2,13 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 import { useTranslation } from "react-i18next";
 
 export default function Survey() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();

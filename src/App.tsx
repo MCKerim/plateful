@@ -6,7 +6,6 @@ import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/signUp/SignUp";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
-import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
@@ -36,8 +35,10 @@ import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValu
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
+import { useSupabase } from "./utils/supabase";
 
 function App() {
+  const { supabase } = useSupabase();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);

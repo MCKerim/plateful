@@ -1,7 +1,7 @@
 import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
@@ -16,6 +16,7 @@ type Recipe = {
 };
 
 export default function Cookbook() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
 

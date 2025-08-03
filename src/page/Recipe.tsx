@@ -2,7 +2,7 @@ import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
@@ -31,6 +31,7 @@ type RecipeItem = {
 };
 
 export default function Recipe() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();

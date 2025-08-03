@@ -1,11 +1,12 @@
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
 import CircleTransition from "@/components/atoms/CircleTransition";
 
 export default function SignUp() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const [showTransition, setShowTransition] = useState(true);
 

@@ -3,8 +3,8 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import supabase from "@/utils/supabase";
 import { useEffect, useState } from "react";
+import { useSupabase } from "@/utils/supabase";
 
 type Props = {
   id: number;
@@ -27,6 +27,7 @@ export default function MealPlannerItem({
   setDaysEaten,
   onRecipeEaten,
 }: Readonly<Props>) {
+  const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   useEffect(() => {

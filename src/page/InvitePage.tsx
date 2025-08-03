@@ -1,6 +1,6 @@
 import { useParams, useNavigate, NavLink } from "react-router";
 import { useEffect, useState } from "react";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { Household, Invite } from "@/types/exportedDatabaseTypes.types";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import { House } from "lucide-react";
 
 export default function InvitePage() {
+  const { supabase } = useSupabase();
   const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();

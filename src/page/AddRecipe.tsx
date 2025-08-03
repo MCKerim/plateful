@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
@@ -21,6 +21,7 @@ import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 };*/
 
 export default function AddRecipe() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
 
   const params = useParams();

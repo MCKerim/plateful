@@ -1,6 +1,6 @@
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { QRCodeSVG } from "qrcode.react";
@@ -10,6 +10,7 @@ import { Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 
 export default function InviteLink() {
+  const { supabase } = useSupabase();
   const user = useAppSelector(selectUser);
   const { t } = useTranslation();
 

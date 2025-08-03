@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from "react";
 import { RotateCcw } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
-import supabase from "../utils/supabase";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
@@ -19,8 +18,10 @@ import {
 import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
+import { useSupabase } from "@/utils/supabase";
 
 export default function Chatbot() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();

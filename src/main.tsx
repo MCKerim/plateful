@@ -7,15 +7,18 @@ import App from "./App.tsx";
 import { ThemeProvider } from "./components/atoms/theme-provider.tsx";
 import "./i18n.ts";
 import { store } from "./redux/store.ts";
+import { SupabaseProvider } from "./utils/supabase.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
-      <BrowserRouter>
-        <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
-          <App />
-        </ThemeProvider>
-      </BrowserRouter>
+      <SupabaseProvider>
+        <BrowserRouter>
+          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <App />
+          </ThemeProvider>
+        </BrowserRouter>
+      </SupabaseProvider>
     </Provider>
   </StrictMode>
 );

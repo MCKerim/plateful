@@ -4,7 +4,7 @@ import StarIcon from "@mui/icons-material/Star";
 import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
 import { useEffect, useState } from "react";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import { useTranslation } from "react-i18next";
@@ -15,6 +15,7 @@ type Props = {
 };
 
 export default function RecipeCard({ id, name }: Readonly<Props>) {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const [averageRating, setAverageRating] = useState<number | null>(null);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
