@@ -14,10 +14,9 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <Provider store={store}>
       <SupabaseProvider>
-        <AppUrlListener />
-
         <BrowserRouter>
           <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+            <AppUrlListener />
             <App />
           </ThemeProvider>
         </BrowserRouter>
