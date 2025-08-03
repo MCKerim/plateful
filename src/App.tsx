@@ -36,6 +36,7 @@ import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import { useSupabase } from "./utils/supabase";
+import { closeBrowser } from "./utils/nativeBrowser";
 
 function App() {
   const { supabase } = useSupabase();
@@ -99,6 +100,7 @@ function App() {
     const { data: { subscription } = { subscription: undefined } } =
       supabase.auth.onAuthStateChange((_event, session) => {
         if (isMounted) updateSession(session);
+        closeBrowser().catch(console.error);
       });
 
     return () => {

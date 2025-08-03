@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
 import CircleTransition from "@/components/atoms/CircleTransition";
+import { openBrowser } from "@/utils/nativeBrowser";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
@@ -41,9 +42,12 @@ export default function SignUp() {
     try {
       const currentUrl = window.location.origin;
       let redirectUri: string;
-      
+
       // Determine the correct redirect URI based on platform
-      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      if (
+        window.location.hostname === "localhost" ||
+        window.location.hostname === "127.0.0.1"
+      ) {
         // Development environment
         redirectUri = currentUrl;
       } else {
@@ -51,10 +55,15 @@ export default function SignUp() {
         redirectUri = "https://app.plateful.cloud/";
       }
 
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { data, error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
           redirectTo: redirectUri,
+          skipBrowserRedirect: true,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
         },
       });
 
@@ -62,6 +71,8 @@ export default function SignUp() {
         console.error("OAuth error:", error);
         alert("Authentication failed. Please try again.");
       }
+
+      await openBrowser(data?.url || "");
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
       alert("An unexpected error occurred. Please try again.");
