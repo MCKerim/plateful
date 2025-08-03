@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.kblanks.plateful",
+      "sha256_cert_fingerprints": [
+        "B3:76:A6:8F:6C:FC:21:55:76:8B:BA:3A:D0:83:14:83:6F:2D:0E:B2:D1:5C:56:9B:7E:BA:46:D6:7B:45:EE:6D"
+      ]
+    }
+  }
+]

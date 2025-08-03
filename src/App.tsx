@@ -36,6 +36,7 @@ import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import { useSupabase } from "./utils/supabase";
+import AppUrlListener from "./components/AppUrlListener";
 
 function App() {
   const { supabase } = useSupabase();
@@ -167,6 +168,8 @@ function App() {
 
   return (
     <Routes>
+      <AppUrlListener />
+
       {/* Privacy Policy */}
       <Route path="/privacy" element={<Privacy />} />
 
