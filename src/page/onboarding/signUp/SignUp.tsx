@@ -38,15 +38,34 @@ export default function SignUp() {
   };
 
   const signUp = async () => {
-    const currentUrl = window.location.origin;
-    let redirectUri = currentUrl ?? "https://app.plateful.cloud/";
+    try {
+      const currentUrl = window.location.origin;
+      let redirectUri: string;
+      
+      // Determine the correct redirect URI based on platform
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Development environment
+        redirectUri = currentUrl;
+      } else {
+        // Production - use your configured domain
+        redirectUri = "https://app.plateful.cloud/";
+      }
 
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: redirectUri,
-      },
-    });
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUri,
+        },
+      });
+
+      if (error) {
+        console.error("OAuth error:", error);
+        alert("Authentication failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Unexpected error during sign up:", error);
+      alert("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
