@@ -40,10 +40,6 @@ export default {
           DEFAULT: "var(--destructive)",
           foreground: "var(--destructive-foreground)",
         },
-				plateful: {
-					DEFAULT: "var(--plateful)",
-					foreground: "var(--plateful-foreground)",
-				},
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
