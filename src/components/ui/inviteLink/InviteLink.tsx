@@ -44,7 +44,7 @@ export default function InviteLink() {
       return;
     }
 
-    setInviteLink(`${window.location.origin}/invite/${token}`);
+    setInviteLink(`https://app.plateful.cloud/invite/${token}`);
   }
 
   async function shareInviteLink() {
