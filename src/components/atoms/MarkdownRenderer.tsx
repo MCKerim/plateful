@@ -1,5 +1,5 @@
-import ReactMarkdown from 'react-markdown';
-import { cn } from '../../lib/utils';
+import ReactMarkdown from "react-markdown";
+import { cn } from "../../lib/utils";
 
 interface MarkdownRendererProps {
   content: string;
@@ -8,7 +8,9 @@ interface MarkdownRendererProps {
 
 // Custom components for markdown rendering with proper types
 const CustomParagraph = (props: any) => (
-  <p className="mb-2 leading-relaxed last:mb-0 text-primary">{props.children}</p>
+  <p className="mb-2 leading-relaxed last:mb-0 text-primary">
+    {props.children}
+  </p>
 );
 
 const CustomH1 = (props: any) => (
@@ -16,7 +18,9 @@ const CustomH1 = (props: any) => (
 );
 
 const CustomH2 = (props: any) => (
-  <h2 className="mb-2 text-base font-semibold text-primary">{props.children}</h2>
+  <h2 className="mb-2 text-base font-semibold text-primary">
+    {props.children}
+  </h2>
 );
 
 const CustomH3 = (props: any) => (
@@ -24,11 +28,15 @@ const CustomH3 = (props: any) => (
 );
 
 const CustomUL = (props: any) => (
-  <ul className="pl-4 mb-2 space-y-1 list-disc text-primary">{props.children}</ul>
+  <ul className="pl-4 mb-2 space-y-1 list-disc text-primary">
+    {props.children}
+  </ul>
 );
 
 const CustomOL = (props: any) => (
-  <ol className="pl-4 mb-2 space-y-1 list-decimal text-primary ">{props.children}</ol>
+  <ol className="pl-4 mb-2 space-y-1 list-decimal text-primary">
+    {props.children}
+  </ol>
 );
 
 const CustomLI = (props: any) => (
@@ -66,8 +74,8 @@ const CustomEm = (props: any) => (
 );
 
 const CustomA = (props: any) => (
-  <a 
-    href={props.href} 
+  <a
+    href={props.href}
     className="underline text-primary hover:no-underline"
     target="_blank"
     rel="noopener noreferrer"
@@ -76,9 +84,12 @@ const CustomA = (props: any) => (
   </a>
 );
 
-export default function MarkdownRenderer({ content, className }: MarkdownRendererProps) {
+export default function MarkdownRenderer({
+  content,
+  className,
+}: Readonly<MarkdownRendererProps>) {
   return (
-    <div className={cn("prose prose-sm max-w-none", className)}>
+    <div className={cn("prose prose-sm max-w-none break-words", className)}>
       <ReactMarkdown
         components={{
           p: CustomParagraph,
