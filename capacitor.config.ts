@@ -1,9 +1,14 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'com.kblanks.plateful',
-  appName: 'Plateful',
-  webDir: 'dist'
+  appId: "com.kblanks.plateful",
+  appName: "Plateful",
+  webDir: "dist",
+  plugins: {
+    EdgeToEdge: {
+      backgroundColor: "#EDECE8",
+    },
+  },
 };
 
 export default config;

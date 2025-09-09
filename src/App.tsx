@@ -37,6 +37,7 @@ import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
+import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
 
 function App() {
   const { supabase } = useSupabase();
@@ -44,6 +45,12 @@ function App() {
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    EdgeToEdge.enable().catch((e) => {
+      console.error("Error enabling edge to edge:", e);
+    });
+  }, []);
 
   async function updateSession(session: Session | null) {
     setLoading(true);
