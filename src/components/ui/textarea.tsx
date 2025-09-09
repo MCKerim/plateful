@@ -21,8 +21,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     const adjustHeight = React.useCallback(() => {
       const textarea = textareaRef.current;
       if (textarea) {
+        // Store current scroll position
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
         textarea.style.height = "auto";
         textarea.style.height = `${textarea.scrollHeight}px`;
+        
+        // Restore scroll position to prevent jumping
+        window.scrollTo(0, scrollTop);
       }
     }, []);
 
