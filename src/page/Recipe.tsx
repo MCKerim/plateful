@@ -23,6 +23,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
+import { formatRating } from "@/lib/formatRatingHelper";
 
 type RecipeItem = {
   id: number;
@@ -60,7 +61,11 @@ export default function Recipe() {
             (acc, rating) => acc + rating.stars,
             0
           );
-          setAverageRating(totalStars / response.data.length);
+
+          const avgStars =
+            response.data.length > 0 ? totalStars / response.data.length : null;
+
+          setAverageRating(avgStars);
         }
       });
   }, [params.recipeId]);
@@ -301,9 +306,7 @@ export default function Recipe() {
       <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
-            imageUrls.length > 0
-              ? imageUrls[currentImageIndex]
-              : "/no-img.jpg"
+            imageUrls.length > 0 ? imageUrls[currentImageIndex] : "/no-img.jpg"
           }
           alt="Recipe"
           className="object-cover w-full h-full rounded-md dark:brightness-75"
@@ -356,7 +359,7 @@ export default function Recipe() {
         </div>
 
         <div className="flex items-center gap-0.5">
-          <p className="text-sm">{averageRating || "-"}</p>
+          <p className="text-sm">{formatRating(averageRating)}</p>
 
           <StarIcon style={{ fontSize: "16px" }} />
         </div>

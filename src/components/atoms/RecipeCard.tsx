@@ -8,6 +8,7 @@ import { useSupabase } from "@/utils/supabase";
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import { useTranslation } from "react-i18next";
+import { formatRating } from "@/lib/formatRatingHelper";
 
 type Props = {
   id: number;
@@ -34,7 +35,11 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
             (acc, rating) => acc + rating.stars,
             0
           );
-          setAverageRating(totalStars / response.data.length);
+
+          const avgStars =
+            response.data.length > 0 ? totalStars / response.data.length : null;
+
+          setAverageRating(avgStars);
         }
       });
   }, [id]);
@@ -110,7 +115,7 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
             </div>
 
             <div className="flex items-center">
-              <p className="text-xs">{averageRating || "-"}</p>
+              <p className="text-xs">{formatRating(averageRating)}</p>
 
               <StarIcon style={{ fontSize: "16px" }} />
             </div>
