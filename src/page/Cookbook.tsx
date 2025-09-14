@@ -8,6 +8,7 @@ import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
+import SortingModal from "@/components/atoms/SortingModal";
 
 type Recipe = {
   id: number;
@@ -24,6 +25,14 @@ export default function Cookbook() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const [sortOption, setSortOption] = useState("neueste");
+
+  const handleSortChange = (newSort: string) => {
+    console.log("Selected sort:", newSort);
+    setSortOption(newSort);
+    // Apply your sorting logic here
+  };
 
   useEffect(() => {
     getRecipes();
@@ -102,13 +111,18 @@ export default function Cookbook() {
     <Layout>
       <div className="sticky z-10 w-full my-1 mb-2 top-14">
         <Input
-          className="w-full rounded-full"
+          className="rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
           showDeleteButton={searchTerm.length > 0}
           onChange={(e) => setSearchTerm(e.target.value)}
           onDelete={() => setSearchTerm("")}
+        />
+
+        <SortingModal
+          onSortChange={handleSortChange}
+          currentSort={sortOption}
         />
       </div>
 
