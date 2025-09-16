@@ -27,11 +27,18 @@ export default function Cookbook() {
   const [loading, setLoading] = useState(true);
 
   const [sortOption, setSortOption] = useState("neueste");
+  const [categoryFilter, setCategoryFilter] = useState("all");
 
   const handleSortChange = (newSort: string) => {
     console.log("Selected sort:", newSort);
     setSortOption(newSort);
     // Apply your sorting logic here
+  };
+
+  const handleCategoryChange = (newCategory: string) => {
+    console.log("Selected category:", newCategory);
+    setCategoryFilter(newCategory);
+    // Apply your category filtering logic here
   };
 
   useEffect(() => {
@@ -123,6 +130,8 @@ export default function Cookbook() {
         <SortingModal
           onSortChange={handleSortChange}
           currentSort={sortOption}
+          onCategoryChange={handleCategoryChange}
+          currentCategory={categoryFilter}
         />
       </div>
 
