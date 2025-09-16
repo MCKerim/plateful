@@ -7,13 +7,45 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.3 (519615d)"
   }
   public: {
     Tables: {
+      cookbooks: {
+        Row: {
+          created_at: string
+          household_id: number
+          id: number
+          name: string
+          owner_id: string
+        }
+        Insert: {
+          created_at?: string
+          household_id: number
+          id?: number
+          name?: string
+          owner_id?: string
+        }
+        Update: {
+          created_at?: string
+          household_id?: number
+          id?: number
+          name?: string
+          owner_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cookbooks_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       household: {
         Row: {
           created_at: string
@@ -242,6 +274,8 @@ export type Database = {
       }
       recipes: {
         Row: {
+          category: number | null
+          cookbook_id: number | null
           created_at: string
           description: string | null
           household_id: number | null
@@ -252,6 +286,8 @@ export type Database = {
           visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
+          category?: number | null
+          cookbook_id?: number | null
           created_at?: string
           description?: string | null
           household_id?: number | null
@@ -262,6 +298,8 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
+          category?: number | null
+          cookbook_id?: number | null
           created_at?: string
           description?: string | null
           household_id?: number | null
@@ -272,6 +310,13 @@ export type Database = {
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Relationships: [
+          {
+            foreignKeyName: "recipes_cookbook_id_fkey"
+            columns: ["cookbook_id"]
+            isOneToOne: false
+            referencedRelation: "cookbooks"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "recipes_houshold_id_fkey"
             columns: ["household_id"]

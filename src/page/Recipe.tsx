@@ -24,6 +24,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
+import { getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 
 type RecipeItem = {
   id: number;
@@ -357,6 +358,12 @@ export default function Recipe() {
 
           <p className="text-sm">{getMealPlanStatus(lastMealPlan, t)}</p>
         </div>
+
+        <p className="text-sm">
+          {recipe?.category
+            ? getTranslatedCategory(recipe.category)
+            : "Unkategorisiert"}
+        </p>
 
         <div className="flex items-center gap-0.5">
           <p className="text-sm">{formatRating(averageRating)}</p>

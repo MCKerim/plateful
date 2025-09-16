@@ -14,6 +14,15 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
 import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { categories } from "@/lib/recipeCategoryHelper";
 
 /*type RecipeItem = {
   itemName: string;
@@ -32,6 +41,8 @@ export default function AddRecipe() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
+  const [category, setCategory] = useState("0");
+
   //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -106,6 +117,7 @@ export default function AddRecipe() {
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
+      setCategory(data[0].category?.toString() ?? "0");
 
       // Fetch image from storage
       const { data: files, error } = await supabase.storage
@@ -209,7 +221,12 @@ export default function AddRecipe() {
       const recipeId = parseInt(params.recipeId);
       const { data, error } = await supabase
         .from("recipes")
-        .update({ name: title, description, link })
+        .update({
+          name: title,
+          description,
+          link,
+          category: category === "0" ? null : parseInt(category),
+        })
         .eq("id", recipeId)
         .select();
       if (!error && data) {
@@ -235,7 +252,15 @@ export default function AddRecipe() {
       // Insert new recipe
       const { data, error } = await supabase
         .from("recipes")
-        .insert([{ name: title, description, link, household_id: householdId }])
+        .insert([
+          {
+            name: title,
+            description,
+            link,
+            household_id: householdId,
+            category: category === "0" ? null : parseInt(category),
+          },
+        ])
         .select();
       if (!error && data) {
         // If an image was uploaded, move it to the correct folder with the new recipe id
@@ -369,6 +394,29 @@ export default function AddRecipe() {
             enterKeyHint="next"
             rows={1}
           />
+        </div>
+
+        <div className="grid items-center w-full gap-2">
+          <Label>Kategorie</Label>
+
+          <Select
+            value={category}
+            onValueChange={(value) => setCategory(value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Wähle eine Kategorie" />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid w-full gap-2">
