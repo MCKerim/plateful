@@ -39,7 +39,7 @@ export default function SortingModal({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="icon" className="size-8">
+        <Button variant="secondary" size="icon" className="size-9">
           <FilterAltIcon />
         </Button>
       </DialogTrigger>

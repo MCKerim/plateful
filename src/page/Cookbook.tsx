@@ -109,7 +109,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="sticky z-10 w-full my-1 mb-2 top-14">
+      <div className="sticky z-10 flex items-center w-full gap-2 my-1 mb-2 top-1">
         <Input
           className="rounded-full"
           type="text"

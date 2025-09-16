@@ -105,7 +105,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     // If there's an action button or character count, wrap in relative container
     if (onSubmit || onDelete || maxLength) {
       return (
-        <div className="relative">
+        <div className="relative w-full">
           {inputElement}
           {renderActionButton()}
           {maxLength && currentLength + 3 > maxLength && (
