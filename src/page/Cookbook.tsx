@@ -134,8 +134,10 @@ export default function Cookbook() {
           onChange={(e) => setSearchTerm(e.target.value)}
           onDelete={() => setSearchTerm("")}
         />
-        <FilterModal />
+
         <SortingModal />
+
+        <FilterModal />        
       </div>
 
       <button

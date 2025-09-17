@@ -57,15 +57,11 @@ export default function FilterModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="rounded-full bg-background size-9"
-        >
-          <FilterAltIcon />
+        <Button variant="outline" size="icon" className="rounded-full w-14 h-9">
+          <FilterAltIcon sx={{ fontSize: 20 }} />
 
           {activeFilterCount > 0 && (
-            <div className="absolute flex items-center justify-center w-4 h-4 text-xs rounded-full text-primary-foreground bg-primary -top-1 -right-1">
+            <div className="absolute flex items-center justify-center w-4 h-4 text-xs rounded-full text-primary-foreground bg-primary -top-0.5 -right-0.5">
               {activeFilterCount}
             </div>
           )}
