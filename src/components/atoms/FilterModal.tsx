@@ -57,7 +57,11 @@ export default function FilterModal() {
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="icon" className="size-9">
+        <Button
+          variant="secondary"
+          size="icon"
+          className="bg-background size-9"
+        >
           <FilterAltIcon />
 
           {activeFilterCount > 0 && (

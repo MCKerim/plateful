@@ -37,7 +37,7 @@ export default function SortingModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="icon" className="size-9">
+        <Button variant="outline" size="icon" className="rounded-full size-9">
           <SwapVertRoundedIcon />
         </Button>
       </DialogTrigger>
