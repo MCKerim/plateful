@@ -10,14 +10,6 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
 import { categories } from "@/lib/recipeCategoryHelper";
 
 type Props = {
@@ -38,14 +30,30 @@ export default function FilterModal({
     setOpen(false);
   };
 
+  const toggleCategory = (categoryId: number) => {
+    if (selectedCategory === categoryId.toString()) {
+      setSelectedCategory("all");
+    } else {
+      setSelectedCategory(categoryId.toString());
+    }
+  };
+
   const handleReset = () => {
     setSelectedCategory("all");
     onCategoryChange("all");
     setOpen(false);
   };
 
+  const handleOpenChange = (isOpen: boolean) => {
+    if (isOpen) {
+      setSelectedCategory(currentCategory);
+    }
+
+    setOpen(isOpen);
+  };
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant="secondary" size="icon" className="size-9">
           <FilterAltIcon />
@@ -57,44 +65,46 @@ export default function FilterModal({
           <DialogTitle>Rezepte filtern nach</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 py-4">
-          <div className="px-6 space-y-6">
-            <div>
-              <Label className="block mb-2">Kategorie</Label>
-              <Select
-                value={selectedCategory}
-                onValueChange={setSelectedCategory}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Alle Kategorien" />
-                </SelectTrigger>
+        <div className="flex flex-col py-4">
+          <div>
+            <Label className="block mb-2">Kategorie</Label>
 
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="all">Alle Kategorien</SelectItem>
-                    {categories.map((category) => (
-                      <SelectItem
-                        key={category.id}
-                        value={category.id.toString()}
-                      >
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-wrap gap-2 pl-2">
+              {categories.map((category) => (
+                <Button
+                  variant="secondary"
+                  key={category.id}
+                  className={`${
+                    selectedCategory === category.id.toString()
+                      ? "bg-accent text-accent-foreground"
+                      : ""
+                  }`}
+                  onClick={() => toggleCategory(category.id)}
+                  size="sm"
+                >
+                  {category.name}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button onClick={handleReset} className="w-full" variant="secondary">
-            Zurücksetzen
-          </Button>
+          <div className="flex w-full gap-2">
+            {selectedCategory !== "all" && (
+              <Button
+                onClick={handleReset}
+                className="w-full"
+                variant="secondary"
+              >
+                Zurücksetzen
+              </Button>
+            )}
 
-          <Button onClick={handleApply} className="w-full">
-            Anwenden
-          </Button>
+            <Button onClick={handleApply} className="w-full">
+              Anwenden
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

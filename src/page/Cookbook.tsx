@@ -123,6 +123,11 @@ export default function Cookbook() {
   return (
     <Layout>
       <div className="sticky z-10 flex items-center w-full gap-2 my-1 top-14">
+        <SortingModal
+          onSortChange={handleSortChange}
+          currentSort={sortOption}
+        />
+
         <Input
           className="rounded-full"
           type="text"
@@ -131,11 +136,6 @@ export default function Cookbook() {
           showDeleteButton={searchTerm.length > 0}
           onChange={(e) => setSearchTerm(e.target.value)}
           onDelete={() => setSearchTerm("")}
-        />
-
-        <SortingModal
-          onSortChange={handleSortChange}
-          currentSort={sortOption}
         />
 
         <FilterModal
