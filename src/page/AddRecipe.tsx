@@ -41,7 +41,7 @@ export default function AddRecipe() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [category, setCategory] = useState("0");
+  const [category, setCategory] = useState("");
 
   //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -409,6 +409,10 @@ export default function AddRecipe() {
 
             <SelectContent>
               <SelectGroup>
+                <SelectItem key={0} value={"0"}>
+                  Keine Kategorie
+                </SelectItem>
+
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id.toString()}>
                     {category.name}

@@ -10,11 +10,13 @@ import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 import FilterModal from "@/components/atoms/FilterModal";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectCategoryId,
   selectSorting,
+  setCategoryId,
 } from "@/redux/slices/filterAndSortingSlice";
+import { categories } from "@/lib/recipeCategoryHelper";
 
 export type Recipe = {
   id: number;
@@ -25,6 +27,7 @@ export type Recipe = {
 };
 
 export default function Cookbook() {
+  const dispatch = useAppDispatch();
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -137,8 +140,35 @@ export default function Cookbook() {
 
         <SortingModal />
 
-        <FilterModal />        
+        <FilterModal />
       </div>
+
+      {categoryId === 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          {categories.map((cat) => {
+            return (
+              <button
+                key={cat.id}
+                className="h-40 text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground"
+                onClick={() => {
+                  dispatch(setCategoryId(cat.id));
+                }}
+              >
+                {cat.name}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {categoryId !== 0 && (
+        <button
+          onClick={() => dispatch(setCategoryId(0))}
+          className="mb-2 text-sm underline"
+        >
+          Zurück
+        </button>
+      )}
 
       <button
         className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
