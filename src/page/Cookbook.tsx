@@ -9,6 +9,16 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { categories } from "@/lib/recipeCategoryHelper";
 
 export type Recipe = {
   id: number;
@@ -121,7 +131,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="sticky z-10 flex items-center w-full gap-2 my-1 mb-2 top-1">
+      <div className="sticky z-10 flex items-center w-full gap-2 my-1 top-14">
         <Input
           className="rounded-full"
           type="text"
@@ -138,6 +148,43 @@ export default function Cookbook() {
           onCategoryChange={handleCategoryChange}
           currentCategory={categoryFilter}
         />
+      </div>
+
+      <div className="flex items-center w-full gap-2 mt-1 mb-2 z-9">
+        <Select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Sortierung" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Sortierung</SelectLabel>
+
+              <SelectItem value="newest">Neueste</SelectItem>
+              <SelectItem value="oldest">Älteste</SelectItem>
+              <SelectItem value="rating">Bewertung</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Select>
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Kategorie" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Kategorie</SelectLabel>
+
+              <SelectItem value="all">Alle Kategorien</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectGroup>
+          </SelectContent>
+        </Select>
       </div>
 
       <button

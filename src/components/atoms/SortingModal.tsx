@@ -39,12 +39,9 @@ export default function SortingModal({
   const [open, setOpen] = useState(false);
 
   const handleApply = () => {
-    if (onSortChange) {
-      onSortChange(selectedSort);
-    }
-    if (onCategoryChange) {
-      onCategoryChange(selectedCategory);
-    }
+    onSortChange(selectedSort);
+    onCategoryChange(selectedCategory);
+
     setOpen(false);
   };
 
@@ -75,11 +72,6 @@ export default function SortingModal({
                 onValueChange={handleValueChange}
                 className="space-y-2"
               >
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="az" id="r1" />
-                  <Label htmlFor="r1">A-Z</Label>
-                </div>
-
                 <div className="flex items-center gap-3">
                   <RadioGroupItem value="newest" id="r2" />
                   <Label htmlFor="r2">Neueste</Label>
