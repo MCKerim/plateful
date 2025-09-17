@@ -11,7 +11,10 @@ import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 import FilterModal from "@/components/atoms/FilterModal";
 import { useAppSelector } from "@/redux/hooks";
-import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
+import {
+  selectCategoryId,
+  selectSorting,
+} from "@/redux/slices/filterAndSortingSlice";
 
 export type Recipe = {
   id: number;
@@ -30,12 +33,8 @@ export default function Cookbook() {
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const [sortOption, setSortOption] = useState("neueste");
   const categoryId = useAppSelector(selectCategoryId);
-
-  const handleSortChange = (newSort: string) => {
-    setSortOption(newSort);
-  };
+  const sorting = useAppSelector(selectSorting);
 
   useEffect(() => {
     getRecipes();
@@ -43,7 +42,7 @@ export default function Cookbook() {
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm, sortOption, categoryId, recipes]);
+  }, [searchTerm, sorting, categoryId, recipes]);
 
   async function getRecipes() {
     const { data } = await supabase
@@ -118,10 +117,7 @@ export default function Cookbook() {
   return (
     <Layout>
       <div className="sticky z-10 flex items-center w-full gap-2 my-1 top-14">
-        <SortingModal
-          onSortChange={handleSortChange}
-          currentSort={sortOption}
-        />
+        <SortingModal />
 
         <Input
           className="rounded-full"

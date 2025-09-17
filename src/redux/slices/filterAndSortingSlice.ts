@@ -4,10 +4,12 @@ import { RootState } from "../store";
 
 interface FilterAndSortingState {
   categoryId: number;
+  sorting: string;
 }
 
 const initialState: FilterAndSortingState = {
   categoryId: 0,
+  sorting: "newest",
 };
 
 export const filterAndSortingSlice = createSlice({
@@ -21,12 +23,19 @@ export const filterAndSortingSlice = createSlice({
     setCategoryId: (state, action: PayloadAction<number>) => {
       state.categoryId = action.payload;
     },
+    setSorting: (state, action: PayloadAction<string>) => {
+      state.sorting = action.payload;
+    },
   },
 });
 
-export const { resetFilter, setCategoryId } = filterAndSortingSlice.actions;
+export const { resetFilter, setCategoryId, setSorting } =
+  filterAndSortingSlice.actions;
 
 export default filterAndSortingSlice.reducer;
 
 export const selectCategoryId = (state: RootState) =>
   state.filterAndSorting.categoryId;
+
+export const selectSorting = (state: RootState) =>
+  state.filterAndSorting.sorting;

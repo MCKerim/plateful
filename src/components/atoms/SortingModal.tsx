@@ -10,29 +10,27 @@ import {
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import SwapVertRoundedIcon from "@mui/icons-material/SwapVertRounded";
-
-type Props = {
-  onSortChange: (newSort: string) => void;
-  currentSort: string;
-};
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  selectSorting,
+  setSorting,
+} from "@/redux/slices/filterAndSortingSlice";
 
 const sortOptions = [
-  { label: "Bewertung", value: "rating" },
   { label: "Neueste", value: "newest" },
   { label: "Älteste", value: "oldest" },
+  { label: "Bewertung", value: "rating" },
   { label: "A bis Z", value: "a-z" },
 ];
 
-export default function SortingModal({
-  onSortChange,
-  currentSort,
-}: Readonly<Props>) {
-  const [selectedSort, setSelectedSort] = useState(currentSort);
+export default function SortingModal() {
+  const dispatch = useAppDispatch();
+  const sorting = useAppSelector(selectSorting);
+
   const [open, setOpen] = useState(false);
 
   const handleValueChange = (value: string) => {
-    setSelectedSort(value);
-    onSortChange(value);
+    dispatch(setSorting(value));
     setOpen(false);
   };
 
@@ -53,7 +51,7 @@ export default function SortingModal({
           <div>
             <RadioGroup
               defaultValue="comfortable"
-              value={selectedSort}
+              value={sorting}
               onValueChange={handleValueChange}
               className="space-y-2"
             >
@@ -63,9 +61,7 @@ export default function SortingModal({
                     htmlFor={`r-${option.value}`}
                     className={
                       "w-full" +
-                      (selectedSort === option.value
-                        ? " font-bold text-accent"
-                        : "")
+                      (sorting === option.value ? " font-bold text-accent" : "")
                     }
                   >
                     {option.label}
