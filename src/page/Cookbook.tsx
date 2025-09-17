@@ -10,10 +10,11 @@ import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 
-type Recipe = {
+export type Recipe = {
   id: number;
   recipeName: string;
   description: string;
+  category?: number | null;
 };
 
 export default function Cookbook() {
@@ -30,15 +31,11 @@ export default function Cookbook() {
   const [categoryFilter, setCategoryFilter] = useState("all");
 
   const handleSortChange = (newSort: string) => {
-    console.log("Selected sort:", newSort);
     setSortOption(newSort);
-    // Apply your sorting logic here
   };
 
   const handleCategoryChange = (newCategory: string) => {
-    console.log("Selected category:", newCategory);
     setCategoryFilter(newCategory);
-    // Apply your category filtering logic here
   };
 
   useEffect(() => {
@@ -47,7 +44,7 @@ export default function Cookbook() {
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm]);
+  }, [searchTerm, sortOption, categoryFilter]);
 
   async function getRecipes() {
     const { data } = await supabase
@@ -56,7 +53,8 @@ export default function Cookbook() {
         `
       id,
       name,
-      description
+      description,
+      category
     `
       )
       .order("created_at", { ascending: true });
@@ -75,6 +73,7 @@ export default function Cookbook() {
         id: recipe.id,
         recipeName: recipe.name,
         description: recipe.description ?? "",
+        category: recipe.category,
       };
       newRecipes.push(newRecipe);
     });
@@ -92,15 +91,21 @@ export default function Cookbook() {
   });
 
   const handleSearch = async () => {
-    if (searchTerm.trim() === "") {
-      setSearchResults(recipes);
-      return;
+    let searchedRecipes = [...recipes];
+
+    if (searchTerm.trim() !== "") {
+      const results = fuse.search(searchTerm);
+      searchedRecipes = results.map((result) => result.item);
     }
 
-    const results = fuse.search(searchTerm);
-    const matchedRecipes = results.map((result) => result.item);
+    if (categoryFilter !== "all") {
+      const categoryId = parseInt(categoryFilter, 10);
+      searchedRecipes = searchedRecipes.filter(
+        (recipe) => recipe.category === categoryId
+      );
+    }
 
-    setSearchResults(matchedRecipes);
+    setSearchResults(searchedRecipes);
   };
 
   function handleAddRecipe() {
