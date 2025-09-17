@@ -60,7 +60,7 @@ export default function FilterModal() {
         <Button
           variant="secondary"
           size="icon"
-          className="bg-background size-9"
+          className="rounded-full bg-background size-9"
         >
           <FilterAltIcon />
 

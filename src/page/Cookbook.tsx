@@ -124,9 +124,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="sticky z-10 flex items-center w-full gap-2 my-1 top-14">
-        <SortingModal />
-
+      <div className="sticky z-10 flex items-center w-full gap-1 my-1 top-14">
         <Input
           className="rounded-full"
           type="text"
@@ -136,8 +134,8 @@ export default function Cookbook() {
           onChange={(e) => setSearchTerm(e.target.value)}
           onDelete={() => setSearchTerm("")}
         />
-
         <FilterModal />
+        <SortingModal />
       </div>
 
       <button
