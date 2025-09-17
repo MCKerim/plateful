@@ -16,6 +16,13 @@ type Props = {
   currentSort: string;
 };
 
+const sortOptions = [
+  { label: "Bewertung", value: "rating" },
+  { label: "Neueste", value: "newest" },
+  { label: "Älteste", value: "oldest" },
+  { label: "A bis Z", value: "a-z" },
+];
+
 export default function SortingModal({
   onSortChange,
   currentSort,
@@ -42,36 +49,35 @@ export default function SortingModal({
           <DialogTitle>Rezepte sortieren nach</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4 py-4">
-          <div className="px-6 space-y-6">
-            <div>
-              <RadioGroup
-                defaultValue="comfortable"
-                value={selectedSort}
-                onValueChange={handleValueChange}
-                className="space-y-2"
-              >
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="rating" id="r1" />
-                  <Label htmlFor="r1">Bewertung</Label>
-                </div>
+        <div className="flex flex-col py-4">
+          <div>
+            <RadioGroup
+              defaultValue="comfortable"
+              value={selectedSort}
+              onValueChange={handleValueChange}
+              className="space-y-2"
+            >
+              {sortOptions.map((option) => (
+                <div className="flex" key={option.value}>
+                  <Label
+                    htmlFor={`r-${option.value}`}
+                    className={
+                      "w-full" +
+                      (selectedSort === option.value
+                        ? " font-bold text-accent"
+                        : "")
+                    }
+                  >
+                    {option.label}
+                  </Label>
 
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="newest" id="r2" />
-                  <Label htmlFor="r2">Neueste</Label>
+                  <RadioGroupItem
+                    value={option.value}
+                    id={`r-${option.value}`}
+                  />
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="oldest" id="r3" />
-                  <Label htmlFor="r3">Älteste</Label>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <RadioGroupItem value="a-z" id="r4" />
-                  <Label htmlFor="r4">A - Z</Label>
-                </div>
-              </RadioGroup>
-            </div>
+              ))}
+            </RadioGroup>
           </div>
         </div>
       </DialogContent>
