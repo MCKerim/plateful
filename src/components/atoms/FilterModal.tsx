@@ -70,7 +70,7 @@ export default function FilterModal() {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Rezepte filtern nach</DialogTitle>
+          <DialogTitle>Filtern nach</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col py-4">
