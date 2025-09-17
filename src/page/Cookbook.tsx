@@ -10,6 +10,8 @@ import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 import FilterModal from "@/components/atoms/FilterModal";
+import { useAppSelector } from "@/redux/hooks";
+import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 
 export type Recipe = {
   id: number;
@@ -29,14 +31,10 @@ export default function Cookbook() {
   const [loading, setLoading] = useState(true);
 
   const [sortOption, setSortOption] = useState("neueste");
-  const [categoryFilter, setCategoryFilter] = useState("all");
+  const categoryId = useAppSelector(selectCategoryId);
 
   const handleSortChange = (newSort: string) => {
     setSortOption(newSort);
-  };
-
-  const handleCategoryChange = (newCategory: string) => {
-    setCategoryFilter(newCategory);
   };
 
   useEffect(() => {
@@ -45,7 +43,7 @@ export default function Cookbook() {
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm, sortOption, categoryFilter]);
+  }, [searchTerm, sortOption, categoryId, recipes]);
 
   async function getRecipes() {
     const { data } = await supabase
@@ -63,8 +61,7 @@ export default function Cookbook() {
     const newRecipes: Recipe[] = [];
 
     if (!data) {
-      setRecipes(newRecipes);
-      setSearchResults(newRecipes);
+      setRecipes([]);
       setLoading(false);
       return;
     }
@@ -80,7 +77,6 @@ export default function Cookbook() {
     });
 
     setRecipes(newRecipes);
-    setSearchResults(newRecipes);
     setLoading(false);
   }
 
@@ -99,8 +95,7 @@ export default function Cookbook() {
       searchedRecipes = results.map((result) => result.item);
     }
 
-    if (categoryFilter !== "all" && categoryFilter !== "") {
-      const categoryId = parseInt(categoryFilter, 10);
+    if (categoryId !== 0) {
       searchedRecipes = searchedRecipes.filter(
         (recipe) => recipe.category === categoryId
       );
@@ -138,10 +133,7 @@ export default function Cookbook() {
           onDelete={() => setSearchTerm("")}
         />
 
-        <FilterModal
-          onCategoryChange={handleCategoryChange}
-          currentCategory={categoryFilter}
-        />
+        <FilterModal />
       </div>
 
       <button

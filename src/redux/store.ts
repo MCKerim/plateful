@@ -3,12 +3,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import userReducer from "./slices/userSlice";
 import householdReducer from "./slices/householdSlice";
 import chatbotReducer from "./slices/chatbotSlice";
+import filterAndSortingReducer from "./slices/filterAndSortingSlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     household: householdReducer,
     chatbot: chatbotReducer,
+    filterAndSorting: filterAndSortingReducer,
   },
 });
 

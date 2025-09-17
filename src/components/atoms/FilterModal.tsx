@@ -11,42 +11,42 @@ import {
 import { Label } from "../ui/label";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { categories } from "@/lib/recipeCategoryHelper";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  resetFilter,
+  selectCategoryId,
+  setCategoryId,
+} from "@/redux/slices/filterAndSortingSlice";
 
-type Props = {
-  onCategoryChange: (newCategory: string) => void;
-  currentCategory: string;
-};
+export default function FilterModal() {
+  const dispatch = useAppDispatch();
+  const categoryId = useAppSelector(selectCategoryId);
 
-export default function FilterModal({
-  onCategoryChange,
-  currentCategory,
-}: Readonly<Props>) {
-  const [selectedCategory, setSelectedCategory] = useState(currentCategory);
+  const [selectedCategory, setSelectedCategory] = useState(categoryId);
   const [open, setOpen] = useState(false);
 
   const handleApply = () => {
-    onCategoryChange(selectedCategory);
-
+    dispatch(setCategoryId(selectedCategory));
     setOpen(false);
   };
 
   const toggleCategory = (categoryId: number) => {
-    if (selectedCategory === categoryId.toString()) {
-      setSelectedCategory("all");
+    if (selectedCategory === categoryId) {
+      setSelectedCategory(0);
     } else {
-      setSelectedCategory(categoryId.toString());
+      setSelectedCategory(categoryId);
     }
   };
 
   const handleReset = () => {
-    setSelectedCategory("all");
-    onCategoryChange("all");
+    setSelectedCategory(0);
+    dispatch(resetFilter());
     setOpen(false);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setSelectedCategory(currentCategory);
+      setSelectedCategory(categoryId);
     }
 
     setOpen(isOpen);
@@ -75,7 +75,7 @@ export default function FilterModal({
                   variant="secondary"
                   key={category.id}
                   className={`${
-                    selectedCategory === category.id.toString()
+                    selectedCategory === category.id
                       ? "bg-accent text-accent-foreground"
                       : ""
                   }`}
@@ -91,7 +91,7 @@ export default function FilterModal({
 
         <DialogFooter>
           <div className="flex w-full gap-2">
-            {selectedCategory !== "all" && (
+            {selectedCategory !== 0 && (
               <Button
                 onClick={handleReset}
                 className="w-full"
