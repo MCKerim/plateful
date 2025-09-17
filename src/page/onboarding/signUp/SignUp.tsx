@@ -46,7 +46,8 @@ export default function SignUp() {
       // Determine the correct redirect URI based on platform
       if (
         window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1"
+        window.location.hostname === "127.0.0.1" ||
+        window.location.hostname === "plateful-git-staging-mckerims-projects.vercel.app"
       ) {
         // Development environment
         redirectUri = currentUrl;
