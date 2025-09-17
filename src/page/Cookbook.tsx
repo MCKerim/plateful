@@ -98,7 +98,7 @@ export default function Cookbook() {
       searchedRecipes = results.map((result) => result.item);
     }
 
-    if (categoryFilter !== "all") {
+    if (categoryFilter !== "all" && categoryFilter !== "") {
       const categoryId = parseInt(categoryFilter, 10);
       searchedRecipes = searchedRecipes.filter(
         (recipe) => recipe.category === categoryId
