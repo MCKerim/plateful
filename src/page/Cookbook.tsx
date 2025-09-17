@@ -21,6 +21,7 @@ export type Recipe = {
   recipeName: string;
   description: string;
   category?: number | null;
+  created_at: string;
 };
 
 export default function Cookbook() {
@@ -45,17 +46,15 @@ export default function Cookbook() {
   }, [searchTerm, sorting, categoryId, recipes]);
 
   async function getRecipes() {
-    const { data } = await supabase
-      .from("recipes")
-      .select(
-        `
+    const { data } = await supabase.from("recipes").select(
+      `
       id,
       name,
       description,
-      category
+      category,
+      created_at
     `
-      )
-      .order("created_at", { ascending: true });
+    );
 
     const newRecipes: Recipe[] = [];
 
@@ -71,6 +70,7 @@ export default function Cookbook() {
         recipeName: recipe.name,
         description: recipe.description ?? "",
         category: recipe.category,
+        created_at: recipe.created_at,
       };
       newRecipes.push(newRecipe);
     });
@@ -99,6 +99,14 @@ export default function Cookbook() {
         (recipe) => recipe.category === categoryId
       );
     }
+
+    searchedRecipes.sort((a, b) => {
+      if (sorting === "newest") return b.created_at.localeCompare(a.created_at);
+      if (sorting === "oldest") return a.created_at.localeCompare(b.created_at);
+      if (sorting === "a-z") return a.recipeName.localeCompare(b.recipeName);
+      if (sorting === "rating") return 0; // Placeholder for future rating sorting
+      return 0;
+    });
 
     setSearchResults(searchedRecipes);
   };
