@@ -9,6 +9,11 @@ import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import { useTranslation } from "react-i18next";
 import { formatRating } from "@/lib/formatRatingHelper";
+import {
+  fetchRecipeAvgRating,
+  fetchRecipeImage,
+  fetchRecipeLastPlanned,
+} from "@/lib/data/dataHelper";
 
 type Props = {
   id: number;
@@ -25,60 +30,9 @@ export default function RecipeCard({ id, name }: Readonly<Props>) {
   const TAGS: string[] = [];
 
   useEffect(() => {
-    supabase
-      .from("recipe_ratings")
-      .select("stars")
-      .eq("recipe_id", id)
-      .then((response) => {
-        if (response.data) {
-          const totalStars = response.data.reduce(
-            (acc, rating) => acc + rating.stars,
-            0
-          );
-
-          const avgStars =
-            response.data.length > 0 ? totalStars / response.data.length : null;
-
-          setAverageRating(avgStars);
-        }
-      });
-  }, [id]);
-
-  useEffect(() => {
-    async function getMealPlanningInfo() {
-      const { data } = await supabase
-        .from("meal_planning")
-        .select("*")
-        .eq("recipe_id", id)
-        .order("created_at", { ascending: false })
-        .limit(1);
-
-      if (data && data.length > 0) {
-        const latestPlan = data[0];
-        setLastMealPlan(latestPlan);
-      } else {
-        setLastMealPlan(null);
-      }
-    }
-
-    getMealPlanningInfo();
-  }, [id]);
-
-  useEffect(() => {
-    async function fetchImage() {
-      const { data, error } = await supabase.storage
-        .from("recipeimages")
-        .list(`recipe_${id}/`);
-      if (!error && data && data.length > 0) {
-        const { data: signedUrlData } = await supabase.storage
-          .from("recipeimages")
-          .createSignedUrl(`recipe_${id}/${data[0].name}`, 3600);
-        setImageUrl(signedUrlData?.signedUrl || null);
-      } else {
-        setImageUrl(null);
-      }
-    }
-    fetchImage();
+    fetchRecipeAvgRating(supabase, id).then((avg) => setAverageRating(avg));
+    fetchRecipeImage(supabase, id).then((url) => setImageUrl(url));
+    fetchRecipeLastPlanned(supabase, id).then((plan) => setLastMealPlan(plan));
   }, [id]);
 
   function renderTagPills() {
