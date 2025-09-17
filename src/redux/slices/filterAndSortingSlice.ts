@@ -37,5 +37,8 @@ export default filterAndSortingSlice.reducer;
 export const selectCategoryId = (state: RootState) =>
   state.filterAndSorting.categoryId;
 
+export const selectActiveFilterCount = (state: RootState) =>
+  state.filterAndSorting.categoryId === 0 ? 0 : 1;
+
 export const selectSorting = (state: RootState) =>
   state.filterAndSorting.sorting;

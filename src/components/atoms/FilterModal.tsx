@@ -14,12 +14,14 @@ import { categories } from "@/lib/recipeCategoryHelper";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   resetFilter,
+  selectActiveFilterCount,
   selectCategoryId,
   setCategoryId,
 } from "@/redux/slices/filterAndSortingSlice";
 
 export default function FilterModal() {
   const dispatch = useAppDispatch();
+  const activeFilterCount = useAppSelector(selectActiveFilterCount);
   const categoryId = useAppSelector(selectCategoryId);
 
   const [selectedCategory, setSelectedCategory] = useState(categoryId);
@@ -57,6 +59,12 @@ export default function FilterModal() {
       <DialogTrigger asChild>
         <Button variant="secondary" size="icon" className="size-9">
           <FilterAltIcon />
+
+          {activeFilterCount > 0 && (
+            <div className="absolute flex items-center justify-center w-4 h-4 text-xs rounded-full text-primary-foreground bg-primary -top-1 -right-1">
+              {activeFilterCount}
+            </div>
+          )}
         </Button>
       </DialogTrigger>
 
