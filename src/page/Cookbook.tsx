@@ -50,12 +50,9 @@ export default function Cookbook() {
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      if (categoryId !== null) {
-        event.preventDefault();
-        dispatch(setCategoryId(null));
-        // Push a new state to replace the one we just prevented
-        window.history.pushState(null, "", window.location.pathname);
-      }
+      event.preventDefault();
+      dispatch(setCategoryId(null));
+      navigate("/cookbook");
     };
 
     window.addEventListener("popstate", handlePopState);
@@ -63,7 +60,7 @@ export default function Cookbook() {
     return () => {
       window.removeEventListener("popstate", handlePopState);
     };
-  }, [categoryId]);
+  }, []);
 
   async function getRecipes() {
     const { data } = await supabase.from("recipes").select(
