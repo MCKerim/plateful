@@ -253,7 +253,7 @@ export default function AddRecipe() {
             .from("recipeimages")
             .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${recipeId}`);
+        navigate(`/recipe/${recipeId}`, { replace: true });
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -282,7 +282,7 @@ export default function AddRecipe() {
             .from("recipeimages")
             .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${data[0].id}`);
+        navigate(`/recipe/${data[0].id}`, { replace: true });
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");

@@ -286,7 +286,7 @@ export default function Recipe() {
 
           <DropdownMenuContent>
             <DropdownMenuGroup>
-              <NavLink to={`/recipe/edit/${recipe?.id}`}>
+              <NavLink to={`/recipe/edit/${recipe?.id}`} replace>
                 <DropdownMenuItem>
                   <Pencil />
 
