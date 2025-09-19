@@ -1,8 +1,11 @@
+import { useAppDispatch } from "@/redux/hooks";
 import BottomNavButton from "./BottomNavButton";
 import { useTranslation } from "react-i18next";
+import { resetFilter } from "@/redux/slices/filterAndSortingSlice";
 
 export default function BottomNav() {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   return (
     <>
@@ -32,6 +35,11 @@ export default function BottomNav() {
               window.location.pathname.startsWith("/cookbook") ||
               window.location.pathname.startsWith("/recipe")
             }
+            onClick={() => {
+              if (window.location.pathname.startsWith("/cookbook")) {
+                dispatch(resetFilter());
+              }
+            }}
           />
 
           <BottomNavButton
