@@ -48,6 +48,26 @@ export default function Cookbook() {
     handleSearch();
   }, [searchTerm, sorting, categoryId, recipes]);
 
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (categoryId !== 0) {
+        event.preventDefault();
+        dispatch(setCategoryId(0));
+        // Push a new state to replace the one we just prevented
+        window.history.pushState(null, "", window.location.pathname);
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    // Push initial state
+    window.history.pushState(null, "", window.location.pathname);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, [categoryId]);
+
   async function getRecipes() {
     const { data } = await supabase.from("recipes").select(
       `
