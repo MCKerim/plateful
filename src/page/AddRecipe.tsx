@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { categories } from "@/lib/recipeCategoryHelper";
+import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 
 /*type RecipeItem = {
   itemName: string;
@@ -41,7 +42,11 @@ export default function AddRecipe() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
-  const [category, setCategory] = useState("");
+
+  const filterCategoryId = useAppSelector(selectCategoryId);
+  const [category, setCategory] = useState(
+    filterCategoryId === 0 ? null : filterCategoryId
+  );
 
   //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -117,7 +122,7 @@ export default function AddRecipe() {
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
-      setCategory(data[0].category?.toString() ?? "0");
+      setCategory(data[0].category);
 
       // Fetch image from storage
       const { data: files, error } = await supabase.storage
@@ -216,7 +221,7 @@ export default function AddRecipe() {
       return;
     }
 
-    if (category === "") {
+    if (category === null) {
       alert("Please select a category.");
       return;
     }
@@ -230,7 +235,7 @@ export default function AddRecipe() {
           name: title,
           description,
           link,
-          category: category === "0" ? null : parseInt(category),
+          category,
         })
         .eq("id", recipeId)
         .select();
@@ -263,7 +268,7 @@ export default function AddRecipe() {
             description,
             link,
             household_id: householdId,
-            category: category === "0" ? null : parseInt(category),
+            category,
           },
         ])
         .select();
@@ -405,8 +410,10 @@ export default function AddRecipe() {
           <Label>Kategorie</Label>
 
           <Select
-            value={category}
-            onValueChange={(value) => setCategory(value)}
+            value={category?.toString() ?? ""}
+            onValueChange={(value) =>
+              setCategory(value ? parseInt(value) : null)
+            }
           >
             <SelectTrigger>
               <SelectValue placeholder="Wähle eine Kategorie" />
