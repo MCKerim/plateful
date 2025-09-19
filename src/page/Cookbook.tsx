@@ -98,9 +98,13 @@ export default function Cookbook() {
     }
 
     if (categoryId !== 0) {
-      searchedRecipes = searchedRecipes.filter(
-        (recipe) => recipe.category === categoryId
-      );
+      if (categoryId === -1) {
+        // -1 means all categories
+      } else {
+        searchedRecipes = searchedRecipes.filter(
+          (recipe) => recipe.category === categoryId
+        );
+      }
     }
 
     searchedRecipes.sort((a, b) => {
@@ -158,16 +162,17 @@ export default function Cookbook() {
               </button>
             );
           })}
-        </div>
-      )}
 
-      {categoryId !== 0 && (
-        <button
-          onClick={() => dispatch(setCategoryId(0))}
-          className="mb-2 text-sm underline"
-        >
-          Zurück
-        </button>
+          <button
+            key={-1}
+            className="h-40 text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground"
+            onClick={() => {
+              dispatch(setCategoryId(-1));
+            }}
+          >
+            Alle Rezepte
+          </button>
+        </div>
       )}
 
       <button
@@ -177,13 +182,19 @@ export default function Cookbook() {
         <Plus size={34} />
       </button>
 
-      <div className="grid grid-cols-2 gap-2">
-        {searchResults.map((recipe) => (
-          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
-        ))}
-      </div>
+      {categoryId !== 0 && (
+        <div className="grid grid-cols-2 gap-2">
+          {searchResults.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              id={recipe.id}
+              name={recipe.recipeName}
+            />
+          ))}
+        </div>
+      )}
 
-      {loading && (
+      {categoryId !== 0 && loading && (
         <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
@@ -191,7 +202,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      {!loading && searchResults.length === 0 && (
+      {categoryId !== 0 && !loading && searchResults.length === 0 && (
         <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
           <div className="w-full h-[80px] mx-auto">
             <Rive src="/plateful-character.riv" artboard="Sad" />
