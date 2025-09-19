@@ -50,18 +50,15 @@ export default function Cookbook() {
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
-      if (categoryId !== 0) {
+      if (categoryId !== null) {
         event.preventDefault();
-        dispatch(setCategoryId(0));
+        dispatch(setCategoryId(null));
         // Push a new state to replace the one we just prevented
         window.history.pushState(null, "", window.location.pathname);
       }
     };
 
     window.addEventListener("popstate", handlePopState);
-
-    // Push initial state
-    window.history.pushState(null, "", window.location.pathname);
 
     return () => {
       window.removeEventListener("popstate", handlePopState);
@@ -117,9 +114,9 @@ export default function Cookbook() {
       searchedRecipes = results.map((result) => result.item);
     }
 
-    if (categoryId !== 0) {
-      if (categoryId === -1) {
-        // -1 means all categories
+    if (categoryId !== null) {
+      if (categoryId === 0) {
+        // 0 means all categories
       } else {
         searchedRecipes = searchedRecipes.filter(
           (recipe) => recipe.category === categoryId
@@ -167,7 +164,7 @@ export default function Cookbook() {
         <FilterModal />
       </div>
 
-      {categoryId === 0 && (
+      {categoryId === null && (
         <div className="grid grid-cols-2 gap-2">
           {categories.map((cat) => {
             return (
@@ -184,10 +181,10 @@ export default function Cookbook() {
           })}
 
           <button
-            key={-1}
+            key={0}
             className="h-40 text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground"
             onClick={() => {
-              dispatch(setCategoryId(-1));
+              dispatch(setCategoryId(0));
             }}
           >
             Alle Rezepte
@@ -202,7 +199,7 @@ export default function Cookbook() {
         <Plus size={34} />
       </button>
 
-      {categoryId !== 0 && (
+      {categoryId !== null && (
         <div className="grid grid-cols-2 gap-2">
           {searchResults.map((recipe) => (
             <RecipeCard
@@ -214,7 +211,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      {categoryId !== 0 && loading && (
+      {categoryId !== null && loading && (
         <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
@@ -222,7 +219,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      {categoryId !== 0 && !loading && searchResults.length === 0 && (
+      {categoryId !== null && !loading && searchResults.length === 0 && (
         <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
           <div className="w-full h-[80px] mx-auto">
             <Rive src="/plateful-character.riv" artboard="Sad" />

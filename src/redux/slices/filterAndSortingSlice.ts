@@ -3,12 +3,12 @@ import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
 interface FilterAndSortingState {
-  categoryId: number;
+  categoryId: number | null;
   sorting: string;
 }
 
 const initialState: FilterAndSortingState = {
-  categoryId: 0,
+  categoryId: null,
   sorting: "newest",
 };
 
@@ -20,7 +20,7 @@ export const filterAndSortingSlice = createSlice({
     resetFilter: (state) => {
       state.categoryId = initialState.categoryId;
     },
-    setCategoryId: (state, action: PayloadAction<number>) => {
+    setCategoryId: (state, action: PayloadAction<number | null>) => {
       state.categoryId = action.payload;
     },
     setSorting: (state, action: PayloadAction<string>) => {
@@ -38,7 +38,7 @@ export const selectCategoryId = (state: RootState) =>
   state.filterAndSorting.categoryId;
 
 export const selectActiveFilterCount = (state: RootState) =>
-  state.filterAndSorting.categoryId === 0 ? 0 : 1;
+  state.filterAndSorting.categoryId === null ? 0 : 1;
 
 export const selectSorting = (state: RootState) =>
   state.filterAndSorting.sorting;
