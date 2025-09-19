@@ -11,7 +11,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
 import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
@@ -481,11 +481,12 @@ export default function AddRecipe() {
 
       <div className="flex w-full gap-2 mt-11">
         <Button asChild className="w-full" variant="secondary">
-          <Link
+          <NavLink
+            replace
             to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}
           >
             {t("common.cancel")}
-          </Link>
+          </NavLink>
         </Button>
 
         <Button className="w-full" onClick={saveRecipe}>
