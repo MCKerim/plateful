@@ -479,16 +479,7 @@ export default function AddRecipe() {
         </div>*/}
       </div>
 
-      <div className="flex w-full gap-2 mt-11">
-        <Button asChild className="w-full" variant="secondary">
-          <NavLink
-            replace
-            to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}
-          >
-            {t("common.cancel")}
-          </NavLink>
-        </Button>
-
+      <div className="mt-11">
         <Button className="w-full" onClick={saveRecipe}>
           {t("common.save")}
         </Button>
