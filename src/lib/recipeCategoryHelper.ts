@@ -3,6 +3,7 @@ export const categories = [
   { id: 2, name: "Hauptspeise" },
   { id: 3, name: "Dessert" },
   { id: 4, name: "Getränke" },
+  { id: 5, name: "Sonstige" },
 ];
 
 export function getTranslatedCategory(id: number): string {

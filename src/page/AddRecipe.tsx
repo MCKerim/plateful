@@ -212,7 +212,12 @@ export default function AddRecipe() {
 
   async function saveRecipe() {
     if (title === "") {
-      alert("Please fill in all fields.");
+      alert("Please enter a name for the recipe.");
+      return;
+    }
+
+    if (category === "") {
+      alert("Please select a category.");
       return;
     }
 
@@ -409,10 +414,6 @@ export default function AddRecipe() {
 
             <SelectContent>
               <SelectGroup>
-                <SelectItem key={0} value={"0"}>
-                  Keine Kategorie
-                </SelectItem>
-
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id.toString()}>
                     {category.name}
