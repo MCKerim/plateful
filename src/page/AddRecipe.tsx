@@ -11,7 +11,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { NavLink, useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
 import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 import { categories } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
-import { Trash2 } from "lucide-react";
 
 /*type RecipeItem = {
   itemName: string;
