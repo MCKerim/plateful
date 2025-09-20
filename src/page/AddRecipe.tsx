@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { categories } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
+import { Trash2 } from "lucide-react";
 
 /*type RecipeItem = {
   itemName: string;
@@ -379,6 +380,33 @@ export default function AddRecipe() {
     }
   }
 
+  async function deleteRecipe() {
+    if (!params.recipeId) return false;
+
+    const recipeId = parseInt(params.recipeId);
+
+    // Delete all images from storage for this recipe
+    const { data: files, error: listError } = await supabase.storage
+      .from("recipeimages")
+      .list(`recipe_${recipeId}/`);
+    if (!listError && files && files.length > 0) {
+      const paths = files.map((file) => `recipe_${recipeId}/${file.name}`);
+      await supabase.storage.from("recipeimages").remove(paths);
+    }
+
+    const { error } = await supabase
+      .from("recipes")
+      .delete()
+      .eq("id", recipeId);
+
+    if (error) {
+      console.error("Error while deleting recipe: ", error);
+      alert("Error while deleting recipe");
+    } else {
+      navigate("/cookbook");
+    }
+  }
+
   return (
     <Layout>
       <h1 className="mb-10 text-2xl font-bold">
@@ -479,10 +507,20 @@ export default function AddRecipe() {
         </div>*/}
       </div>
 
-      <div className="mt-11">
+      <div className="flex flex-col gap-2 mt-11">
         <Button className="w-full" onClick={saveRecipe}>
           {t("common.save")}
         </Button>
+
+        {params.recipeId && (
+          <Button
+            className="w-full"
+            onClick={deleteRecipe}
+            variant="destructive"
+          >
+            {t("common.delete")}
+          </Button>
+        )}
       </div>
     </Layout>
   );

@@ -49,6 +49,21 @@ export default function Recipe() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      if (window.location.pathname.startsWith("/recipe/")) {
+        window.history.back();
+      }
+    };
+
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  useEffect(() => {
     if (!params.recipeId) return;
     const recipeId = parseInt(params.recipeId);
 
@@ -222,33 +237,6 @@ export default function Recipe() {
     }
   }
 
-  async function deleteRecipe() {
-    if (!recipe) {
-      return;
-    }
-
-    // Delete all images from storage for this recipe
-    const { data: files, error: listError } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipe.id}/`);
-    if (!listError && files && files.length > 0) {
-      const paths = files.map((file) => `recipe_${recipe.id}/${file.name}`);
-      await supabase.storage.from("recipeimages").remove(paths);
-    }
-
-    const { error } = await supabase
-      .from("recipes")
-      .delete()
-      .eq("id", recipe.id);
-
-    if (error) {
-      console.error("Error while deleting recipe: ", error);
-      alert("Error while deleting recipe");
-    } else {
-      navigate("/cookbook");
-    }
-  }
-
   useEffect(() => {
     async function getMealPlanningInfo() {
       if (!params.recipeId) return;
@@ -277,31 +265,12 @@ export default function Recipe() {
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold">{recipe?.name}</h1>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="text-[20px] cursor-pointer">
-              <MoreVertIcon fontSize="inherit" />
-            </div>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <NavLink to={`/recipe/edit/${recipe?.id}`} replace>
-                <DropdownMenuItem>
-                  <Pencil />
-
-                  {t("common.edit")}
-                </DropdownMenuItem>
-              </NavLink>
-
-              <DropdownMenuItem onClick={deleteRecipe}>
-                <Trash2 />
-
-                <span>{t("common.delete")}</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <NavLink
+          to={`/recipe/edit/${recipe?.id}`}
+          className="flex items-center pl-6"
+        >
+          <Pencil height={18} width={18} />
+        </NavLink>
       </div>
 
       <AspectRatio ratio={16 / 9} className="-z-10">
