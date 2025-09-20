@@ -10,7 +10,6 @@ import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import { useTranslation } from "react-i18next";
 import { formatRating } from "@/lib/formatRatingHelper";
 import {
-  fetchRecipeAvgRating,
   fetchRecipeImage,
   fetchRecipeLastPlanned,
 } from "@/lib/data/dataHelper";
@@ -18,19 +17,18 @@ import {
 type Props = {
   id: number;
   name: string;
+  averageRating: number | null;
 };
 
-export default function RecipeCard({ id, name }: Readonly<Props>) {
+export default function RecipeCard({ id, name, averageRating }: Readonly<Props>) {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
-  const [averageRating, setAverageRating] = useState<number | null>(null);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
   const TAGS: string[] = [];
 
   useEffect(() => {
-    fetchRecipeAvgRating(supabase, id).then((avg) => setAverageRating(avg));
     fetchRecipeImage(supabase, id).then((url) => setImageUrl(url));
     fetchRecipeLastPlanned(supabase, id).then((plan) => setLastMealPlan(plan));
   }, [id]);

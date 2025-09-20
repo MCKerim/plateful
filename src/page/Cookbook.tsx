@@ -24,6 +24,7 @@ export type Recipe = {
   description: string;
   category?: number | null;
   created_at: string;
+  avg_rating: number | null;
 };
 
 export default function Cookbook() {
@@ -63,15 +64,14 @@ export default function Cookbook() {
   }, []);
 
   async function getRecipes() {
-    const { data } = await supabase.from("recipes").select(
-      `
-      id,
-      name,
-      description,
-      category,
-      created_at
-    `
-    );
+    const { data } = await supabase.from("recipes").select(`
+        id,
+        name,
+        description,
+        category,
+        created_at,
+        recipe_ratings(stars)
+      `);
 
     const newRecipes: Recipe[] = [];
 
@@ -88,6 +88,13 @@ export default function Cookbook() {
         description: recipe.description ?? "",
         category: recipe.category,
         created_at: recipe.created_at,
+        avg_rating:
+          recipe.recipe_ratings.length > 0
+            ? recipe.recipe_ratings.reduce(
+                (sum, rating) => sum + rating.stars,
+                0
+              ) / recipe.recipe_ratings.length
+            : null,
       };
       newRecipes.push(newRecipe);
     });
@@ -125,7 +132,17 @@ export default function Cookbook() {
       if (sorting === "newest") return b.created_at.localeCompare(a.created_at);
       if (sorting === "oldest") return a.created_at.localeCompare(b.created_at);
       if (sorting === "a-z") return a.recipeName.localeCompare(b.recipeName);
-      if (sorting === "rating") return 0; // Placeholder for future rating sorting
+      if (sorting === "rating") {
+        if (a.avg_rating === null && b.avg_rating === null) {
+          return 0;
+        } else if (a.avg_rating === null) {
+          return 1;
+        } else if (b.avg_rating === null) {
+          return -1;
+        } else {
+          return b.avg_rating - a.avg_rating;
+        }
+      }
       return 0;
     });
 
@@ -190,6 +207,7 @@ export default function Cookbook() {
               key={recipe.id}
               id={recipe.id}
               name={recipe.recipeName}
+              averageRating={recipe.avg_rating}
             />
           ))}
         </div>

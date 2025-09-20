@@ -52,7 +52,6 @@ export default function SortingModal() {
                 key={option.value}
                 variant={sorting === option.value ? "accent" : "secondary"}
                 onClick={() => handleValueChange(option.value)}
-                disabled={option.value === "rating"}
                 className="w-full mb-2"
               >
                 {option.label}
