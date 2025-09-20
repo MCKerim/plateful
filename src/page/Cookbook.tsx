@@ -16,6 +16,7 @@ import {
   setCategoryId,
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories } from "@/lib/recipeCategoryHelper";
+import CategoryButton from "@/components/atoms/CategoryButton";
 
 export type Recipe = {
   id: number;
@@ -162,27 +163,11 @@ export default function Cookbook() {
         <div className="grid grid-cols-2 gap-2">
           {categories.map((cat) => {
             return (
-              <button
-                key={cat.id}
-                className="h-40 text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground"
-                onClick={() => {
-                  dispatch(setCategoryId(cat.id));
-                }}
-              >
-                {cat.name}
-              </button>
+              <CategoryButton key={cat.id} id={cat.id} name={t(cat.name)} />
             );
           })}
 
-          <button
-            key={0}
-            className="h-40 text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground"
-            onClick={() => {
-              dispatch(setCategoryId(0));
-            }}
-          >
-            Alle Rezepte
-          </button>
+          <CategoryButton key={0} id={0} name="Alle Rezepte" />
         </div>
       )}
 
