@@ -8,23 +8,14 @@ import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
-import { Pencil, Trash2, Link, CalendarDays } from "lucide-react";
+import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
 import StarIcon from "@mui/icons-material/Star";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
-import { getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 
 type RecipeItem = {
   id: number;
@@ -327,12 +318,6 @@ export default function Recipe() {
 
           <p className="text-sm">{getMealPlanStatus(lastMealPlan, t)}</p>
         </div>
-
-        <p className="text-sm">
-          {recipe?.category
-            ? getTranslatedCategory(recipe.category)
-            : "Unkategorisiert"}
-        </p>
 
         <div className="flex items-center gap-0.5">
           <p className="text-sm">{formatRating(averageRating)}</p>
