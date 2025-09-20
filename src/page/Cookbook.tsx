@@ -9,7 +9,6 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
-import FilterModal from "@/components/atoms/FilterModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectCategoryId,
@@ -157,8 +156,6 @@ export default function Cookbook() {
         />
 
         <SortingModal />
-
-        <FilterModal />
       </div>
 
       {categoryId === null && (
