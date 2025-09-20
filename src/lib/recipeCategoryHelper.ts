@@ -1,9 +1,9 @@
 export const categories = [
-  { id: 1, name: "Frühstück" },
-  { id: 2, name: "Hauptspeise" },
-  { id: 3, name: "Dessert" },
-  { id: 4, name: "Getränke" },
-  { id: 5, name: "Sonstige" },
+  { id: 1, name: "Frühstück", color: "yellow" },
+  { id: 2, name: "Hauptspeise", color: "green" },
+  { id: 3, name: "Dessert", color: "pink" },
+  { id: 4, name: "Getränke", color: "blue" },
+  { id: 5, name: "Sonstige", color: "purple" },
 ];
 
 export function getTranslatedCategory(id: number): string {

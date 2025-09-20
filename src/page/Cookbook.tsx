@@ -163,11 +163,16 @@ export default function Cookbook() {
         <div className="grid items-center justify-center grid-cols-2 gap-y-4">
           {categories.map((cat) => {
             return (
-              <CategoryButton key={cat.id} id={cat.id} name={t(cat.name)} />
+              <CategoryButton
+                key={cat.id}
+                id={cat.id}
+                name={t(cat.name)}
+                color={cat.color}
+              />
             );
           })}
 
-          <CategoryButton key={0} id={0} name="Alle Rezepte" />
+          <CategoryButton key={0} id={0} name="Alle Rezepte" color="" />
         </div>
       )}
 

@@ -4,10 +4,33 @@ import { setCategoryId } from "@/redux/slices/filterAndSortingSlice";
 type Props = {
   id: number;
   name: string;
+  color: string;
 };
 
-export default function CategoryButton({ id, name }: Readonly<Props>) {
+export default function CategoryButton({ id, name, color }: Readonly<Props>) {
   const dispatch = useAppDispatch();
+
+  function getColorClass(color: string): string {
+    switch (color) {
+      case "yellow":
+        return "bg-yellow-200";
+
+      case "green":
+        return "bg-green-200";
+
+      case "pink":
+        return "bg-pink-200";
+
+      case "blue":
+        return "bg-blue-200";
+
+      case "purple":
+        return "bg-purple-200";
+
+      default:
+        return "bg-stone-300";
+    }
+  }
 
   return (
     <button
@@ -21,7 +44,11 @@ export default function CategoryButton({ id, name }: Readonly<Props>) {
 
       <div className="absolute top-0 left-0 w-[94%] h-full bg-secondary rounded-lg z-20"></div>
 
-      <div className="absolute top-0 left-0 z-30 w-4 h-full bg-red-200"></div>
+      <div
+        className={
+          "absolute top-0 left-0 z-30 w-4 h-full " + getColorClass(color)
+        }
+      ></div>
 
       <p className="z-40">{name}</p>
     </button>
