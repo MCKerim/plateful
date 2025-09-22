@@ -364,7 +364,7 @@ export default function Recipe() {
       <div>
         <h2 className="text-xl font-bold border-t-2 mt-4 mb-1">Bewertungen</h2>
 
-        {ratings.length === 0 && <p>Noch keine Bewertungen</p>}
+        {ratings.length === 0 && <p>Keine Bewertungen</p>}
 
         {ratings.map((rating) => {
           return (
