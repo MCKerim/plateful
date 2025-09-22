@@ -5,12 +5,17 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
+import {
+  MealPlanning,
+  RecipeRatings,
+  Recipes,
+} from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal from "@/components/atoms/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
@@ -21,6 +26,12 @@ type RecipeItem = {
   id: number;
   itemName: string;
   amount: string;
+};
+
+type RecipeRatingWithUser = RecipeRatings & {
+  users: {
+    email: string;
+  };
 };
 
 export default function Recipe() {
@@ -35,6 +46,8 @@ export default function Recipe() {
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
+
+  const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -60,10 +73,12 @@ export default function Recipe() {
 
     supabase
       .from("recipe_ratings")
-      .select("stars")
+      .select("*, users(email)")
       .eq("recipe_id", recipeId)
       .then((response) => {
         if (response.data) {
+          setRatings(response.data);
+
           const totalStars = response.data.reduce(
             (acc, rating) => acc + rating.stars,
             0
@@ -345,6 +360,32 @@ export default function Recipe() {
         content={recipe?.description || ""}
         className="font-medium"
       />
+
+      <div>
+        <h2 className="text-xl font-bold border-t-2 mt-4 mb-1">Bewertungen</h2>
+
+        {ratings.length === 0 && <p>Noch keine Bewertungen</p>}
+
+        {ratings.map((rating) => {
+          return (
+            <div className="mb-6" key={rating.id}>
+              <p>{rating.users.email}</p>
+
+              <div>
+                {Array.from({ length: 5 }, (_, index) => {
+                  return index < rating.stars ? (
+                    <StarIcon style={{ fontSize: "16px" }} />
+                  ) : (
+                    <StarBorderIcon style={{ fontSize: "16px" }} />
+                  );
+                })}
+              </div>
+
+              <p className="text-wrap break-words">{rating.note}</p>
+            </div>
+          );
+        })}
+      </div>
     </Layout>
   );
 }
