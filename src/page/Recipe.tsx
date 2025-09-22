@@ -268,6 +268,16 @@ export default function Recipe() {
 
   return (
     <Layout>
+      <AspectRatio ratio={16 / 9} className="-z-10">
+        <img
+          src={
+            imageUrls.length > 0 ? imageUrls[currentImageIndex] : "/no-img.jpg"
+          }
+          alt="Recipe"
+          className="object-cover w-full h-full rounded-md dark:brightness-75"
+        />
+      </AspectRatio>
+
       <div className="flex justify-between">
         <h1 className="first-font text-2xl font-bold">{recipe?.name}</h1>
 
@@ -278,16 +288,6 @@ export default function Recipe() {
           <Pencil height={18} width={18} />
         </NavLink>
       </div>
-
-      <AspectRatio ratio={16 / 9} className="-z-10">
-        <img
-          src={
-            imageUrls.length > 0 ? imageUrls[currentImageIndex] : "/no-img.jpg"
-          }
-          alt="Recipe"
-          className="object-cover w-full h-full rounded-md dark:brightness-75"
-        />
-      </AspectRatio>
 
       {imageUrls.length > 1 && (
         <div className="flex justify-between mt-2">
@@ -362,7 +362,9 @@ export default function Recipe() {
       />
 
       <div>
-        <h2 className="second-font text-xl font-bold border-t-2 mt-4 mb-1">Bewertungen</h2>
+        <h2 className="second-font text-xl font-bold border-t-2 mt-4 mb-1">
+          Bewertungen
+        </h2>
 
         {ratings.length === 0 && <p>Keine Bewertungen</p>}
 

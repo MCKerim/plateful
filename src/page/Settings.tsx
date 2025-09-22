@@ -49,7 +49,7 @@ export default function Settings() {
 
   return (
     <Layout>
-      <h1 className="text-2xl">{t("settings.title")}</h1>
+      <h1 className="second-font text-2xl">{t("settings.title")}</h1>
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
