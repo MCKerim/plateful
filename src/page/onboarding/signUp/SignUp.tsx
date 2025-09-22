@@ -47,7 +47,8 @@ export default function SignUp() {
       if (
         window.location.hostname === "localhost" ||
         window.location.hostname === "127.0.0.1" ||
-        window.location.hostname === "plateful-git-staging-mckerims-projects.vercel.app"
+        window.location.hostname ===
+          "plateful-git-staging-mckerims-projects.vercel.app"
       ) {
         // Development environment
         redirectUri = currentUrl;
@@ -91,15 +92,14 @@ export default function SignUp() {
       <div className="flex flex-col items-center h-screen px-4 py-10">
         <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
           <h1
-            className="font-bold text-7xl"
-            style={{
-              fontFamily: "Modak",
-            }}
+            className="font-bold text-7xl first-font"
           >
             {t("signup.title")}
           </h1>
 
-          <p className="text-sm italic text-muted-foreground">
+          <p
+            className="text-sm text-muted-foreground second-font"
+          >
             {t("signup.subtitle")}
           </p>
         </div>

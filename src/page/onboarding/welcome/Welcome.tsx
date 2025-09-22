@@ -9,15 +9,14 @@ export default function Welcome() {
     <div className="flex flex-col items-center h-screen px-4 py-10 bg-accent">
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-primary-foreground">
         <h1
-          className="text-5xl"
-          style={{
-            fontFamily: "Modak",
-          }}
+          className="text-5xl first-font"
         >
           {t("welcome.title")}
         </h1>
 
-        <h2 className="italic text-xl font-semibold">
+        <h2
+          className="italic text-xl font-semibold second-font"
+        >
           {t("welcome.subtitle")}
         </h2>
       </div>

@@ -7,10 +7,18 @@ type Props = {
   isStart?: boolean;
 };
 
-export default function OnboardingButton({ label, onClick, icon, isStart }: Readonly<Props>) {
+export default function OnboardingButton({
+  label,
+  onClick,
+  icon,
+  isStart,
+}: Readonly<Props>) {
   return (
     <Button
-      className={"w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20" + (isStart && " bg-primary dark:bg-primary-foreground dark:text-primary")}
+      className={
+        "second-font w-full h-12 rounded-full font-semibold text-base shadow-lg shadow-primary/20" +
+        (isStart && " bg-primary dark:bg-primary-foreground dark:text-primary")
+      }
       onClick={onClick}
     >
       {icon}
