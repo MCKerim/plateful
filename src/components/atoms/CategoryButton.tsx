@@ -35,7 +35,7 @@ export default function CategoryButton({ id, name, color }: Readonly<Props>) {
   return (
     <button
       key={id}
-      className="relative z-0 flex flex-col justify-center h-40 px-2 py-4 mx-auto overflow-hidden text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground w-44"
+      className="relative z-0 flex flex-col justify-center h-40 px-2 py-4 mx-auto overflow-hidden text-lg font-semibold rounded-lg bg-secondary text-secondary-foreground max-w-40 w-full"
       onClick={() => {
         dispatch(setCategoryId(id));
       }}

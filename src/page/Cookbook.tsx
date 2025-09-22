@@ -177,7 +177,7 @@ export default function Cookbook() {
       </div>
 
       {categoryId === null && (
-        <div className="grid items-center justify-center grid-cols-2 gap-y-4">
+        <div className="grid items-center justify-center grid-cols-2 gap-y-4 gap-x-4">
           {categories.map((cat) => {
             return (
               <CategoryButton
