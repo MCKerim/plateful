@@ -13,22 +13,22 @@ export default function CategoryButton({ id, name, color }: Readonly<Props>) {
   function getColorClass(color: string): string {
     switch (color) {
       case "yellow":
-        return "bg-yellow-200 dark:bg-yellow-600";
+        return "bg-yellow-300 dark:bg-yellow-600";
 
       case "green":
-        return "bg-green-200 dark:bg-green-800";
+        return "bg-green-300 dark:bg-green-800";
 
       case "pink":
-        return "bg-pink-200 dark:bg-pink-800";
+        return "bg-pink-300 dark:bg-pink-800";
 
       case "blue":
-        return "bg-blue-200 dark:bg-blue-800";
+        return "bg-blue-300 dark:bg-blue-800";
 
       case "purple":
-        return "bg-purple-200 dark:bg-purple-800";
+        return "bg-purple-300 dark:bg-purple-800";
 
       default:
-        return "bg-stone-300 dark:bg-stone-800";
+        return "bg-stone-400 dark:bg-stone-800";
     }
   }
 
