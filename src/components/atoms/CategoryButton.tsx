@@ -40,13 +40,14 @@ export default function CategoryButton({ id, name, color }: Readonly<Props>) {
         dispatch(setCategoryId(id));
       }}
     >
-      <div className="absolute top-0 left-0 w-[97%] h-full bg-background rounded-lg z-10 "></div>
+      <div className="absolute top-0 left-0 w-[97%] h-full bg-background rounded-lg z-10"></div>
 
       <div className="absolute top-0 left-0 w-[94%] h-full bg-secondary rounded-lg z-20"></div>
 
       <div
         className={
-          "absolute top-0 left-0 z-30 w-4 h-full " + getColorClass(color)
+          "border-background border-r-4 absolute top-0 left-0 z-30 w-5 h-full " +
+          getColorClass(color)
         }
       ></div>
 
