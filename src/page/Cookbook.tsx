@@ -176,6 +176,12 @@ export default function Cookbook() {
         <SortingModal />
       </div>
 
+      {categoryId !== null && (
+        <h1 className="text-lg font-bold">
+          {categoryId === 0 ? "Alle Rezepte" : categories[categoryId - 1].name}
+        </h1>
+      )}
+
       {categoryId === null && (
         <div className="grid items-center justify-center grid-cols-2 gap-y-4 gap-x-4">
           {categories.map((cat) => {
@@ -183,7 +189,7 @@ export default function Cookbook() {
               <CategoryButton
                 key={cat.id}
                 id={cat.id}
-                name={t(cat.name)}
+                name={cat.name}
                 color={cat.color}
               />
             );
