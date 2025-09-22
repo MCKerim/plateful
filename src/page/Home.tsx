@@ -16,13 +16,13 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <House />
 
-          <h1 className="flex items-center gap-2 text-2xl font-bold">
+          <h1 className="first-font flex items-center gap-2 text-2xl font-bold">
             {household?.name}
           </h1>
         </div>
       </NavLink>
 
-      <p className="mt-2 italic text-muted-foreground">
+      <p className="second-font mt-2 italic text-muted-foreground">
         {t("home.enjoyCooking")}
       </p>
 

@@ -51,7 +51,9 @@ export default function CategoryButton({ id, name, color }: Readonly<Props>) {
         }
       ></div>
 
-      <p className="z-40 px-3 break-words text-center w-full">{name}</p>
+      <p className="second-font z-40 px-3 break-words text-center w-full">
+        {name}
+      </p>
     </button>
   );
 }

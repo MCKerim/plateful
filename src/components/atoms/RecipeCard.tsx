@@ -50,7 +50,7 @@ export default function RecipeCard({ id, name, averageRating }: Readonly<Props>)
 
         <div className="flex flex-col justify-between gap-2 p-2">
           <div className="flex justify-between">
-            <h1 className="font-bold leading-tight text-md line-clamp-2">
+            <h1 className="second-font font-bold leading-tight text-md line-clamp-2">
               {name}
             </h1>
           </div>

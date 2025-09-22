@@ -81,7 +81,7 @@ export default function MealPlannerItem({
       />
 
       <NavLink
-        className="flex-1 text-lg font-semibold px-2.5"
+        className="second-font flex-1 text-lg font-semibold px-2.5"
         to={`/recipe/${recipeId}`}
       >
         {recipeName}

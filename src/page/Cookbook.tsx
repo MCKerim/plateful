@@ -177,7 +177,7 @@ export default function Cookbook() {
       </div>
 
       {categoryId !== null && (
-        <h1 className="text-lg font-bold">
+        <h1 className="second-font text-lg font-bold">
           {categoryId === 0 ? "Alle Rezepte" : categories[categoryId - 1].name}
         </h1>
       )}

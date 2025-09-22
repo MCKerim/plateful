@@ -137,7 +137,7 @@ export default function Chatbot() {
           </div>
 
           <div className="flex items-center justify-center w-full gap-2 mb-6">
-            <h2 className="text-xl font-bold">{t("chatbot.greeting")}</h2>
+            <h2 className="first-font text-xl font-bold">{t("chatbot.greeting")}</h2>
           </div>
 
           <div className="flex flex-col items-center gap-2">

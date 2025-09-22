@@ -269,7 +269,7 @@ export default function Recipe() {
   return (
     <Layout>
       <div className="flex justify-between">
-        <h1 className="text-2xl font-bold">{recipe?.name}</h1>
+        <h1 className="first-font text-2xl font-bold">{recipe?.name}</h1>
 
         <NavLink
           to={`/recipe/edit/${recipe?.id}`}
@@ -362,7 +362,7 @@ export default function Recipe() {
       />
 
       <div>
-        <h2 className="text-xl font-bold border-t-2 mt-4 mb-1">Bewertungen</h2>
+        <h2 className="second-font text-xl font-bold border-t-2 mt-4 mb-1">Bewertungen</h2>
 
         {ratings.length === 0 && <p>Keine Bewertungen</p>}
 
