@@ -252,6 +252,13 @@
     "category4": "Getränke",
     "category5": "Sonstige"
   },
+  "sortingModal": {
+    "sortBy": "Sortieren nach",
+    "newest": "Neueste",
+    "oldest": "Älteste",
+    "rating": "Am besten bewertet",
+    "aToZ": "A bis Z"
+  },
 
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",

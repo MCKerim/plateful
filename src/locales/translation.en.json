@@ -253,6 +253,13 @@
     "category4": "Drinks",
     "category5": "Other"
   },
+  "sortingModal": {
+    "sortBy": "Sort by",
+    "newest": "Newest",
+    "oldest": "Oldest",
+    "rating": "Top rated",
+    "aToZ": "A to Z"
+  },
 
   "ingredients": "Ingredients",
   "addIngredient": "Add ingredient",

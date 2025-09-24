@@ -131,7 +131,7 @@ export default function Cookbook() {
     searchedRecipes.sort((a, b) => {
       if (sorting === "newest") return b.created_at.localeCompare(a.created_at);
       if (sorting === "oldest") return a.created_at.localeCompare(b.created_at);
-      if (sorting === "a-z") return a.recipeName.localeCompare(b.recipeName);
+      if (sorting === "aToZ") return a.recipeName.localeCompare(b.recipeName);
       if (sorting === "rating") {
         if (a.avg_rating === null && b.avg_rating === null) {
           return 0;
@@ -178,7 +178,9 @@ export default function Cookbook() {
 
       {categoryId !== null && (
         <h1 className="second-font text-lg font-bold">
-          {categoryId === 0 ? "Alle Rezepte" : categories[categoryId - 1].name}
+          {categoryId === 0
+            ? t("categorys.allRecipes")
+            : t(`categorys.${categories[categoryId - 1].name}`)}
         </h1>
       )}
 

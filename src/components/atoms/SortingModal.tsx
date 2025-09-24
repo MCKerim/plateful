@@ -13,16 +13,19 @@ import {
   selectSorting,
   setSorting,
 } from "@/redux/slices/filterAndSortingSlice";
+import { useTranslation } from "react-i18next";
 
 const sortOptions = [
   { label: "Neueste", value: "newest" },
   { label: "Älteste", value: "oldest" },
   { label: "Am besten bewertet", value: "rating" },
-  { label: "A bis Z", value: "a-z" },
+  { label: "A bis Z", value: "aToZ" },
 ];
 
 export default function SortingModal() {
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
+
   const sorting = useAppSelector(selectSorting);
 
   const [open, setOpen] = useState(false);
@@ -42,7 +45,7 @@ export default function SortingModal() {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Sortieren nach</DialogTitle>
+          <DialogTitle>{t("sortingModal.sortBy")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col py-4">
@@ -54,7 +57,7 @@ export default function SortingModal() {
                 onClick={() => handleValueChange(option.value)}
                 className="w-full mb-2"
               >
-                {option.label}
+                {t(`sortingModal.${option.value}`)}
               </Button>
             ))}
           </div>
