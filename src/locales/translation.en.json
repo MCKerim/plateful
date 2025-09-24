@@ -246,6 +246,8 @@
     "submit": "Save"
   },
   "categorys": {
+    "category": "Category",
+    "chooseACategory": "Choose a category",
     "allRecipes": "All Recipes",
     "category1": "Breakfast",
     "category2": "Main Course",

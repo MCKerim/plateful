@@ -245,6 +245,8 @@
     "submit": "Speichern"
   },
   "categorys": {
+    "category": "Kategorie",
+    "chooseACategory": "Wähle eine Kategorie",
     "allRecipes": "Alle Rezepte",
     "category1": "Frühstück",
     "category2": "Hauptspeise",

@@ -22,7 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories } from "@/lib/recipeCategoryHelper";
+import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 
 /*type RecipeItem = {
@@ -434,7 +434,7 @@ export default function AddRecipe() {
         </div>
 
         <div className="grid items-center w-full gap-2">
-          <Label>Kategorie</Label>
+          <Label>{t("categorys.category")}</Label>
 
           <Select
             value={category?.toString() ?? ""}
@@ -443,14 +443,14 @@ export default function AddRecipe() {
             }
           >
             <SelectTrigger>
-              <SelectValue placeholder="Wähle eine Kategorie" />
+              <SelectValue placeholder={t("categorys.chooseACategory")} />
             </SelectTrigger>
 
             <SelectContent>
               <SelectGroup>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id.toString()}>
-                    {category.name}
+                    {getTranslatedCategory(t, category.id)}
                   </SelectItem>
                 ))}
               </SelectGroup>

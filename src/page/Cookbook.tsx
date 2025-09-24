@@ -180,7 +180,7 @@ export default function Cookbook() {
         <h1 className="second-font text-lg font-bold">
           {categoryId === 0
             ? t("categorys.allRecipes")
-            : t(`categorys.${categories[categoryId - 1].name}`)}
+            : getTranslatedCategory(t, categoryId)}
         </h1>
       )}
 
