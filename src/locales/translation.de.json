@@ -69,7 +69,7 @@
     "features": {
       "title": "Was euch erwartet:",
       "sharedRecipes": "Gemeinsame Rezeptsammlung",
-      "sharedLists": "Geteilte Einkaufslisten", 
+      "sharedLists": "Geteilte Einkaufslisten",
       "mealPlanning": "Koordinierte Essensplanung"
     },
     "nameLabel": "Wie soll dein Haushalt heißen?",
@@ -128,7 +128,9 @@
   },
   "recipe": {
     "toTheRecipe": "Zum Rezept",
-    "planRecipe": "Rezept planen"
+    "planRecipe": "Rezept planen",
+    "ratings": "Bewertungen",
+    "noRatings": "Keine Bewertungen"
   },
   "addRecipe": {
     "editRecipe": "Rezept bearbeiten",
@@ -242,6 +244,15 @@
     "commentPlaceholder": "Dein Kommentar (optional)",
     "submit": "Speichern"
   },
+  "categorys": {
+    "allRecipes": "Alle Rezepte",
+    "category1": "Frühstück",
+    "category2": "Hauptspeise",
+    "category3": "Dessert",
+    "category4": "Getränke",
+    "category5": "Sonstige"
+  },
+
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",
 

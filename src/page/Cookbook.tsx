@@ -15,7 +15,7 @@ import {
   selectSorting,
   setCategoryId,
 } from "@/redux/slices/filterAndSortingSlice";
-import { categories } from "@/lib/recipeCategoryHelper";
+import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/atoms/CategoryButton";
 
 export type Recipe = {
@@ -189,13 +189,18 @@ export default function Cookbook() {
               <CategoryButton
                 key={cat.id}
                 id={cat.id}
-                name={cat.name}
+                name={getTranslatedCategory(t, cat.id)}
                 color={cat.color}
               />
             );
           })}
 
-          <CategoryButton key={0} id={0} name="Alle Rezepte" color="" />
+          <CategoryButton
+            key={0}
+            id={0}
+            name={t("categorys.allRecipes")}
+            color=""
+          />
         </div>
       )}
 

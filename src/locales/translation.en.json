@@ -128,7 +128,9 @@
   },
   "recipe": {
     "toTheRecipe": "To the recipe",
-    "planRecipe": "Plan recipe"
+    "planRecipe": "Plan recipe",
+    "ratings": "Ratings",
+    "noRatings": "No Ratings"
   },
   "addRecipe": {
     "editRecipe": "Edit recipe",
@@ -242,6 +244,14 @@
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
     "submit": "Save"
+  },
+  "categorys": {
+    "allRecipes": "All Recipes",
+    "category1": "Breakfast",
+    "category2": "Main Course",
+    "category3": "Dessert",
+    "category4": "Drinks",
+    "category5": "Other"
   },
 
   "ingredients": "Ingredients",
