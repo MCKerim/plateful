@@ -15,6 +15,8 @@ import {
   setIsTyping,
   resetChat,
   ChatMessage,
+  setPreviousResponseId,
+  selectPreviousResponseId,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -27,7 +29,9 @@ export default function Chatbot() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
+
   const messages = useAppSelector(selectMessages);
+  const previousResponseId = useAppSelector(selectPreviousResponseId);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
 
@@ -47,7 +51,7 @@ export default function Chatbot() {
 
     const userMessage: ChatMessage = {
       role: "user",
-      content: inputValue
+      content: inputValue,
     };
 
     dispatch(addMessage(userMessage));
@@ -57,7 +61,7 @@ export default function Chatbot() {
     try {
       // Call the Supabase edge function
       const { data, error } = await supabase.functions.invoke("chatbot", {
-        body: { messages: [userMessage] },
+        body: { previous_response_id: previousResponseId, messages: [userMessage] },
       });
 
       if (error) {
@@ -67,14 +71,13 @@ export default function Chatbot() {
 
       console.log("Chatbot response:", data);
 
-      const newMessages: any[] = [];
-      data.forEach((answear: any) => {
-        if (answear.type === "message") {
-          newMessages.push({role: "assistant", content: answear.content[0].text});
-        }
-      });
+      const newMessage: ChatMessage = {
+        role: "assistant",
+        content: data.output_text,
+      };
 
-      dispatch(addMessages(newMessages));
+      dispatch(setPreviousResponseId(data.id));
+      dispatch(addMessages([newMessage]));
     } catch (error) {
       console.error("Error calling chatbot function:", error);
 
@@ -140,7 +143,9 @@ export default function Chatbot() {
           </div>
 
           <div className="flex items-center justify-center w-full gap-2 mb-6">
-            <h2 className="first-font text-xl font-bold">{t("chatbot.greeting")}</h2>
+            <h2 className="first-font text-xl font-bold">
+              {t("chatbot.greeting")}
+            </h2>
           </div>
 
           <div className="flex flex-col items-center gap-2">
