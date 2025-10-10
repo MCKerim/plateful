@@ -14,6 +14,7 @@ import {
   addMessages,
   setIsTyping,
   resetChat,
+  ChatMessage,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -44,9 +45,9 @@ export default function Chatbot() {
   const handleSendMessage = async () => {
     if (!inputValue.trim()) return;
 
-    const userMessage: any = {
-      content: inputValue,
+    const userMessage: ChatMessage = {
       role: "user",
+      content: inputValue
     };
 
     dispatch(addMessage(userMessage));
@@ -56,7 +57,7 @@ export default function Chatbot() {
     try {
       // Call the Supabase edge function
       const { data, error } = await supabase.functions.invoke("chatbot", {
-        body: { messages: [...messages, userMessage] },
+        body: { messages: [userMessage] },
       });
 
       if (error) {
@@ -67,8 +68,10 @@ export default function Chatbot() {
       console.log("Chatbot response:", data);
 
       const newMessages: any[] = [];
-      data.newMessages.forEach((msg: any) => {
-        newMessages.push(msg);
+      data.forEach((answear: any) => {
+        if (answear.type === "message") {
+          newMessages.push({role: "assistant", content: answear.content[0].text});
+        }
       });
 
       dispatch(addMessages(newMessages));
