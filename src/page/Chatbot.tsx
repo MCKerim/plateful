@@ -25,6 +25,7 @@ import { useSupabase } from "@/utils/supabase";
 import { DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogFooter,
   DialogHeader,
@@ -255,11 +256,23 @@ export default function Chatbot() {
                         </DialogHeader>
 
                         <div>
-                          {message.toolOutputsForUI[0].args.description}
+                          <MarkdownRenderer
+                            content={
+                              message.toolOutputsForUI[0].args.description || ""
+                            }
+                            className="font-medium"
+                          />
                         </div>
 
                         <DialogFooter>
+                          <DialogClose className="w-full">
+                            <Button variant="secondary" className="w-full">
+                              {t("common.cancel")}
+                            </Button>
+                          </DialogClose>
+
                           <Button
+                            className="w-full"
                             onClick={() =>
                               saveSuggestedRecipe(
                                 message.toolOutputsForUI[0].args.title ?? "",
@@ -268,7 +281,7 @@ export default function Chatbot() {
                               )
                             }
                           >
-                            Save
+                            {t("common.save")}
                           </Button>
                         </DialogFooter>
                       </DialogContent>
