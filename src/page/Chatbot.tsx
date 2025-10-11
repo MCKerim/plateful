@@ -22,6 +22,13 @@ import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
+import { DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "@/components/ui/dialog";
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -61,7 +68,10 @@ export default function Chatbot() {
     try {
       // Call the Supabase edge function
       const { data, error } = await supabase.functions.invoke("chatbot", {
-        body: { previous_response_id: previousResponseId, messages: [userMessage] },
+        body: {
+          previous_response_id: previousResponseId,
+          messages: [userMessage],
+        },
       });
 
       if (error) {
@@ -230,15 +240,39 @@ export default function Chatbot() {
                 {message.role === "assistant" &&
                   message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 && (
-                    <Button
-                      onClick={() =>
-                        saveSuggestedRecipe(
-                          message.toolOutputsForUI[0].args.title ?? "", message.toolOutputsForUI[0].args.description ?? ""
-                        )
-                      }
-                    >
-                      {t("chatbot.saveRecipe")}
-                    </Button>
+                    <Dialog>
+                      <DialogTrigger>
+                        <Button variant="secondary" size="sm" className="mt-2">
+                          {message.toolOutputsForUI[0].args.title}
+                        </Button>
+                      </DialogTrigger>
+
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            {message.toolOutputsForUI[0].args.title}
+                          </DialogTitle>
+                        </DialogHeader>
+
+                        <div>
+                          {message.toolOutputsForUI[0].args.description}
+                        </div>
+
+                        <DialogFooter>
+                          <Button
+                            onClick={() =>
+                              saveSuggestedRecipe(
+                                message.toolOutputsForUI[0].args.title ?? "",
+                                message.toolOutputsForUI[0].args.description ??
+                                  ""
+                              )
+                            }
+                          >
+                            Save
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   )}
               </div>
             </div>
