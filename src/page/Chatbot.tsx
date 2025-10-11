@@ -30,6 +30,7 @@ import {
   DialogFooter,
   DialogHeader,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -242,8 +243,12 @@ export default function Chatbot() {
                   message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 && (
                     <Dialog>
-                      <DialogTrigger>
-                        <Button variant="secondary" size="sm" className="mt-2">
+                      <DialogTrigger asChild>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="max-w-[80vw] mt-2"
+                        >
                           {message.toolOutputsForUI[0].args.title}
                         </Button>
                       </DialogTrigger>
@@ -255,16 +260,16 @@ export default function Chatbot() {
                           </DialogTitle>
                         </DialogHeader>
 
-                        <div>
+                        <ScrollArea className="max-h-[60vh] rounded-md border p-2">
                           <MarkdownRenderer
                             content={
                               message.toolOutputsForUI[0].args.description || ""
                             }
                             className="font-medium"
                           />
-                        </div>
+                        </ScrollArea>
 
-                        <DialogFooter>
+                        <DialogFooter className="flex-row w-full gap-2">
                           <DialogClose className="w-full">
                             <Button variant="secondary" className="w-full">
                               {t("common.cancel")}
