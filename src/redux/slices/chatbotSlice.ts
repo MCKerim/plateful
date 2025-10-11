@@ -5,7 +5,7 @@ import { RootState } from "../store";
 export interface ChatMessage {
   role: "user" | "assistant" | "tool";
   content: string;
-  tool_calls?: any[];
+  toolOutputsForUI?: any;
   previous_response_id?: string;
 }
 

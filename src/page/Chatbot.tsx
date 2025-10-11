@@ -74,6 +74,7 @@ export default function Chatbot() {
       const newMessage: ChatMessage = {
         role: "assistant",
         content: data.output_text,
+        toolOutputsForUI: JSON.parse(data.tool_outputs_for_ui),
       };
 
       dispatch(setPreviousResponseId(data.id));
@@ -108,9 +109,7 @@ export default function Chatbot() {
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(functionArguments: any) {
-    const { title, description } = JSON.parse(functionArguments);
-
+  async function saveSuggestedRecipe(title: string, description: string) {
     // Insert new recipe
     const { data, error } = await supabase
       .from("recipes")
@@ -229,12 +228,12 @@ export default function Chatbot() {
                 )}
 
                 {message.role === "assistant" &&
-                  message.tool_calls &&
-                  message.tool_calls.length > 0 && (
+                  message.toolOutputsForUI &&
+                  message.toolOutputsForUI.length > 0 && (
                     <Button
                       onClick={() =>
                         saveSuggestedRecipe(
-                          message.tool_calls![0].function.arguments
+                          message.toolOutputsForUI[0].args.title ?? "", message.toolOutputsForUI[0].args.description ?? ""
                         )
                       }
                     >
