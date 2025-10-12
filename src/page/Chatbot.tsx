@@ -247,7 +247,7 @@ export default function Chatbot() {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="max-w-[80vw] mt-2"
+                          className="mt-2"
                         >
                           {message.toolOutputsForUI[0].args.title}
                         </Button>
