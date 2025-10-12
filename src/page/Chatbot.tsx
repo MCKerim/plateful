@@ -222,7 +222,7 @@ export default function Chatbot() {
             >
               {/* Message Bubble */}
               <div
-                className={`rounded-lg px-4 py-2 ${
+                className={`rounded-lg max-w-full px-4 py-2 ${
                   message.role === "user"
                     ? "bg-primary text-primary-foreground"
                     : "bg-muted"
@@ -247,9 +247,11 @@ export default function Chatbot() {
                         <Button
                           variant="secondary"
                           size="sm"
-                          className="mt-2"
+                          className="mt-2 max-w-full"
                         >
-                          {message.toolOutputsForUI[0].args.title}
+                          <span className="truncate">
+                            {message.toolOutputsForUI[0].args.title}
+                          </span>
                         </Button>
                       </DialogTrigger>
 
