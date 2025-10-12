@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ImagePlus } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import { Input } from "@/components/ui/input";
@@ -32,6 +32,10 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+type VisionPart =
+  | { type: "input_text"; text: string }
+  | { type: "input_image"; image_url: string };
+
 export default function Chatbot() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
@@ -45,6 +49,9 @@ export default function Chatbot() {
   const visibleMessages = useAppSelector(selectVisibleMessages);
 
   const [inputValue, setInputValue] = useState("");
+  const [imageDataUrls, setImageDataUrls] = useState<string[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -55,24 +62,73 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  const handleSendMessage = async () => {
-    if (!inputValue.trim()) return;
+  async function fileToDataURL(file: File): Promise<string> {
+    // Keeps EXIF and content type
+    const buf = await file.arrayBuffer();
+    let binary = "";
+    const bytes = new Uint8Array(buf);
+    const chunk = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunk) {
+      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+    }
+    const b64 = btoa(binary);
+    const mime = file.type || "image/png";
+    return `data:${mime};base64,${b64}`;
+  }
 
-    const userMessage: ChatMessage = {
+  const handlePickImagesClick = () => fileInputRef.current?.click();
+
+  const handleFilesSelected = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
+
+    // Convert to data URLs
+    const asDataUrls = await Promise.all(files.map(fileToDataURL));
+    // Keep a small cap to avoid huge payloads
+    const capped = asDataUrls.slice(0, 4);
+    setImageDataUrls(prev => [...prev, ...capped].slice(0, 4));
+    // Clear input so same file can be uploaded again later
+    e.target.value = "";
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputValue.trim() && imageDataUrls.length === 0) return;
+
+    // Show the user message in the UI right away
+    const userMessage: ChatMessage & { images?: string[] } = {
       role: "user",
-      content: inputValue,
+      content: inputValue || "Sent image",
+      images: imageDataUrls,
     };
 
     dispatch(addMessage(userMessage));
     setInputValue("");
+    setImageDataUrls([]);
     dispatch(setIsTyping(true));
 
     try {
+      // Build vision content parts for the server
+      const parts: VisionPart[] = [];
+      if (inputValue.trim()) {
+        parts.push({ type: "input_text", text: inputValue.trim() });
+      }
+      for (const url of userMessage.images || []) {
+        parts.push({ type: "input_image", image_url: url });
+      }
+
       // Call the Supabase edge function
       const { data, error } = await supabase.functions.invoke("chatbot", {
         body: {
           previous_response_id: previousResponseId,
-          messages: [userMessage],
+          // Responses API accepts an array of messages with mixed content parts
+          messages: [
+            {
+              role: "user",
+              content: parts,
+            },
+          ],
         },
       });
 
@@ -94,7 +150,7 @@ export default function Chatbot() {
     } catch (error) {
       console.error("Error calling chatbot function:", error);
 
-      const errorMessage: any = {
+      const errorMessage: ChatMessage  = {
         content: t("chatbot.errorMessage"),
         role: "assistant",
       };
@@ -115,6 +171,7 @@ export default function Chatbot() {
   const handleResetChat = () => {
     dispatch(resetChat());
     setInputValue("");
+    setImageDataUrls([]);
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
@@ -229,7 +286,22 @@ export default function Chatbot() {
                 }`}
               >
                 {message.role === "user" && (
-                  <p className="text-sm">{message.content}</p>
+                  <>
+                    <p className="text-sm">{message.content}</p>
+                    {/* optional thumbnails if present */}
+                    {"images" in message && Array.isArray((message as any).images) && (message as any).images.length > 0 && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {(message as any).images.map((src: string, i: number) => (
+                          <img
+                            key={i}
+                            src={src}
+                            alt={`upload-${i}`}
+                            className="rounded-md border w-16 h-16 object-cover"
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </>
                 )}
 
                 {message.role === "assistant" && (
@@ -319,18 +391,54 @@ export default function Chatbot() {
 
       {/* Input Area */}
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
-        <Input
-          type="text"
-          className="flex-1 w-full rounded-full"
-          showSubmitButton
-          placeholder={t("chatbot.inputPlaceholder")}
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-          onKeyDown={handleKeyDown}
-          disabled={isTyping}
-          onSubmit={handleSendMessage}
-          maxLength={200}
-        />
+        <div className="flex items-center gap-2">
+          {/* tiny image button */}
+          <Button
+            type="button"
+            variant="secondary"
+            size="icon"
+            onClick={handlePickImagesClick}
+            title={t("common.uploadImage") as string}
+          >
+            <ImagePlus className="w-5 h-5" />
+          </Button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFilesSelected}
+            capture="environment"
+          />
+
+          <Input
+            type="text"
+            className="flex-1 w-full rounded-full"
+            showSubmitButton
+            placeholder={t("chatbot.inputPlaceholder")}
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onKeyDown={handleKeyDown}
+            disabled={isTyping}
+            onSubmit={handleSendMessage}
+            maxLength={200}
+          />
+        </div>
+
+        {/* small strip of selected image previews before sending */}
+        {imageDataUrls.length > 0 && (
+          <div className="flex gap-2 mt-2">
+            {imageDataUrls.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`preview-${i}`}
+                className="rounded-md border w-12 h-12 object-cover"
+              />
+            ))}
+          </div>
+        )}
       </div>
     </Layout>
   );
