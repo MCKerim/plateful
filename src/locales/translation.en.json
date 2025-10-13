@@ -12,7 +12,8 @@
     "today": "Today",
     "yesterday": "Yesterday",
     "day": "Day",
-    "days": "Days"
+    "days": "Days",
+    "uploadImage": "Upload image"
   },
   "welcome": {
     "title": "Congratulations,",

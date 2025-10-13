@@ -407,8 +407,8 @@ export default function Chatbot() {
                 key={i}
                 className="relative"
                 onClick={() => handleRemoveImage(i)}
-                aria-label={t("common.removeImage") as string}
-                title={t("common.removeImage") as string}
+                aria-label={t("common.remove")}
+                title={t("common.remove")}
               >
                 <img
                   src={src}
@@ -431,7 +431,7 @@ export default function Chatbot() {
             variant="secondary"
             size="icon"
             onClick={handlePickImagesClick}
-            title={t("common.uploadImage") as string}
+            title={t("common.uploadImage")}
           >
             <ImagePlus className="w-5 h-5" />
           </Button>

@@ -12,7 +12,8 @@
     "today": "Heute",
     "yesterday": "Gestern",
     "day": "Tag",
-    "days": "Tage"
+    "days": "Tage",
+    "uploadImage": "Bild hochladen"
   },
   "signup": {
     "title": "Plateful",
