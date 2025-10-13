@@ -202,7 +202,13 @@ export default function Chatbot() {
   return (
     <Layout
       headerButtons={
-        <Button onClick={handleResetChat} variant="ghost" size="icon">
+        <Button
+          onClick={handleResetChat}
+          variant="ghost"
+          size="icon"
+          aria-label={t("common.reset")}
+          title={t("common.reset")}
+        >
           <RotateCcw />
         </Button>
       }
