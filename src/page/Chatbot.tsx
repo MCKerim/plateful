@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { RotateCcw, ImagePlus } from "lucide-react";
+import { RotateCcw, ImagePlus, X } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
 import { Input } from "@/components/ui/input";
@@ -88,9 +88,13 @@ export default function Chatbot() {
     const asDataUrls = await Promise.all(files.map(fileToDataURL));
     // Keep a small cap to avoid huge payloads
     const capped = asDataUrls.slice(0, 4);
-    setImageDataUrls(prev => [...prev, ...capped].slice(0, 4));
+    setImageDataUrls((prev) => [...prev, ...capped].slice(0, 4));
     // Clear input so same file can be uploaded again later
     e.target.value = "";
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImageDataUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSendMessage = async () => {
@@ -99,7 +103,7 @@ export default function Chatbot() {
     // Show the user message in the UI right away
     const userMessage: ChatMessage & { images?: string[] } = {
       role: "user",
-      content: inputValue || "Sent image",
+      content: inputValue || "",
       images: imageDataUrls,
     };
 
@@ -150,7 +154,7 @@ export default function Chatbot() {
     } catch (error) {
       console.error("Error calling chatbot function:", error);
 
-      const errorMessage: ChatMessage  = {
+      const errorMessage: ChatMessage = {
         content: t("chatbot.errorMessage"),
         role: "assistant",
       };
@@ -289,18 +293,22 @@ export default function Chatbot() {
                   <>
                     <p className="text-sm">{message.content}</p>
                     {/* optional thumbnails if present */}
-                    {"images" in message && Array.isArray((message as any).images) && (message as any).images.length > 0 && (
-                      <div className="flex gap-2 mt-2 flex-wrap">
-                        {(message as any).images.map((src: string, i: number) => (
-                          <img
-                            key={i}
-                            src={src}
-                            alt={`upload-${i}`}
-                            className="rounded-md border w-16 h-16 object-cover"
-                          />
-                        ))}
-                      </div>
-                    )}
+                    {"images" in message &&
+                      Array.isArray((message as any).images) &&
+                      (message as any).images.length > 0 && (
+                        <div className="flex gap-2 mt-2 flex-wrap">
+                          {(message as any).images.map(
+                            (src: string, i: number) => (
+                              <img
+                                key={i}
+                                src={src}
+                                alt={`upload-${i}`}
+                                className="rounded-md border w-16 h-16 object-cover"
+                              />
+                            )
+                          )}
+                        </div>
+                      )}
                   </>
                 )}
 
@@ -391,6 +399,31 @@ export default function Chatbot() {
 
       {/* Input Area */}
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
+        {/* small strip of selected image previews before sending */}
+        {imageDataUrls.length > 0 && (
+          <div className="flex gap-2 flex-wrap mb-2">
+            {imageDataUrls.map((src, i) => (
+              <button
+                key={i}
+                className="relative"
+                onClick={() => handleRemoveImage(i)}
+                aria-label={t("common.removeImage") as string}
+                title={t("common.removeImage") as string}
+              >
+                <img
+                  src={src}
+                  alt={`preview-${i}`}
+                  className="rounded-md border w-12 h-12 object-cover"
+                />
+
+                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-black/70 text-white border border-white">
+                  <X className="w-3 h-3" />
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
         <div className="flex items-center gap-2">
           {/* tiny image button */}
           <Button
@@ -402,6 +435,7 @@ export default function Chatbot() {
           >
             <ImagePlus className="w-5 h-5" />
           </Button>
+
           <input
             ref={fileInputRef}
             type="file"
@@ -425,20 +459,6 @@ export default function Chatbot() {
             maxLength={200}
           />
         </div>
-
-        {/* small strip of selected image previews before sending */}
-        {imageDataUrls.length > 0 && (
-          <div className="flex gap-2 mt-2">
-            {imageDataUrls.map((src, i) => (
-              <img
-                key={i}
-                src={src}
-                alt={`preview-${i}`}
-                className="rounded-md border w-12 h-12 object-cover"
-              />
-            ))}
-          </div>
-        )}
       </div>
     </Layout>
   );
