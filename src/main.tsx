@@ -15,6 +15,7 @@ createRoot(document.getElementById("root")!).render(
       <SupabaseProvider>
         <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
           <AppUrlListener />
+
           <App />
         </ThemeProvider>
       </SupabaseProvider>
