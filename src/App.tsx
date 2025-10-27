@@ -1,4 +1,4 @@
-import { Route, Routes, Navigate } from "react-router";
+import { Route, Routes, Navigate, useNavigate } from "react-router";
 import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
@@ -37,7 +37,8 @@ import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
-import { EdgeToEdge } from '@capawesome/capacitor-android-edge-to-edge-support';
+import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
+import { SharedData, ShareHandler } from "./utils/shareHandler";
 
 function App() {
   const { supabase } = useSupabase();
@@ -45,6 +46,32 @@ function App() {
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    ShareHandler.initialize();
+
+    const handleSharedData = (data: SharedData) => {
+      console.log("Received shared data:", data);
+
+      // Navigate with search params
+      const params = new URLSearchParams();
+      if (data.url || data.text) {
+        params.set("url", data.url || data.text || "");
+      }
+      if (data.title) {
+        params.set("title", data.title);
+      }
+
+      navigate(`/recipe/add?${params.toString()}`);
+    };
+
+    ShareHandler.addListener(handleSharedData);
+
+    return () => {
+      ShareHandler.removeListener(handleSharedData);
+    };
+  }, [navigate]);
 
   useEffect(() => {
     EdgeToEdge.enable().catch((e) => {

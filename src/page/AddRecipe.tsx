@@ -11,7 +11,11 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams, useSearchParams } from "react-router";
+import {
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router";
 import imageCompression from "browser-image-compression";
 import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
@@ -71,10 +75,6 @@ export default function AddRecipe() {
     - falls nicht nimm aus text
     */
     const extractSharedData = () => {
-      if (!searchUrl && !searchTitle && !searchText) {
-        return;
-      }
-
       let finalUrl = "";
       let finalTitle = "";
 
@@ -83,7 +83,8 @@ export default function AddRecipe() {
       }
 
       if (!finalUrl && searchText) {
-        const urlMatch = searchText.match(/https?:\/\/[^\s]+/);
+        const urlRegex = /https?:\/\/[^\s]+/;
+        const urlMatch = urlRegex.exec(searchText);
         if (urlMatch) {
           finalUrl = urlMatch[0];
         }
@@ -104,7 +105,7 @@ export default function AddRecipe() {
     };
 
     extractSharedData();
-  }, [searchUrl, searchTitle, searchText]);
+  }, [searchUrl, searchTitle, searchText, setSearchParams]);
 
   // Fetch recipe data if editing
   useEffect(() => {
