@@ -60,42 +60,82 @@ export default function AddRecipe() {
   const searchTitle = searchParams.get("title");
   const searchText = searchParams.get("text");
 
-  // Extract shared data from URL or text
   useEffect(() => {
-    /*
-    nimmt url aus url
-    falls nicht nimm aus text
-    - falls nicht nimm aus title
-
-    nimmt title aus title
-    - falls nicht nimm aus text
-    */
     const extractSharedData = () => {
       let finalUrl = "";
       let finalTitle = "";
 
-      if (searchUrl) {
-        finalUrl = searchUrl;
-      }
+      const urlRegex = /(https?:\/\/[^\s]+)/i;
 
-      if (!finalUrl && searchText) {
-        const urlRegex = /https?:\/\/[^\s]+/;
-        const urlMatch = urlRegex.exec(searchText);
-        if (urlMatch) {
-          finalUrl = urlMatch[0];
+      // --- 1️⃣ Extract clean URL from searchUrl ---
+      if (searchUrl) {
+        const match = urlRegex.exec(searchUrl);
+        if (match) {
+          finalUrl = match[0];
+        } else {
+          finalUrl = searchUrl.trim();
         }
       }
 
-      if (searchTitle) {
-        finalTitle = searchTitle;
+      // --- 2️⃣ Fallback: extract URL from searchText ---
+      if (!finalUrl && searchText) {
+        const match = urlRegex.exec(searchText);
+        if (match) {
+          finalUrl = match[0];
+        }
       }
 
+      // --- 3️⃣ Use given title if provided ---
+      if (searchTitle) {
+        finalTitle = searchTitle.trim();
+      }
+
+      // --- 4️⃣ Chefkoch cleanup ---
       if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
         finalTitle = finalTitle
           .replace(/ - gefunden auf chefkoch\.de$/i, "")
           .trim();
       }
 
+      // --- 5️⃣ Generate fallback title ---
+      if (!finalTitle) {
+        // Try to extract readable text before the URL
+        if (searchUrl && searchUrl.includes("http")) {
+          const beforeUrl = searchUrl.split("http")[0].trim();
+          if (beforeUrl) {
+            finalTitle = beforeUrl;
+          }
+        }
+
+        // Still empty? Try to make something nice from the hostname
+        if (!finalTitle && finalUrl) {
+          try {
+            const hostname = new URL(finalUrl).hostname
+              .replace(/^www\./, "")
+              .replace(/\.com$|\.de$|\.net$|\.org$/i, ""); // remove common TLDs
+
+            const parts = hostname.split(".");
+            // Take last 1–2 parts to avoid subdomains like "s."
+            const mainName =
+              parts.length > 2 ? parts[parts.length - 2] : parts[0];
+            const capitalized =
+              mainName.charAt(0).toUpperCase() + mainName.slice(1);
+            finalTitle = capitalized;
+          } catch {
+            finalTitle = finalUrl;
+          }
+        }
+
+        // Last resort: fallback from text param
+        if (!finalTitle && searchText) {
+          const beforeUrl = searchText.split("http")[0].trim();
+          if (beforeUrl) {
+            finalTitle = beforeUrl;
+          }
+        }
+      }
+
+      // --- 6️⃣ Set results ---
       setTitle(finalTitle);
       setLink(finalUrl);
     };
