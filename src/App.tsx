@@ -38,7 +38,7 @@ import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
-import { SharedData, ShareHandler } from "./utils/shareHandler";
+import { SendIntent } from "@supernotes/capacitor-send-intent";
 
 function App() {
   const { supabase } = useSupabase();
@@ -49,28 +49,32 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    ShareHandler.initialize();
+    // check on startup
+    SendIntent.checkSendIntentReceived()
+      .then((result: any) => {
+        if (result && (result.url || result.text)) {
+          const params = new URLSearchParams();
+          if (result.url) params.set("url", decodeURIComponent(result.url));
+          if (result.text) params.set("text", result.text);
+          // Adapt route as you need
+          navigate(`/recipe/add?${params.toString()}`);
+        }
+      })
+      .catch((err) => {
+        console.error("SendIntent error", err);
+      });
 
-    const handleSharedData = (data: SharedData) => {
-      console.log("Received shared data:", data);
-
-      // Navigate with search params
-      const params = new URLSearchParams();
-      if (data.url || data.text) {
-        params.set("url", data.url || data.text || "");
-      }
-      if (data.title) {
-        params.set("title", data.title);
-      }
-
-      navigate(`/recipe/add?${params.toString()}`);
-    };
-
-    ShareHandler.addListener(handleSharedData);
-
-    return () => {
-      ShareHandler.removeListener(handleSharedData);
-    };
+    // Optionally listen for future intents (plugin might support event)
+    window.addEventListener("sendIntentReceived", () => {
+      SendIntent.checkSendIntentReceived().then((result: any) => {
+        if (result && (result.url || result.text)) {
+          const params = new URLSearchParams();
+          if (result.url) params.set("url", decodeURIComponent(result.url));
+          if (result.text) params.set("text", result.text);
+          navigate(`/recipe/add?${params.toString()}`);
+        }
+      });
+    });
   }, [navigate]);
 
   useEffect(() => {
