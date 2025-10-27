@@ -61,11 +61,12 @@ export default function AddRecipe() {
   const searchText = searchParams.get("text");
 
   // Debug logs
-  console.log("Full URL:", window.location.href);
-  console.log("Search params:", window.location.search);
+  console.log("Full URL:", globalThis.location.href);
+  console.log("Search params:", globalThis.location.search);
   console.log("searchParams object:", searchParams.toString());
   console.log("Extracted url:", searchUrl);
   console.log("Extracted title:", searchTitle);
+  console.log("Extracted text:", searchText);
 
   // Extract shared data from URL or text
   useEffect(() => {

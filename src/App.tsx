@@ -49,32 +49,31 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // check on startup
-    SendIntent.checkSendIntentReceived()
-      .then((result: any) => {
-        if (result && (result.url || result.text)) {
-          const params = new URLSearchParams();
-          if (result.url) params.set("url", decodeURIComponent(result.url));
-          if (result.text) params.set("text", result.text);
-          // Adapt route as you need
-          navigate(`/recipe/add?${params.toString()}`);
-        }
-      })
-      .catch((err) => {
-        console.error("SendIntent error", err);
-      });
+    const handleIntentReceived = (event: any) => {
+      const result = event.detail || event;
+      if (!result) return;
 
-    // Optionally listen for future intents (plugin might support event)
-    window.addEventListener("sendIntentReceived", () => {
-      SendIntent.checkSendIntentReceived().then((result: any) => {
-        if (result && (result.url || result.text)) {
-          const params = new URLSearchParams();
-          if (result.url) params.set("url", decodeURIComponent(result.url));
-          if (result.text) params.set("text", result.text);
-          navigate(`/recipe/add?${params.toString()}`);
-        }
-      });
-    });
+      const { url, text } = result;
+      if (url || text) {
+        const params = new URLSearchParams();
+        if (url) params.set("url", url);
+        if (text) params.set("text", text);
+
+        navigate(`/recipe/add?${params.toString()}`);
+      }
+    };
+
+    // Check on app startup
+    SendIntent.checkSendIntentReceived()
+      .then(handleIntentReceived)
+      .catch((err) => console.error("SendIntent error", err));
+
+    // Listen for new share intents while app is running
+    globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
+
+    return () => {
+      globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
+    };
   }, [navigate]);
 
   useEffect(() => {
