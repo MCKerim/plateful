@@ -13,6 +13,7 @@ dependencies {
     implementation project(':capacitor-browser')
     implementation project(':capacitor-camera')
     implementation project(':capawesome-capacitor-android-edge-to-edge-support')
+    implementation project(':supernotes-capacitor-send-intent')
 
 }
 

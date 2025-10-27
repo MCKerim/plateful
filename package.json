@@ -44,6 +44,7 @@
     "@reduxjs/toolkit": "^2.8.2",
     "@rive-app/react-canvas": "^4.21.4",
     "@supabase/supabase-js": "^2.47.13",
+    "@supernotes/capacitor-send-intent": "^7.0.0",
     "browser-image-compression": "^2.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
