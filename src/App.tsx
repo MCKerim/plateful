@@ -49,14 +49,17 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const handleIntentReceived = (event: any) => {
-      const result = event.detail || event;
+    const handleIntentReceived = (result: any) => {
       if (!result) return;
 
-      const { url, text } = result;
-      if (url || text) {
+      console.log("SendIntent received");
+      console.log(JSON.stringify(result));
+
+      const { url, title, text } = result;
+      if (url || title || text) {
         const params = new URLSearchParams();
         if (url) params.set("url", url);
+        if (title) params.set("title", title);
         if (text) params.set("text", text);
 
         navigate(`/recipe/add?${params.toString()}`);
@@ -66,13 +69,20 @@ function App() {
     // Check on app startup
     SendIntent.checkSendIntentReceived()
       .then(handleIntentReceived)
-      .catch((err) => console.error("SendIntent error", err));
+      .catch((err) => {
+        if (err?.message !== "No processing needed") {
+          console.error("SendIntent error", err);
+        }
+      });
 
     // Listen for new share intents while app is running
     globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
 
     return () => {
-      globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
+      globalThis.removeEventListener(
+        "sendIntentReceived",
+        handleIntentReceived
+      );
     };
   }, [navigate]);
 
