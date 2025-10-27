@@ -11,11 +11,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import {
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
 import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
@@ -63,6 +59,13 @@ export default function AddRecipe() {
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
   const searchText = searchParams.get("text");
+
+  // Debug logs
+  console.log("Full URL:", window.location.href);
+  console.log("Search params:", window.location.search);
+  console.log("searchParams object:", searchParams.toString());
+  console.log("Extracted url:", searchUrl);
+  console.log("Extracted title:", searchTitle);
 
   // Extract shared data from URL or text
   useEffect(() => {
