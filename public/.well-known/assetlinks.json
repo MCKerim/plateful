@@ -5,8 +5,7 @@
       "namespace": "android_app",
       "package_name": "com.kblanks.plateful",
       "sha256_cert_fingerprints": [
-        "68:87:E1:8F:07:88:07:F8:5A:F3:78:8D:11:96:D0:B3:62:0F:52:CA:4E:DA:E2:08:CD:95:3E:9C:F2:86:D1:7A",
-        "B3:76:A6:8F:6C:FC:21:55:76:8B:BA:3A:D0:83:14:83:6F:2D:0E:B2:D1:5C:56:9B:7E:BA:46:D6:7B:45:EE:6D"
+        "68:87:E1:8F:07:88:07:F8:5A:F3:78:8D:11:96:D0:B3:62:0F:52:CA:4E:DA:E2:08:CD:95:3E:9C:F2:86:D1:7A"
       ]
     }
   }
