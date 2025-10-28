@@ -40,20 +40,20 @@ export default function SignUp() {
 
   const signUp = async () => {
     try {
-      const currentUrl = window.location.origin;
+      const currentUrl = globalThis.location.origin;
       let redirectUri: string;
 
       // Determine the correct redirect URI based on platform
       if (
-        window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1" ||
-        window.location.hostname ===
+        globalThis.location.hostname === "localhost" ||
+        globalThis.location.hostname === "127.0.0.1" ||
+        globalThis.location.hostname ===
           "plateful-git-staging-mckerims-projects.vercel.app"
       ) {
         // Development environment
         redirectUri = currentUrl;
       } else {
-        // Production - use your configured domain
+        // Production
         redirectUri = "https://app.plateful.cloud/";
       }
 
