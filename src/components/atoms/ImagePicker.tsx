@@ -25,6 +25,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -66,6 +67,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   const handleButtonClick = async () => {
     if (isNative) {
       const permsOk = await ensureNativeCameraPermissions();
+
       try {
         const photo = await Camera.getPhoto({
           quality: 80,
@@ -73,12 +75,15 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           // Show prompt to choose between Camera or Photos
           source: CameraSource.Prompt,
           resultType: CameraResultType.DataUrl,
-          promptLabelHeader: t("common.selectImage"),
-          promptLabelPhoto: t("common.gallery") || "Gallery",
-          promptLabelPicture: t("common.camera") || "Camera",
+          promptLabelHeader: t("common.selectImageSource"),
+          promptLabelPhoto: t("common.gallery"),
+          promptLabelPicture: t("common.camera"),
         });
 
         if (photo?.dataUrl) {
+          console.log("Photo obtained from camera/gallery");
+          console.log(photo.dataUrl);
+
           const ext = photo.format || "jpeg";
           const file = dataURLtoFile(photo.dataUrl, `image.${ext}`);
           onImageSelected(file, photo.dataUrl);
@@ -88,6 +93,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         // Fall back to file input if user cancels or camera flow fails
         console.debug("Camera getPhoto failed, falling back to file input:", err);
       }
+
       if (!permsOk) {
         // If permissions not granted, try gallery-only as a fallback
         try {
@@ -97,6 +103,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
             source: CameraSource.Photos,
             resultType: CameraResultType.DataUrl,
           });
+
           if (photo?.dataUrl) {
             const ext = photo.format || "jpeg";
             const file = dataURLtoFile(photo.dataUrl, `image.${ext}`);
@@ -107,6 +114,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           console.debug("Photos fallback failed, falling back to file input:", err);
         }
       }
+
       // Final fallback to web file picker
       fileInputRef.current?.click();
       return;
@@ -129,6 +137,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
             alt="Preview"
             className="object-cover w-full rounded-md max-h-48"
           />
+
           {onDeleteImage && (
             <Button
               type="button"
@@ -154,6 +163,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
           {t("common.selectImage")}
         </Button>
       )}
+
       <input
         ref={fileInputRef}
         type="file"
@@ -163,6 +173,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         className="hidden"
         onChange={handleFileChange}
       />
+
       {uploading && (
         <div className="text-xs text-muted-foreground">
           {t("common.uploading")}
