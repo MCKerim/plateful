@@ -17,14 +17,14 @@ export default function BottomNav() {
             label={t("bottomNav.home")}
             icon="home"
             link="/home"
-            active={window.location.pathname.startsWith("/home")}
+            active={globalThis.location.pathname.startsWith("/home")}
           />
 
           <BottomNavButton
             label={t("bottomNav.chatbot")}
             icon="chatbot"
             link="/chatbot"
-            active={window.location.pathname.startsWith("/chatbot")}
+            active={globalThis.location.pathname.startsWith("/chatbot")}
           />
 
           <BottomNavButton
@@ -32,11 +32,11 @@ export default function BottomNav() {
             icon="cookbook"
             link="/cookbook"
             active={
-              window.location.pathname.startsWith("/cookbook") ||
-              window.location.pathname.startsWith("/recipe")
+              globalThis.location.pathname.startsWith("/cookbook") ||
+              globalThis.location.pathname.startsWith("/recipe")
             }
             onClick={() => {
-              if (window.location.pathname.startsWith("/cookbook")) {
+              if (globalThis.location.pathname.startsWith("/cookbook")) {
                 dispatch(resetFilter());
               }
             }}
@@ -46,14 +46,14 @@ export default function BottomNav() {
             label={t("bottomNav.planner")}
             icon="planner"
             link="/planner"
-            active={window.location.pathname.startsWith("/planner")}
+            active={globalThis.location.pathname.startsWith("/planner")}
           />
 
           <BottomNavButton
             label={t("bottomNav.list")}
             icon="lists"
             link="/lists"
-            active={window.location.pathname.startsWith("/lists")}
+            active={globalThis.location.pathname.startsWith("/lists")}
           />
         </div>
       </div>

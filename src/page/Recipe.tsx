@@ -55,15 +55,15 @@ export default function Recipe() {
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
-      if (window.location.pathname.startsWith("/recipe/")) {
-        window.history.back();
+      if (globalThis.location.pathname.startsWith("/recipe/")) {
+        globalThis.history.back();
       }
     };
 
-    window.addEventListener("popstate", handlePopState);
+    globalThis.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      globalThis.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
