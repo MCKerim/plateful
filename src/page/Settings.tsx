@@ -176,7 +176,7 @@ export default function Settings() {
           <h2 className="font-medium border-b">Info</h2>
 
           <p className="text-sm">
-            v0.0.1 <span>- Beta </span>
+            v0.0.2 <span>- Beta </span>
             {environment === "preview" && <span>- Preview </span>}
             {environment === "development" && <span>- Development </span>}
           </p>
