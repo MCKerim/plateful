@@ -67,7 +67,7 @@ export default function AddRecipe() {
 
       const urlRegex = /(https?:\/\/[^\s]+)/i;
 
-      // --- 1️⃣ Extract clean URL from searchUrl ---
+      // --- Extract clean URL from searchUrl ---
       if (searchUrl) {
         const match = urlRegex.exec(searchUrl);
         if (match) {
@@ -77,7 +77,7 @@ export default function AddRecipe() {
         }
       }
 
-      // --- 2️⃣ Fallback: extract URL from searchText ---
+      // --- Fallback: extract URL from searchText ---
       if (!finalUrl && searchText) {
         const match = urlRegex.exec(searchText);
         if (match) {
@@ -85,22 +85,22 @@ export default function AddRecipe() {
         }
       }
 
-      // --- 3️⃣ Use given title if provided ---
+      // --- Use given title if provided ---
       if (searchTitle) {
         finalTitle = searchTitle.trim();
       }
 
-      // --- 4️⃣ Chefkoch cleanup ---
+      // --- Chefkoch cleanup ---
       if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
         finalTitle = finalTitle
           .replace(/ - gefunden auf chefkoch\.de$/i, "")
           .trim();
       }
 
-      // --- 5️⃣ Generate fallback title ---
+      // --- Generate fallback title ---
       if (!finalTitle) {
         // Try to extract readable text before the URL
-        if (searchUrl && searchUrl.includes("http")) {
+        if (searchUrl?.includes("http")) {
           const beforeUrl = searchUrl.split("http")[0].trim();
           if (beforeUrl) {
             finalTitle = beforeUrl;
@@ -115,7 +115,7 @@ export default function AddRecipe() {
               .replace(/\.com$|\.de$|\.net$|\.org$/i, ""); // remove common TLDs
 
             const parts = hostname.split(".");
-            // Take last 1–2 parts to avoid subdomains like "s."
+            // Take last 1-2 parts to avoid subdomains like "s."
             const mainName =
               parts.length > 2 ? parts[parts.length - 2] : parts[0];
             const capitalized =
@@ -135,7 +135,6 @@ export default function AddRecipe() {
         }
       }
 
-      // --- 6️⃣ Set results ---
       setTitle(finalTitle);
       setLink(finalUrl);
     };

@@ -53,7 +53,7 @@ export default function SignUp() {
         // Development environment
         redirectUri = currentUrl;
       } else {
-        // Production - use your configured domain
+        // Production
         redirectUri = "https://app.plateful.cloud/";
       }
 
