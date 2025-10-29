@@ -178,7 +178,6 @@ export default function Settings() {
           <p className="text-sm">
             v0.0.3 <span>- Beta </span>
             {environment === "preview" && <span>- Preview </span>}
-            {environment === "development" && <span>- Development </span>}
           </p>
 
           <NavLink to="/privacy">
