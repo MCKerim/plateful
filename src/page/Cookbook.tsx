@@ -56,10 +56,10 @@ export default function Cookbook() {
       navigate("/cookbook");
     };
 
-    window.addEventListener("popstate", handlePopState);
+    globalThis.addEventListener("popstate", handlePopState);
 
     return () => {
-      window.removeEventListener("popstate", handlePopState);
+      globalThis.removeEventListener("popstate", handlePopState);
     };
   }, []);
 
@@ -201,7 +201,7 @@ export default function Cookbook() {
             key={0}
             id={0}
             name={t("categorys.allRecipes")}
-            color=""
+            color="zinc"
           />
         </div>
       )}

@@ -9,7 +9,7 @@ export const openBrowser = async (url: string) => {
       presentationStyle: "popover",
     });
   } else {
-    window.location.href = url;
+    globalThis.location.href = url;
   }
 };
 
