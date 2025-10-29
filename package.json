@@ -22,6 +22,7 @@
     "@capacitor/cli": "^7.0.1",
     "@capacitor/core": "^7.0.1",
     "@capacitor/ios": "^7.0.1",
+    "@capacitor/status-bar": "^7.0.3",
     "@capawesome/capacitor-android-edge-to-edge-support": "^7.2.3",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
