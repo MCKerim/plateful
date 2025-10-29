@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
+import DeleteDialog from "@/components/atoms/DeleteDialog";
 
 /*type RecipeItem = {
   itemName: string;
@@ -548,15 +549,7 @@ export default function AddRecipe() {
           {t("common.save")}
         </Button>
 
-        {params.recipeId && (
-          <Button
-            className="w-full"
-            onClick={deleteRecipe}
-            variant="destructive"
-          >
-            {t("common.delete")}
-          </Button>
-        )}
+        {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
       </div>
     </Layout>
   );

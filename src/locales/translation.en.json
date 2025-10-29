@@ -3,6 +3,8 @@
     "edit": "Edit",
     "remove": "Remove",
     "delete": "Delete",
+    "deleteTitle": "Are you sure?",
+    "deleteConfirmation": "This action cannot be undone.",
     "cancel": "Cancel",
     "save": "Save",
     "commingSoon": "Comming soon...",

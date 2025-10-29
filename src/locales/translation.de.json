@@ -3,6 +3,8 @@
     "edit": "Bearbeiten",
     "remove": "Entfernen",
     "delete": "Löschen",
+    "deleteTitle": "Bist du sicher?",
+    "deleteConfirmation": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "cancel": "Abbrechen",
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar...",
