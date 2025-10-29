@@ -1,4 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type Theme = "dark" | "light" | "system";
 
@@ -32,29 +33,44 @@ export function ThemeProvider({
 
   useEffect(() => {
     const root = globalThis.document.documentElement;
+    const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
 
-    root.classList.remove("light", "dark");
+    const updateTheme = () => {
+      root.classList.remove("light", "dark");
+
+      let effectiveTheme: "light" | "dark";
+      if (theme === "system") {
+        effectiveTheme = mediaQuery.matches ? "dark" : "light";
+      } else {
+        effectiveTheme = theme;
+      }
+
+      root.classList.add(effectiveTheme);
+      setEdgeToEdgeBackgroundColor(effectiveTheme === "dark" ? "#0A0905" : "#FAF9F5");
+    };
+
+    updateTheme(); // Initial update
 
     if (theme === "system") {
-      const systemTheme = globalThis.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light";
-
-      root.classList.add(systemTheme);
-      return;
+      mediaQuery.addEventListener("change", updateTheme);
+      return () => mediaQuery.removeEventListener("change", updateTheme);
     }
-
-    root.classList.add(theme);
   }, [theme]);
 
-  const value = {
-    theme,
-    setTheme: (theme: Theme) => {
-      localStorage.setItem(storageKey, theme);
-      setTheme(theme);
-    },
+  const setEdgeToEdgeBackgroundColor = async (color: string) => {
+    await EdgeToEdge.setBackgroundColor({ color });
   };
+
+  const value = useMemo(
+    () => ({
+      theme,
+      setTheme: (newTheme: Theme) => {
+        localStorage.setItem(storageKey, newTheme);
+        setTheme(newTheme);
+      },
+    }),
+    [theme, storageKey]
+  );
 
   return (
     <ThemeProviderContext.Provider {...props} value={value}>
