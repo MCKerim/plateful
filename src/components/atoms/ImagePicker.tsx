@@ -1,10 +1,11 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { useNativeCamera } from "../../hooks/useNativeCamera";
+import { AlertCircle } from "lucide-react";
 
 interface ImagePickerProps {
   onImageSelected: (file: File | undefined, previewUrl: string) => void;
@@ -22,101 +23,53 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   const { t } = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const isNative = Capacitor.isNativePlatform();
+  const { takePhoto, ensurePermissions } = useNativeCamera();
+  const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setError(null);
 
     if (file) {
+      if (file.size > 10 * 1024 * 1024) { // 10MB limit
+        setError(t("common.imageTooLarge"));
+        return;
+      }
+
       const reader = new FileReader();
       reader.onloadend = () => {
         onImageSelected(file, reader.result as string);
+      };
+      reader.onerror = () => {
+        setError(t("common.errorReadingFile"));
       };
       reader.readAsDataURL(file);
     }
   };
 
-  // Convert a data URL to a File
-  const dataURLtoFile = (dataUrl: string, filename: string) => {
-    const [header, data] = dataUrl.split(",");
-    const match = /data:(.*?);base64/.exec(header || "");
-    const mime = match?.[1] || "image/jpeg";
-    const binary = atob(data || "");
-    const len = binary.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) bytes[i] = binary.charCodeAt(i);
-    return new File([bytes], filename, { type: mime });
-  };
-
-  // Ensure runtime permissions on native apps so Camera option appears in the prompt
-  const ensureNativeCameraPermissions = async () => {
-    try {
-      const perms = await Camera.checkPermissions();
-      const hasCamera = (perms as any).camera === "granted";
-      const photos = (perms as any).photos;
-      const hasPhotos = photos === "granted" || photos === "limited"; // iOS can be "limited"
-      if (hasCamera && hasPhotos) return true;
-      const req = await Camera.requestPermissions({ permissions: ["camera", "photos"] });
-      const cameraOk = (req as any).camera === "granted";
-      const photosOk = (req as any).photos === "granted" || (req as any).photos === "limited";
-      return cameraOk && photosOk;
-    } catch {
-      return false;
-    }
-  };
-
   const handleButtonClick = async () => {
+    setError(null);
+    
     if (isNative) {
-      const permsOk = await ensureNativeCameraPermissions();
-
       try {
-        const photo = await Camera.getPhoto({
-          quality: 80,
-          allowEditing: false,
-          // Show prompt to choose between Camera or Photos
-          source: CameraSource.Prompt,
-          resultType: CameraResultType.DataUrl,
-          promptLabelHeader: t("common.selectImageSource"),
-          promptLabelPhoto: t("common.gallery"),
-          promptLabelPicture: t("common.camera"),
-        });
-
-        if (photo?.dataUrl) {
-          console.log("Photo obtained from camera/gallery");
-          console.log(photo.dataUrl);
-
-          const ext = photo.format || "jpeg";
-          const file = dataURLtoFile(photo.dataUrl, `image.${ext}`);
-          onImageSelected(file, photo.dataUrl);
+        const permsOk = await ensurePermissions();
+        if (!permsOk) {
+          setError(t("common.cameraPermissionDenied"));
+          fileInputRef.current?.click();
           return;
         }
-      } catch (err) {
-        // Fall back to file input if user cancels or camera flow fails
-        console.debug("Camera getPhoto failed, falling back to file input:", err);
-      }
 
-      if (!permsOk) {
-        // If permissions not granted, try gallery-only as a fallback
-        try {
-          const photo = await Camera.getPhoto({
-            quality: 80,
-            allowEditing: false,
-            source: CameraSource.Photos,
-            resultType: CameraResultType.DataUrl,
-          });
-
-          if (photo?.dataUrl) {
-            const ext = photo.format || "jpeg";
-            const file = dataURLtoFile(photo.dataUrl, `image.${ext}`);
-            onImageSelected(file, photo.dataUrl);
-            return;
-          }
-        } catch (err) {
-          console.debug("Photos fallback failed, falling back to file input:", err);
+        const result = await takePhoto();
+        if (result) {
+          onImageSelected(result.file, result.dataUrl);
+        } else {
+          fileInputRef.current?.click();
         }
+      } catch (err) {
+        console.error("Error taking photo:", err);
+        setError(t("common.errorTakingPhoto"));
+        fileInputRef.current?.click();
       }
-
-      // Final fallback to web file picker
-      fileInputRef.current?.click();
       return;
     }
 
@@ -124,6 +77,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   };
 
   const handleDeleteImage = () => {
+    setError(null);
     if (onDeleteImage) onDeleteImage();
     onImageSelected(undefined, "");
   };
@@ -134,7 +88,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         <div className="relative mb-2">
           <img
             src={previewUrl}
-            alt="Preview"
+            alt={t("common.imagePreview")}
             className="object-cover w-full rounded-md max-h-48"
           />
 
@@ -145,7 +99,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
               variant="destructive"
               size="icon"
               className="absolute flex items-center justify-center p-0 transition-transform rounded-full shadow-md -top-1 -right-1 w-7 h-7 hover:scale-110"
-              aria-label="Delete image"
+              aria-label={t("common.deleteImage")}
               disabled={uploading}
             >
               <DeleteIcon fontSize="small" />
@@ -168,8 +122,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        // On mobile web, hint to use the back camera; ignored on desktop and native path uses Capacitor
-        capture={!isNative ? "environment" : undefined}
+        capture={isNative ? undefined : "environment"}
         className="hidden"
         onChange={handleFileChange}
       />
@@ -177,6 +130,13 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
       {uploading && (
         <div className="text-xs text-muted-foreground">
           {t("common.uploading")}
+        </div>
+      )}
+
+      {error && (
+        <div className="flex items-center gap-1 text-xs text-destructive">
+          <AlertCircle className="w-3 h-3" />
+          <span>{error}</span>
         </div>
       )}
     </Card>
