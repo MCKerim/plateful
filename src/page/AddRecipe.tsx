@@ -238,6 +238,7 @@ export default function AddRecipe() {
     });
     setImageFile(compressedFile);
     setImagePreview(previewUrl);
+
     const path = await uploadToSupabase(compressedFile);
     setImageSupabaseUrl(path ?? "");
   }
