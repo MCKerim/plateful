@@ -4,16 +4,26 @@ import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map, LogOut } from "lucide-react";
+import { Donut, House, Newspaper, Map, LogOut, Pencil } from "lucide-react";
 import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export default function Settings() {
   const { supabase } = useSupabase();
   const { t, i18n } = useTranslation();
   const user = useAppSelector(selectUser);
+  const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
+  const [newUsername, setNewUsername] = useState(user?.username || "");
 
   const environment = import.meta.env.VITE_NODE_ENV;
 
@@ -45,6 +55,30 @@ export default function Settings() {
     if (error) {
       console.error("Error while sign out: ", error);
     }
+  };
+
+  const updateUsername = async () => {
+    if (newUsername.trim() === "" || !user) {
+      alert(t("settings.usernameCannotBeEmpty"));
+      return;
+    }
+
+    if (newUsername.length < 3 || newUsername.length > 20) {
+      alert(t("settings.usernameLengthInvalid"));
+      return;
+    }
+
+    const { error } = await supabase
+      .from("users")
+      .update({ username: newUsername })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Error updating username:", error);
+      return;
+    }
+
+    setIsUsernameDialogOpen(false);
   };
 
   return (
@@ -194,7 +228,16 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
-          <h2 className="font-medium border-b">{t("settings.dangerZone")}</h2>
+          <div className="flex justify-between items-center border-b">
+            <h2 className="font-medium">{t("settings.account")}</h2>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setIsUsernameDialogOpen(true)}
+            >
+              <Pencil className="h-4 w-4" />
+            </Button>
+          </div>
 
           <p>
             {user?.username} | {user?.email}
@@ -205,6 +248,39 @@ export default function Settings() {
           </Button>
         </div>
       </div>
+
+      <Dialog
+        open={isUsernameDialogOpen}
+        onOpenChange={setIsUsernameDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("settings.editUsername")}</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            placeholder={t("settings.enterNewUsername")}
+          />
+
+          <DialogFooter>
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setIsUsernameDialogOpen(false)}
+              >
+                {t("common.cancel")}
+              </Button>
+
+              <Button className="w-full" onClick={updateUsername}>
+                {t("common.save")}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

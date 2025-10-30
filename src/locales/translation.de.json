@@ -176,13 +176,17 @@
     "privacyPolicy": "Datenschutz",
     "termsOfService": "AGB",
 
-    "dangerZone": "Konto",
+    "account": "Konto",
     "signOut": "Abmelden",
     "modeToggle": {
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System"
-    }
+    },
+    "editUsername": "Benutzername bearbeiten",
+    "enterNewUsername": "Neuen Benutzernamen eingeben",
+    "usernameCannotBeEmpty": "Benutzername darf nicht leer sein",
+    "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein"
   },
   "householdSettings": {
     "member": "Mitglied",
@@ -240,7 +244,7 @@
       }
     },
     "saveRecipe": "Rezept speichern",
-    "saveRecipeError": "Fehler beim Speichern des Rezepts. Bitte versuche es später erneut.",
+    "saveRecipeError": "Fehler beim Speichern des rezepts. Bitte versuche es später erneut.",
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
     "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
   },

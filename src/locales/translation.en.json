@@ -177,13 +177,17 @@
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
 
-    "dangerZone": "Account",
+    "account": "Account",
     "signOut": "Sign out",
     "modeToggle": {
       "light": "Light",
       "dark": "Dark",
       "system": "System"
-    }
+    },
+    "editUsername": "Edit Username",
+    "enterNewUsername": "Enter new username",
+    "usernameCannotBeEmpty": "Username cannot be empty",
+    "usernameLengthInvalid": "Username must be between 3 and 20 characters"
   },
   "householdSettings": {
     "member": "Member",
