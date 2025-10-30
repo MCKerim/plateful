@@ -231,13 +231,16 @@ export default function Settings() {
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <div className="flex justify-between items-center border-b">
-            <h2 className="font-medium">{t("settings.account")}</h2>
+            <h2 className="font-medium">
+              {t("settings.account")}
+            </h2>
+
             <Button
               variant="ghost"
-              size="icon"
+              size="iconSm"
               onClick={() => setIsUsernameDialogOpen(true)}
             >
-              <Pencil className="h-4 w-4" />
+              <Pencil />
             </Button>
           </div>
 
