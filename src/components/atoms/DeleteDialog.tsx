@@ -27,7 +27,7 @@ export default function DeleteDialog({ onDelete }: Readonly<Props>) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
-        <Button className="w-full hover:bg-destructive text-destructive" variant="ghost">
+        <Button className="w-full hover:bg-destructive" variant="ghost">
           <Trash2 size={20} />
         </Button>
       </DialogTrigger>
