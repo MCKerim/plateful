@@ -31,6 +31,7 @@ type RecipeItem = {
 type RecipeRatingWithUser = RecipeRatings & {
   users: {
     email: string;
+    username: string;
   };
 };
 
@@ -73,7 +74,7 @@ export default function Recipe() {
 
     supabase
       .from("recipe_ratings")
-      .select("*, users(email)")
+      .select("*, users(email, username)")
       .eq("recipe_id", recipeId)
       .then((response) => {
         if (response.data) {
@@ -370,8 +371,8 @@ export default function Recipe() {
 
         {ratings.map((rating) => {
           return (
-            <div className="mb-6" key={rating.id}>
-              <p>{rating.users.email}</p>
+            <div className="mb-6 font-semibold" key={rating.id}>
+              <p>{rating.users.username}</p>
 
               <div>
                 {Array.from({ length: 5 }, (_, index) => {

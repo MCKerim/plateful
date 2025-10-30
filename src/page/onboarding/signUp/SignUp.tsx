@@ -91,15 +91,9 @@ export default function SignUp() {
 
       <div className="flex flex-col items-center h-screen px-4 py-10">
         <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-          <h1
-            className="font-bold text-7xl first-font"
-          >
-            {t("signup.title")}
-          </h1>
+          <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
 
-          <p
-            className="text-sm text-muted-foreground second-font"
-          >
+          <p className="text-sm text-muted-foreground second-font">
             {t("signup.subtitle")}
           </p>
         </div>

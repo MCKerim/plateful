@@ -429,6 +429,7 @@ export type Database = {
           has_seen_value_screens: boolean
           household_id: number | null
           id: string
+          username: string
         }
         Insert: {
           created_at?: string
@@ -437,6 +438,7 @@ export type Database = {
           has_seen_value_screens?: boolean
           household_id?: number | null
           id?: string
+          username?: string
         }
         Update: {
           created_at?: string
@@ -445,6 +447,7 @@ export type Database = {
           has_seen_value_screens?: boolean
           household_id?: number | null
           id?: string
+          username?: string
         }
         Relationships: [
           {
