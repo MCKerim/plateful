@@ -446,7 +446,7 @@ export default function AddRecipe() {
 
   return (
     <Layout>
-      <div className="flex justify-between w-full mb-5 items-center">
+      <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold">
           {params.recipeId
             ? t("addRecipe.editRecipe")
