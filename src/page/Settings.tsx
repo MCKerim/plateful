@@ -214,17 +214,19 @@ export default function Settings() {
             {environment === "preview" && <span>- Preview </span>}
           </p>
 
-          <NavLink to="/privacy">
-            <Button variant="secondary" className="w-full">
-              {t("settings.privacyPolicy")}
-            </Button>
-          </NavLink>
+          <div className="flex gap-2">
+            <NavLink to="/privacy" className="w-full">
+              <Button variant="secondary" className="w-full">
+                {t("settings.privacyPolicy")}
+              </Button>
+            </NavLink>
 
-          <NavLink to="/terms">
-            <Button variant="secondary" className="w-full">
-              {t("settings.termsOfService")}
-            </Button>
-          </NavLink>
+            <NavLink to="/terms" className="w-full">
+              <Button variant="secondary" className="w-full">
+                {t("settings.termsOfService")}
+              </Button>
+            </NavLink>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
