@@ -25,7 +25,6 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/atoms/DeleteDialog";
-import { Separator } from "@/components/ui/separator";
 
 /*type RecipeItem = {
   itemName: string;
