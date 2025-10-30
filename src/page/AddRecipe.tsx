@@ -445,7 +445,7 @@ export default function AddRecipe() {
   }
 
   return (
-    <Layout>
+    <Layout showHeader={false} showFooter={false}>
       <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold">
           {params.recipeId

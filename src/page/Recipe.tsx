@@ -267,7 +267,7 @@ export default function Recipe() {
   }, [params.recipeId]);
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
