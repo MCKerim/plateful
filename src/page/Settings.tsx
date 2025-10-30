@@ -196,7 +196,9 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">{t("settings.dangerZone")}</h2>
 
-          {user?.email}
+          <p>
+            {user?.username} | {user?.email}
+          </p>
 
           <Button variant="destructive" onClick={signOut}>
             <LogOut size={16} /> {t("settings.signOut")}
