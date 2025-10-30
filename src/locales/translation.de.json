@@ -152,7 +152,7 @@
   },
   "home": {
     "title": "Startseite",
-    "enjoyCooking": "Viel Spaß beim Kochen!"
+    "enjoyCooking": "Viel Spaß beim Kochen, {{username}}!"
   },
   "explore": {
     "title": "Erkunden"

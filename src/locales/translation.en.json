@@ -152,7 +152,7 @@
   },
   "home": {
     "title": "Home",
-    "enjoyCooking": "Enjoy cooking!"
+    "enjoyCooking": "Enjoy cooking, {{username}}!"
   },
   "explore": {
     "title": "Explore"
