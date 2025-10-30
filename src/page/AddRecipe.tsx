@@ -446,19 +446,23 @@ export default function AddRecipe() {
   }
 
   const saveFooter = (
-    <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-      <Button
-        className="w-full"
-        variant="secondary"
-        onClick={() => navigate(-1)}
-      >
-        {t("common.cancel")}
-      </Button>
+    <>
+      <div className="h-[100px]"></div>
 
-      <Button className="w-full" variant="accent" onClick={saveRecipe}>
-        {t("common.save")}
-      </Button>
-    </div>
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+        <Button
+          className="w-full"
+          variant="secondary"
+          onClick={() => navigate(-1)}
+        >
+          {t("common.cancel")}
+        </Button>
+
+        <Button className="w-full" variant="accent" onClick={saveRecipe}>
+          {t("common.save")}
+        </Button>
+      </div>
+    </>
   );
 
   return (
