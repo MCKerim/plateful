@@ -446,9 +446,15 @@ export default function AddRecipe() {
 
   return (
     <Layout>
-      <h1 className="mb-10 text-2xl font-bold">
-        {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
-      </h1>
+      <div className="flex justify-between w-full mb-5 items-center">
+        <h1 className="text-2xl font-bold">
+          {params.recipeId
+            ? t("addRecipe.editRecipe")
+            : t("addRecipe.addRecipe")}
+        </h1>
+
+        {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
+      </div>
 
       <div className="grid items-center w-full gap-5">
         <ImagePicker
@@ -548,8 +554,6 @@ export default function AddRecipe() {
         <Button className="w-full" onClick={saveRecipe}>
           {t("common.save")}
         </Button>
-
-        {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
       </div>
     </Layout>
   );

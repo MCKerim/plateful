@@ -9,6 +9,7 @@ import {
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
+import { Trash2 } from "lucide-react";
 
 type Props = {
   onDelete: () => void;
@@ -26,8 +27,8 @@ export default function DeleteDialog({ onDelete }: Readonly<Props>) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
-        <Button className="w-full" variant="destructive">
-          {t("common.delete")}
+        <Button className="w-full hover:bg-destructive text-destructive" variant="ghost">
+          <Trash2 size={20} />
         </Button>
       </DialogTrigger>
 
@@ -37,9 +38,7 @@ export default function DeleteDialog({ onDelete }: Readonly<Props>) {
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">
-          <p>
-            {t("common.deleteConfirmation")}
-          </p>
+          <p>{t("common.deleteConfirmation")}</p>
 
           <div className="flex gap-2">
             <Button
