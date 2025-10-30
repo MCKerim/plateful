@@ -6,6 +6,7 @@ type Props = {
   showFooter?: boolean;
   headerButtons?: React.ReactNode;
   children?: React.ReactNode;
+  footer?: React.ReactNode;
 };
 
 export default function Layout({
@@ -13,6 +14,7 @@ export default function Layout({
   showFooter = true,
   children,
   headerButtons,
+  footer,
 }: Readonly<Props>) {
   return (
     <div className="flex flex-col items-center w-full max-w-lg min-h-screen m-auto">
@@ -22,7 +24,7 @@ export default function Layout({
         {children}
       </div>
 
-      {showFooter && <BottomNav />}
+      {footer ?? (showFooter && <BottomNav />)}
     </div>
   );
 }

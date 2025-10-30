@@ -25,6 +25,7 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/atoms/DeleteDialog";
+import { Separator } from "@/components/ui/separator";
 
 /*type RecipeItem = {
   itemName: string;
@@ -444,8 +445,16 @@ export default function AddRecipe() {
     }
   }
 
+  const saveFooter = (
+    <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex flex-col gap-4 border-border border-t-[1px]">
+      <Button className="w-full" onClick={saveRecipe}>
+        {t("common.save")}
+      </Button>
+    </div>
+  );
+
   return (
-    <Layout showHeader={false} showFooter={false}>
+    <Layout showHeader={true} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold">
           {params.recipeId
@@ -548,12 +557,6 @@ export default function AddRecipe() {
 
           <AddRecipeItemMenu onItemAdded={addItem} />
         </div>*/}
-      </div>
-
-      <div className="flex flex-col gap-2 mt-11">
-        <Button className="w-full" onClick={saveRecipe}>
-          {t("common.save")}
-        </Button>
       </div>
     </Layout>
   );
