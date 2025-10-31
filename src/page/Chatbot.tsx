@@ -31,6 +31,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -49,8 +50,9 @@ export default function Chatbot() {
   const visibleMessages = useAppSelector(selectVisibleMessages);
 
   const [inputValue, setInputValue] = useState("");
-  const [imageDataUrls, setImageDataUrls] = useState<string[]>([]);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
+    string[]
+  >([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -62,54 +64,39 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  async function fileToDataURL(file: File): Promise<string> {
-    // Keeps EXIF and content type
-    const buf = await file.arrayBuffer();
-    let binary = "";
-    const bytes = new Uint8Array(buf);
-    const chunk = 0x8000;
-    for (let i = 0; i < bytes.length; i += chunk) {
-      binary += String.fromCharCode(...bytes.subarray(i, i + chunk));
+  const handlePickImagesClick = async () => {
+    const image = await Camera.getPhoto({
+      quality: 70,
+      allowEditing: false,
+      resultType: CameraResultType.Base64,
+      source: CameraSource.Prompt,
+      saveToGallery: false,
+    });
+
+    if (!image.base64String) {
+      return;
     }
-    const b64 = btoa(binary);
-    const mime = file.type || "image/png";
-    return `data:${mime};base64,${b64}`;
-  }
 
-  const handlePickImagesClick = () => fileInputRef.current?.click();
-
-  const handleFilesSelected = async (
-    e: React.ChangeEvent<HTMLInputElement>
-  ) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-
-    // Convert to data URLs
-    const asDataUrls = await Promise.all(files.map(fileToDataURL));
-    // Keep a small cap to avoid huge payloads
-    const capped = asDataUrls.slice(0, 4);
-    setImageDataUrls((prev) => [...prev, ...capped].slice(0, 4));
-    // Clear input so same file can be uploaded again later
-    e.target.value = "";
+    setSelectedImagesAsbase64((prev) => [...prev, image.base64String!]);
   };
 
   const handleRemoveImage = (index: number) => {
-    setImageDataUrls((prev) => prev.filter((_, i) => i !== index));
+    setSelectedImagesAsbase64((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSendMessage = async () => {
-    if (!inputValue.trim() && imageDataUrls.length === 0) return;
+    if (!inputValue.trim() && selectedImagesAsbase64.length === 0) return;
 
     // Show the user message in the UI right away
     const userMessage: ChatMessage & { images?: string[] } = {
       role: "user",
       content: inputValue || "",
-      images: imageDataUrls,
+      images: selectedImagesAsbase64,
     };
 
     dispatch(addMessage(userMessage));
     setInputValue("");
-    setImageDataUrls([]);
+    setSelectedImagesAsbase64([]);
     dispatch(setIsTyping(true));
 
     try {
@@ -175,7 +162,7 @@ export default function Chatbot() {
   const handleResetChat = () => {
     dispatch(resetChat());
     setInputValue("");
-    setImageDataUrls([]);
+    setSelectedImagesAsbase64([]);
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
@@ -406,9 +393,9 @@ export default function Chatbot() {
       {/* Input Area */}
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
         {/* small strip of selected image previews before sending */}
-        {imageDataUrls.length > 0 && (
+        {selectedImagesAsbase64.length > 0 && (
           <div className="flex gap-2 flex-wrap mb-2">
-            {imageDataUrls.map((src, i) => (
+            {selectedImagesAsbase64.map((imageAsBase64, i) => (
               <button
                 key={i}
                 className="relative"
@@ -417,7 +404,9 @@ export default function Chatbot() {
                 title={t("common.remove")}
               >
                 <img
-                  src={src}
+                  src={`data:image/jpeg;base64,${imageAsBase64}`}
+                  srcSet={`data:image/jpeg;base64,${imageAsBase64}`}
+                  loading="lazy"
                   alt={`preview-${i}`}
                   className="rounded-md border w-12 h-12 object-cover"
                 />
@@ -441,16 +430,6 @@ export default function Chatbot() {
           >
             <ImagePlus className="w-5 h-5" />
           </Button>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={handleFilesSelected}
-            capture="environment"
-          />
 
           <Input
             type="text"
