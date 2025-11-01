@@ -25,8 +25,6 @@ export default function Settings() {
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [newUsername, setNewUsername] = useState(user?.username || "");
 
-  const environment = import.meta.env.VITE_NODE_ENV;
-
   useEffect(() => {
     // Benutzeridentifikation mit Canny
     supabase.auth.getUser().then(({ data, error }) => {
@@ -211,7 +209,6 @@ export default function Settings() {
 
           <p className="text-sm">
             v0.0.3 <span>- Beta </span>
-            {environment === "preview" && <span>- Preview </span>}
           </p>
 
           <div className="flex gap-2">

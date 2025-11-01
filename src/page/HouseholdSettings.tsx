@@ -46,7 +46,7 @@ export default function HouseholdSettings() {
   const [editedName, setEditedName] = useState("");
 
   async function removeMember(memberId: string) {
-    if (!household || !user?.household_id) {
+    if (!household || !user?.household_id || memberId === user.id) {
       return;
     }
 
@@ -231,13 +231,23 @@ export default function HouseholdSettings() {
 
       <Separator className="my-2" />
 
-      <Button variant="destructive" onClick={leaveHousehold}>
-        <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
-      </Button>
+      <div className="w-full gap-2 flex">
+        <Button
+          variant="destructive"
+          className="w-full"
+          onClick={leaveHousehold}
+        >
+          <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
+        </Button>
 
-      <Button variant="destructive" onClick={deleteHousehold}>
-        <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
-      </Button>
+        <Button
+          variant="destructive"
+          className="w-full"
+          onClick={deleteHousehold}
+        >
+          <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
+        </Button>
+      </div>
 
       {/* Leave Household Confirmation Dialog */}
       <Dialog
@@ -249,29 +259,31 @@ export default function HouseholdSettings() {
             <DialogTitle>
               {t("householdSettings.confirmations.leaveHousehold.title")}
             </DialogTitle>
-
-            <DialogDescription>
-              {t("householdSettings.confirmations.leaveHousehold.description")}
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="flex gap-2 mt-4">
-            <Button
-              variant="secondary"
-              onClick={() => setShowLeaveConfirmation(false)}
-              className="w-full"
-            >
-              {t("householdSettings.confirmations.leaveHousehold.cancel")}
-            </Button>
+          <DialogDescription className="flex flex-col gap-4 py-4">
+            <p>
+              {t("householdSettings.confirmations.leaveHousehold.description")}
+            </p>
 
-            <Button
-              variant="destructive"
-              onClick={confirmLeaveHousehold}
-              className="w-full"
-            >
-              {t("householdSettings.confirmations.leaveHousehold.confirm")}
-            </Button>
-          </div>
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setShowLeaveConfirmation(false)}
+              >
+                {t("householdSettings.confirmations.leaveHousehold.cancel")}
+              </Button>
+
+              <Button
+                className="w-full"
+                variant="destructive"
+                onClick={confirmLeaveHousehold}
+              >
+                {t("householdSettings.confirmations.leaveHousehold.confirm")}
+              </Button>
+            </div>
+          </DialogDescription>
         </DialogContent>
       </Dialog>
 
@@ -285,29 +297,31 @@ export default function HouseholdSettings() {
             <DialogTitle>
               {t("householdSettings.confirmations.deleteHousehold.title")}
             </DialogTitle>
-
-            <DialogDescription>
-              {t("householdSettings.confirmations.deleteHousehold.description")}
-            </DialogDescription>
           </DialogHeader>
 
-          <div className="flex gap-2 mt-4">
-            <Button
-              className="w-full"
-              variant="secondary"
-              onClick={() => setShowDeleteConfirmation(false)}
-            >
-              {t("householdSettings.confirmations.deleteHousehold.cancel")}
-            </Button>
+          <DialogDescription className="flex flex-col gap-4 py-4">
+            <p>
+              {t("householdSettings.confirmations.deleteHousehold.description")}
+            </p>
 
-            <Button
-              variant="destructive"
-              onClick={confirmDeleteHousehold}
-              className="w-full"
-            >
-              {t("householdSettings.confirmations.deleteHousehold.confirm")}
-            </Button>
-          </div>
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setShowDeleteConfirmation(false)}
+              >
+                {t("householdSettings.confirmations.deleteHousehold.cancel")}
+              </Button>
+
+              <Button
+                className="w-full"
+                variant="destructive"
+                onClick={confirmDeleteHousehold}
+              >
+                {t("householdSettings.confirmations.deleteHousehold.confirm")}
+              </Button>
+            </div>
+          </DialogDescription>
         </DialogContent>
       </Dialog>
     </Layout>

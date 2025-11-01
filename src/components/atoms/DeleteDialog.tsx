@@ -34,7 +34,9 @@ export default function DeleteDialog({ onDelete }: Readonly<Props>) {
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("common.deleteTitle")}</DialogTitle>
+          <DialogTitle>
+            {t("common.deleteTitle")}
+          </DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">

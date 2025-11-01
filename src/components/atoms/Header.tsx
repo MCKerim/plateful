@@ -8,8 +8,6 @@ type Props = {
 };
 
 export default function Header({ buttons }: Readonly<Props>) {
-  const environment = import.meta.env.VITE_NODE_ENV;
-
   return (
     <>
       <div style={{ height: "38px" }}></div>
@@ -17,17 +15,13 @@ export default function Header({ buttons }: Readonly<Props>) {
       <div className="fixed top-0 z-20 w-full max-w-lg pt-1 bg-background">
         <div className="flex items-center justify-between w-full px-2">
           <div className="flex items-center gap-1">
-            <h1 className="text-xl font-bold first-font">Plateful</h1>
+            <h1 className="text-xl font-bold first-font">
+              Plateful
+            </h1>
 
             <div className="text-xs font-bold bg-accent text-accent-foreground py-0.5 px-2 rounded-full">
               Beta
             </div>
-
-            {environment === "preview" && (
-              <div className="text-xs font-bold bg-primary text-primary-foreground py-0.5 px-2 rounded-full">
-                Preview
-              </div>
-            )}
           </div>
 
           <div className="flex gap-2">
