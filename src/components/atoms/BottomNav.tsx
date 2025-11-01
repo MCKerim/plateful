@@ -13,12 +13,14 @@ export default function BottomNav() {
 
       <div className="fixed bottom-0 z-20 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
         <div className="flex justify-between w-full gap-1 px-2">
-          <BottomNavButton
-            label={t("bottomNav.home")}
-            icon="home"
-            link="/home"
-            active={globalThis.location.pathname.startsWith("/home")}
-          />
+          {/*
+            <BottomNavButton
+              label={t("bottomNav.home")}
+              icon="home"
+              link="/home"
+              active={globalThis.location.pathname.startsWith("/home")}
+            />
+          */}
 
           <BottomNavButton
             label={t("bottomNav.chatbot")}
@@ -49,12 +51,14 @@ export default function BottomNav() {
             active={globalThis.location.pathname.startsWith("/planner")}
           />
 
-          <BottomNavButton
-            label={t("bottomNav.list")}
-            icon="lists"
-            link="/lists"
-            active={globalThis.location.pathname.startsWith("/lists")}
-          />
+          {/*
+            <BottomNavButton
+              label={t("bottomNav.list")}
+              icon="lists"
+              link="/lists"
+              active={globalThis.location.pathname.startsWith("/lists")}
+            />
+          */}
         </div>
       </div>
     </>
