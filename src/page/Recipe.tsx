@@ -21,6 +21,8 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
+import { formatDate as dateFnsFormatDate } from "date-fns";
+import { de } from "date-fns/locale";
 
 type RecipeItem = {
   id: number;
@@ -37,7 +39,7 @@ type RecipeRatingWithUser = RecipeRatings & {
 
 export default function Recipe() {
   const { supabase } = useSupabase();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -74,7 +76,7 @@ export default function Recipe() {
 
     supabase
       .from("recipe_ratings")
-      .select("*, users(email, username)")
+      .select("*, users(created_at, email, username)")
       .eq("recipe_id", recipeId)
       .then((response) => {
         if (response.data) {
@@ -267,8 +269,17 @@ export default function Recipe() {
     getMealPlanningInfo();
   }, [params.recipeId]);
 
+  const formatDateByLocale = (date: string | Date) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+    return dateFnsFormatDate(
+      dateObj,
+      i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
+      { locale: i18n.language === "de" ? de : undefined }
+    );
+  };
+
   return (
-    <Layout showHeader={false}>
+    <Layout showHeader={false} showFooter={false}>
       <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
@@ -355,8 +366,6 @@ export default function Recipe() {
         </NavLink>
       )}
 
-      <RatingModal recipeId={recipe?.id} />
-
       <MarkdownRenderer
         content={recipe?.description || ""}
         className="font-medium"
@@ -367,12 +376,18 @@ export default function Recipe() {
           {t("recipe.ratings")}
         </h2>
 
+        <RatingModal recipeId={recipe?.id} />
+
         {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
 
         {ratings.map((rating) => {
           return (
             <div className="mb-6 font-semibold" key={rating.id}>
-              <p>{rating.users.username}</p>
+              <div className="flex justify-between items-center">
+                <p>{rating.users.username}</p>
+
+                <p>{formatDateByLocale(rating.created_at)}</p>
+              </div>
 
               <div>
                 {Array.from({ length: 5 }, (_, index) => {

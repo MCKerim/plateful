@@ -69,14 +69,11 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         {showTriggerButton && (
-          <DialogTrigger>
-            <Button variant="outline" className="w-full">
-              {
-                <>
-                  <HotelClassIcon />
-                  {t("rating.rate")}
-                </>
-              }
+          <DialogTrigger className="w-full mb-6">
+            <Button variant="secondary" className="w-full">
+              <HotelClassIcon />
+
+              {t("rating.rate")}
             </Button>
           </DialogTrigger>
         )}
