@@ -120,7 +120,7 @@ function App() {
         // get household members
         const { data: membersData, error: membersError } = await supabase
           .from("users")
-          .select("id, email")
+          .select("id, email, username")
           .eq("household_id", userData.household_id);
 
         if (membersError) {

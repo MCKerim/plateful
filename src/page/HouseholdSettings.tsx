@@ -196,8 +196,7 @@ export default function HouseholdSettings() {
             className="flex items-center justify-between"
             onClick={() => removeMember(member.id)}
           >
-            {member.email}
-
+            {member.username} - {member.email}
             {member.id === user?.id ? (
               <span className="text-sm text-muted-foreground">
                 {t("householdSettings.you")}

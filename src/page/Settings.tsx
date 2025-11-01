@@ -242,7 +242,7 @@ export default function Settings() {
           </div>
 
           <p>
-            {user?.username} | {user?.email}
+            {user?.username} - {user?.email}
           </p>
 
           <Button variant="destructive" onClick={signOut}>
