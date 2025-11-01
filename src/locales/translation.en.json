@@ -125,7 +125,7 @@
   "mealPlanner": {
     "title": "Meal planner",
     "selectNumberOfDays": "Select the number of days",
-    "alreadyEaten": "Already eaten",
+    "alreadyEaten": "Recently eaten",
     "nothingPlanned": "No recipes planned..."
   },
   "cookbook": {

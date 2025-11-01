@@ -125,7 +125,7 @@
   "mealPlanner": {
     "title": "Essens Planer",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus",
-    "alreadyEaten": "Bereits gegessen",
+    "alreadyEaten": "Zuletzt gegessen",
     "nothingPlanned": "Keine Rezepte geplant..."
   },
   "cookbook": {
