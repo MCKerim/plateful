@@ -246,7 +246,7 @@
     "saveRecipe": "Rezept speichern",
     "saveRecipeError": "Fehler beim Speichern des rezepts. Bitte versuche es später erneut.",
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
-    "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
+    "inputPlaceholder": "Frage nach Rezepten oder Tipps!"
   },
   "rating": {
     "rate": "Bewerte dieses Rezept",
