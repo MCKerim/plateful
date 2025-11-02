@@ -278,8 +278,18 @@ export default function Recipe() {
     );
   };
 
+  const saveFooter = (
+    <>
+      <div className="h-[100px]"></div>
+
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
+      </div>
+    </>
+  );
+
   return (
-    <Layout showHeader={false} showFooter={false}>
+    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <AspectRatio ratio={16 / 9} className="-z-10">
         <img
           src={
@@ -353,13 +363,8 @@ export default function Recipe() {
         </div>
       </div>
 
-      {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
-
       {recipe?.link && (
-        <NavLink
-          to={recipe.link}
-          className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
-        >
+        <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
           <Link />
 
           {t("recipe.toTheRecipe")}

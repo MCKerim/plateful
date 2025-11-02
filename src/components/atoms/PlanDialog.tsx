@@ -53,8 +53,8 @@ export default function PlanDialog({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-      <DialogTrigger>
-        <Button className="w-full">
+      <DialogTrigger asChild>
+        <Button className="w-full" variant="accent">
           {isEdit ? (
             <Pencil />
           ) : (
