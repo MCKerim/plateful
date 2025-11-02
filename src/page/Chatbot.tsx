@@ -318,7 +318,7 @@ export default function Chatbot() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <Button
-                          variant="secondary"
+                          variant="accent"
                           size="sm"
                           className="mt-2 max-w-full"
                         >
@@ -330,7 +330,7 @@ export default function Chatbot() {
 
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>
+                          <DialogTitle className="second-font text-lg font-bold mt-2">
                             {message.toolOutputsForUI[0].args.title}
                           </DialogTitle>
                         </DialogHeader>
@@ -353,6 +353,7 @@ export default function Chatbot() {
 
                           <Button
                             className="w-full"
+                            variant="accent"
                             onClick={() =>
                               saveSuggestedRecipe(
                                 message.toolOutputsForUI[0].args.title ?? "",
