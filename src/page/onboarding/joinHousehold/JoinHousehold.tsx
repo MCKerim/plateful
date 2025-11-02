@@ -9,7 +9,9 @@ export default function JoinHousehold() {
   return (
     <div className="relative flex flex-col items-center justify-between h-screen px-4 py-6 overflow-hidden">
       <div className="text-center">
-        <h1 className="text-4xl font-bold">{t("joinHousehold.title")}</h1>
+        <h1 className="text-4xl font-bold">
+          {t("joinHousehold.title")}
+        </h1>
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-4 mx-auto">

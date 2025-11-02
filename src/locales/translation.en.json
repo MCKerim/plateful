@@ -100,6 +100,7 @@
   "inviteLink": {
     "shareTitle": "Plateful - Cook Together! 🏡",
     "shareText": "Hey! Let's plan meals and share recipes together. Join my Plateful household:",
+    "shareDialogTitle": "Share with Friends",
     "copyButton": "Copy Link",
     "shareButton": "Share Link",
     "copySuccess": "Invitation link copied to clipboard!",

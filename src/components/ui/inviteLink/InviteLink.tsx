@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../button";
 import { Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { Share } from "@capacitor/share";
 
 export default function InviteLink() {
   const { supabase } = useSupabase();
@@ -48,19 +49,15 @@ export default function InviteLink() {
   }
 
   async function shareInviteLink() {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: t("inviteLink.shareTitle"),
-          text: t("inviteLink.shareText"),
-          url: inviteLink,
-        });
-      } catch (err) {
-        console.error("Fehler beim Teilen:", err);
-      }
-    } else {
-      // Fallback, z.B. Link kopieren
-      alert(t("inviteLink.shareNotSupported"));
+    try {
+      await Share.share({
+        title: t("inviteLink.shareTitle"),
+        text: t("inviteLink.shareText"),
+        url: inviteLink,
+        dialogTitle: t("inviteLink.shareDialogTitle"),
+      });
+    } catch (err) {
+      console.error("Fehler beim Teilen des Links:", err);
       await copyInviteLink();
     }
   }

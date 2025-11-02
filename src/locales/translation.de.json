@@ -106,6 +106,7 @@
   "inviteLink": {
     "shareTitle": "Plateful - Gemeinsam kochen! 🏡",
     "shareText": "Hey! Lass uns gemeinsam Mahlzeiten planen und Rezepte teilen. Tritt meinem Plateful-Haushalt bei:",
+    "shareDialogTitle": "Teile mit Freunden",
     "copyButton": "Link kopieren",
     "shareButton": "Link teilen",
     "copySuccess": "Einladungslink wurde in die Zwischenablage kopiert!",
