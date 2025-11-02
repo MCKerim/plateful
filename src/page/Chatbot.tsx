@@ -22,7 +22,11 @@ import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
-import { DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
+import {
+  DialogDescription,
+  DialogTitle,
+  DialogTrigger,
+} from "@radix-ui/react-dialog";
 import {
   Dialog,
   DialogClose,
@@ -333,6 +337,10 @@ export default function Chatbot() {
                           <DialogTitle className="second-font text-lg font-bold mt-2">
                             {message.toolOutputsForUI[0].args.title}
                           </DialogTitle>
+
+                          <DialogDescription className="text-sm text-muted-foreground">
+                            {t("chatbot.saveRecipePrompt")}
+                          </DialogDescription>
                         </DialogHeader>
 
                         <ScrollArea className="max-h-[60vh] rounded-md border p-2">

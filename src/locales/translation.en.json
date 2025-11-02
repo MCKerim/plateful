@@ -240,7 +240,8 @@
     "saveRecipe": "Save recipe",
     "saveRecipeError": "Error saving recipe. Please try again later.",
     "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
-    "inputPlaceholder": "Ask about recipes or tips!"
+    "inputPlaceholder": "Ask about recipes or tips!",
+    "saveRecipePrompt": "Save this recipe or ask for changes"
   },
   "bottomNav": {
     "home": "Home",
