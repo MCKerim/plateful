@@ -36,7 +36,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref
   ) => {
     const [currentLength, setCurrentLength] = React.useState(
-      (props.value as string)?.length || (props.defaultValue as string)?.length || 0
+      (props.value as string)?.length ||
+        (props.defaultValue as string)?.length ||
+        0
     );
 
     // Update currentLength when value prop changes
@@ -66,7 +68,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     // Common button classes
     const buttonClasses =
-      "absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors";
+      "absolute right-0 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors h-full w-12 flex items-center justify-center";
 
     // Render action button based on type
     const renderActionButton = () => {
@@ -112,7 +114,9 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             <div className="absolute text-xs bottom-11 right-3 text-muted-foreground">
               <span
                 className={
-                  currentLength + 1 > maxLength ? "text-destructive font-bold" : ""
+                  currentLength + 1 > maxLength
+                    ? "text-destructive font-bold"
+                    : ""
                 }
               >
                 {currentLength}/{maxLength}
