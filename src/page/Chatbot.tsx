@@ -36,6 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -173,12 +174,30 @@ export default function Chatbot() {
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(title: string, description: string) {
+  async function saveSuggestedRecipe(
+    title: string,
+    description: string,
+    category: string
+  ) {
+    console.log("Saving suggested recipe:", title, category);
+    let categoryId = getCategoryIdByTranslatedEnglishName(category);
+
+    if (categoryId === null) {
+      console.error("Invalid category:", category);
+      categoryId = 5;
+    }
+
     // Insert new recipe
     const { data, error } = await supabase
       .from("recipes")
       .insert([
-        { name: title, description, link: null, household_id: householdId },
+        {
+          name: title,
+          description,
+          link: null,
+          household_id: householdId,
+          category: categoryId,
+        },
       ])
       .select();
 
@@ -338,8 +357,8 @@ export default function Chatbot() {
                             {message.toolOutputsForUI[0].args.title}
                           </DialogTitle>
 
-                          <DialogDescription className="text-sm text-muted-foreground">
-                            {t("chatbot.saveRecipePrompt")}
+                          <DialogDescription className="text-sm font-medium text-muted-foreground">
+                            {message.toolOutputsForUI[0].args.category}
                           </DialogDescription>
                         </DialogHeader>
 
@@ -351,6 +370,10 @@ export default function Chatbot() {
                             className="font-medium"
                           />
                         </ScrollArea>
+
+                        <div className="text-sm text-muted-foreground">
+                          {t("chatbot.saveRecipePrompt")}
+                        </div>
 
                         <DialogFooter className="flex-row w-full gap-2">
                           <DialogClose className="w-full">
@@ -366,7 +389,8 @@ export default function Chatbot() {
                               saveSuggestedRecipe(
                                 message.toolOutputsForUI[0].args.title ?? "",
                                 message.toolOutputsForUI[0].args.description ??
-                                  ""
+                                  "",
+                                message.toolOutputsForUI[0].args.category
                               )
                             }
                           >
