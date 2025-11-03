@@ -343,7 +343,7 @@ export default function Chatbot() {
                         <Button
                           variant="accent"
                           size="sm"
-                          className="mt-2 max-w-full"
+                          className="mt-2 w-full"
                         >
                           <span className="truncate">
                             {message.toolOutputsForUI[0].args.title}
