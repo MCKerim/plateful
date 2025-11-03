@@ -210,7 +210,7 @@ function App() {
     );
   }
 
-  if (loading) {
+  if (loading && !user) {
     return <LoadingScreen />;
   }
 
