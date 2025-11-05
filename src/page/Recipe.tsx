@@ -384,7 +384,7 @@ export default function Recipe() {
 
         <RatingModal recipeId={recipe?.id} />
 
-        <h2 className="second-font text-xl font-bold mb-1">
+        <h2 className="first-font text-xl font-bold mb-1">
           {t("recipe.ratings")}
         </h2>
 
