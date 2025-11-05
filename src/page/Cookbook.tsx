@@ -195,11 +195,7 @@ export default function Cookbook() {
             );
           })}
 
-          <CategoryButton
-            key={0}
-            id={0}
-            name={t("categorys.allRecipes")}
-          />
+          <CategoryButton key={0} id={0} name={t("categorys.allRecipes")} />
         </div>
       )}
 
