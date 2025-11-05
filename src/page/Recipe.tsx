@@ -394,9 +394,13 @@ export default function Recipe() {
           return (
             <div className="mb-6 font-semibold" key={rating.id}>
               <div className="flex justify-between items-center">
-                <p>{rating.users.username}</p>
+                <p>
+                  {rating.users.username}
+                </p>
 
-                <p>{formatDateByLocale(rating.created_at)}</p>
+                <p className="text-sm font-normal text-muted-foreground">
+                  {formatDateByLocale(rating.created_at)}
+                </p>
               </div>
 
               <div>
