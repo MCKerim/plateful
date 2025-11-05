@@ -81,7 +81,7 @@ export default function CategoryButton({
 
       {/* Front part of the folder with label */}
       <div
-        className="absolute bottom-0 left-0 right-0 h-[106px] flex items-center justify-center rounded-lg"
+        className="absolute bottom-0 left-0 right-0 h-28 flex items-center justify-center rounded-lg"
         style={{ backgroundColor: frontColor }}
       >
         <p className="first-font text-background z-40 break-words text-center text-xl px-2">
