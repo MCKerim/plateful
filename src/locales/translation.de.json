@@ -135,6 +135,7 @@
     "nothingFound": "Keine Rezepte gefunden..."
   },
   "recipe": {
+    "editRecipe": "Rezept bearbeiten",
     "toTheRecipe": "Zum Rezept",
     "planRecipe": "Rezept planen",
     "ratings": "Bewertungen",

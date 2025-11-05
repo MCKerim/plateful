@@ -284,6 +284,15 @@ export default function Recipe() {
       <div className="h-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+        <NavLink
+          to={`/recipe/edit/${recipe?.id}`}
+          className={buttonVariants({ variant: "secondary" }) + " w-full"}
+        >
+          <Pencil />
+
+          {t("recipe.editRecipe")}
+        </NavLink>
+
         {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
       </div>
     </>
@@ -303,13 +312,6 @@ export default function Recipe() {
 
       <div className="flex justify-between">
         <h1 className="first-font text-2xl font-bold">{recipe?.name}</h1>
-
-        <NavLink
-          to={`/recipe/edit/${recipe?.id}`}
-          className="flex items-center pl-6"
-        >
-          <Pencil height={18} width={18} />
-        </NavLink>
       </div>
 
       {imageUrls.length > 1 && (

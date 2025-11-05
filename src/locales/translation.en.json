@@ -135,6 +135,7 @@
     "nothingFound": "No recipes found..."
   },
   "recipe": {
+    "editRecipe": "Edit recipe",
     "toTheRecipe": "To the recipe",
     "planRecipe": "Plan recipe",
     "ratings": "Ratings",
