@@ -23,6 +23,7 @@ import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
 import { formatDate as dateFnsFormatDate } from "date-fns";
 import { de } from "date-fns/locale";
+import { Separator } from "@/components/ui/separator";
 
 type RecipeItem = {
   id: number;
@@ -371,13 +372,17 @@ export default function Recipe() {
         </NavLink>
       )}
 
+      <Separator />
+
       <MarkdownRenderer
         content={recipe?.description || ""}
         className="font-medium"
       />
 
       <div>
-        <h2 className="second-font text-xl font-bold border-t-2 mt-4 mb-1">
+        <Separator />
+
+        <h2 className="second-font text-xl font-bold mt-4 mb-1">
           {t("recipe.ratings")}
         </h2>
 
