@@ -199,7 +199,6 @@ export default function Cookbook() {
             key={0}
             id={0}
             name={t("categorys.allRecipes")}
-            color="zinc"
           />
         </div>
       )}
