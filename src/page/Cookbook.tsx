@@ -160,7 +160,7 @@ export default function Cookbook() {
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="sticky z-10 flex items-center w-full gap-1 my-1 top-14">
+      <div className="sticky z-20 flex items-center w-full gap-1 my-1 top-14">
         <Input
           className="rounded-full"
           type="text"
@@ -183,7 +183,7 @@ export default function Cookbook() {
       )}
 
       {categoryId === null && searchTerm.trim() === "" && (
-        <div className="grid items-center justify-center grid-cols-2 gap-y-4 gap-x-4">
+        <div className="grid items-center justify-center grid-cols-2 gap-6">
           {categories.map((cat) => {
             return (
               <CategoryButton
