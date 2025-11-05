@@ -380,25 +380,25 @@ export default function Recipe() {
       />
 
       <div>
-        <Separator />
-
-        <h2 className="second-font text-xl font-bold mt-4 mb-1">
-          {t("recipe.ratings")}
-        </h2>
+        <Separator className="mb-2 mt-4" />
 
         <RatingModal recipeId={recipe?.id} />
+
+        <h2 className="second-font text-xl font-bold mb-1">
+          {t("recipe.ratings")}
+        </h2>
 
         {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
 
         {ratings.map((rating) => {
           return (
-            <div className="mb-6 font-semibold" key={rating.id}>
+            <div className="mb-6" key={rating.id}>
               <div className="flex justify-between items-center">
-                <p>
+                <p className="font-semibold second-font">
                   {rating.users.username}
                 </p>
 
-                <p className="text-sm font-normal text-muted-foreground">
+                <p className="text-sm text-muted-foreground">
                   {formatDateByLocale(rating.created_at)}
                 </p>
               </div>
