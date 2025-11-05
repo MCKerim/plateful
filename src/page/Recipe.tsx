@@ -7,13 +7,14 @@ import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import {
   MealPlanning,
-  RecipeRatings,
   Recipes,
 } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
-import RatingModal from "@/components/atoms/RatingModal";
+import RatingModal, {
+  RecipeRatingWithUser,
+} from "@/components/atoms/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useAppSelector } from "@/redux/hooks";
@@ -29,13 +30,6 @@ type RecipeItem = {
   id: number;
   itemName: string;
   amount: string;
-};
-
-type RecipeRatingWithUser = RecipeRatings & {
-  users: {
-    email: string;
-    username: string;
-  };
 };
 
 export default function Recipe() {
@@ -73,12 +67,13 @@ export default function Recipe() {
 
   useEffect(() => {
     if (!params.recipeId) return;
-    const recipeId = parseInt(params.recipeId);
+    const recipeId = Number.parseInt(params.recipeId);
 
     supabase
       .from("recipe_ratings")
       .select("*, users(created_at, email, username)")
       .eq("recipe_id", recipeId)
+      .order("created_at", { ascending: false })
       .then((response) => {
         if (response.data) {
           setRatings(response.data);
@@ -384,7 +379,28 @@ export default function Recipe() {
       <div>
         <Separator className="mb-2 mt-4" />
 
-        <RatingModal recipeId={recipe?.id} />
+        <RatingModal
+          recipeId={recipe?.id}
+          ratingSubmittedCallback={(newRating) => {
+            setRatings((prevRatings) => {
+              const updatedRatings = [newRating, ...prevRatings];
+
+              const totalStars = updatedRatings.reduce(
+                (acc, rating) => acc + rating.stars,
+                0
+              );
+
+              const avgStars =
+                updatedRatings.length > 0
+                  ? totalStars / updatedRatings.length
+                  : null;
+
+              setAverageRating(avgStars);
+
+              return updatedRatings;
+            });
+          }}
+        />
 
         <h2 className="first-font text-xl font-bold mb-1">
           {t("recipe.ratings")}
