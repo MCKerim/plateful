@@ -1,11 +1,9 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
 
 export default function EmailVerification() {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
@@ -32,45 +30,20 @@ export default function EmailVerification() {
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-        <div className="mb-6 text-6xl">✉️</div>
-        <h1 className="font-bold text-5xl first-font">{t("emailVerification.title")}</h1>
-        <p className="text-sm text-muted-foreground second-font mt-4">
-          {t("emailVerification.subtitle")}
-        </p>
-      </div>
+        <h1 className="font-bold text-5xl first-font">
+          {t("emailVerification.title")}
+        </h1>
 
-      <div className="flex flex-col w-full max-w-sm gap-4 mb-8">
-        <div className="p-4 bg-muted rounded-lg text-center">
-          <p className="text-sm font-medium">{email}</p>
-          <p className="text-xs text-muted-foreground mt-2">
-            {t("emailVerification.checkEmail")}
-          </p>
-        </div>
-
-        <p className="text-xs text-muted-foreground text-center">
-          {t("emailVerification.description")}
+        <p className="text-md second-font mt-4 p-4">
+          {t("emailVerification.subtitle", { email: email })}
         </p>
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-3">
         <OnboardingButton
-          label={t("emailVerification.continueButton")}
-          onClick={() => navigate("/")}
-        />
-
-        <button
+          label={t("emailVerification.resendButton")}
           onClick={handleResendEmail}
-          className="px-4 py-2 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-        >
-          {t("emailVerification.resendButton")}
-        </button>
-
-        <button
-          onClick={() => navigate("/signup/email")}
-          className="px-4 py-2 text-sm text-muted-foreground hover:text-primary underline underline-offset-4 transition-colors"
-        >
-          {t("emailVerification.changeEmailButton")}
-        </button>
+        />
       </div>
     </div>
   );

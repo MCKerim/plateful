@@ -125,6 +125,8 @@
   "emailSignup": {
     "title": "Create Account",
     "subtitle": "Sign up with your email",
+    "displayNameLabel": "Display Name",
+    "displayNamePlaceholder": "Your name",
     "emailLabel": "Email",
     "emailPlaceholder": "your@email.com",
     "passwordLabel": "Password",
@@ -143,11 +145,11 @@
   },
   "emailVerification": {
     "title": "Check Your Email",
-    "subtitle": "We've sent you a verification link",
+    "subtitle": "We've sent a verification link to {{email}}",
     "checkEmail": "Check your email inbox and click the verification link to activate your account",
     "description": "This helps us confirm your email address and secure your account.",
     "continueButton": "Back to Home",
-    "resendButton": "Resend verification email",
+    "resendButton": "Resend email",
     "changeEmailButton": "Use a different email",
     "resendSent": "Verification email resent. Please check your inbox."
   },

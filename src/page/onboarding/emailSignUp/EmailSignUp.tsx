@@ -13,11 +13,12 @@ export default function EmailSignUp() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isFormValid = () => {
-    return email.trim() !== "" && password.trim() !== "" && email.includes("@");
+    return email.trim() !== "" && password.trim() !== "" && displayName.trim() !== "" && email.includes("@");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -42,6 +43,9 @@ export default function EmailSignUp() {
         password,
         options: {
           emailRedirectTo: `${globalThis.location.origin}/`,
+          data: {
+            display_name: displayName,
+          },
         },
       });
 
@@ -69,6 +73,22 @@ export default function EmailSignUp() {
         onSubmit={handleSignUp}
         className="flex flex-col w-full max-w-sm gap-4"
       >
+        <div className="flex flex-col gap-2">
+          <Label htmlFor="displayName">
+            {t("emailSignup.displayNameLabel")}
+          </Label>
+
+          <Input
+            id="displayName"
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder={t("emailSignup.displayNamePlaceholder")}
+            disabled={loading}
+            required
+          />
+        </div>
+
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">
             {t("emailSignup.emailLabel")}

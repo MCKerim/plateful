@@ -32,6 +32,8 @@
   "emailSignup": {
     "title": "Konto erstellen",
     "subtitle": "Melden Sie sich mit Ihrer E-Mail an",
+    "displayNameLabel": "Anzeigename",
+    "displayNamePlaceholder": "Ihr Name",
     "emailLabel": "E-Mail",
     "emailPlaceholder": "ihre@email.de",
     "passwordLabel": "Passwort",
@@ -50,11 +52,11 @@
   },
   "emailVerification": {
     "title": "Überprüfen Sie Ihre E-Mail",
-    "subtitle": "Wir haben Ihnen einen Bestätigungslink gesendet",
+    "subtitle": "Wir haben einen Bestätigungslink an {{email}} gesendet",
     "checkEmail": "Überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink, um Ihr Konto zu aktivieren",
     "description": "Dies hilft uns, Ihre E-Mail-Adresse zu bestätigen und Ihr Konto zu sichern.",
     "continueButton": "Zurück nach Hause",
-    "resendButton": "Bestätigungsemail erneut senden",
+    "resendButton": "Erneut senden",
     "changeEmailButton": "Eine andere E-Mail verwenden",
     "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach."
   },
