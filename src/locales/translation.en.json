@@ -119,7 +119,8 @@
     "subtitle": "Never stare blankly at your fridge again!",
     "continueWithGoogle": "Continue with Google",
     "continueWithEMail": "Continue with E-Mail",
-    "termsAndConditions": "By signing up, you agree to our Terms of Service and Privacy Policy."
+    "termsAndConditions": "By signing up, you agree to our Terms of Service and Privacy Policy.",
+    "alreadyHaveAccount": "Already have an account? Sign in"
   },
   "emailSignup": {
     "title": "Create Account",
@@ -132,10 +133,39 @@
     "confirmPasswordPlaceholder": "Confirm your password",
     "signupButton": "Create Account",
     "loading": "Creating account...",
+    "backButton": "Back to sign up options",
+    "alreadyHaveAccount": "Already have an account? Log in",
     "errors": {
       "invalidEmail": "Please enter a valid email address",
       "fillAllFields": "Please fill in all fields",
       "signupFailed": "Failed to create account. Please try again."
+    }
+  },
+  "emailVerification": {
+    "title": "Check Your Email",
+    "subtitle": "We've sent you a verification link",
+    "checkEmail": "Check your email inbox and click the verification link to activate your account",
+    "description": "This helps us confirm your email address and secure your account.",
+    "continueButton": "Back to Home",
+    "resendButton": "Resend verification email",
+    "changeEmailButton": "Use a different email",
+    "resendSent": "Verification email resent. Please check your inbox."
+  },
+  "login": {
+    "title": "Welcome Back",
+    "subtitle": "Sign in to your account",
+    "emailLabel": "Email",
+    "emailPlaceholder": "your@email.com",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Your password",
+    "loginButton": "Sign In",
+    "loading": "Signing in...",
+    "dontHaveAccount": "Don't have an account? Sign up",
+    "forgotPassword": "Forgot your password?",
+    "errors": {
+      "invalidEmail": "Please enter a valid email address",
+      "fillAllFields": "Please fill in all fields",
+      "loginFailed": "Failed to sign in. Please check your credentials and try again."
     }
   },
   "list": {

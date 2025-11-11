@@ -6,7 +6,7 @@ import OnboardingButton from "@/components/ui/onboarding/onboardingButton/Onboar
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-export default function EmailSignUp() {
+export default function Login() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -20,16 +20,16 @@ export default function EmailSignUp() {
     return email.trim() !== "" && password.trim() !== "" && email.includes("@");
   };
 
-  const handleSignUp = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     if (!isFormValid()) {
       if (email.includes("@")) {
         // Email is valid, so check other conditions
-        setError(t("emailSignup.errors.fillAllFields"));
+        setError(t("login.errors.fillAllFields"));
       } else {
-        setError(t("emailSignup.errors.invalidEmail"));
+        setError(t("login.errors.invalidEmail"));
       }
       return;
     }
@@ -37,41 +37,42 @@ export default function EmailSignUp() {
     setLoading(true);
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error: loginError } = await supabase.auth.signInWithPassword({
         email,
         password,
-        options: {
-          emailRedirectTo: `${globalThis.location.origin}/`,
-        },
       });
 
-      if (signUpError) {
-        setError(signUpError.message);
+      if (loginError) {
+        setError(loginError.message);
         setLoading(false);
         return;
       }
 
-      // Store email for verification page
-      sessionStorage.setItem("signupEmail", email);
-      
-      // Navigate to verification page
-      navigate("/signup/verify");
+      // Login successful - navigation will be handled by App.tsx auth state change
+      setLoading(false);
     } catch (err) {
-      console.error("Sign up error:", err);
-      setError(t("emailSignup.errors.signupFailed"));
+      console.error("Login error:", err);
+      setError(t("login.errors.loginFailed"));
       setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
+      <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
+        <h1 className="font-bold text-6xl first-font">{t("login.title")}</h1>
+        <p className="text-sm text-muted-foreground second-font mt-2">
+          {t("login.subtitle")}
+        </p>
+      </div>
+
       <form
-        onSubmit={handleSignUp}
+        onSubmit={handleLogin}
         className="flex flex-col w-full max-w-sm gap-4"
       >
         <div className="flex flex-col gap-2">
           <Label htmlFor="email">
-            {t("emailSignup.emailLabel")}
+            {t("login.emailLabel")}
           </Label>
 
           <Input
@@ -79,7 +80,7 @@ export default function EmailSignUp() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder={t("emailSignup.emailPlaceholder")}
+            placeholder={t("login.emailPlaceholder")}
             disabled={loading}
             required
           />
@@ -87,7 +88,7 @@ export default function EmailSignUp() {
 
         <div className="flex flex-col gap-2">
           <Label htmlFor="password">
-            {t("emailSignup.passwordLabel")}
+            {t("login.passwordLabel")}
           </Label>
 
           <Input
@@ -95,7 +96,7 @@ export default function EmailSignUp() {
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder={t("emailSignup.passwordPlaceholder")}
+            placeholder={t("login.passwordPlaceholder")}
             disabled={loading}
             required
           />
@@ -109,9 +110,15 @@ export default function EmailSignUp() {
 
         <OnboardingButton
           label={
-            loading ? t("emailSignup.loading") : t("emailSignup.signupButton")
+            loading ? t("login.loading") : t("login.loginButton")
           }
-          onClick={() => navigate("/signup/email")}
+          onClick={() => {
+            const form = document.querySelector("form");
+            if (form) {
+              const event = new Event("submit", { bubbles: true, cancelable: true });
+              form.dispatchEvent(event);
+            }
+          }}
         />
       </form>
 
@@ -121,16 +128,20 @@ export default function EmailSignUp() {
           disabled={loading}
           className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
         >
-          {t("emailSignup.backButton")}
+          {t("login.dontHaveAccount")}
         </button>
 
         <button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate("/forgotPassword")}
           disabled={loading}
           className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
         >
-          {t("emailSignup.alreadyHaveAccount")}
+          {t("login.forgotPassword")}
         </button>
+      </div>
+
+      <div className="mt-auto mb-8 text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
+        {t("signup.termsAndConditions")}
       </div>
     </div>
   );

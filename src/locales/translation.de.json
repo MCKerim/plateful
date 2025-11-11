@@ -26,9 +26,12 @@
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
     "continueWithGoogle": "Mit Google fortfahren",
     "continueWithEMail": "Mit E-Mail fortfahren",
-    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
+    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu.",
+    "alreadyHaveAccount": "Bereits registriert? Anmelden"
   },
   "emailSignup": {
+    "title": "Konto erstellen",
+    "subtitle": "Melden Sie sich mit Ihrer E-Mail an",
     "emailLabel": "E-Mail",
     "emailPlaceholder": "ihre@email.de",
     "passwordLabel": "Passwort",
@@ -37,10 +40,39 @@
     "confirmPasswordPlaceholder": "Bestätigen Sie Ihr Passwort",
     "signupButton": "Konto erstellen",
     "loading": "Konto wird erstellt...",
+    "backButton": "Zurück zu Anmeldeoptionen",
+    "alreadyHaveAccount": "Bereits registriert? Anmelden",
     "errors": {
       "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "fillAllFields": "Bitte füllen Sie alle Felder aus",
       "signupFailed": "Fehler beim Erstellen des Kontos. Bitte versuchen Sie es später erneut."
+    }
+  },
+  "emailVerification": {
+    "title": "Überprüfen Sie Ihre E-Mail",
+    "subtitle": "Wir haben Ihnen einen Bestätigungslink gesendet",
+    "checkEmail": "Überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink, um Ihr Konto zu aktivieren",
+    "description": "Dies hilft uns, Ihre E-Mail-Adresse zu bestätigen und Ihr Konto zu sichern.",
+    "continueButton": "Zurück nach Hause",
+    "resendButton": "Bestätigungsemail erneut senden",
+    "changeEmailButton": "Eine andere E-Mail verwenden",
+    "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach."
+  },
+  "login": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melden Sie sich bei Ihrem Konto an",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "passwordLabel": "Passwort",
+    "passwordPlaceholder": "Ihr Passwort",
+    "loginButton": "Anmelden",
+    "loading": "Wird angemeldet...",
+    "dontHaveAccount": "Noch nicht registriert? Jetzt anmelden",
+    "forgotPassword": "Passwort vergessen?",
+    "errors": {
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "fillAllFields": "Bitte füllen Sie alle Felder aus",
+      "loginFailed": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut."
     }
   },
   "welcome": {
