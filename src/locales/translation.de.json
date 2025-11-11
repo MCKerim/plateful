@@ -28,6 +28,21 @@
     "continueWithEMail": "Mit E-Mail fortfahren",
     "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
   },
+  "emailSignup": {
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "passwordLabel": "Passwort",
+    "passwordPlaceholder": "Mindestens 6 Zeichen",
+    "confirmPasswordLabel": "Passwort bestätigen",
+    "confirmPasswordPlaceholder": "Bestätigen Sie Ihr Passwort",
+    "signupButton": "Konto erstellen",
+    "loading": "Konto wird erstellt...",
+    "errors": {
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "fillAllFields": "Bitte füllen Sie alle Felder aus",
+      "signupFailed": "Fehler beim Erstellen des Kontos. Bitte versuchen Sie es später erneut."
+    }
+  },
   "welcome": {
     "title": "Glückwunsch,",
     "subtitle": "smarte Essensplanung beginnt jetzt!",

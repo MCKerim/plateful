@@ -4,6 +4,7 @@ import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/signUp/SignUp";
+import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
 import { useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import Settings from "./page/Settings";
@@ -234,6 +235,11 @@ function App() {
       <Route
         path="/signup"
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
+      />
+
+      <Route
+        path="/signup/email"
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailSignUp />}
       />
 
       <Route path="/beta" element={<BetaScreen />} />
