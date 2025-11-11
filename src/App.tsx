@@ -39,6 +39,7 @@ import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { SendIntent } from "@supernotes/capacitor-send-intent";
+import { Capacitor } from "@capacitor/core";
 
 function App() {
   const { supabase } = useSupabase();
@@ -87,9 +88,11 @@ function App() {
   }, [navigate]);
 
   useEffect(() => {
-    EdgeToEdge.enable().catch((e) => {
-      console.error("Error enabling edge to edge:", e);
-    });
+    if (Capacitor.isNativePlatform()) {
+      EdgeToEdge.enable().catch((e) => {
+        console.error("Error enabling edge to edge:", e);
+      });
+    }
   }, []);
 
   async function updateSession(session: Session | null) {
