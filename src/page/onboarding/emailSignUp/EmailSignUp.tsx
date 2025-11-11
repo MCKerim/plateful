@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { useSupabase } from "@/utils/supabase";
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 export default function EmailSignUp() {
   const { supabase } = useSupabase();
@@ -67,43 +69,41 @@ export default function EmailSignUp() {
         className="flex flex-col w-full max-w-sm gap-4"
       >
         <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium">
+          <Label htmlFor="email">
             {t("emailSignup.emailLabel")}
-          </label>
+          </Label>
 
-          <input
+          <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={t("emailSignup.emailPlaceholder")}
             disabled={loading}
-            className="px-3 py-2 border border-input rounded-md bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             required
           />
         </div>
 
         <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium">
+          <Label htmlFor="password">
             {t("emailSignup.passwordLabel")}
-          </label>
+          </Label>
 
-          <input
+          <Input
             id="password"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder={t("emailSignup.passwordPlaceholder")}
             disabled={loading}
-            className="px-3 py-2 border border-input rounded-md bg-background text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50"
             required
           />
         </div>
 
         {error && (
-          <div className="p-3 bg-destructive/10 text-destructive rounded-md text-sm">
+          <p className="text-destructive text-sm">
             {error}
-          </div>
+          </p>
         )}
 
         <OnboardingButton
