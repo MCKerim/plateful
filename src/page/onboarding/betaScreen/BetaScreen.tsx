@@ -1,9 +1,6 @@
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
-import { Badge } from "@/components/ui/badge";
-import { Sparkles } from "lucide-react";
 import { useState, useEffect } from "react";
 import Rive from "@rive-app/react-canvas";
-import RocketLaunchIcon from "@mui/icons-material/RocketLaunch";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 
