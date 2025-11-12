@@ -7,42 +7,42 @@ type Props = {
   color?: string;
 };
 
-function getBackgroundColorCode(color: string): string {
+function getBackgroundColorCode(color: string, darkmode: boolean): string {
   switch (color) {
     case "yellow":
-      return "#FFD151";
+      return darkmode ? "#a97c00" : "#FFD151";
 
     case "green":
-      return "#6DD961";
+      return darkmode ? "#25641e" : "#6DD961";
 
     case "pink":
-      return "#FFA7FC";
+      return darkmode ? "#a01e9c" : "#FFA7FC";
 
     case "blue":
-      return "#63CEFF";
+      return darkmode ? "#245b75" : "#63CEFF";
 
     case "purple":
-      return "#FF7274";
+      return darkmode ? "#863032" : "#FF7274";
 
     default:
-      return "#9D9D9D";
+      return darkmode ? "#313131" : "#9D9D9D";
   }
 }
 
-function getFrontColorCode(color: string): string {
+function getFrontColorCode(color: string, darkmode: boolean): string {
   switch (color) {
     case "yellow":
-      return "#FFBB00";
+      return darkmode ? "#e4a700" : "#FFBB00";
     case "green":
-      return "#53C946";
+      return darkmode ? "#3a962f" : "#53C946";
     case "pink":
-      return "#FF88FB";
+      return darkmode ? "#c14abd" : "#FF88FB";
     case "blue":
-      return "#47BCF2";
+      return darkmode ? "#3084ab" : "#47BCF2";
     case "purple":
-      return "#F25C5F";
+      return darkmode ? "#bc4547" : "#F25C5F";
     default:
-      return "#868686";
+      return darkmode ? "#676767" : "#868686";
   }
 }
 
@@ -53,7 +53,7 @@ export default function CategoryButton({
   color = "",
 }: Readonly<Props>) {
   const dispatch = useAppDispatch();
-  const frontColor = getFrontColorCode(color);
+  const frontColor = getFrontColorCode(color, true);
 
   return (
     <button
@@ -74,7 +74,7 @@ export default function CategoryButton({
         >
           <path
             d="M0 8C0 3.58172 3.58172 0 8 0H46.4866C48.8931 0 51.1718 1.0833 52.691 2.94964L60.099 12.0504C61.6182 13.9167 63.8968 15 66.3033 15H161C165.418 15 169 18.5817 169 23V124C169 128.418 165.418 132 161 132H8C3.58172 132 0 128.418 0 124V8Z"
-            fill={getBackgroundColorCode(color)}
+            fill={getBackgroundColorCode(color, true)}
           />
         </svg>
       </div>
