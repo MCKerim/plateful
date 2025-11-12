@@ -25,49 +25,38 @@ export default function BetaScreen() {
   };
 
   return (
-    <OnboardingLayout nextButtonLabel={t("beta.nextButton")} onNext={handleNext}>
-      <div className="space-y-4 text-center">
-        {/* Beta Badge */}
-        <div className="flex justify-center">
-          <Badge
-            variant="secondary"
-            className="px-4 py-2 text-orange-800 bg-orange-100 border-orange-200"
-          >
-            <Sparkles className="w-4 h-4 mr-2" />
-            {t("beta.badge")}
-          </Badge>
-        </div>
+    <OnboardingLayout
+      nextButtonLabel={t("beta.nextButton")}
+      onNext={handleNext}
+    >
+      <div className="flex flex-col justify-center w-full mb-8 text-center">
+        <h1 className="font-bold text-4xl first-font">{t("beta.title")}</h1>
 
-        <h1 className="text-4xl font-bold text-accent">{t("beta.title")}</h1>
+        <p className="text-sm text-muted-foreground second-font">
+          {t("beta.thankYou")}
+        </p>
       </div>
 
-      {/* Animated character */}
       <div className="w-64 h-64 mx-auto">
         <Rive src="/plateful-character.riv" artboard="Fly-In" />
       </div>
 
-      {/* Main message */}
       <div className="flex flex-col w-full max-w-sm gap-6 mx-auto">
         <div
-          className={`text-center space-y-4 transition-all duration-700 ${
+          className={`text-center space-y-2 transition-all duration-700 ${
             showAppreciation
               ? "opacity-100 translate-y-0"
               : "opacity-70 translate-y-8"
           }`}
         >
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <RocketLaunchIcon />
-            <p className="text-lg font-semibold text-gray-800">
-              {t("beta.thankYou")}
+          <div className="flex items-center justify-center">
+            <p className="text-md second-font font-bold">
+              {t("beta.description")}
             </p>
           </div>
 
-          <p className="leading-relaxed text-gray-600">
-            {t("beta.description")}
-          </p>
-
-          <div className="p-4 mt-6 border border-orange-200 rounded-lg bg-orange-50">
-            <ul className="space-y-1 text-sm text-orange-700">
+          <div className="py-4 px-2 border border-primary rounded-lg">
+            <ul className="space-y-1 text-xs">
               <li>• {t("beta.benefits.newFeatures")}</li>
               <li>• {t("beta.benefits.directInput")}</li>
               <li>• {t("beta.benefits.helpImprove")}</li>
