@@ -19,8 +19,8 @@ export default function Survey() {
   const [selected, setSelected] = useState<string[]>([]);
 
   function parseQuestionId() {
-    const id = parseInt(params.questionId ?? "1", 10);
-    return isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
+    const id = Number.parseInt(params.questionId ?? "1", 10);
+    return Number.isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
   }
 
   const handleSelect = async (option: string) => {

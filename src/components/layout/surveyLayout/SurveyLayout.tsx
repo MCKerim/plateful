@@ -40,7 +40,7 @@ export default function SurveyLayout({
 
         <motion.h1
           key={`question-${questionNumber}`}
-          className="mb-4 text-3xl font-bold text-center"
+          className="mb-4 text-3xl second-font font-bold text-center"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
