@@ -30,24 +30,16 @@
     "alreadyHaveAccount": "Bereits registriert? Anmelden"
   },
   "emailSignup": {
-    "title": "Konto erstellen",
+    "title": "Konto erstellen oder anmelden",
     "subtitle": "Melden Sie sich mit Ihrer E-Mail an",
-    "displayNameLabel": "Anzeigename",
-    "displayNamePlaceholder": "Ihr Name",
     "emailLabel": "E-Mail",
     "emailPlaceholder": "ihre@email.de",
-    "passwordLabel": "Passwort",
-    "passwordPlaceholder": "Mindestens 6 Zeichen",
-    "confirmPasswordLabel": "Passwort bestätigen",
-    "confirmPasswordPlaceholder": "Bestätigen Sie Ihr Passwort",
-    "signupButton": "Konto erstellen",
-    "loading": "Konto wird erstellt...",
-    "backButton": "Zurück zu Anmeldeoptionen",
-    "alreadyHaveAccount": "Bereits registriert? Anmelden",
+    "signupButton": "Magic Link senden",
+    "loading": "Magic Link wird gesendet...",
     "errors": {
       "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "fillAllFields": "Bitte füllen Sie alle Felder aus",
-      "signupFailed": "Fehler beim Erstellen des Kontos. Bitte versuchen Sie es später erneut."
+      "signupFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
     }
   },
   "emailVerification": {
@@ -65,16 +57,12 @@
     "subtitle": "Melden Sie sich bei Ihrem Konto an",
     "emailLabel": "E-Mail",
     "emailPlaceholder": "ihre@email.de",
-    "passwordLabel": "Passwort",
-    "passwordPlaceholder": "Ihr Passwort",
-    "loginButton": "Anmelden",
-    "loading": "Wird angemeldet...",
+    "loginButton": "Magic Link senden",
+    "loading": "Magic Link wird gesendet...",
     "dontHaveAccount": "Noch nicht registriert? Jetzt anmelden",
-    "forgotPassword": "Passwort vergessen?",
     "errors": {
       "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-      "fillAllFields": "Bitte füllen Sie alle Felder aus",
-      "loginFailed": "Anmeldung fehlgeschlagen. Bitte überprüfen Sie Ihre Anmeldedaten und versuchen Sie es erneut."
+      "loginFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
     }
   },
   "welcome": {

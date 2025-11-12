@@ -125,22 +125,14 @@
   "emailSignup": {
     "title": "Create Account",
     "subtitle": "Sign up with your email",
-    "displayNameLabel": "Display Name",
-    "displayNamePlaceholder": "Your name",
     "emailLabel": "Email",
     "emailPlaceholder": "your@email.com",
-    "passwordLabel": "Password",
-    "passwordPlaceholder": "At least 6 characters",
-    "confirmPasswordLabel": "Confirm Password",
-    "confirmPasswordPlaceholder": "Confirm your password",
-    "signupButton": "Create Account",
-    "loading": "Creating account...",
-    "backButton": "Back to sign up options",
-    "alreadyHaveAccount": "Already have an account? Log in",
+    "signupButton": "Send Magic Link",
+    "loading": "Sending magic link...",
     "errors": {
       "invalidEmail": "Please enter a valid email address",
       "fillAllFields": "Please fill in all fields",
-      "signupFailed": "Failed to create account. Please try again."
+      "signupFailed": "Failed to send magic link. Please try again."
     }
   },
   "emailVerification": {
@@ -158,16 +150,12 @@
     "subtitle": "Sign in to your account",
     "emailLabel": "Email",
     "emailPlaceholder": "your@email.com",
-    "passwordLabel": "Password",
-    "passwordPlaceholder": "Your password",
-    "loginButton": "Sign In",
-    "loading": "Signing in...",
+    "loginButton": "Send Magic Link",
+    "loading": "Sending magic link...",
     "dontHaveAccount": "Don't have an account? Sign up",
-    "forgotPassword": "Forgot your password?",
     "errors": {
       "invalidEmail": "Please enter a valid email address",
-      "fillAllFields": "Please fill in all fields",
-      "loginFailed": "Failed to sign in. Please check your credentials and try again."
+      "loginFailed": "Failed to send magic link. Please try again."
     }
   },
   "list": {

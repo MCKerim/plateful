@@ -30,11 +30,11 @@ export default function EmailVerification() {
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-        <h1 className="font-bold text-5xl first-font">
+        <h1 className="font-bold text-4xl first-font">
           {t("emailVerification.title")}
         </h1>
 
-        <p className="text-md second-font mt-4 p-4">
+        <p className="text-sm text-muted-foreground second-font">
           {t("emailVerification.subtitle", { email: email })}
         </p>
       </div>

@@ -125,13 +125,6 @@ export default function SignUp() {
             onClick={() => navigate("/signup/email")}
           />
         </div>
-
-        <button
-          onClick={() => navigate("/login")}
-          className="mt-6 text-sm text-muted-foreground hover:text-primary underline underline-offset-4 transition-colors"
-        >
-          {t("signup.alreadyHaveAccount")}
-        </button>
       </div>
     </>
   );

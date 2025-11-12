@@ -12,12 +12,11 @@ export default function Login() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isFormValid = () => {
-    return email.trim() !== "" && password.trim() !== "" && email.includes("@");
+    return email.trim() !== "" && email.includes("@");
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -25,21 +24,18 @@ export default function Login() {
     setError(null);
 
     if (!isFormValid()) {
-      if (email.includes("@")) {
-        // Email is valid, so check other conditions
-        setError(t("login.errors.fillAllFields"));
-      } else {
-        setError(t("login.errors.invalidEmail"));
-      }
+      setError(t("login.errors.invalidEmail"));
       return;
     }
 
     setLoading(true);
 
     try {
-      const { error: loginError } = await supabase.auth.signInWithPassword({
+      const { error: loginError } = await supabase.auth.signInWithOtp({
         email,
-        password,
+        options: {
+          emailRedirectTo: `${globalThis.location.origin}/`,
+        },
       });
 
       if (loginError) {
@@ -48,8 +44,11 @@ export default function Login() {
         return;
       }
 
-      // Login successful - navigation will be handled by App.tsx auth state change
-      setLoading(false);
+      // Store email for verification page
+      sessionStorage.setItem("signupEmail", email);
+      
+      // Navigate to verification page
+      navigate("/signup/verify");
     } catch (err) {
       console.error("Login error:", err);
       setError(t("login.errors.loginFailed"));
@@ -86,22 +85,6 @@ export default function Login() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">
-            {t("login.passwordLabel")}
-          </Label>
-
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t("login.passwordPlaceholder")}
-            disabled={loading}
-            required
-          />
-        </div>
-
         {error && (
           <p className="text-destructive text-sm">
             {error}
@@ -129,14 +112,6 @@ export default function Login() {
           className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
         >
           {t("login.dontHaveAccount")}
-        </button>
-
-        <button
-          onClick={() => navigate("/forgotPassword")}
-          disabled={loading}
-          className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
-        >
-          {t("login.forgotPassword")}
         </button>
       </div>
 

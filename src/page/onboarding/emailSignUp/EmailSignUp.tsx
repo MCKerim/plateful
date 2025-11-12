@@ -12,13 +12,11 @@ export default function EmailSignUp() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [displayName, setDisplayName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isFormValid = () => {
-    return email.trim() !== "" && password.trim() !== "" && displayName.trim() !== "" && email.includes("@");
+    return email.trim() !== "" && email.includes("@");
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -38,14 +36,10 @@ export default function EmailSignUp() {
     setLoading(true);
 
     try {
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError } = await supabase.auth.signInWithOtp({
         email,
-        password,
         options: {
           emailRedirectTo: `${globalThis.location.origin}/`,
-          data: {
-            display_name: displayName,
-          },
         },
       });
 
@@ -57,7 +51,7 @@ export default function EmailSignUp() {
 
       // Store email for verification page
       sessionStorage.setItem("signupEmail", email);
-      
+
       // Navigate to verification page
       navigate("/signup/verify");
     } catch (err) {
@@ -69,30 +63,22 @@ export default function EmailSignUp() {
 
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
+      <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
+        <h1 className="font-bold text-4xl first-font">
+          {t("emailSignup.title")}
+        </h1>
+
+        <p className="text-sm text-muted-foreground second-font">
+          {t("emailSignup.subtitle")}
+        </p>
+      </div>
+
       <form
         onSubmit={handleSignUp}
-        className="flex flex-col w-full max-w-sm gap-4"
+        className="flex flex-col w-full max-w-sm gap-3 h-full justify-center"
       >
         <div className="flex flex-col gap-2">
-          <Label htmlFor="displayName">
-            {t("emailSignup.displayNameLabel")}
-          </Label>
-
-          <Input
-            id="displayName"
-            type="text"
-            value={displayName}
-            onChange={(e) => setDisplayName(e.target.value)}
-            placeholder={t("emailSignup.displayNamePlaceholder")}
-            disabled={loading}
-            required
-          />
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="email">
-            {t("emailSignup.emailLabel")}
-          </Label>
+          <Label htmlFor="email">{t("emailSignup.emailLabel")}</Label>
 
           <Input
             id="email"
@@ -105,53 +91,17 @@ export default function EmailSignUp() {
           />
         </div>
 
-        <div className="flex flex-col gap-2">
-          <Label htmlFor="password">
-            {t("emailSignup.passwordLabel")}
-          </Label>
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t("emailSignup.passwordPlaceholder")}
-            disabled={loading}
-            required
+        <div className="flex flex-col w-full max-w-sm gap-3">
+          <OnboardingButton
+            label={
+              loading ? t("emailSignup.loading") : t("emailSignup.signupButton")
+            }
+            onClick={() => navigate("/signup/email")}
           />
         </div>
-
-        {error && (
-          <p className="text-destructive text-sm">
-            {error}
-          </p>
-        )}
-
-        <OnboardingButton
-          label={
-            loading ? t("emailSignup.loading") : t("emailSignup.signupButton")
-          }
-          onClick={() => navigate("/signup/email")}
-        />
       </form>
-
-      <div className="flex flex-col w-full max-w-sm gap-3 mt-6">
-        <button
-          onClick={() => navigate("/signup")}
-          disabled={loading}
-          className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
-        >
-          {t("emailSignup.backButton")}
-        </button>
-
-        <button
-          onClick={() => navigate("/login")}
-          disabled={loading}
-          className="text-sm text-muted-foreground hover:text-primary underline underline-offset-4 disabled:opacity-50 transition-colors"
-        >
-          {t("emailSignup.alreadyHaveAccount")}
-        </button>
-      </div>
     </div>
   );
 }
