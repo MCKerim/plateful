@@ -34,9 +34,9 @@ export default function MealPlanningValue() {
   return (
     <OnboardingLayout onNext={completeValueScreen}>
       <div className="text-center">
-        <h1 className="text-4xl font-bold">{t("valueScreens.mealPlanning.title")}</h1>
+        <h1 className="text-4xl font-bold first-font">{t("valueScreens.mealPlanning.title")}</h1>
 
-        <h2 className="text-2xl italic font-semibold">{t("valueScreens.mealPlanning.subtitle")}</h2>
+        <h2 className="text-2xl italic font-semibold second-font">{t("valueScreens.mealPlanning.subtitle")}</h2>
       </div>
 
       <PhoneMockup mediaUrl="/meal-planner-screenshot.jpg" />

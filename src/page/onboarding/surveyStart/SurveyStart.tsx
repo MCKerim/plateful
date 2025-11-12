@@ -18,7 +18,7 @@ export default function SurveyStart() {
       </h1>
 
       <Button
-        className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+        className="second-font w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
         onClick={() => navigate("/survey/1")}
       >
         {t("surveyStart.nextButton")}

@@ -26,9 +26,9 @@ export default function ChatbotValue() {
   return (
     <OnboardingLayout onNext={() => navigate("/values/3")}>
       <div className="text-center">
-        <h1 className="text-4xl font-bold">{t("valueScreens.chatbot.title")}</h1>
+        <h1 className="text-4xl font-bold first-font">{t("valueScreens.chatbot.title")}</h1>
 
-        <h2 className="flex items-center justify-center h-8 text-2xl italic font-semibold">
+        <h2 className="flex items-center justify-center h-8 text-2xl italic font-semibold second-font">
           <span 
             key={currentTextIndex}
             className="inline-block duration-500 animate-in fade-in-50 slide-in-from-bottom-3"

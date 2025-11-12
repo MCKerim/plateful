@@ -97,7 +97,7 @@ export default function SurveyLayout({
           className="w-full"
         >
           <Button
-            className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+            className="w-full second-font h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
             onClick={onComplete}
             asChild
             disabled={!showNextButton}
