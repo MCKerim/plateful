@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CircleTransition from "@/components/atoms/CircleTransition";
 import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
-import { Mail } from "lucide-react";
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 
 export default function SignUp() {
   const { supabase } = useSupabase();
@@ -123,8 +123,9 @@ export default function SignUp() {
 
           <OnboardingButton
             label={t("signup.continueWithEMail")}
+            variant="secondary"
             onClick={() => navigate("/signup/email")}
-            icon={<Mail />}
+            icon={<EmailOutlinedIcon />}
           />
         </div>
       </div>

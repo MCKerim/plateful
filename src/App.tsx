@@ -80,7 +80,7 @@ function App() {
           if (platform === "android" && result.immediateUpdateAllowed) {
             await AppUpdate.performImmediateUpdate();
           } else if (platform === "ios") {
-            // iOS App Store update flow
+            // TODO: iOS App Store update flow
             // await AppUpdate.openAppStore({ appId: "..."});
           } else {
             await AppUpdate.openAppStore();
