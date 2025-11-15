@@ -208,7 +208,7 @@ export default function Settings() {
           <h2 className="font-medium border-b">Info</h2>
 
           <p className="text-sm">
-            v0.0.5 <span>- Beta </span>
+            v0.0.6 <span>- Beta </span>
           </p>
 
           <div className="flex gap-2">
