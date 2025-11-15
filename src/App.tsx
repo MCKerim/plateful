@@ -43,14 +43,56 @@ import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
+import {
+  AppUpdate,
+  AppUpdateAvailability,
+} from "@capawesome/capacitor-app-update";
+import { useTranslation } from "react-i18next";
 
 function App() {
+  const { t } = useTranslation();
   const { supabase } = useSupabase();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        if (!Capacitor.isNativePlatform()) return;
+
+        if (!Capacitor.isPluginAvailable("AppUpdate")) {
+          console.warn("AppUpdate plugin not available");
+          return;
+        }
+
+        const result = await AppUpdate.getAppUpdateInfo();
+        if (
+          result.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE
+        ) {
+          const shouldUpdate = globalThis.confirm(t("update.updateAvailable"));
+
+          if (!shouldUpdate) return;
+
+          const platform = Capacitor.getPlatform();
+          if (platform === "android" && result.immediateUpdateAllowed) {
+            await AppUpdate.performImmediateUpdate();
+          } else if (platform === "ios") {
+            // iOS App Store update flow
+            // await AppUpdate.openAppStore({ appId: "..."});
+          } else {
+            await AppUpdate.openAppStore();
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for app updates:", error);
+      }
+    };
+
+    checkForUpdates();
+  }, []);
 
   useEffect(() => {
     const handleIntentReceived = (result: any) => {
@@ -246,7 +288,9 @@ function App() {
 
       <Route
         path="/signup/verify"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />}
+        element={
+          isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />
+        }
       />
 
       <Route

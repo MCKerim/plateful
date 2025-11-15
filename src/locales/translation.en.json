@@ -21,6 +21,9 @@
     "uploadImage": "Upload image",
     "reset": "Reset"
   },
+  "update": {
+    "updateAvailable": "A new version is available! Update now?"
+  },
   "welcome": {
     "title": "Congratulations,",
     "subtitle": "smart food planning starts now!",

@@ -21,6 +21,9 @@
     "uploadImage": "Bild hochladen",
     "reset": "Zurücksetzen"
   },
+  "update": {
+    "updateAvailable": "Eine neue Version ist verfügbar! jetzt aktualisieren?"
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
