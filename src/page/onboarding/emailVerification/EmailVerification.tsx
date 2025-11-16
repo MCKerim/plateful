@@ -1,15 +1,19 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import { useSupabase } from "@/utils/supabase";
 
 export default function EmailVerification() {
   const { t } = useTranslation();
+  const { supabase } = useSupabase();
+
   const [email, setEmail] = useState<string>("");
 
   useEffect(() => {
     // Get email from URL or session storage
     const urlParams = new URLSearchParams(globalThis.location.search);
     const emailParam = urlParams.get("email");
+
     if (emailParam) {
       setEmail(emailParam);
       sessionStorage.setItem("signupEmail", emailParam);
@@ -21,10 +25,30 @@ export default function EmailVerification() {
     }
   }, []);
 
-  const handleResendEmail = () => {
-    // This would trigger a resend email function
-    // For now, we'll just show a message
-    alert(t("emailVerification.resendSent"));
+  const handleResendEmail = async () => {
+    if (!email) {
+      alert(t("Error: No email found to resend verification."));
+      return;
+    }
+
+    try {
+      const { error: signUpError } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: `${globalThis.location.origin}/`,
+        },
+      });
+
+      if (signUpError) {
+        alert("Error resending verification email: " + signUpError.message);
+        return;
+      }
+
+      alert(t("emailVerification.resendSent"));
+    } catch (err) {
+      console.error("Sign up error:", err);
+      alert(t("emailSignup.errors.signupFailed"));
+    }
   };
 
   return (
