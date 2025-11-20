@@ -111,7 +111,7 @@ export default function Chatbot() {
         parts.push({ type: "input_text", text: inputValue.trim() });
       }
       for (const url of userMessage.images || []) {
-        parts.push({ type: "input_image", image_url: url });
+        parts.push({ type: "input_image", image_url: `data:image/jpeg;base64,${url}` });
       }
 
       // Call the Supabase edge function
@@ -307,8 +307,11 @@ export default function Chatbot() {
               >
                 {message.role === "user" && (
                   <>
-                    <p className="text-sm">{message.content}</p>
-                    {/* optional thumbnails if present */}
+                    <p className="text-sm">
+                      {message.content}
+                    </p>
+
+                    {/* optional images if present */}
                     {"images" in message &&
                       Array.isArray((message as any).images) &&
                       (message as any).images.length > 0 && (
@@ -317,7 +320,8 @@ export default function Chatbot() {
                             (src: string, i: number) => (
                               <img
                                 key={i}
-                                src={src}
+                                src={`data:image/jpeg;base64,${src}`}
+                                srcSet={`data:image/jpeg;base64,${src}`}
                                 alt={`upload-${i}`}
                                 className="rounded-md border w-16 h-16 object-cover"
                               />
