@@ -17,6 +17,7 @@ import {
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/atoms/CategoryButton";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 
 export type Recipe = {
   id: number;
@@ -33,6 +34,8 @@ export default function Cookbook() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  useScrollRestoration("cookbook-scroll");
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
@@ -41,63 +44,13 @@ export default function Cookbook() {
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
 
-  const [scrollRestored, setScrollRestored] = useState(false);
-
   useEffect(() => {
     getRecipes();
   }, []);
 
-  const scrollKey = "recipe-list-scroll";
   useEffect(() => {
     handleSearch();
   }, [searchTerm, sorting, categoryId, recipes]);
-  
-  useEffect(() => {
-    // Try to restore scroll position when component mounts
-    const savedPosition = Number.parseInt(
-      sessionStorage.getItem(scrollKey) || "0",
-      10
-    );
-
-    if (savedPosition > 0) {
-      // Attempt to restore multiple times as content loads
-      let attempts = 0;
-      const maxAttempts = 10;
-      
-      const tryRestore = () => {
-        attempts++;
-        window.scrollTo(0, savedPosition);
-
-        // Check if we've reached the position (within 50px tolerance)
-        setTimeout(() => {
-          if (Math.abs(window.scrollY - savedPosition) < 50 || attempts >= maxAttempts) {
-            console.log("Scroll restored after", attempts, "attempts");
-            setScrollRestored(true);
-          } else {
-            tryRestore();
-          }
-        }, 100);
-      };
-
-      tryRestore();
-    } else {
-      setScrollRestored(true);
-    }
-  }, [scrollKey]);
-
-  useEffect(() => {
-    if (!scrollRestored) return;
-
-    function handleScrolling() {
-      console.log("Saving scroll position:", window.scrollY);
-      sessionStorage.setItem(scrollKey, window.scrollY.toString());
-    }
-
-    window.addEventListener("scroll", handleScrolling);
-    return () => {
-      window.removeEventListener("scroll", handleScrolling);
-    };
-  }, [scrollRestored, scrollKey]);
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
