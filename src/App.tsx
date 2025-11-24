@@ -48,6 +48,7 @@ import {
   AppUpdateAvailability,
 } from "@capawesome/capacitor-app-update";
 import { useTranslation } from "react-i18next";
+import 'react-photo-view/dist/react-photo-view.css';
 
 function App() {
   const { t } = useTranslation();

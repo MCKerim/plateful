@@ -5,10 +5,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import {
-  MealPlanning,
-  Recipes,
-} from "@/types/exportedDatabaseTypes.types";
+import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
@@ -25,6 +22,7 @@ import { formatRating } from "@/lib/formatRatingHelper";
 import { formatDate as dateFnsFormatDate } from "date-fns";
 import { de } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 
 type RecipeItem = {
   id: number;
@@ -48,7 +46,6 @@ export default function Recipe() {
   const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -122,24 +119,14 @@ export default function Recipe() {
           })
         );
 
+        urls.push("/no-img.jpg");
+
         setImageUrls(urls.filter((url) => url !== null));
       }
     }
 
     getAllRecipeImages();
   }, [params.recipeId]);
-
-  function handleNextImage() {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
-    );
-  }
-
-  function handlePreviousImage() {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
-    );
-  }
 
   useEffect(() => {
     async function getRecipe() {
@@ -295,31 +282,35 @@ export default function Recipe() {
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
-      <AspectRatio ratio={16 / 9} className="-z-10">
-        <img
-          src={
-            imageUrls.length > 0 ? imageUrls[currentImageIndex] : "/no-img.jpg"
-          }
-          alt="Recipe"
-          className="object-cover w-full h-full rounded-md dark:brightness-75"
-        />
-      </AspectRatio>
+      {imageUrls.length === 0 ? (
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={"/no-img.jpg"}
+            alt="Recipe"
+            className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+          />
+        </AspectRatio>
+      ) : (
+        <PhotoProvider loop maskOpacity={0.7}>
+          <AspectRatio ratio={16 / 9}>
+            {imageUrls.map((item, index) => (
+              <PhotoView key={index} src={item}>
+                {index < 1 ? (
+                  <img
+                    src={item}
+                    alt="Recipe"
+                    className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+                  />
+                ) : undefined}
+              </PhotoView>
+            ))}
+          </AspectRatio>
+        </PhotoProvider>
+      )}
 
       <div className="flex justify-between">
         <h1 className="first-font text-2xl font-bold">{recipe?.name}</h1>
       </div>
-
-      {imageUrls.length > 1 && (
-        <div className="flex justify-between mt-2">
-          <Button variant="secondary" onClick={handlePreviousImage}>
-            Previous
-          </Button>
-
-          <Button variant="secondary" onClick={handleNextImage}>
-            Next
-          </Button>
-        </div>
-      )}
 
       {recipeItems.length > 0 && (
         <>
