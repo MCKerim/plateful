@@ -119,8 +119,6 @@ export default function Recipe() {
           })
         );
 
-        urls.push("/no-img.jpg");
-
         setImageUrls(urls.filter((url) => url !== null));
       }
     }
