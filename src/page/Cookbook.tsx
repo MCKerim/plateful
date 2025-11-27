@@ -154,13 +154,11 @@ export default function Cookbook() {
   };
 
   function handleAddRecipe() {
-    const path =
-      "/recipe/add" +
-      (searchTerm.trim() !== ""
-        ? `?recipeNameFromSearch=${searchTerm.trim()}`
-        : "");
+    const params = searchTerm.trim()
+      ? `?recipeNameFromSearch=${encodeURIComponent(searchTerm.trim())}`
+      : "";
 
-    navigate(path);
+    navigate(`/recipe/add${params}`);
   }
 
   // searchbar: pr-8 fixed bottom-[4.5rem]

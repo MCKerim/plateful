@@ -141,21 +141,23 @@ export default function AddRecipe() {
     };
 
     extractSharedData();
-  }, [searchUrl, searchTitle, searchText, setSearchParams]);
+  }, [searchUrl, searchTitle, searchText]);
 
   // Fetch recipe data if editing
   useEffect(() => {
-    async function getRecipe(): Promise<boolean> {
+    async function tryGetRecipe(): Promise<boolean> {
       if (!params.recipeId) return false;
 
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
       const { data } = await supabase
         .from("recipes")
         .select("*")
         .eq("id", recipeId);
+
       if (!data || data.length === 0) {
         return false;
       }
+
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
@@ -180,15 +182,15 @@ export default function AddRecipe() {
       return true;
     }
 
-    getRecipe().then((hasFound) => {
+    tryGetRecipe().then((hasFound) => {
       if (hasFound) return;
+
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
       if (recipeNameFromSearch !== null) {
         setTitle(recipeNameFromSearch.trim());
-        setSearchParams("");
       }
     });
-  }, [params.recipeId, searchParams, setSearchParams]);
+  }, [params.recipeId, searchParams]);
 
   /*function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
