@@ -15,7 +15,6 @@ import {
   selectCategoryId,
   selectSearchTerm,
   selectSorting,
-  setCategoryId,
   setSearchTerm,
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";

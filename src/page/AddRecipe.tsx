@@ -36,7 +36,7 @@ export default function AddRecipe() {
   const { t } = useTranslation();
 
   const params = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const householdId = useAppSelector(selectHouseholdId);
 
