@@ -289,7 +289,8 @@ export default function Recipe() {
           />
         </AspectRatio>
       ) : (
-        <PhotoProvider loop maskOpacity={0.7}>
+        // if multiple images, turn on looping, image counter and arrows
+        <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
           <AspectRatio ratio={16 / 9}>
             {imageUrls.map((item, index) => (
               <PhotoView key={index} src={item}>
