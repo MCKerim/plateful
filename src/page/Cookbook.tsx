@@ -11,6 +11,7 @@ import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
+  resetFilter,
   selectCategoryId,
   selectSearchTerm,
   selectSorting,
@@ -57,7 +58,7 @@ export default function Cookbook() {
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
       event.preventDefault();
-      dispatch(setCategoryId(null));
+      dispatch(resetFilter());
       navigate("/cookbook");
     };
 
