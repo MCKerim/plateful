@@ -12,8 +12,10 @@ import SortingModal from "@/components/atoms/SortingModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   selectCategoryId,
+  selectSearchTerm,
   selectSorting,
   setCategoryId,
+  setSearchTerm,
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/atoms/CategoryButton";
@@ -37,12 +39,12 @@ export default function Cookbook() {
   useScrollRestoration("cookbook-scroll");
 
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
 
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
+  const searchTerm = useAppSelector(selectSearchTerm);
 
   useEffect(() => {
     getRecipes();
@@ -170,8 +172,8 @@ export default function Cookbook() {
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
           showDeleteButton={searchTerm.length > 0}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onDelete={() => setSearchTerm("")}
+          onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+          onDelete={() => dispatch(setSearchTerm(""))}
         />
 
         <SortingModal />
