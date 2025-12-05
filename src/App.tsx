@@ -8,7 +8,7 @@ import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
 import EmailVerification from "./page/onboarding/emailVerification/EmailVerification";
 import Login from "./page/onboarding/login/Login";
 import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
+import { RealtimeChannel, Session } from "@supabase/supabase-js";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
@@ -48,7 +48,8 @@ import {
   AppUpdateAvailability,
 } from "@capawesome/capacitor-app-update";
 import { useTranslation } from "react-i18next";
-import 'react-photo-view/dist/react-photo-view.css';
+import "react-photo-view/dist/react-photo-view.css";
+import posthog from "posthog-js";
 
 function App() {
   const { t } = useTranslation();
@@ -141,14 +142,14 @@ function App() {
     }
   }, []);
 
-  async function updateSession(session: Session | null) {
+  async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
 
-    if (session?.user) {
+    if (userId) {
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*, household:household_id(*)")
-        .eq("id", session.user.id)
+        .eq("id", userId)
         .single();
 
       if (userError) {
@@ -157,9 +158,16 @@ function App() {
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
+
+        posthog.reset();
       } else {
         dispatch(setUser(userData));
         dispatch(setHousehold(userData.household ?? null));
+
+        posthog.identify(userData.id, {
+          email: userData.email,
+          username: userData.username,
+        });
 
         if (!userData.household_id) {
           setLoading(false);
@@ -184,23 +192,25 @@ function App() {
       dispatch(setUser(null));
       dispatch(setHousehold(null));
       dispatch(setHouseholdMembers(null));
+      posthog.reset();
     }
 
     setLoading(false);
   }
 
-  // Subscribe to auth state changes
   useEffect(() => {
-    let isMounted = true;
-
     const { data: { subscription } = { subscription: undefined } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        if (isMounted) updateSession(session);
-        closeBrowser().catch(console.error);
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        updateUser(session?.user.id ?? null);
+
+        try {
+          await closeBrowser();
+        } catch (error) {
+          console.error(error);
+        }
       });
 
     return () => {
-      isMounted = false;
       subscription?.unsubscribe();
     };
   }, []);
@@ -222,7 +232,7 @@ function App() {
         () => {
           // Refetch user data and update Redux state
           supabase.auth.getSession().then(({ data: { session } }) => {
-            updateSession(session);
+            updateUser(session?.user.id ?? null);
           });
         }
       )
