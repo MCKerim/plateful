@@ -8,7 +8,6 @@ import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
 import EmailVerification from "./page/onboarding/emailVerification/EmailVerification";
 import Login from "./page/onboarding/login/Login";
 import { useEffect, useState } from "react";
-import { RealtimeChannel, Session } from "@supabase/supabase-js";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
