@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/atoms/SortingModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -20,6 +19,7 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/atoms/CategoryButton";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+import AddNewRecipeDrawer from "@/components/atoms/AddRecipeDrawer";
 
 export type Recipe = {
   id: number;
@@ -202,12 +202,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      <button
-        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
-        onClick={handleAddRecipe}
-      >
-        <Plus size={34} />
-      </button>
+      <AddNewRecipeDrawer newRecipeClicked={handleAddRecipe} />
 
       {(categoryId !== null || searchTerm.trim() !== "") && (
         <div className="grid grid-cols-2 gap-2">
@@ -222,7 +217,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      {loading && (
+      {loading && categoryId !== null && (
         <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
