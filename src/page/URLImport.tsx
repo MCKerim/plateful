@@ -35,7 +35,9 @@ export default function URLImport() {
         <Field>
           <FieldLabel htmlFor="url"> Rezept-Link</FieldLabel>
 
-          <FieldDescription>z.B.: TikTok, YouTube, Webseite</FieldDescription>
+          <FieldDescription>
+            z.B.: TikTok, YouTube oder Webseiten-Link
+          </FieldDescription>
 
           <Input
             id="url"
