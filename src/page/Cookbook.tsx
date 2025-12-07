@@ -152,6 +152,10 @@ export default function Cookbook() {
     setSearchResults(searchedRecipes);
   };
 
+  function handleURLImportClicked() {
+    navigate(`/urlImport`);
+  }
+
   function handleAddRecipe() {
     const params = searchTerm.trim()
       ? `?recipeNameFromSearch=${encodeURIComponent(searchTerm.trim())}`
@@ -202,7 +206,10 @@ export default function Cookbook() {
         </div>
       )}
 
-      <AddNewRecipeDrawer newRecipeClicked={handleAddRecipe} />
+      <AddNewRecipeDrawer
+        urlImportClicked={handleURLImportClicked}
+        newRecipeClicked={handleAddRecipe}
+      />
 
       {(categoryId !== null || searchTerm.trim() !== "") && (
         <div className="grid grid-cols-2 gap-2">

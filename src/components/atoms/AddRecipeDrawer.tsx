@@ -8,10 +8,12 @@ import {
 import { Camera, Link, Plus } from "lucide-react";
 
 type Props = {
+  urlImportClicked: () => void;
   newRecipeClicked: () => void;
 };
 
 export default function AddNewRecipeDrawer({
+  urlImportClicked,
   newRecipeClicked,
 }: Readonly<Props>) {
   function renderButton(
@@ -48,7 +50,7 @@ export default function AddNewRecipeDrawer({
           {renderButton(
             <Link />,
             "Rezept aus URL hinzufügen",
-            () => {},
+            urlImportClicked,
             "TikTok, YouTube, Instagram, Webseite"
           )}
 
