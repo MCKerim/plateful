@@ -469,7 +469,7 @@ export default function AddRecipe() {
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
-        <h1 className="text-2xl font-bold">
+        <h1 className="text-2xl font-bold first-font">
           {params.recipeId
             ? t("addRecipe.editRecipe")
             : t("addRecipe.addRecipe")}
