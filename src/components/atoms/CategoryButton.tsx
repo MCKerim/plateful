@@ -55,11 +55,13 @@ export default function CategoryButton({
 }: Readonly<Props>) {
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
-  
+
   // Determine if darkmode is active
-  const isDarkMode = theme === "dark" || 
-    (theme === "system" && globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
-  
+  const isDarkMode =
+    theme === "dark" ||
+    (theme === "system" &&
+      globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
+
   const frontColor = getFrontColorCode(color, isDarkMode);
 
   return (
