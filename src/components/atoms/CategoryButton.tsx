@@ -55,18 +55,20 @@ export default function CategoryButton({
 }: Readonly<Props>) {
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
-  
+
   // Determine if darkmode is active
-  const isDarkMode = theme === "dark" || 
-    (theme === "system" && globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
-  
+  const isDarkMode =
+    theme === "dark" ||
+    (theme === "system" &&
+      globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
+
   const frontColor = getFrontColorCode(color, isDarkMode);
 
   return (
     <button
       key={id}
       type="button"
-      className="relative h-[132px] w-full max-w-[169px] mx-auto"
+      className="relative h-[132px] w-full max-w-[169px] mx-auto ease-in-out duration-200 hover:scale-105 active:scale-90"
       onClick={() => {
         dispatch(setCategoryId(id));
       }}
