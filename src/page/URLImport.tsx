@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
+import LoadingDots from "@/components/atoms/LoadingDots";
+import { toast } from "sonner";
 
 export default function URLImport() {
   const { t } = useTranslation();
@@ -77,28 +79,59 @@ export default function URLImport() {
       </div>
 
       <div className="flex items-center flex-1">
-        <Field>
-          <FieldLabel htmlFor="url"> Rezept-Link</FieldLabel>
+        {!isSaving && (
+          <Field>
+            <FieldLabel htmlFor="url">Rezept-Link</FieldLabel>
 
-          <FieldDescription>
-            z.B.: TikTok, YouTube oder Webseiten-Link
-          </FieldDescription>
+            <FieldDescription>
+              z.B.: TikTok, YouTube oder Webseiten-Link
+            </FieldDescription>
 
-          <Input
-            id="url"
-            type="text"
-            placeholder="https://"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            autoComplete="off"
-            autoFocus
-          />
-        </Field>
+            <Input
+              id="url"
+              type="text"
+              placeholder="https://"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              autoComplete="off"
+              autoFocus
+              disabled={isSaving}
+            />
+          </Field>
+        )}
+
+        {isSaving && (
+          <div className="flex flex-col items-center justify-center w-full gap-8">
+            <LoadingDots />
+
+            <p className="second-font text-center">
+              Importiere Rezept Daten...
+            </p>
+          </div>
+        )}
       </div>
+
+      <Button
+        onClick={() => {
+          toast.success("Recipe Imported!", {
+            position: "top-right",
+            richColors: true,
+            action: {
+              label: "Undo",
+              onClick: () => {
+                toast("Undone!");
+              },
+            },
+          });
+        }}
+      >
+        wwd
+      </Button>
 
       {data && (
         <div className="mt-4 p-4 border border-border rounded-lg w-full">
           <h2 className="text-lg font-semibold mb-2">Importierte Daten:</h2>
+
           <pre className="whitespace-pre-wrap break-all">
             {JSON.stringify(data, null, 2)}
           </pre>
