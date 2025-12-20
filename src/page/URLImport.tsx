@@ -68,6 +68,19 @@ export default function URLImport() {
     }
   }
 
+  async function handlePaste() {
+    try {
+      const text = await navigator.clipboard.readText();
+      setUrlInput(text);
+    } catch (err) {
+      console.error("Failed to read clipboard contents:", err);
+      toast.error("Fehler beim Einfügen aus der Zwischenablage.", {
+        position: "top-right",
+        richColors: true,
+      });
+    }
+  }
+
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
@@ -110,6 +123,10 @@ export default function URLImport() {
               autoFocus
               disabled={isSaving}
             />
+
+            <Button variant="outline" onClick={handlePaste} disabled={isSaving}>
+              {t("common.paste")}
+            </Button>
           </Field>
         )}
 
