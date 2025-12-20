@@ -52,25 +52,28 @@ export default function ImageImport() {
   return (
     <Layout showHeader={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center mb-4">
-        <h1 className="text-2xl font-bold first-font">{t("common.importPhotos")}</h1>
+        <h1 className="text-2xl font-bold first-font">
+          {t("common.importPhotos")}
+        </h1>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
         {images.map((image, index) => (
-          <div key={index} className="relative">
+          <div key={index} className="relative group">
             <AspectRatio ratio={16 / 9}>
               <img
                 src={image.preview}
                 alt={`Uploaded ${index}`}
-                className="object-cover w-full h-full rounded-md dark:brightness-75"
+                className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted transition-transform transform"
               />
             </AspectRatio>
 
             <button
               onClick={() => handleRemoveImage(index)}
-              className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1"
+              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg transition-opacity opacity-0 group-hover:opacity-100 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              aria-label="Delete image"
             >
-              X
+              ✕
             </button>
           </div>
         ))}
