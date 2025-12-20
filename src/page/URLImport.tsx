@@ -19,8 +19,8 @@ export default function URLImport() {
   async function handleSave() {
     if (!urlInput?.trim()) return;
     setIsSaving(true);
+
     try {
-      console.log("Calling recipe-from-url with", urlInput);
       const { data, error } = await supabase.functions.invoke(
         "recipe-from-url",
         {
@@ -33,12 +33,25 @@ export default function URLImport() {
       if (error) {
         console.error("Edge function returned error:", error);
         setData(error);
+        toast.error("Fehler beim Importieren des Rezepts.", {
+          position: "top-right",
+          richColors: true,
+        });
       } else {
         console.log("recipe-from-url response:", data);
         setData(data);
+        toast.success("Recipe Imported!", {
+          position: "top-right",
+          richColors: true,
+        });
       }
     } catch (err: unknown) {
       console.error("Unexpected error calling recipe-from-url:", err);
+      toast.error("Unerwarteter Fehler beim Importieren des Rezepts.", {
+        position: "top-right",
+        richColors: true,
+      });
+
       try {
         // Attempt to access error.response.text() safely using `any`.
         const anyErr = err as any;
@@ -105,28 +118,14 @@ export default function URLImport() {
             <LoadingDots />
 
             <p className="second-font text-center">
-              Importiere Rezept Daten...
+              Importiere Rezept...
+              <br />
+              Du kannst die Seite schließen,
+              <br /> es wird automatisch in deinem Kochbuch gespeichert
             </p>
           </div>
         )}
       </div>
-
-      <Button
-        onClick={() => {
-          toast.success("Recipe Imported!", {
-            position: "top-right",
-            richColors: true,
-            action: {
-              label: "Undo",
-              onClick: () => {
-                toast("Undone!");
-              },
-            },
-          });
-        }}
-      >
-        wwd
-      </Button>
 
       {data && (
         <div className="mt-4 p-4 border border-border rounded-lg w-full">
