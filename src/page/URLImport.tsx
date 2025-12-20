@@ -142,7 +142,6 @@ export default function URLImport() {
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               autoComplete="off"
-              autoFocus
               disabled={isSaving}
             />
           </Field>
