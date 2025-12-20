@@ -59,18 +59,18 @@ export default function ImageImport() {
 
       <div className="grid grid-cols-2 gap-4">
         {images.map((image, index) => (
-          <div key={index} className="relative group">
+          <div key={index} className="relative">
             <AspectRatio ratio={16 / 9}>
               <img
                 src={image.preview}
                 alt={`Uploaded ${index}`}
-                className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted transition-transform transform"
+                className="object-cover w-full h-full rounded-md shadow-md"
               />
             </AspectRatio>
 
             <button
               onClick={() => handleRemoveImage(index)}
-              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg transition-opacity opacity-0 group-hover:opacity-100 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               aria-label="Delete image"
             >
               ✕
