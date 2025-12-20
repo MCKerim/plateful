@@ -156,6 +156,10 @@ export default function Cookbook() {
     navigate(`/urlImport`);
   }
 
+  function handleImageImportClicked() {
+    navigate("/imageImport");
+  }
+
   function handleAddRecipe() {
     const params = searchTerm.trim()
       ? `?recipeNameFromSearch=${encodeURIComponent(searchTerm.trim())}`
@@ -208,6 +212,7 @@ export default function Cookbook() {
 
       <AddNewRecipeDrawer
         urlImportClicked={handleURLImportClicked}
+        imageImportClicked={handleImageImportClicked}
         newRecipeClicked={handleAddRecipe}
       />
 

@@ -50,6 +50,7 @@ import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
 import posthog from "posthog-js";
 import URLImport from "./page/URLImport";
+import ImageImport from "./page/ImageImport";
 
 function App() {
   const { t } = useTranslation();
@@ -364,6 +365,7 @@ function App() {
       />
 
       <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
+      <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
 
       {/* 404 Not Found Route */}
       <Route path="*" element={<NotFound />} />

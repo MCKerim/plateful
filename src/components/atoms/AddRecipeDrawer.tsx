@@ -9,11 +9,13 @@ import { Camera, Link, Plus } from "lucide-react";
 
 type Props = {
   urlImportClicked: () => void;
+  imageImportClicked: () => void;
   newRecipeClicked: () => void;
 };
 
 export default function AddNewRecipeDrawer({
   urlImportClicked,
+  imageImportClicked,
   newRecipeClicked,
 }: Readonly<Props>) {
   function renderButton(
@@ -63,9 +65,8 @@ export default function AddNewRecipeDrawer({
           {renderButton(
             <Camera />,
             "Rezept aus Foto hinzufügen",
-            () => {},
-            "Scanne ein Rezeptbuch oder Gericht",
-            true
+            imageImportClicked,
+            "Scanne ein Rezeptbuch oder Gericht"
           )}
 
           {renderButton(<Plus />, "Neues Rezept erstellen", newRecipeClicked)}
