@@ -110,7 +110,7 @@ function App() {
         if (title) params.set("title", title);
         if (text) params.set("text", text);
 
-        navigate(`/recipe/add?${params.toString()}`);
+        navigate(`/urlImport?${params.toString()}`);
       }
     };
 

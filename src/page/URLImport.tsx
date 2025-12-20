@@ -7,36 +7,43 @@ import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/atoms/LoadingDots";
 import { toast } from "sonner";
+import { useSearchParams } from "react-router";
 
 export default function URLImport() {
   const { t } = useTranslation();
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
   const [isSaving, setIsSaving] = useState(false);
-
   const [data, setData] = useState<any>(null);
 
-  useEffect(() => {
-    async function autoPasteFromClipboard() {
-      try {
-        const text = await navigator.clipboard.readText();
-        if (text.startsWith("http://") || text.startsWith("https://")) {
-          setUrlInput(text);
-          toast.success("Link automatisch eingefügt!", {
-            position: "top-right",
-            richColors: true,
-          });
-        }
-      } catch (err) {
-        console.debug(
-          "Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.",
-          err
-        );
-      }
-    }
+  const [searchParams] = useSearchParams();
+  const searchUrl = searchParams.get("url");
 
-    autoPasteFromClipboard();
-  }, []);
+  useEffect(() => {
+    if (searchUrl) {
+      setUrlInput(searchUrl);
+    } else {
+      async function autoPasteFromClipboard() {
+        try {
+          const text = await navigator.clipboard.readText();
+          if (text.startsWith("http://") || text.startsWith("https://")) {
+            setUrlInput(text);
+            toast.success("Link automatisch eingefügt!", {
+              position: "top-right",
+              richColors: true,
+            });
+          }
+        } catch (err) {
+          console.debug(
+            "Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.",
+            err
+          );
+        }
+      }
+
+      autoPasteFromClipboard();
+    }
+  }, [searchUrl]);
 
   async function handleSave() {
     if (!urlInput?.trim()) return;
@@ -87,19 +94,6 @@ export default function URLImport() {
       }
     } finally {
       setIsSaving(false);
-    }
-  }
-
-  async function handlePaste() {
-    try {
-      const text = await navigator.clipboard.readText();
-      setUrlInput(text);
-    } catch (err) {
-      console.error("Failed to read clipboard contents:", err);
-      toast.error("Fehler beim Einfügen aus der Zwischenablage.", {
-        position: "top-right",
-        richColors: true,
-      });
     }
   }
 
