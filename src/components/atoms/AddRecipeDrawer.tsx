@@ -20,10 +20,16 @@ export default function AddNewRecipeDrawer({
     icon: any,
     label: string,
     onClick: () => void,
-    description?: string
+    description?: string,
+    disabled?: boolean
   ) {
     return (
-      <Button variant="secondary" size="lg" onClick={onClick}>
+      <Button
+        variant="secondary"
+        size="lg"
+        onClick={onClick}
+        disabled={disabled}
+      >
         <div className="flex justify-start gap-4 w-full h-full items-center text-start">
           {icon}
 
@@ -58,7 +64,8 @@ export default function AddNewRecipeDrawer({
             <Camera />,
             "Rezept aus Foto hinzufügen",
             () => {},
-            "Scanne ein Rezeptbuch oder Gericht"
+            "Scanne ein Rezeptbuch oder Gericht",
+            true
           )}
 
           {renderButton(<Plus />, "Neues Rezept erstellen", newRecipeClicked)}
