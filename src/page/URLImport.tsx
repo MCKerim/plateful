@@ -48,6 +48,18 @@ export default function URLImport() {
 
   async function handleSave(url = urlInput) {
     if (!url?.trim()) return;
+
+    // Validate URL
+    try {
+      new URL(url.trim());
+    } catch {
+      toast.error("Ungültige URL. Bitte überprüfe den Link.", {
+        position: "top-right",
+        richColors: true,
+      });
+      return;
+    }
+
     setIsSaving(true);
 
     try {
