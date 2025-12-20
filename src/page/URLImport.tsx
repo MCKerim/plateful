@@ -17,11 +17,12 @@ export default function URLImport() {
   const [data, setData] = useState<any>(null);
 
   const [searchParams] = useSearchParams();
-  const searchUrl = searchParams.get("url");
 
   useEffect(() => {
-    if (searchUrl) {
-      setUrlInput(searchUrl);
+    const urlFromParams = searchParams.get("url");
+    if (urlFromParams) {
+      setUrlInput(urlFromParams);
+      handleSave(urlFromParams);
     } else {
       async function autoPasteFromClipboard() {
         try {
@@ -43,10 +44,10 @@ export default function URLImport() {
 
       autoPasteFromClipboard();
     }
-  }, [searchUrl]);
+  }, [searchParams]);
 
-  async function handleSave() {
-    if (!urlInput?.trim()) return;
+  async function handleSave(url = urlInput) {
+    if (!url?.trim()) return;
     setIsSaving(true);
 
     try {
@@ -54,7 +55,7 @@ export default function URLImport() {
         "recipe-from-url",
         {
           body: {
-            url: urlInput.trim(),
+            url: url.trim(),
           },
         }
       );
@@ -82,14 +83,12 @@ export default function URLImport() {
       });
 
       try {
-        // Attempt to access error.response.text() safely using `any`.
         const anyErr = err as any;
         if (anyErr?.response && typeof anyErr.response.text === "function") {
           const text = await anyErr.response.text();
           console.error("Edge function returned (raw text):", text);
         }
       } catch (error_) {
-        // silent fallback if we cannot read raw body
         console.debug("Could not retrieve raw response from error.", error_);
       }
     } finally {
@@ -105,7 +104,7 @@ export default function URLImport() {
         <Button
           className="w-full"
           variant="accent"
-          onClick={handleSave}
+          onClick={() => handleSave()} // Ensure no arguments are passed
           disabled={isSaving}
         >
           {t("common.save")}
