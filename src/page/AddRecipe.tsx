@@ -547,10 +547,6 @@ export default function AddRecipe() {
             onChange={(e) => setLink(e.target.value)}
             autoComplete="off"
           />
-
-          <Button variant="secondary" onClick={importRecipeData}>
-            {t("addRecipe.importRecipeData")}
-          </Button>
         </div>
 
         {/*<div className="flex flex-col w-full gap-2">
