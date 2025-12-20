@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/atoms/LoadingDots";
@@ -15,6 +15,28 @@ export default function URLImport() {
   const [isSaving, setIsSaving] = useState(false);
 
   const [data, setData] = useState<any>(null);
+
+  useEffect(() => {
+    async function autoPasteFromClipboard() {
+      try {
+        const text = await navigator.clipboard.readText();
+        if (text.startsWith("http://") || text.startsWith("https://")) {
+          setUrlInput(text);
+          toast.success("Link automatisch eingefügt!", {
+            position: "top-right",
+            richColors: true,
+          });
+        }
+      } catch (err) {
+        console.debug(
+          "Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.",
+          err
+        );
+      }
+    }
+
+    autoPasteFromClipboard();
+  }, []);
 
   async function handleSave() {
     if (!urlInput?.trim()) return;
@@ -123,10 +145,6 @@ export default function URLImport() {
               autoFocus
               disabled={isSaving}
             />
-
-            <Button variant="outline" onClick={handlePaste} disabled={isSaving}>
-              {t("common.paste")}
-            </Button>
           </Field>
         )}
 
