@@ -181,6 +181,19 @@
     "ratings": "Ratings",
     "noRatings": "No Ratings"
   },
+  "addRecipeDrawer": {
+    "importFromUrl": {
+      "label": "Import recipe from URL",
+      "description": "TikTok, YouTube, Instagram, Website"
+    },
+    "importFromImage": {
+      "label": "Import recipe from image",
+      "description": "Scan a recipe book or dish"
+    },
+    "createNewRecipe": {
+      "label": "Create new recipe"
+    }
+  },
   "addRecipe": {
     "editRecipe": "Edit recipe",
     "addRecipe": "Add recipe",

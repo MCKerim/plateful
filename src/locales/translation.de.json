@@ -181,6 +181,19 @@
     "ratings": "Bewertungen",
     "noRatings": "Keine Bewertungen"
   },
+  "addRecipeDrawer": {
+    "importFromUrl": {
+      "label": "Rezept aus URL hinzufügen",
+      "description": "TikTok, YouTube, Instagram, Webseite"
+    },
+    "importFromImage": {
+      "label": "Rezept aus Foto hinzufügen",
+      "description": "Scanne ein Rezeptbuch oder Gericht"
+    },
+    "createNewRecipe": {
+      "label": "Neues Rezept erstellen"
+    }
+  },
   "addRecipe": {
     "editRecipe": "Rezept bearbeiten",
     "addRecipe": "Rezept hinzufügen",

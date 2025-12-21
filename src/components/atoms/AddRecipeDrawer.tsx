@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import {
   Drawer,
@@ -18,6 +19,8 @@ export default function AddNewRecipeDrawer({
   imageImportClicked,
   newRecipeClicked,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   function renderButton(
     icon: any,
     label: string,
@@ -57,19 +60,23 @@ export default function AddNewRecipeDrawer({
         <DrawerFooter className="gap-4 mb-8 mt-4">
           {renderButton(
             <Link />,
-            "Rezept aus URL hinzufügen",
+            t("addRecipeDrawer.importFromUrl.label"),
             urlImportClicked,
-            "TikTok, YouTube, Instagram, Webseite"
+            t("addRecipeDrawer.importFromUrl.description")
           )}
 
           {renderButton(
             <Camera />,
-            "Rezept aus Foto hinzufügen",
+            t("addRecipeDrawer.importFromImage.label"),
             imageImportClicked,
-            "Scanne ein Rezeptbuch oder Gericht"
+            t("addRecipeDrawer.importFromImage.description")
           )}
 
-          {renderButton(<Plus />, "Neues Rezept erstellen", newRecipeClicked)}
+          {renderButton(
+            <Plus />,
+            t("addRecipeDrawer.createNewRecipe.label"),
+            newRecipeClicked
+          )}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
