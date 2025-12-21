@@ -155,6 +155,11 @@ export default function URLImport() {
               onChange={(e) => setUrlInput(e.target.value)}
               autoComplete="off"
               disabled={isSaving}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleSave();
+                }
+              }}
             />
           </Field>
         )}
