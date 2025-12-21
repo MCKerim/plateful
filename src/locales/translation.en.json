@@ -192,6 +192,22 @@
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)"
   },
+  "urlImport": {
+    "linkPastedFromClipboard": "Link pasted from clipboard",
+    "title": "Import Recipe",
+    "urlFieldLabel": "Recipe Link",
+    "urlFieldDescription": "e.g., TikTok, YouTube or Website link",
+    "urlFieldPlaceholder": "https://",
+    "importButton": "Import Recipe",
+    "importingMessage": "This can take a few seconds...",
+    "importingDescription": "You can close this page and find the recipe in your cookbook later",
+    "errors": {
+      "invalidUrl": "Invalid URL. Please check the link.",
+      "importFailed": "Failed to import recipe."
+    },
+    "success": "Recipe imported successfully!",
+    "importedRecipe": "Recipe imported successfully:"
+  },
   "home": {
     "title": "Home",
     "enjoyCooking": "Enjoy cooking, {{username}}!"

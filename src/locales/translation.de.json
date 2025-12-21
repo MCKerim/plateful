@@ -192,6 +192,22 @@
     "linkPlaceholder": "https://www.tomaten-suppe.de",
     "importRecipeData": "Rezeptdaten importieren (TikTok)"
   },
+  "urlImport": {
+    "linkPastedFromClipboard": "Link aus der Zwischenablage eingefügt",
+    "title": "Rezept Importieren",
+    "urlFieldLabel": "Rezept-Link",
+    "urlFieldDescription": "z.B.: TikTok, YouTube oder Webseiten-Link",
+    "urlFieldPlaceholder": "https://",
+    "importButton": "Rezept importieren",
+    "importingMessage": "Dies kann einige Sekunden dauern...",
+    "importingDescription": "Du kannst die Seite schließen und später das Rezept in deinem Kochbuch finden",
+    "errors": {
+      "invalidUrl": "Ungültige URL. Bitte überprüfe den Link.",
+      "importFailed": "Fehler beim Importieren des Rezepts."
+    },
+    "success": "Rezept erfolgreich importiert!",
+    "importedRecipe": "Rezept erfolgreich importiert"
+  },
   "home": {
     "title": "Startseite",
     "enjoyCooking": "Viel Spaß beim Kochen, {{username}}!"

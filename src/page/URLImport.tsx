@@ -31,7 +31,7 @@ export default function URLImport() {
           const text = await navigator.clipboard.readText();
           if (text.startsWith("http://") || text.startsWith("https://")) {
             setUrlInput(text);
-            toast.success("Link automatisch eingefügt!", {
+            toast.success(t("urlImport.linkPastedFromClipboard"), {
               position: "top-right",
               richColors: true,
             });
@@ -55,7 +55,7 @@ export default function URLImport() {
     try {
       new URL(url.trim());
     } catch {
-      toast.error("Ungültige URL. Bitte überprüfe den Link.", {
+      toast.error(t("urlImport.errors.invalidUrl"), {
         position: "top-right",
         richColors: true,
       });
@@ -76,14 +76,14 @@ export default function URLImport() {
 
       if (error) {
         console.error("Edge function returned error:", error);
-        toast.error("Fehler beim Importieren des Rezepts.", {
+        toast.error(t("urlImport.errors.importFailed"), {
           position: "top-right",
           richColors: true,
         });
       } else {
         console.log("recipe-from-url response:", data);
         setData(data[0]);
-        toast.success("Recipe Imported!", {
+        toast.success(t("urlImport.success"), {
           position: "top-right",
           richColors: true,
           action: {
@@ -96,7 +96,7 @@ export default function URLImport() {
       }
     } catch (err: unknown) {
       console.error("Unexpected error calling recipe-from-url:", err);
-      toast.error("Unerwarteter Fehler beim Importieren des Rezepts.", {
+      toast.error(t("urlImport.errors.importFailed"), {
         position: "top-right",
         richColors: true,
       });
@@ -123,10 +123,10 @@ export default function URLImport() {
         <Button
           className="w-full"
           variant="accent"
-          onClick={() => handleSave()} // Ensure no arguments are passed
+          onClick={() => handleSave()}
           disabled={isSaving || data !== null}
         >
-          {t("common.save")}
+          {t("urlImport.importButton")}
         </Button>
       </div>
     </>
@@ -135,22 +135,26 @@ export default function URLImport() {
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
-        <h1 className="text-2xl font-bold first-font">Rezept Importieren</h1>
+        <h1 className="text-2xl font-bold first-font">
+          {t("urlImport.title")}
+        </h1>
       </div>
 
       <div className="flex items-center flex-1">
         {!isSaving && !data && (
           <Field>
-            <FieldLabel htmlFor="url">Rezept-Link</FieldLabel>
+            <FieldLabel htmlFor="url">
+              {t("urlImport.urlFieldLabel")}
+            </FieldLabel>
 
             <FieldDescription>
-              z.B.: TikTok, YouTube oder Webseiten-Link
+              {t("urlImport.urlFieldDescription")}
             </FieldDescription>
 
             <Input
               id="url"
               type="text"
-              placeholder="https://"
+              placeholder={t("urlImport.urlFieldPlaceholder")}
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               autoComplete="off"
@@ -169,10 +173,9 @@ export default function URLImport() {
             <LoadingDots />
 
             <p className="second-font text-center">
-              Dies kann einige Sekunden dauern...
+              {t("urlImport.importingMessage")}
               <br />
-              Du kannst die Seite schließen und später das Rezept in deinem
-              Kochbuch finden
+              {t("urlImport.importingDescription")}
             </p>
           </div>
         )}
@@ -180,7 +183,7 @@ export default function URLImport() {
         {data && (
           <div className="flex flex-col w-full gap-4">
             <h2 className="text-lg font-bold second-font">
-              Importiertes Rezept
+              {t("urlImport.importedRecipe")}
             </h2>
 
             <RecipeCard
