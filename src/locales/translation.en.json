@@ -209,6 +209,10 @@
     "importedRecipe": "Recipe imported successfully:",
     "viewRecipe": "View"
   },
+  "imageImport": {
+    "title": "Import Recipe",
+    "importButton": "Import Recipe"
+  },
   "home": {
     "title": "Home",
     "enjoyCooking": "Enjoy cooking, {{username}}!"

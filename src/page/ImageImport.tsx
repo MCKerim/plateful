@@ -4,6 +4,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { ImagePicker } from "@/components/atoms/ImagePicker";
+import { Trash2 } from "lucide-react";
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -43,7 +44,7 @@ export default function ImageImport() {
           variant="accent"
           onClick={() => handleStartImport()}
         >
-          {t("common.save")}
+          {t("imageImport.importButton")}
         </Button>
       </div>
     </>
@@ -53,7 +54,7 @@ export default function ImageImport() {
     <Layout showHeader={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center mb-4">
         <h1 className="text-2xl font-bold first-font">
-          {t("common.importPhotos")}
+          {t("imageImport.title")}
         </h1>
       </div>
 
@@ -64,7 +65,7 @@ export default function ImageImport() {
               <img
                 src={image.preview}
                 alt={`Uploaded ${index}`}
-                className="object-cover w-full h-full rounded-md shadow-md"
+                className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted-foreground"
               />
             </AspectRatio>
 
@@ -73,7 +74,7 @@ export default function ImageImport() {
               className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
               aria-label="Delete image"
             >
-              ✕
+              <Trash2 size={16} />
             </button>
           </div>
         ))}

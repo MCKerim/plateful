@@ -209,6 +209,10 @@
     "importedRecipe": "Rezept erfolgreich importiert",
     "viewRecipe": "Ansehen"
   },
+  "imageImport": {
+    "title": "Rezept Importieren",
+    "importButton": "Rezept importieren"
+  },
   "home": {
     "title": "Startseite",
     "enjoyCooking": "Viel Spaß beim Kochen, {{username}}!"
