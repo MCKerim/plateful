@@ -7,10 +7,12 @@ import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/atoms/LoadingDots";
 import { toast } from "sonner";
-import { useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import RecipeCard from "@/components/atoms/RecipeCard";
 
 export default function URLImport() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
   const [isSaving, setIsSaving] = useState(false);
@@ -74,17 +76,22 @@ export default function URLImport() {
 
       if (error) {
         console.error("Edge function returned error:", error);
-        setData(error);
         toast.error("Fehler beim Importieren des Rezepts.", {
           position: "top-right",
           richColors: true,
         });
       } else {
         console.log("recipe-from-url response:", data);
-        setData(data);
+        setData(data[0]);
         toast.success("Recipe Imported!", {
           position: "top-right",
           richColors: true,
+          action: {
+            label: "View",
+            onClick: () => {
+              navigate(`/recipe/${data[0].id}`);
+            },
+          },
         });
       }
     } catch (err: unknown) {
@@ -117,7 +124,7 @@ export default function URLImport() {
           className="w-full"
           variant="accent"
           onClick={() => handleSave()} // Ensure no arguments are passed
-          disabled={isSaving}
+          disabled={isSaving || data !== null}
         >
           {t("common.save")}
         </Button>
@@ -132,7 +139,7 @@ export default function URLImport() {
       </div>
 
       <div className="flex items-center flex-1">
-        {!isSaving && (
+        {!isSaving && !data && (
           <Field>
             <FieldLabel htmlFor="url">Rezept-Link</FieldLabel>
 
@@ -157,24 +164,29 @@ export default function URLImport() {
             <LoadingDots />
 
             <p className="second-font text-center">
-              Importiere Rezept...
+              Dies kann einige Sekunden dauern...
               <br />
-              Du kannst die Seite schließen,
-              <br /> es wird automatisch in deinem Kochbuch gespeichert
+              Du kannst die Seite schließen und später das Rezept in deinem
+              Kochbuch finden
             </p>
           </div>
         )}
+
+        {data && (
+          <div className="flex flex-col w-full gap-4">
+            <h2 className="text-lg font-bold second-font">
+              Importiertes Rezept
+            </h2>
+
+            <RecipeCard
+              key={data.id}
+              id={data.id}
+              name={data.name}
+              averageRating={null}
+            />
+          </div>
+        )}
       </div>
-
-      {data && (
-        <div className="mt-4 p-4 border border-border rounded-lg w-full">
-          <h2 className="text-lg font-semibold mb-2">Importierte Daten:</h2>
-
-          <pre className="whitespace-pre-wrap break-all">
-            {JSON.stringify(data, null, 2)}
-          </pre>
-        </div>
-      )}
     </Layout>
   );
 }
