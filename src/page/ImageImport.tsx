@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { ImagePicker } from "@/components/atoms/ImagePicker";
 import { Trash2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -30,8 +31,10 @@ export default function ImageImport() {
   };
 
   const handleStartImport = () => {
-    console.log("Starting import with images:", images);
-    alert("Import started with " + images.length + " images.");
+    toast.error("Image import will work soon", {
+      position: "top-right",
+      richColors: true,
+    });
   };
 
   const saveFooter = (
