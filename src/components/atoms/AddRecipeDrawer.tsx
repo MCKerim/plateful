@@ -36,7 +36,7 @@ export default function AddNewRecipeDrawer({
           {icon}
 
           <div className="flex flex-col justify-start">
-            <p className="second-font">{label}</p>
+            <p className="second-font font-semibold">{label}</p>
 
             <p className="text-xs font-normal text-muted-foreground">
               {description}
