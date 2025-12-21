@@ -87,7 +87,7 @@ export default function URLImport() {
           position: "top-right",
           richColors: true,
           action: {
-            label: "View",
+            label: t("urlImport.viewRecipe"),
             onClick: () => {
               navigate(`/recipe/${data[0].id}`);
             },

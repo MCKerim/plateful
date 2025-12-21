@@ -206,7 +206,8 @@
       "importFailed": "Fehler beim Importieren des Rezepts."
     },
     "success": "Rezept erfolgreich importiert!",
-    "importedRecipe": "Rezept erfolgreich importiert"
+    "importedRecipe": "Rezept erfolgreich importiert",
+    "viewRecipe": "Ansehen"
   },
   "home": {
     "title": "Startseite",

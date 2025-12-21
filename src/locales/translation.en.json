@@ -206,7 +206,8 @@
       "importFailed": "Failed to import recipe."
     },
     "success": "Recipe imported successfully!",
-    "importedRecipe": "Recipe imported successfully:"
+    "importedRecipe": "Recipe imported successfully:",
+    "viewRecipe": "View"
   },
   "home": {
     "title": "Home",
