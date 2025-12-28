@@ -1,12 +1,17 @@
 import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
 import CircleTransition from "@/components/atoms/CircleTransition";
+import { openBrowser } from "@/utils/nativeBrowser";
+import { useNavigate } from "react-router";
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
 
 export default function SignUp() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [showTransition, setShowTransition] = useState(true);
 
   const { rive, RiveComponent } = useRive({
@@ -37,15 +42,46 @@ export default function SignUp() {
   };
 
   const signUp = async () => {
-    const currentUrl = window.location.origin;
-    let redirectUri = currentUrl ?? "https://www.plateful.cloud/";
+    try {
+      const currentUrl = globalThis.location.origin;
+      let redirectUri: string;
 
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: redirectUri,
-      },
-    });
+      // Determine the correct redirect URI based on platform
+      if (
+        globalThis.location.hostname === "localhost" ||
+        globalThis.location.hostname === "127.0.0.1" ||
+        globalThis.location.hostname ===
+          "plateful-git-staging-mckerims-projects.vercel.app"
+      ) {
+        // Development environment
+        redirectUri = currentUrl;
+      } else {
+        // Production
+        redirectUri = "https://app.plateful.cloud/";
+      }
+
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: redirectUri,
+          skipBrowserRedirect: true,
+          queryParams: {
+            access_type: "offline",
+            prompt: "consent",
+          },
+        },
+      });
+
+      if (error) {
+        console.error("OAuth error:", error);
+        alert("Authentication failed. Please try again.");
+      }
+
+      await openBrowser(data?.url || "");
+    } catch (error) {
+      console.error("Unexpected error during sign up:", error);
+      alert("An unexpected error occurred. Please try again.");
+    }
   };
 
   return (
@@ -57,24 +93,17 @@ export default function SignUp() {
       />
 
       <div className="flex flex-col items-center h-screen px-4 py-10">
-        <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center">
-          <h1
-            className="text-7xl font-bold"
-            style={{
-              fontFamily: "Modak",
-            }}
-          >
-            {t("signup.title")}
-          </h1>
+        <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
+          <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
 
-          <p className="text-sm text-muted-foreground italic">
+          <p className="text-sm text-muted-foreground second-font">
             {t("signup.subtitle")}
           </p>
         </div>
 
         <RiveComponent onClick={replayAnimation} />
 
-        <div className="w-full max-w-sm flex flex-col gap-3">
+        <div className="flex flex-col w-full max-w-sm gap-2">
           <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
             {t("signup.termsAndConditions")}
           </div>
@@ -90,6 +119,13 @@ export default function SignUp() {
                 />
               </svg>
             }
+          />
+
+          <OnboardingButton
+            label={t("signup.continueWithEMail")}
+            variant="secondary"
+            onClick={() => navigate("/signup/email")}
+            icon={<EmailOutlinedIcon />}
           />
         </div>
       </div>

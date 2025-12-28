@@ -1,15 +1,19 @@
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { QRCodeSVG } from "qrcode.react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../button";
-import { Link } from "lucide-react";
+import { Copy, Share2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Share } from "@capacitor/share";
 
 export default function InviteLink() {
+  const { supabase } = useSupabase();
   const user = useAppSelector(selectUser);
+  const { t } = useTranslation();
 
   const [inviteLink, setInviteLink] = useState("");
 
@@ -37,32 +41,23 @@ export default function InviteLink() {
     ]);
 
     if (error) {
-      alert(
-        "Fehler beim Erstellen des Einladungslinks. Bitte versuche es später erneut. " +
-          error.message
-      );
+      alert(t("inviteLink.createError") + " " + error.message);
       return;
     }
 
-    setInviteLink(`${window.location.origin}/invite/${token}`);
+    setInviteLink(`https://app.plateful.cloud/invite/${token}`);
   }
 
   async function shareInviteLink() {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Haushaltseinladung 🏡",
-          text: "Hey, tritt meinem Haushalt bei!",
-          url: inviteLink,
-        });
-      } catch (err) {
-        console.error("Fehler beim Teilen:", err);
-      }
-    } else {
-      // Fallback, z.B. Link kopieren
-      alert(
-        "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
-      );
+    try {
+      await Share.share({
+        title: t("inviteLink.shareTitle"),
+        text: t("inviteLink.shareText"),
+        url: inviteLink,
+        dialogTitle: t("inviteLink.shareDialogTitle"),
+      });
+    } catch (err) {
+      console.error("Fehler beim Teilen des Links:", err);
       await copyInviteLink();
     }
   }
@@ -74,10 +69,10 @@ export default function InviteLink() {
 
     try {
       await navigator.clipboard.writeText(inviteLink);
-      alert("Einladungslink wurde in die Zwischenablage kopiert!");
+      alert(t("inviteLink.copySuccess"));
     } catch (err) {
       console.error("Fehler beim Kopieren des Links:", err);
-      alert("Fehler beim Kopieren des Links. Bitte versuche es später erneut.");
+      alert(t("inviteLink.copyError"));
     }
   }
 
@@ -91,11 +86,11 @@ export default function InviteLink() {
           className="w-full mt-4"
           variant={"secondary"}
         >
-          <Link size={16} /> Link kopieren
+          <Copy size={16} className="mr-2" /> {t("inviteLink.copyButton")}
         </Button>
 
         <Button onClick={shareInviteLink} className="w-full mt-4">
-          <Link size={16} /> Link teilen
+          <Share2 size={16} className="mr-2" /> {t("inviteLink.shareButton")}
         </Button>
       </div>
     </div>

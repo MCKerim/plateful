@@ -1,20 +1,29 @@
 import Layout from "@/components/layout/Layout";
 import { ModeToggle } from "@/components/atoms/mode-toggle";
 import { Button } from "@/components/ui/button";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, Newspaper, Map, Globe } from "lucide-react";
-import { FaInstagram, FaThreads, FaTiktok } from "react-icons/fa6";
+import { Donut, House, Newspaper, Map, LogOut, Pencil } from "lucide-react";
+import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 export default function Settings() {
+  const { supabase } = useSupabase();
   const { t, i18n } = useTranslation();
   const user = useAppSelector(selectUser);
-
-  const environment = import.meta.env.VITE_NODE_ENV;
+  const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
+  const [newUsername, setNewUsername] = useState(user?.username || "");
 
   useEffect(() => {
     // Benutzeridentifikation mit Canny
@@ -46,9 +55,33 @@ export default function Settings() {
     }
   };
 
+  const updateUsername = async () => {
+    if (newUsername.trim() === "" || !user) {
+      alert(t("settings.usernameCannotBeEmpty"));
+      return;
+    }
+
+    if (newUsername.length < 3 || newUsername.length > 20) {
+      alert(t("settings.usernameLengthInvalid"));
+      return;
+    }
+
+    const { error } = await supabase
+      .from("users")
+      .update({ username: newUsername })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Error updating username:", error);
+      return;
+    }
+
+    setIsUsernameDialogOpen(false);
+  };
+
   return (
     <Layout>
-      <h1 className="text-2xl">{t("settings.title")}</h1>
+      <h1 className="second-font text-2xl">{t("settings.title")}</h1>
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
@@ -153,8 +186,8 @@ export default function Settings() {
           </div>
 
           <div className="flex py-2 justify-evenly">
-            <NavLink to="https://kblanks.com/" target="_blank">
-              <Globe size={24} />
+            <NavLink to="https://x.com/MCKerim5" target="_blank">
+              <FaXTwitter size={24} />
             </NavLink>
 
             <NavLink to="https://www.threads.com/@kblanks_com" target="_blank">
@@ -175,34 +208,81 @@ export default function Settings() {
           <h2 className="font-medium border-b">Info</h2>
 
           <p className="text-sm">
-            v0.0.0 <span>- Beta </span>
-            {environment === "preview" && <span>- Preview </span>}
-            {environment === "development" && <span>- Development </span>}
+            v0.0.10 - Beta
           </p>
 
-          <NavLink to="/privacy">
-            <Button variant="secondary" className="w-full">
-              {t("settings.privacyPolicy")}
-            </Button>
-          </NavLink>
+          <div className="flex gap-2">
+            <NavLink to="/privacy" className="w-full">
+              <Button variant="secondary" className="w-full">
+                {t("settings.privacyPolicy")}
+              </Button>
+            </NavLink>
 
-          <NavLink to="/terms">
-            <Button variant="secondary" className="w-full">
-              {t("settings.termsOfService")}
-            </Button>
-          </NavLink>
+            <NavLink to="/terms" className="w-full">
+              <Button variant="secondary" className="w-full">
+                {t("settings.termsOfService")}
+              </Button>
+            </NavLink>
+          </div>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
-          <h2 className="font-medium border-b">{t("settings.dangerZone")}</h2>
+          <div className="flex justify-between items-center border-b">
+            <h2 className="font-medium">
+              {t("settings.account")}
+            </h2>
 
-          {user?.email}
+            <Button
+              variant="ghost"
+              size="iconSm"
+              onClick={() => setIsUsernameDialogOpen(true)}
+            >
+              <Pencil />
+            </Button>
+          </div>
+
+          <p>
+            {user?.username} - {user?.email}
+          </p>
 
           <Button variant="destructive" onClick={signOut}>
-            {t("settings.signOut")}
+            <LogOut size={16} /> {t("settings.signOut")}
           </Button>
         </div>
       </div>
+
+      <Dialog
+        open={isUsernameDialogOpen}
+        onOpenChange={setIsUsernameDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("settings.editUsername")}</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            value={newUsername}
+            onChange={(e) => setNewUsername(e.target.value)}
+            placeholder={t("settings.enterNewUsername")}
+          />
+
+          <DialogFooter>
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setIsUsernameDialogOpen(false)}
+              >
+                {t("common.cancel")}
+              </Button>
+
+              <Button className="w-full" onClick={updateUsername}>
+                {t("common.save")}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 }

@@ -1,7 +1,7 @@
 import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import {
   format,
   isSameDay,
@@ -32,6 +32,9 @@ type MealPlannerItem = {
 };
 
 export default function MealPlanner() {
+  const { supabase } = useSupabase();
+  const { t, i18n } = useTranslation();
+
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState(new Date());

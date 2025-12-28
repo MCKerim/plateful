@@ -1,22 +1,50 @@
 import RecipeCard from "@/components/atoms/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
 import Rive from "@rive-app/react-canvas";
-import { getRecipes, type Recipe } from "@/utils/recipeHelpers";
+import SortingModal from "@/components/atoms/SortingModal";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  resetFilter,
+  selectCategoryId,
+  selectSearchTerm,
+  selectSorting,
+  setSearchTerm,
+} from "@/redux/slices/filterAndSortingSlice";
+import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
+import CategoryButton from "@/components/atoms/CategoryButton";
+import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+import AddNewRecipeDrawer from "@/components/atoms/AddRecipeDrawer";
+
+export type Recipe = {
+  id: number;
+  recipeName: string;
+  description: string;
+  category?: number | null;
+  created_at: string;
+  avg_rating: number | null;
+};
 
 export default function Cookbook() {
+  const dispatch = useAppDispatch();
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
+  useScrollRestoration("cookbook-scroll");
+
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<Recipe[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const categoryId = useAppSelector(selectCategoryId);
+  const sorting = useAppSelector(selectSorting);
+  const searchTerm = useAppSelector(selectSearchTerm);
 
   useEffect(() => {
     loadRecipes();
@@ -24,12 +52,59 @@ export default function Cookbook() {
 
   useEffect(() => {
     handleSearch();
-  }, [searchTerm]);
+  }, [searchTerm, sorting, categoryId, recipes]);
 
-  async function loadRecipes() {
-    const fetchedRecipes = await getRecipes();
-    setRecipes(fetchedRecipes);
-    setSearchResults(fetchedRecipes);
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      dispatch(resetFilter());
+      navigate("/cookbook");
+    };
+
+    globalThis.addEventListener("popstate", handlePopState);
+
+    return () => {
+      globalThis.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
+
+  async function getRecipes() {
+    const { data } = await supabase.from("recipes").select(`
+        id,
+        name,
+        description,
+        category,
+        created_at,
+        recipe_ratings(stars)
+      `);
+
+    const newRecipes: Recipe[] = [];
+
+    if (!data) {
+      setRecipes([]);
+      setLoading(false);
+      return;
+    }
+
+    data.forEach((recipe) => {
+      const newRecipe: Recipe = {
+        id: recipe.id,
+        recipeName: recipe.name,
+        description: recipe.description ?? "",
+        category: recipe.category,
+        created_at: recipe.created_at,
+        avg_rating:
+          recipe.recipe_ratings.length > 0
+            ? recipe.recipe_ratings.reduce(
+                (sum, rating) => sum + rating.stars,
+                0
+              ) / recipe.recipe_ratings.length
+            : null,
+      };
+      newRecipes.push(newRecipe);
+    });
+
+    setRecipes(newRecipes);
     setLoading(false);
   }
 
@@ -41,56 +116,120 @@ export default function Cookbook() {
   });
 
   const handleSearch = async () => {
-    if (searchTerm.trim() === "") {
-      setSearchResults(recipes);
-      return;
+    let searchedRecipes = [...recipes];
+
+    if (searchTerm.trim() !== "") {
+      const results = fuse.search(searchTerm);
+      searchedRecipes = results.map((result) => result.item);
     }
 
-    const results = fuse.search(searchTerm);
-    const matchedRecipes = results.map((result) => result.item);
+    if (categoryId === null || categoryId === 0) {
+      // 0 means all categories
+    } else {
+      searchedRecipes = searchedRecipes.filter(
+        (recipe) => recipe.category === categoryId
+      );
+    }
 
-    setSearchResults(matchedRecipes);
+    searchedRecipes.sort((a, b) => {
+      if (sorting === "newest") return b.created_at.localeCompare(a.created_at);
+      if (sorting === "oldest") return a.created_at.localeCompare(b.created_at);
+      if (sorting === "aToZ") return a.recipeName.localeCompare(b.recipeName);
+      if (sorting === "rating") {
+        if (a.avg_rating === null && b.avg_rating === null) {
+          return 0;
+        } else if (a.avg_rating === null) {
+          return 1;
+        } else if (b.avg_rating === null) {
+          return -1;
+        } else {
+          return b.avg_rating - a.avg_rating;
+        }
+      }
+      return 0;
+    });
+
+    setSearchResults(searchedRecipes);
   };
 
-  function handleAddRecipe() {
-    const path =
-      "/recipe/add" +
-      (searchTerm.trim() !== ""
-        ? `?recipeNameFromSearch=${searchTerm.trim()}`
-        : "");
+  function handleURLImportClicked() {
+    navigate(`/urlImport`);
+  }
 
-    navigate(path);
+  function handleImageImportClicked() {
+    navigate("/imageImport");
+  }
+
+  function handleAddRecipe() {
+    const params = searchTerm.trim()
+      ? `?recipeNameFromSearch=${encodeURIComponent(searchTerm.trim())}`
+      : "";
+
+    navigate(`/recipe/add${params}`);
   }
 
   // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
-      <div className="sticky z-10 w-full my-1 mb-2 top-14">
+      <div className="sticky z-20 flex items-center w-full gap-1 my-1 top-14">
         <Input
-          className="w-full rounded-full"
+          className="rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
           value={searchTerm}
           showDeleteButton={searchTerm.length > 0}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onDelete={() => setSearchTerm("")}
+          onChange={(e) => dispatch(setSearchTerm(e.target.value))}
+          onDelete={() => dispatch(setSearchTerm(""))}
         />
+
+        <SortingModal />
       </div>
 
-      <button
-        className="p-2.5 fixed bottom-[5rem] right-[1rem] z-10 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95"
-        onClick={handleAddRecipe}
-      >
-        <Plus size={34} />
-      </button>
+      {(categoryId !== null || searchTerm.trim() !== "") && (
+        <h1 className="second-font text-lg font-bold">
+          {categoryId === 0 || categoryId === null
+            ? t("categorys.allRecipes")
+            : getTranslatedCategory(t, categoryId)}
+        </h1>
+      )}
 
-      <div className="grid grid-cols-2 gap-2">
-        {searchResults.map((recipe) => (
-          <RecipeCard key={recipe.id} id={recipe.id} name={recipe.recipeName} />
-        ))}
-      </div>
+      {categoryId === null && searchTerm.trim() === "" && (
+        <div className="grid items-center justify-center grid-cols-2 gap-6">
+          {categories.map((cat) => {
+            return (
+              <CategoryButton
+                key={cat.id}
+                id={cat.id}
+                name={getTranslatedCategory(t, cat.id)}
+                color={cat.color}
+              />
+            );
+          })}
 
-      {loading && (
+          <CategoryButton key={0} id={0} name={t("categorys.allRecipes")} />
+        </div>
+      )}
+
+      <AddNewRecipeDrawer
+        urlImportClicked={handleURLImportClicked}
+        imageImportClicked={handleImageImportClicked}
+        newRecipeClicked={handleAddRecipe}
+      />
+
+      {(categoryId !== null || searchTerm.trim() !== "") && (
+        <div className="grid grid-cols-2 gap-2">
+          {searchResults.map((recipe) => (
+            <RecipeCard
+              key={recipe.id}
+              id={recipe.id}
+              name={recipe.recipeName}
+              averageRating={recipe.avg_rating}
+            />
+          ))}
+        </div>
+      )}
+
+      {loading && categoryId !== null && (
         <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
@@ -98,17 +237,19 @@ export default function Cookbook() {
         </div>
       )}
 
-      {!loading && searchResults.length === 0 && (
-        <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
-          <div className="w-full h-[80px] mx-auto">
-            <Rive src="/plateful-character.riv" artboard="Sad" />
-          </div>
+      {(categoryId !== null || searchTerm.trim() !== "") &&
+        !loading &&
+        searchResults.length === 0 && (
+          <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
+            <div className="w-full h-[80px] mx-auto">
+              <Rive src="/plateful-character.riv" artboard="Sad" />
+            </div>
 
-          <p className="flex justify-center italic font-bold">
-            Keine Rezepte gefunden...
-          </p>
-        </div>
-      )}
+            <p className="flex justify-center italic font-bold">
+              {t("cookbook.nothingFound")}
+            </p>
+          </div>
+        )}
     </Layout>
   );
 }

@@ -1,8 +1,11 @@
+import { useAppDispatch } from "@/redux/hooks";
 import BottomNavButton from "./BottomNavButton";
 import { useTranslation } from "react-i18next";
+import { resetFilter } from "@/redux/slices/filterAndSortingSlice";
 
 export default function BottomNav() {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   return (
     <>
@@ -10,18 +13,20 @@ export default function BottomNav() {
 
       <div className="fixed bottom-0 z-20 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
         <div className="flex justify-between w-full gap-1 px-2">
-          <BottomNavButton
-            label={t("bottomNav.home")}
-            icon="home"
-            link="/home"
-            active={window.location.pathname.startsWith("/home")}
-          />
+          {/*
+            <BottomNavButton
+              label={t("bottomNav.home")}
+              icon="home"
+              link="/home"
+              active={globalThis.location.pathname.startsWith("/home")}
+            />
+          */}
 
           <BottomNavButton
             label={t("bottomNav.chatbot")}
             icon="chatbot"
             link="/chatbot"
-            active={window.location.pathname.startsWith("/chatbot")}
+            active={globalThis.location.pathname.startsWith("/chatbot")}
           />
 
           <BottomNavButton
@@ -29,24 +34,31 @@ export default function BottomNav() {
             icon="cookbook"
             link="/cookbook"
             active={
-              window.location.pathname.startsWith("/cookbook") ||
-              window.location.pathname.startsWith("/recipe")
+              globalThis.location.pathname.startsWith("/cookbook") ||
+              globalThis.location.pathname.startsWith("/recipe")
             }
+            onClick={() => {
+              if (globalThis.location.pathname.startsWith("/cookbook")) {
+                dispatch(resetFilter());
+              }
+            }}
           />
 
           <BottomNavButton
             label={t("bottomNav.planner")}
             icon="planner"
             link="/planner"
-            active={window.location.pathname.startsWith("/planner")}
+            active={globalThis.location.pathname.startsWith("/planner")}
           />
 
-          <BottomNavButton
-            label={t("bottomNav.list")}
-            icon="lists"
-            link="/lists"
-            active={window.location.pathname.startsWith("/lists")}
-          />
+          {/*
+            <BottomNavButton
+              label={t("bottomNav.list")}
+              icon="lists"
+              link="/lists"
+              active={globalThis.location.pathname.startsWith("/lists")}
+            />
+          */}
         </div>
       </div>
     </>

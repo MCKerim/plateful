@@ -14,22 +14,41 @@ import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-import supabase from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
+import { useSupabase } from "@/utils/supabase";
+import { RecipeRatings } from "@/types/exportedDatabaseTypes.types";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/slices/userSlice";
 
 type Props = {
   showTriggerButton?: boolean;
   recipeId?: number;
+  ratingSubmittedCallback?: (newRating: RecipeRatingWithUser) => void;
 };
 
 export type RatingModalRef = {
   open: () => void;
 };
 
+export type RecipeRatingWithUser = RecipeRatings & {
+  users: {
+    username: string;
+  };
+};
+
 const RatingModal = forwardRef<RatingModalRef, Props>(
-  ({ showTriggerButton = true, recipeId }: Readonly<Props>, ref) => {
+  (
+    {
+      showTriggerButton = true,
+      recipeId,
+      ratingSubmittedCallback = () => {},
+    }: Readonly<Props>,
+    ref
+  ) => {
+    const { supabase } = useSupabase();
     const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const currentUser = useAppSelector(selectUser); 
 
     // Expose the `open` method via the ref
     useImperativeHandle(ref, () => ({
@@ -51,9 +70,11 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
         return;
       }
 
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from("recipe_ratings")
-        .insert([{ recipe_id: recipeId, stars: rating, note: note }]);
+        .insert([{ recipe_id: recipeId, stars: rating, note: note }])
+        .select()
+        .single();
 
       if (error) {
         console.error("Fehler beim Speichern der Bewertung:", error.message);
@@ -63,19 +84,22 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       setIsDialogOpen(false);
       setNote("");
       setRating(1);
+
+      if (!currentUser) {
+        return;
+      }
+
+      ratingSubmittedCallback({...data, users: {username: currentUser.username}});
     }
 
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
         {showTriggerButton && (
-          <DialogTrigger>
-            <Button variant="outline" className="w-full">
-              {
-                <>
-                  <HotelClassIcon />
-                  {t("rating.rate")}
-                </>
-              }
+          <DialogTrigger className="w-full mb-2">
+            <Button variant="secondary" className="w-full">
+              <HotelClassIcon />
+
+              {t("rating.rate")}
             </Button>
           </DialogTrigger>
         )}

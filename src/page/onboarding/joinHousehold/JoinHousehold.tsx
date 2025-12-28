@@ -1,27 +1,33 @@
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { NavLink } from "react-router";
+import { useTranslation } from "react-i18next";
 
 export default function JoinHousehold() {
+  const { t } = useTranslation();
+
   return (
     <div className="relative flex flex-col items-center justify-between h-screen px-4 py-6 overflow-hidden">
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Haushalt beitreten</h1>
+        <h1 className="text-4xl font-bold">
+          {t("joinHousehold.title")}
+        </h1>
       </div>
 
-      <div className="flex flex-col gap-4 w-full max-w-sm mx-auto">
-        <p className="text-gray-600 text-justify">
-          Lass dir einen Einladungslink zuschicken oder scanne den QR-Code einer
-          Person aus deinem Haushalt, um beizutreten.
+      <div className="flex flex-col w-full max-w-sm gap-4 mx-auto">
+        <p className="font-medium leading-relaxed text-center text-primary">
+          {t("joinHousehold.description")}
         </p>
 
-        <Separator>
-          <p className="italic">oder</p>
+        <Separator className="my-4">
+          <p className="px-3 text-sm italic text-gray-500 bg-background">
+            {t("joinHousehold.dontHaveHousehold")}
+          </p>
         </Separator>
 
         <NavLink to="/createHousehold" className="w-full">
           <Button className="w-full" variant="secondary">
-            Erstelle einen neuen Haushalt
+            {t("joinHousehold.createNew")}
           </Button>
         </NavLink>
       </div>

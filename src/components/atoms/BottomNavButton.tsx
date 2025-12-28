@@ -6,6 +6,7 @@ type Props = {
   icon: "home" | "chatbot" | "explore" | "cookbook" | "planner" | "lists";
   link: string;
   active?: boolean;
+  onClick?: () => void;
 };
 
 export default function BottomNavButton({
@@ -13,6 +14,7 @@ export default function BottomNavButton({
   icon,
   link,
   active = false,
+  onClick = () => {},
 }: Readonly<Props>) {
   const ICON_SIZE = 22;
 
@@ -47,6 +49,7 @@ export default function BottomNavButton({
       className={`w-full align-middle items-center transition-colors duration-700 ease-out ${
         active ? "text-secondary-foreground" : "text-muted-foreground"
       }`}
+      onClick={onClick}
     >
       <div className="flex justify-center w-full">{getIcon()}</div>
 

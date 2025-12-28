@@ -3,27 +3,162 @@
     "edit": "Bearbeiten",
     "remove": "Entfernen",
     "delete": "Löschen",
+    "deleteTitle": "Bist du sicher?",
+    "deleteConfirmation": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "cancel": "Abbrechen",
     "save": "Speichern",
     "commingSoon": "Demnächst verfügbar...",
     "selectImage": "Bild auswählen",
+    "selectImageSource": "Bildquelle auswählen",
+    "gallery": "Galerie",
+    "camera": "Kamera",
     "uploading": "Hochladen...",
     "planned": "Geplant",
     "today": "Heute",
     "yesterday": "Gestern",
     "day": "Tag",
-    "days": "Tage"
+    "days": "Tage",
+    "uploadImage": "Bild hochladen",
+    "reset": "Zurücksetzen"
+  },
+  "update": {
+    "updateAvailable": "Eine neue Version ist verfügbar! jetzt aktualisieren?"
   },
   "signup": {
     "title": "Plateful",
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
     "continueWithGoogle": "Mit Google fortfahren",
-    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu."
+    "continueWithEMail": "Mit E-Mail fortfahren",
+    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu.",
+    "alreadyHaveAccount": "Bereits registriert? Anmelden"
+  },
+  "emailSignup": {
+    "title": "Konto erstellen oder anmelden",
+    "subtitle": "Melden Sie sich mit Ihrer E-Mail an",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "signupButton": "Magic Link senden",
+    "loading": "Magic Link wird gesendet...",
+    "errors": {
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "fillAllFields": "Bitte füllen Sie alle Felder aus",
+      "signupFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
+    }
+  },
+  "emailVerification": {
+    "title": "Überprüfen Sie Ihre E-Mail",
+    "subtitle": "Wir haben einen Bestätigungslink an {{email}} gesendet",
+    "checkEmail": "Überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink, um Ihr Konto zu aktivieren",
+    "description": "Dies hilft uns, Ihre E-Mail-Adresse zu bestätigen und Ihr Konto zu sichern.",
+    "continueButton": "Zurück nach Hause",
+    "resendButton": "Erneut senden",
+    "changeEmailButton": "Eine andere E-Mail verwenden",
+    "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach."
+  },
+  "login": {
+    "title": "Willkommen zurück",
+    "subtitle": "Melden Sie sich bei Ihrem Konto an",
+    "emailLabel": "E-Mail",
+    "emailPlaceholder": "ihre@email.de",
+    "loginButton": "Magic Link senden",
+    "loading": "Magic Link wird gesendet...",
+    "dontHaveAccount": "Noch nicht registriert? Jetzt anmelden",
+    "errors": {
+      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+      "loginFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
+    }
   },
   "welcome": {
     "title": "Glückwunsch,",
     "subtitle": "smarte Essensplanung beginnt jetzt!",
     "nextButton": "Jetzt Loslegen!"
+  },
+  "beta": {
+    "title": "Plateful Beta",
+    "thankYou": "Danke, dass du dabei bist!",
+    "description": "Deine Erfahrungen werden uns dabei helfen, die beste Kochapp zu entwickeln.",
+    "benefits": {
+      "newFeatures": "Du bekommst alle neuen Features zuerst",
+      "directInput": "Deine Meinung fließt direkt in die Entwicklung ein",
+      "helpImprove": "Du hilfst dabei, Plateful noch besser zu machen"
+    },
+    "nextButton": "Los geht's!"
+  },
+  "valueScreens": {
+    "importRecipes": {
+      "title": "Speichere Rezepte",
+      "subtitle": "von überall",
+      "description": "Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!"
+    },
+    "chatbot": {
+      "title": "Intelligenter Chatbot",
+      "subtitles": {
+        "mealPlan": "für dein Wochenplan",
+        "recipes": "für Rezepte",
+        "questions": "für Fragen"
+      },
+      "description": "Schreibe worauf du lust hast oder stelle Fragen zum Kochen!"
+    },
+    "mealPlanning": {
+      "title": "Planne Mahlzeiten",
+      "subtitle": "auf die einfache Art",
+      "description": "Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim Einkaufen!"
+    }
+  },
+  "surveyStart": {
+    "title": "Lass uns zuerst dein Erlebnis personalisieren",
+    "nextButton": "Weiter"
+  },
+  "createHousehold": {
+    "title": "Erstelle deinen Haushalt",
+    "description": "Teile Rezepte und plant gemeinsam Mahlzeiten in eurem Haushalt.",
+    "pricingNote": "Nur eine Person pro Haushalt muss bezahlen.",
+    "features": {
+      "title": "Was euch erwartet:",
+      "sharedRecipes": "Gemeinsame Rezeptsammlung",
+      "sharedLists": "Geteilte Einkaufslisten",
+      "mealPlanning": "Koordinierte Essensplanung"
+    },
+    "nameLabel": "Wie soll dein Haushalt heißen?",
+    "namePlaceholder": "z.B. Familie Müller",
+    "nextButton": "Haushalt erstellen",
+    "alreadyHaveHousehold": "Ihr habt schon einen Haushalt?",
+    "joinExisting": "Bestehendem Haushalt beitreten",
+    "errors": {
+      "nameRequired": "Bitte gib einen Namen für deinen Haushalt ein.",
+      "createFailed": "Fehler beim Erstellen des Haushalts:",
+      "updateFailed": "Fehler beim Aktualisieren des Haushalts:",
+      "loading": "Lade, bitte warten..."
+    }
+  },
+  "joinHousehold": {
+    "title": "Haushalt beitreten",
+    "description": "Lass dir einen Einladungslink zuschicken oder scanne den QR-Code einer Person aus deinem Haushalt, um beizutreten.",
+    "dontHaveHousehold": "Ihr habt noch keinen Haushalt?",
+    "createNew": "Erstelle einen neuen Haushalt"
+  },
+  "inviteMembers": {
+    "title": "Füge Mitglieder hinzu",
+    "description": "Lade Freunde oder Familie in deinen Haushalt ein.",
+    "description2": "Scanne dazu den QR-Code oder teile den Link.",
+    "nextButton": "Fertig!"
+  },
+  "inviteLink": {
+    "shareTitle": "Plateful - Gemeinsam kochen! 🏡",
+    "shareText": "Hey! Lass uns gemeinsam Mahlzeiten planen und Rezepte teilen. Tritt meinem Plateful-Haushalt bei:",
+    "shareDialogTitle": "Teile mit Freunden",
+    "copyButton": "Link kopieren",
+    "shareButton": "Link teilen",
+    "copySuccess": "Einladungslink wurde in die Zwischenablage kopiert!",
+    "copyError": "Fehler beim Kopieren des Links. Bitte versuche es später erneut.",
+    "createError": "Fehler beim Erstellen des Einladungslinks. Bitte versuche es später erneut.",
+    "shareNotSupported": "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
+  },
+  "invitePage": {
+    "invitedTo": "Du wurdest zu folgendem Haushalt eingeladen:",
+    "joinButton": "Dem Haushalt beitreten",
+    "declineButton": "Nicht beitreten",
+    "invalidLink": "Ungültiger oder abgelaufener Link"
   },
   "list": {
     "title": "Einkaufsliste"
@@ -31,17 +166,33 @@
   "mealPlanner": {
     "title": "Essens Planer",
     "selectNumberOfDays": "Wähle die anzahl der Tage aus",
-    "alreadyEaten": "Bereits gegessen"
+    "alreadyEaten": "Zuletzt gegessen",
+    "nothingPlanned": "Keine Rezepte geplant..."
   },
   "cookbook": {
     "title": "Kochbuch",
     "enterRecipeName": "Rezept suchen...",
-    "nothingFound": "Nichts gefunden...",
-    "addNewViaPlus": "...füge über das '+' ein neues Rezept hinzu!"
+    "nothingFound": "Keine Rezepte gefunden..."
   },
   "recipe": {
+    "editRecipe": "Rezept bearbeiten",
     "toTheRecipe": "Zum Rezept",
-    "planRecipe": "Rezept planen"
+    "planRecipe": "Rezept planen",
+    "ratings": "Bewertungen",
+    "noRatings": "Keine Bewertungen"
+  },
+  "addRecipeDrawer": {
+    "importFromUrl": {
+      "label": "Rezept aus URL hinzufügen",
+      "description": "TikTok, YouTube, Instagram, Webseite"
+    },
+    "importFromImage": {
+      "label": "Rezept aus Foto hinzufügen",
+      "description": "Scanne ein Rezeptbuch oder Gericht"
+    },
+    "createNewRecipe": {
+      "label": "Neues Rezept erstellen"
+    }
   },
   "addRecipe": {
     "editRecipe": "Rezept bearbeiten",
@@ -52,11 +203,32 @@
     "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de",
-    "importRecipeData": "Rezeptdaten importieren"
+    "importRecipeData": "Rezeptdaten importieren (TikTok)"
+  },
+  "urlImport": {
+    "linkPastedFromClipboard": "Link aus der Zwischenablage eingefügt",
+    "title": "Rezept Importieren",
+    "urlFieldLabel": "Rezept-Link",
+    "urlFieldDescription": "z.B.: TikTok, YouTube oder Webseiten-Link",
+    "urlFieldPlaceholder": "https://",
+    "importButton": "Rezept importieren",
+    "importingMessage": "Dies kann einige Sekunden dauern...",
+    "importingDescription": "Du kannst die Seite schließen und später das Rezept in deinem Kochbuch finden",
+    "errors": {
+      "invalidUrl": "Ungültige URL. Bitte überprüfe den Link.",
+      "importFailed": "Fehler beim Importieren des Rezepts."
+    },
+    "success": "Rezept erfolgreich importiert!",
+    "importedRecipe": "Rezept erfolgreich importiert",
+    "viewRecipe": "Ansehen"
+  },
+  "imageImport": {
+    "title": "Rezept Importieren",
+    "importButton": "Rezept importieren"
   },
   "home": {
     "title": "Startseite",
-    "enjoyCooking": "Viel Spaß beim Kochen!"
+    "enjoyCooking": "Viel Spaß beim Kochen, {{username}}!"
   },
   "explore": {
     "title": "Erkunden"
@@ -80,12 +252,47 @@
     "privacyPolicy": "Datenschutz",
     "termsOfService": "AGB",
 
-    "dangerZone": "Konto",
+    "account": "Konto",
     "signOut": "Abmelden",
     "modeToggle": {
       "light": "Hell",
       "dark": "Dunkel",
       "system": "System"
+    },
+    "editUsername": "Benutzername bearbeiten",
+    "enterNewUsername": "Neuen Benutzernamen eingeben",
+    "usernameCannotBeEmpty": "Benutzername darf nicht leer sein",
+    "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein"
+  },
+  "householdSettings": {
+    "member": "Mitglied",
+    "members": "Mitglieder",
+    "you": "Du",
+    "inviteMember": "Mitglied einladen",
+    "scanQrOrShareLink": "Scanne den QR-Code oder teile den Link",
+    "leaveHousehold": "Haushalt verlassen",
+    "deleteHousehold": "Haushalt löschen",
+    "confirmations": {
+      "leaveHousehold": {
+        "title": "Haushalt verlassen",
+        "description": "Bist du sicher, dass du diesen Haushalt verlassen möchtest? Du benötigst eine Einladung, um wieder beizutreten.",
+        "confirm": "Verlassen",
+        "cancel": "Abbrechen"
+      },
+      "deleteHousehold": {
+        "title": "Haushalt löschen",
+        "description": "Bist du sicher, dass du diesen Haushalt löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden und alle Mitglieder werden entfernt.",
+        "confirm": "Löschen",
+        "cancel": "Abbrechen"
+      }
+    },
+    "errors": {
+      "removeMemberFailed": "Fehler beim Entfernen des Mitglieds. Bitte versuche es später erneut.",
+      "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut.",
+      "updateNameFailed": "Fehler beim Aktualisieren des Haushaltsnamens. Bitte versuche es später erneut."
+    },
+    "success": {
+      "memberRemoved": "Mitglied erfolgreich entfernt."
     }
   },
   "bottomNav": {
@@ -113,17 +320,36 @@
       }
     },
     "saveRecipe": "Rezept speichern",
-    "saveRecipeError": "Fehler beim Speichern des Rezepts. Bitte versuche es später erneut.",
+    "saveRecipeError": "Fehler beim Speichern des rezepts. Bitte versuche es später erneut.",
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
-    "inputPlaceholder": "Frage mich nach Rezepten oder Tipps!"
+    "inputPlaceholder": "Frage nach Rezepten oder Tipps!",
+    "saveRecipePrompt": "Speichere das Rezept oder frage nach Anpassungen"
   },
   "rating": {
-    "rate": "Bewerten",
+    "rate": "Bewerte dieses Rezept",
     "title": "Wie hat es dir geschmeckt?",
     "commentLabel": "Anmerkungen",
     "commentPlaceholder": "Dein Kommentar (optional)",
     "submit": "Speichern"
   },
+  "categorys": {
+    "category": "Kategorie",
+    "chooseACategory": "Wähle eine Kategorie",
+    "allRecipes": "Alle Rezepte",
+    "category1": "Frühstück",
+    "category2": "Hauptspeise",
+    "category3": "Dessert",
+    "category4": "Getränke",
+    "category5": "Sonstige"
+  },
+  "sortingModal": {
+    "sortBy": "Sortieren nach",
+    "newest": "Neueste",
+    "oldest": "Älteste",
+    "rating": "Am besten bewertet",
+    "aToZ": "A bis Z"
+  },
+
   "ingredients": "Zutaten",
   "addIngredient": "Zutat hinzufügen",
 
@@ -135,32 +361,99 @@
 
   "questions": {
     "question1": {
-      "question": "Wie oft kochst du?",
-      "option1": "Täglich",
-      "option2": "Mehrmals pro Woche",
-      "option3": "Wöchentlich",
-      "option4": "Selten"
+      "question": "Was ist dein Ziel?",
+      "option1": "Zeit sparen",
+      "option2": "Gesünder essen",
+      "option3": "Neue Rezepte entdecken",
+      "option4": "Stress beim Essensplanen reduzieren",
+      "option5": "Anderes"
     },
     "question2": {
-      "question": "Welche Art von Gerichten kochst du am liebsten?",
-      "option1": "Vegetarisch",
-      "option2": "Vegan",
-      "option3": "Fleischgerichte",
-      "option4": "Fischgerichte"
+      "question": "Wie alt bist du?",
+      "option1": "Unter 25",
+      "option2": "25-34",
+      "option3": "35-44",
+      "option4": "45-54",
+      "option5": "55 oder älter"
     },
     "question3": {
-      "question": "Wie wichtig ist dir die Zubereitungszeit?",
-      "option1": "Sehr wichtig",
-      "option2": "Wichtig",
-      "option3": "Nicht so wichtig",
-      "option4": "Unwichtig"
+      "question": "Welches Geschlecht hast du?",
+      "option1": "Männlich",
+      "option2": "Weiblich",
+      "option3": "Divers"
     },
     "question4": {
-      "question": "Welche Küche bevorzugst du?",
-      "option1": "Italienisch",
-      "option2": "Asiatisch",
-      "option3": "Mexikanisch",
-      "option4": "Deutsch"
+      "question": "Wie hast du von uns erfahren?",
+      "option1": "Google-Suche",
+      "option2": "App Store",
+      "option3": "Empfehlung von Freunden",
+      "option4": "Soziale Medien",
+      "option5": "Anderes"
+    },
+    "question5": {
+      "question": "Wo findest du normalerweise Rezepte?",
+      "option1": "Instagram",
+      "option2": "TikTok",
+      "option3": "Facebook",
+      "option4": "Pinterest",
+      "option5": "Kochbücher",
+      "option6": "Rezepte-Websites",
+      "option7": "YouTube",
+      "option8": "Anderes"
+    },
+    "question6": {
+      "question": "Wie organisiert du normalerweise deine Rezepte?",
+      "option1": "In einer Notizen-App",
+      "option2": "Screenshots oder gespeicherte Bilder",
+      "option3": "Auf Papier",
+      "option4": "In Social-Media-Apps",
+      "option5": "Ich organisiere sie nicht"
+    },
+    "question7": {
+      "question": "Wie oft kochst du pro Woche?",
+      "option1": "1-2 Mal",
+      "option2": "3-4 Mal",
+      "option3": "5-6 Mal",
+      "option4": "7 Mal oder mehr"
+    },
+    "question8": {
+      "question": "Für wie viele Personen kochst du?",
+      "option1": "Nur für mich",
+      "option2": "2 Personen",
+      "option3": "3-4 Personen",
+      "option4": "5 oder mehr Personen"
+    },
+    "question9": {
+      "question": "Welche Ernährungsweise bevorzugst du?",
+      "option1": "Vegetarisch",
+      "option2": "Vegan",
+      "option3": "Proteinreich",
+      "option4": "Low-Carb",
+      "option5": "Andere",
+      "option6": "Keine"
+    },
+    "question10": {
+      "question": "Allergien & Intoleranzen?",
+      "option1": "Gluten",
+      "option2": "Laktose",
+      "option3": "Nüsse",
+      "option4": "Milch",
+      "option5": "Schalentiere",
+      "option6": "Fruktose",
+      "option7": "Sorbit",
+      "option8": "Fisch",
+      "option9": "Andere",
+      "option10": "Keine"
+    },
+    "question11": {
+      "question": "Sonstige Abneigungen?",
+      "option1": "Pilze",
+      "option2": "Fisch",
+      "option3": "Koriander",
+      "option4": "Schweinefleisch",
+      "option5": "Rosenkohl",
+      "option6": "Ersatzprodukte",
+      "option7": "Keine"
     }
   }
 }

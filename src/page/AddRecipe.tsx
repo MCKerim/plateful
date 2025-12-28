@@ -8,12 +8,23 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate, useParams, useSearchParams } from "react-router";
+import { useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
-import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
+//import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
+import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
+import DeleteDialog from "@/components/atoms/DeleteDialog";
 
 /*type RecipeItem = {
   itemName: string;
@@ -21,16 +32,23 @@ import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 };*/
 
 export default function AddRecipe() {
+  const { supabase } = useSupabase();
   const { t } = useTranslation();
 
   const params = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
 
   const householdId = useAppSelector(selectHouseholdId);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [link, setLink] = useState("");
+
+  const filterCategoryId = useAppSelector(selectCategoryId);
+  const [category, setCategory] = useState(
+    filterCategoryId === 0 ? null : filterCategoryId
+  );
+
   //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -43,43 +61,79 @@ export default function AddRecipe() {
   const searchTitle = searchParams.get("title");
   const searchText = searchParams.get("text");
 
-  // Extract shared data from URL or text
   useEffect(() => {
-    /*
-    nimmt url aus url
-    falls nicht nimm aus text
-    - falls nicht nimm aus title
-
-    nimmt title aus title
-    - falls nicht nimm aus text
-    */
     const extractSharedData = () => {
-      if (!searchUrl && !searchTitle && !searchText) {
-        return;
-      }
-
       let finalUrl = "";
       let finalTitle = "";
 
-      if (searchUrl) {
-        finalUrl = searchUrl;
-      }
+      const urlRegex = /(https?:\/\/[^\s]+)/i;
 
-      if (!finalUrl && searchText) {
-        const urlMatch = searchText.match(/https?:\/\/[^\s]+/);
-        if (urlMatch) {
-          finalUrl = urlMatch[0];
+      // --- Extract clean URL from searchUrl ---
+      if (searchUrl) {
+        const match = urlRegex.exec(searchUrl);
+        if (match) {
+          finalUrl = match[0];
+        } else {
+          finalUrl = searchUrl.trim();
         }
       }
 
-      if (searchTitle) {
-        finalTitle = searchTitle;
+      // --- Fallback: extract URL from searchText ---
+      if (!finalUrl && searchText) {
+        const match = urlRegex.exec(searchText);
+        if (match) {
+          finalUrl = match[0];
+        }
       }
 
+      // --- Use given title if provided ---
+      if (searchTitle) {
+        finalTitle = searchTitle.trim();
+      }
+
+      // --- Chefkoch cleanup ---
       if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
         finalTitle = finalTitle
           .replace(/ - gefunden auf chefkoch\.de$/i, "")
           .trim();
+      }
+
+      // --- Generate fallback title ---
+      if (!finalTitle) {
+        // Try to extract readable text before the URL
+        if (searchUrl?.includes("http")) {
+          const beforeUrl = searchUrl.split("http")[0].trim();
+          if (beforeUrl) {
+            finalTitle = beforeUrl;
+          }
+        }
+
+        // Still empty? Try to make something nice from the hostname
+        if (!finalTitle && finalUrl) {
+          try {
+            const hostname = new URL(finalUrl).hostname
+              .replace(/^www\./, "")
+              .replace(/\.com$|\.de$|\.net$|\.org$/i, ""); // remove common TLDs
+
+            const parts = hostname.split(".");
+            // Take last 1-2 parts to avoid subdomains like "s."
+            const mainName =
+              parts.length > 2 ? parts[parts.length - 2] : parts[0];
+            const capitalized =
+              mainName.charAt(0).toUpperCase() + mainName.slice(1);
+            finalTitle = capitalized;
+          } catch {
+            finalTitle = finalUrl;
+          }
+        }
+
+        // Last resort: fallback from text param
+        if (!finalTitle && searchText) {
+          const beforeUrl = searchText.split("http")[0].trim();
+          if (beforeUrl) {
+            finalTitle = beforeUrl;
+          }
+        }
       }
 
       setTitle(finalTitle);
@@ -91,20 +145,23 @@ export default function AddRecipe() {
 
   // Fetch recipe data if editing
   useEffect(() => {
-    async function getRecipe(): Promise<boolean> {
+    async function tryGetRecipe(): Promise<boolean> {
       if (!params.recipeId) return false;
 
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
       const { data } = await supabase
         .from("recipes")
         .select("*")
         .eq("id", recipeId);
+
       if (!data || data.length === 0) {
         return false;
       }
+
       setTitle(data[0].name);
       setDescription(data[0].description ?? "");
       setLink(data[0].link ?? "");
+      setCategory(data[0].category);
 
       // Fetch image from storage
       const { data: files, error } = await supabase.storage
@@ -125,15 +182,15 @@ export default function AddRecipe() {
       return true;
     }
 
-    getRecipe().then((hasFound) => {
+    tryGetRecipe().then((hasFound) => {
       if (hasFound) return;
+
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
       if (recipeNameFromSearch !== null) {
         setTitle(recipeNameFromSearch.trim());
-        setSearchParams("");
       }
     });
-  }, [params.recipeId, searchParams, setSearchParams]);
+  }, [params.recipeId, searchParams]);
 
   /*function addItem(name: string, amount: string) {
     console.log("Adding item: ", name, amount);
@@ -184,6 +241,7 @@ export default function AddRecipe() {
     });
     setImageFile(compressedFile);
     setImagePreview(previewUrl);
+
     const path = await uploadToSupabase(compressedFile);
     setImageSupabaseUrl(path ?? "");
   }
@@ -199,7 +257,12 @@ export default function AddRecipe() {
 
   async function saveRecipe() {
     if (title === "") {
-      alert("Please fill in all fields.");
+      alert("Please enter a name for the recipe.");
+      return;
+    }
+
+    if (category === null) {
+      alert("Please select a category.");
       return;
     }
 
@@ -208,7 +271,12 @@ export default function AddRecipe() {
       const recipeId = parseInt(params.recipeId);
       const { data, error } = await supabase
         .from("recipes")
-        .update({ name: title, description, link })
+        .update({
+          name: title,
+          description,
+          link,
+          category,
+        })
         .eq("id", recipeId)
         .select();
       if (!error && data) {
@@ -225,7 +293,7 @@ export default function AddRecipe() {
             .from("recipeimages")
             .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${recipeId}`);
+        navigate(`/recipe/${recipeId}`, { replace: true });
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -234,7 +302,15 @@ export default function AddRecipe() {
       // Insert new recipe
       const { data, error } = await supabase
         .from("recipes")
-        .insert([{ name: title, description, link, household_id: householdId }])
+        .insert([
+          {
+            name: title,
+            description,
+            link,
+            household_id: householdId,
+            category,
+          },
+        ])
         .select();
       if (!error && data) {
         // If an image was uploaded, move it to the correct folder with the new recipe id
@@ -246,7 +322,7 @@ export default function AddRecipe() {
             .from("recipeimages")
             .move(imageSupabaseUrl, newPath);
         }
-        navigate(`/recipe/${data[0].id}`);
+        navigate(`/recipe/${data[0].id}`, { replace: true });
       } else {
         console.error(error);
         alert("An error occurred. Please try again.");
@@ -301,7 +377,7 @@ export default function AddRecipe() {
     }
   }*/
 
-  async function importRecipeData() {
+  /*async function importRecipeData() {
     if (!link) {
       alert("Please enter a link.");
       return;
@@ -341,13 +417,66 @@ export default function AddRecipe() {
         "An error occurred while importing the recipe data. Please try again."
       );
     }
+  }*/
+
+  async function deleteRecipe() {
+    if (!params.recipeId) return false;
+
+    const recipeId = parseInt(params.recipeId);
+
+    // Delete all images from storage for this recipe
+    const { data: files, error: listError } = await supabase.storage
+      .from("recipeimages")
+      .list(`recipe_${recipeId}/`);
+    if (!listError && files && files.length > 0) {
+      const paths = files.map((file) => `recipe_${recipeId}/${file.name}`);
+      await supabase.storage.from("recipeimages").remove(paths);
+    }
+
+    const { error } = await supabase
+      .from("recipes")
+      .delete()
+      .eq("id", recipeId);
+
+    if (error) {
+      console.error("Error while deleting recipe: ", error);
+      alert("Error while deleting recipe");
+    } else {
+      navigate("/cookbook");
+    }
   }
 
+  const saveFooter = (
+    <>
+      <div className="h-[100px]"></div>
+
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+        <Button
+          className="w-full"
+          variant="secondary"
+          onClick={() => navigate(-1)}
+        >
+          {t("common.cancel")}
+        </Button>
+
+        <Button className="w-full" variant="accent" onClick={saveRecipe}>
+          {t("common.save")}
+        </Button>
+      </div>
+    </>
+  );
+
   return (
-    <Layout>
-      <h1 className="mb-10 text-2xl font-bold">
-        {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
-      </h1>
+    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
+      <div className="flex justify-between w-full items-center">
+        <h1 className="text-2xl font-bold first-font">
+          {params.recipeId
+            ? t("addRecipe.editRecipe")
+            : t("addRecipe.addRecipe")}
+        </h1>
+
+        {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
+      </div>
 
       <div className="grid items-center w-full gap-5">
         <ImagePicker
@@ -368,6 +497,31 @@ export default function AddRecipe() {
             enterKeyHint="next"
             rows={1}
           />
+        </div>
+
+        <div className="grid items-center w-full gap-2">
+          <Label>{t("categorys.category")}</Label>
+
+          <Select
+            value={category?.toString() ?? ""}
+            onValueChange={(value) =>
+              setCategory(value ? parseInt(value) : null)
+            }
+          >
+            <SelectTrigger>
+              <SelectValue placeholder={t("categorys.chooseACategory")} />
+            </SelectTrigger>
+
+            <SelectContent>
+              <SelectGroup>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    {getTranslatedCategory(t, category.id)}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid w-full gap-2">
@@ -393,10 +547,6 @@ export default function AddRecipe() {
             onChange={(e) => setLink(e.target.value)}
             autoComplete="off"
           />
-
-          <Button variant="secondary" onClick={importRecipeData}>
-            {t("addRecipe.importRecipeData")}
-          </Button>
         </div>
 
         {/*<div className="flex flex-col w-full gap-2">
@@ -416,20 +566,6 @@ export default function AddRecipe() {
 
           <AddRecipeItemMenu onItemAdded={addItem} />
         </div>*/}
-      </div>
-
-      <div className="flex w-full gap-2 mt-11">
-        <Button asChild className="w-full" variant="secondary">
-          <Link
-            to={params.recipeId ? `/recipe/${params.recipeId}` : "/cookbook"}
-          >
-            {t("common.cancel")}
-          </Link>
-        </Button>
-
-        <Button className="w-full" onClick={saveRecipe}>
-          {t("common.save")}
-        </Button>
       </div>
     </Layout>
   );

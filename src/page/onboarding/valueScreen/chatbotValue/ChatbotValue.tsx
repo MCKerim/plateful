@@ -2,15 +2,17 @@ import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLay
 import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 
 export default function ChatbotValue() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   
   const h2Texts = [
-    "für dein Wochenplan",
-    "für Rezepte",
-    "für Fragen"
+    t("valueScreens.chatbot.subtitles.mealPlan"),
+    t("valueScreens.chatbot.subtitles.recipes"),
+    t("valueScreens.chatbot.subtitles.questions")
   ];
 
   useEffect(() => {
@@ -24,22 +26,22 @@ export default function ChatbotValue() {
   return (
     <OnboardingLayout onNext={() => navigate("/values/3")}>
       <div className="text-center">
-        <h1 className="text-4xl font-bold">Intelligenter Chatbot</h1>
+        <h1 className="text-4xl font-bold first-font">{t("valueScreens.chatbot.title")}</h1>
 
-        <h2 className="italic text-2xl font-semibold h-8 flex items-center justify-center">
+        <h2 className="flex items-center justify-center h-8 text-2xl italic font-semibold second-font">
           <span 
             key={currentTextIndex}
-            className="inline-block animate-in fade-in-50 slide-in-from-bottom-3 duration-500"
+            className="inline-block duration-500 animate-in fade-in-50 slide-in-from-bottom-3"
           >
             {h2Texts[currentTextIndex]}
           </span>
         </h2>
       </div>
 
-      <PhoneMockup screenshotUrl="/chatbotScreenshot.jpg" />
+      <PhoneMockup mediaUrl="/chatbot-screen-recording.mp4" />
 
-      <p className="text-gray-600 max-w-sm mt-2 text-center">
-        Schreibe worauf du lust hast oder stelle Fragen zum Kochen!
+      <p className="max-w-sm mt-2 text-center text-gray-600">
+        {t("valueScreens.chatbot.description")}
       </p>
     </OnboardingLayout>
   );

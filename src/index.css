@@ -9,6 +9,33 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.first-font {
+  font-family: "Shrikhand", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.second-font {
+  font-family: "Lora", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.third-font {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
 @layer base {
   :root {
     --background-color: #FAF9F5;
@@ -76,6 +103,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+    --radius: 0.5rem;
   }
 }
 

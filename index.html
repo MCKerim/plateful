@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -9,15 +9,54 @@
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#ffffff" />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Modak&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&family=Roboto:ital,wght@0,100..900;1,100..900&family=Shrikhand&display=swap"
+      rel="stylesheet"
+    />
   </head>
+
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
     <!-- Download Canny SDK -->
-    <script>!function(w,d,i,s){function l(){if(!d.getElementById(i)){var f=d.getElementsByTagName(s)[0],e=d.createElement(s);e.type="text/javascript",e.async=!0,e.src="https://canny.io/sdk.js",f.parentNode.insertBefore(e,f)}}if("function"!=typeof w.Canny){var c=function(){c.q.push(arguments)};c.q=[],w.Canny=c,"complete"===d.readyState?l():w.attachEvent?w.attachEvent("onload",l):w.addEventListener("load",l,!1)}}(window,document,"canny-jssdk","script");</script>
+    <script>
+      !(function (w, d, i, s) {
+        function l() {
+          if (!d.getElementById(i)) {
+            var f = d.getElementsByTagName(s)[0],
+              e = d.createElement(s);
+            (e.type = "text/javascript"),
+              (e.async = !0),
+              (e.src = "https://canny.io/sdk.js"),
+              f.parentNode.insertBefore(e, f);
+          }
+        }
+        if ("function" != typeof w.Canny) {
+          var c = function () {
+            c.q.push(arguments);
+          };
+          (c.q = []),
+            (w.Canny = c),
+            "complete" === d.readyState
+              ? l()
+              : w.attachEvent
+              ? w.attachEvent("onload", l)
+              : w.addEventListener("load", l, !1);
+        }
+      })(window, document, "canny-jssdk", "script");
+    </script>
+
+    <!--
+        ██╗  ██╗██████╗ ██╗      █████╗ ███╗   ██╗██╗  ██╗███████╗
+        ██║ ██╔╝██╔══██╗██║     ██╔══██╗████╗  ██║██║ ██╔╝██╔════╝
+        █████╔╝ ██████╔╝██║     ███████║██╔██╗ ██║█████╔╝ ███████╗
+        ██╔═██╗ ██╔══██╗██║     ██╔══██║██║╚██╗██║██╔═██╗ ╚════██║
+        ██║  ██╗██████╔╝███████╗██║  ██║██║ ╚████║██║  ██╗███████║
+        ╚═╝  ╚═╝╚═════╝ ╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝
+                            - Kerim Ismail -
+    -->
   </body>
 </html>

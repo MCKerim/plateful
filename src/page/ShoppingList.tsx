@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import ShoppingItem from "@/components/atoms/ShoppingItem";
 import { useEffect, useState } from "react";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import AddNewItemDrawer from "@/components/atoms/AddNewItemDrawer";
 import {
   Accordion,
@@ -20,6 +20,7 @@ type ShoppingListItem = {
 };
 
 export default function ShoppingList() {
+  const { supabase } = useSupabase();
   const [items, setItems] = useState<ShoppingListItem[]>([]);
 
   useEffect(() => {

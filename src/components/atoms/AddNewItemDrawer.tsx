@@ -12,13 +12,14 @@ import {
 } from "../ui/drawer";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 
 type Props = {
   onItemAdded: () => void;
 };
 
 export default function AddNewItemDrawer({ onItemAdded }: Readonly<Props>) {
+  const { supabase } = useSupabase();
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 

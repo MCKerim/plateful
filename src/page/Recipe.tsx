@@ -2,27 +2,27 @@ import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
 import { useEffect, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import { useTranslation } from "react-i18next";
-import { Pencil, Trash2, Link, CalendarDays } from "lucide-react";
-import RatingModal from "@/components/atoms/RatingModal";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
+import { Pencil, Link, CalendarDays } from "lucide-react";
+import RatingModal, {
+  RecipeRatingWithUser,
+} from "@/components/atoms/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
+import { formatRating } from "@/lib/formatRatingHelper";
+import { formatDate as dateFnsFormatDate } from "date-fns";
+import { de } from "date-fns/locale";
+import { Separator } from "@/components/ui/separator";
+import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
 
 type RecipeItem = {
@@ -32,7 +32,8 @@ type RecipeItem = {
 };
 
 export default function Recipe() {
-  const { t } = useTranslation();
+  const { supabase } = useSupabase();
+  const { t, i18n } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -43,24 +44,47 @@ export default function Recipe() {
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
   const [averageRating, setAverageRating] = useState<number | null>(null);
 
+  const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
+
   const [imageUrls, setImageUrls] = useState<string[]>([]);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      if (globalThis.location.pathname.startsWith("/recipe/")) {
+        globalThis.history.back();
+      }
+    };
+
+    globalThis.addEventListener("popstate", handlePopState);
+
+    return () => {
+      globalThis.removeEventListener("popstate", handlePopState);
+    };
+  }, []);
 
   useEffect(() => {
     if (!params.recipeId) return;
-    const recipeId = parseInt(params.recipeId);
+    const recipeId = Number.parseInt(params.recipeId);
 
     supabase
       .from("recipe_ratings")
-      .select("stars")
+      .select("*, users(created_at, email, username)")
       .eq("recipe_id", recipeId)
+      .order("created_at", { ascending: false })
       .then((response) => {
         if (response.data) {
+          setRatings(response.data);
+
           const totalStars = response.data.reduce(
             (acc, rating) => acc + rating.stars,
             0
           );
-          setAverageRating(totalStars / response.data.length);
+
+          const avgStars =
+            response.data.length > 0 ? totalStars / response.data.length : null;
+
+          setAverageRating(avgStars);
         }
       });
   }, [params.recipeId]);
@@ -102,18 +126,6 @@ export default function Recipe() {
 
     getAllRecipeImages();
   }, [params.recipeId]);
-
-  function handleNextImage() {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === imageUrls.length - 1 ? 0 : prevIndex + 1
-    );
-  }
-
-  function handlePreviousImage() {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0 ? imageUrls.length - 1 : prevIndex - 1
-    );
-  }
 
   useEffect(() => {
     async function getRecipe() {
@@ -196,33 +208,6 @@ export default function Recipe() {
     }
   }
 
-  async function deleteRecipe() {
-    if (!recipe) {
-      return;
-    }
-
-    // Delete all images from storage for this recipe
-    const { data: files, error: listError } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipe.id}/`);
-    if (!listError && files && files.length > 0) {
-      const paths = files.map((file) => `recipe_${recipe.id}/${file.name}`);
-      await supabase.storage.from("recipeimages").remove(paths);
-    }
-
-    const { error } = await supabase
-      .from("recipes")
-      .delete()
-      .eq("id", recipe.id);
-
-    if (error) {
-      console.error("Error while deleting recipe: ", error);
-      alert("Error while deleting recipe");
-    } else {
-      navigate("/cookbook");
-    }
-  }
-
   useEffect(() => {
     async function fetchMealPlanningInfo() {
       if (!params.recipeId) return;
@@ -262,8 +247,36 @@ export default function Recipe() {
     });
   }
 
+  const formatDateByLocale = (date: string | Date) => {
+    const dateObj = typeof date === "string" ? new Date(date) : date;
+    return dateFnsFormatDate(
+      dateObj,
+      i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
+      { locale: i18n.language === "de" ? de : undefined }
+    );
+  };
+
+  const saveFooter = (
+    <>
+      <div className="h-[100px]"></div>
+
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+        <NavLink
+          to={`/recipe/edit/${recipe?.id}`}
+          className={buttonVariants({ variant: "secondary" }) + " w-full"}
+        >
+          <Pencil />
+
+          {t("recipe.editRecipe")}
+        </NavLink>
+
+        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
+      </div>
+    </>
+  );
+
   return (
-    <Layout>
+    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold">{recipe?.name}</h1>
 
@@ -280,43 +293,48 @@ export default function Recipe() {
                 <DropdownMenuItem>
                   <Pencil />
 
-                  {t("common.edit")}
-                </DropdownMenuItem>
-              </NavLink>
+          {t("recipe.editRecipe")}
+        </NavLink>
 
-              <DropdownMenuItem onClick={deleteRecipe}>
-                <Trash2 />
-
-                <span>{t("common.delete")}</span>
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
       </div>
+    </>
+  );
 
-      <AspectRatio ratio={16 / 9} className="-z-10">
-        <img
-          src={
-            imageUrls.length > 0
-              ? imageUrls[currentImageIndex]
-              : "https://images.unsplash.com/photo-1588345921523-c2dcdb7f1dcd?w=800&dpr=2&q=80"
-          }
-          alt="Recipe"
-          className="object-cover w-full h-full rounded-md"
-        />
-      </AspectRatio>
-
-      {imageUrls.length > 1 && (
-        <div className="flex justify-between mt-2">
-          <Button variant="secondary" onClick={handlePreviousImage}>
-            Previous
-          </Button>
-
-          <Button variant="secondary" onClick={handleNextImage}>
-            Next
-          </Button>
-        </div>
+  return (
+    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
+      {imageUrls.length === 0 ? (
+        <AspectRatio ratio={16 / 9}>
+          <img
+            src={"/no-img.jpg"}
+            alt="Recipe"
+            className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+          />
+        </AspectRatio>
+      ) : (
+        // if multiple images, turn on looping, image counter and arrows
+        <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
+          <AspectRatio ratio={16 / 9}>
+            {imageUrls.map((item, index) => (
+              <PhotoView key={index} src={item}>
+                {index < 1 ? (
+                  <img
+                    src={item}
+                    alt="Recipe"
+                    className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+                  />
+                ) : undefined}
+              </PhotoView>
+            ))}
+          </AspectRatio>
+        </PhotoProvider>
       )}
+
+      <div className="flex justify-between">
+        <h1 className="first-font text-2xl font-bold break-words w-full">
+          {recipe?.name}
+        </h1>
+      </div>
 
       {recipeItems.length > 0 && (
         <>
@@ -352,7 +370,7 @@ export default function Recipe() {
         </div>
 
         <div className="flex items-center gap-0.5">
-          <p className="text-sm">{averageRating || "-"}</p>
+          <p className="text-sm">{formatRating(averageRating)}</p>
 
           <StarIcon style={{ fontSize: "16px" }} />
         </div>
@@ -361,22 +379,80 @@ export default function Recipe() {
       {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
 
       {recipe?.link && (
-        <NavLink
-          to={recipe.link}
-          className={buttonVariants({ variant: "outline" }) + " w-full mt-2"}
-        >
+        <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
           <Link />
 
           {t("recipe.toTheRecipe")}
         </NavLink>
       )}
 
-      <RatingModal recipeId={recipe?.id} />
+      <Separator />
 
       <MarkdownRenderer
         content={recipe?.description || ""}
         className="font-medium"
       />
+
+      <div>
+        <Separator className="mb-2 mt-4" />
+
+        <RatingModal
+          recipeId={recipe?.id}
+          ratingSubmittedCallback={(newRating) => {
+            setRatings((prevRatings) => {
+              const updatedRatings = [newRating, ...prevRatings];
+
+              const totalStars = updatedRatings.reduce(
+                (acc, rating) => acc + rating.stars,
+                0
+              );
+
+              const avgStars =
+                updatedRatings.length > 0
+                  ? totalStars / updatedRatings.length
+                  : null;
+
+              setAverageRating(avgStars);
+
+              return updatedRatings;
+            });
+          }}
+        />
+
+        <h2 className="first-font text-xl font-bold mb-1">
+          {t("recipe.ratings")}
+        </h2>
+
+        {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
+
+        {ratings.map((rating) => {
+          return (
+            <div className="mb-6" key={rating.id}>
+              <div className="flex justify-between items-center">
+                <p className="font-semibold second-font">
+                  {rating.users.username}
+                </p>
+
+                <p className="text-sm text-muted-foreground">
+                  {formatDateByLocale(rating.created_at)}
+                </p>
+              </div>
+
+              <div>
+                {Array.from({ length: 5 }, (_, index) => {
+                  return index < rating.stars ? (
+                    <StarIcon style={{ fontSize: "16px" }} />
+                  ) : (
+                    <StarBorderIcon style={{ fontSize: "16px" }} />
+                  );
+                })}
+              </div>
+
+              <p className="text-wrap break-words">{rating.note}</p>
+            </div>
+          );
+        })}
+      </div>
     </Layout>
   );
 }

@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import supabase from "@/utils/supabase";
+import { useSupabase } from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
+import { useTranslation } from "react-i18next";
 
 export default function Survey() {
+  const { supabase } = useSupabase();
+  const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
 
@@ -16,14 +19,16 @@ export default function Survey() {
   const [selected, setSelected] = useState<string[]>([]);
 
   function parseQuestionId() {
-    const id = parseInt(params.questionId ?? "1", 10);
-    return isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
+    const id = Number.parseInt(params.questionId ?? "1", 10);
+    return Number.isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
   }
 
-  const handleSelect = (option: string) => {
+  const handleSelect = async (option: string) => {
     const question = SURVEY_QUESTIONS[questionId - 1];
     if (question.type === "single") {
       setSelected([option]);
+      // Auto-advance for single-type questions
+      await handleSingleQuestionComplete(option);
     } else {
       setSelected((prev) =>
         prev.includes(option)
@@ -32,6 +37,32 @@ export default function Survey() {
       );
     }
   };
+
+  async function handleSingleQuestionComplete(selectedOption: string) {
+    if (!user) {
+      return;
+    }
+
+    const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
+    const translatedOption = t(`questions.${QUESTION_KEY}.${selectedOption}`);
+
+    await supabase.from("survey_answears").upsert(
+      [
+        {
+          question: t(`questions.${QUESTION_KEY}.question`),
+          user_id: user.id,
+          selected_options: translatedOption,
+          question_number: questionId,
+        },
+      ],
+      {
+        onConflict: "user_id,question_number",
+      }
+    );
+
+    setSelected([]);
+    goToNext();
+  }
 
   async function onComplete() {
     if (!user) {
@@ -43,17 +74,26 @@ export default function Survey() {
       return;
     }
 
-    await supabase.from("survey_answears").insert([
+    const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
+    const translatedOptions = selected.map((option) =>
+      t(`questions.${QUESTION_KEY}.${option}`)
+    );
+
+    await supabase.from("survey_answears").upsert(
+      [
+        {
+          question: t(`questions.${QUESTION_KEY}.question`),
+          user_id: user.id,
+          selected_options: translatedOptions.join(", "),
+          question_number: questionId,
+        },
+      ],
       {
-        question_id: SURVEY_QUESTIONS[questionId - 1].questionKey,
-        user_id: user.id,
-        selected_options_ids: selected.join(","),
-        question_number: questionId,
-      },
-    ]);
+        onConflict: "user_id,question_number",
+      }
+    );
 
     setSelected([]);
-
     goToNext();
   }
 
@@ -94,6 +134,8 @@ export default function Survey() {
       selected={selected}
       handleSelect={handleSelect}
       onComplete={onComplete}
+      showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single"}
+      twoColumns={SURVEY_QUESTIONS[questionId - 1].twoColumns}
     />
   );
 }

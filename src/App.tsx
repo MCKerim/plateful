@@ -1,12 +1,13 @@
-import { Route, Routes, Navigate } from "react-router";
+import { Route, Routes, Navigate, useNavigate } from "react-router";
 import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/signUp/SignUp";
+import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
+import EmailVerification from "./page/onboarding/emailVerification/EmailVerification";
+import Login from "./page/onboarding/login/Login";
 import { useEffect, useState } from "react";
-import { Session } from "@supabase/supabase-js";
-import supabase from "./utils/supabase";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
@@ -35,21 +36,121 @@ import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
 import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValue";
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
+import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
+import { useSupabase } from "./utils/supabase";
+import { closeBrowser } from "./utils/nativeBrowser";
+import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
+import { SendIntent } from "@supernotes/capacitor-send-intent";
+import { Capacitor } from "@capacitor/core";
+import {
+  AppUpdate,
+  AppUpdateAvailability,
+} from "@capawesome/capacitor-app-update";
+import { useTranslation } from "react-i18next";
+import "react-photo-view/dist/react-photo-view.css";
+import posthog from "posthog-js";
+import URLImport from "./page/URLImport";
+import ImageImport from "./page/ImageImport";
 
 function App() {
+  const { t } = useTranslation();
+  const { supabase } = useSupabase();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  async function updateSession(session: Session | null) {
+  useEffect(() => {
+    const checkForUpdates = async () => {
+      try {
+        if (!Capacitor.isNativePlatform()) return;
+
+        if (!Capacitor.isPluginAvailable("AppUpdate")) {
+          console.warn("AppUpdate plugin not available");
+          return;
+        }
+
+        const result = await AppUpdate.getAppUpdateInfo();
+        if (
+          result.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE
+        ) {
+          const shouldUpdate = globalThis.confirm(t("update.updateAvailable"));
+
+          if (!shouldUpdate) return;
+
+          const platform = Capacitor.getPlatform();
+          if (platform === "android" && result.immediateUpdateAllowed) {
+            await AppUpdate.performImmediateUpdate();
+          } else if (platform === "ios") {
+            // TODO: iOS App Store update flow
+            // await AppUpdate.openAppStore({ appId: "..."});
+          } else {
+            await AppUpdate.openAppStore();
+          }
+        }
+      } catch (error) {
+        console.error("Error checking for app updates:", error);
+      }
+    };
+
+    checkForUpdates();
+  }, []);
+
+  useEffect(() => {
+    const handleIntentReceived = (result: any) => {
+      if (!result) return;
+
+      console.log("SendIntent received");
+      console.log(JSON.stringify(result));
+
+      const { url, title, text } = result;
+      if (url || title || text) {
+        const params = new URLSearchParams();
+        if (url) params.set("url", url);
+        if (title) params.set("title", title);
+        if (text) params.set("text", text);
+
+        navigate(`/urlImport?${params.toString()}`);
+      }
+    };
+
+    // Check on app startup
+    SendIntent.checkSendIntentReceived()
+      .then(handleIntentReceived)
+      .catch((err) => {
+        if (err?.message !== "No processing needed") {
+          console.error("SendIntent error", err);
+        }
+      });
+
+    // Listen for new share intents while app is running
+    globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
+
+    return () => {
+      globalThis.removeEventListener(
+        "sendIntentReceived",
+        handleIntentReceived
+      );
+    };
+  }, [navigate]);
+
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      EdgeToEdge.enable().catch((e) => {
+        console.error("Error enabling edge to edge:", e);
+      });
+    }
+  }, []);
+
+  async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
 
-    if (session?.user) {
+    if (userId) {
       const { data: userData, error: userError } = await supabase
         .from("users")
         .select("*, household:household_id(*)")
-        .eq("id", session.user.id)
+        .eq("id", userId)
         .single();
 
       if (userError) {
@@ -58,9 +159,16 @@ function App() {
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
+
+        posthog.reset();
       } else {
         dispatch(setUser(userData));
         dispatch(setHousehold(userData.household ?? null));
+
+        posthog.identify(userData.id, {
+          email: userData.email,
+          username: userData.username,
+        });
 
         if (!userData.household_id) {
           setLoading(false);
@@ -70,7 +178,7 @@ function App() {
         // get household members
         const { data: membersData, error: membersError } = await supabase
           .from("users")
-          .select("id, email")
+          .select("id, email, username")
           .eq("household_id", userData.household_id);
 
         if (membersError) {
@@ -85,22 +193,25 @@ function App() {
       dispatch(setUser(null));
       dispatch(setHousehold(null));
       dispatch(setHouseholdMembers(null));
+      posthog.reset();
     }
 
     setLoading(false);
   }
 
-  // Subscribe to auth state changes
   useEffect(() => {
-    let isMounted = true;
-
     const { data: { subscription } = { subscription: undefined } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        if (isMounted) updateSession(session);
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        updateUser(session?.user.id ?? null);
+
+        try {
+          await closeBrowser();
+        } catch (error) {
+          console.error(error);
+        }
       });
 
     return () => {
-      isMounted = false;
       subscription?.unsubscribe();
     };
   }, []);
@@ -122,7 +233,7 @@ function App() {
         () => {
           // Refetch user data and update Redux state
           supabase.auth.getSession().then(({ data: { session } }) => {
-            updateSession(session);
+            updateUser(session?.user.id ?? null);
           });
         }
       )
@@ -159,7 +270,7 @@ function App() {
     );
   }
 
-  if (loading) {
+  if (loading && !user) {
     return <LoadingScreen />;
   }
 
@@ -181,6 +292,25 @@ function App() {
         path="/signup"
         element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
       />
+
+      <Route
+        path="/signup/email"
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailSignUp />}
+      />
+
+      <Route
+        path="/signup/verify"
+        element={
+          isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />
+        }
+      />
+
+      <Route
+        path="/login"
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />}
+      />
+
+      <Route path="/beta" element={<BetaScreen />} />
 
       <Route path="/values" element={<ImportRecipes />} />
       <Route path="/values/1" element={<ImportRecipes />} />
@@ -233,6 +363,10 @@ function App() {
         path="/recipe/edit/:recipeId"
         element={routeToCorrectPage(<AddRecipe />)}
       />
+
+      <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
+      <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+
       {/* 404 Not Found Route */}
       <Route path="*" element={<NotFound />} />
     </Routes>
