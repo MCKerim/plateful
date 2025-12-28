@@ -51,17 +51,6 @@ export default function URLImport() {
   async function handleSave(url = urlInput) {
     if (!url?.trim()) return;
 
-    // Validate URL
-    try {
-      new URL(url.trim());
-    } catch {
-      toast.error(t("urlImport.errors.invalidUrl"), {
-        position: "top-right",
-        richColors: true,
-      });
-      return;
-    }
-
     setIsSaving(true);
 
     try {
