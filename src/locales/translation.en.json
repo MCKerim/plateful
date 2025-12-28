@@ -181,6 +181,19 @@
     "ratings": "Ratings",
     "noRatings": "No Ratings"
   },
+  "addRecipeDrawer": {
+    "importFromUrl": {
+      "label": "Import recipe from URL",
+      "description": "TikTok, YouTube, Instagram, Website"
+    },
+    "importFromImage": {
+      "label": "Import recipe from image",
+      "description": "Scan a recipe book or dish"
+    },
+    "createNewRecipe": {
+      "label": "Create new recipe"
+    }
+  },
   "addRecipe": {
     "editRecipe": "Edit recipe",
     "addRecipe": "Add recipe",
@@ -191,6 +204,27 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)"
+  },
+  "urlImport": {
+    "linkPastedFromClipboard": "Link pasted from clipboard",
+    "title": "Import Recipe",
+    "urlFieldLabel": "Recipe Link",
+    "urlFieldDescription": "e.g., TikTok, YouTube or Website link",
+    "urlFieldPlaceholder": "https://",
+    "importButton": "Import Recipe",
+    "importingMessage": "This can take a few seconds...",
+    "importingDescription": "You can close this page and find the recipe in your cookbook later",
+    "errors": {
+      "invalidUrl": "Invalid URL. Please check the link.",
+      "importFailed": "Failed to import recipe."
+    },
+    "success": "Recipe imported successfully!",
+    "importedRecipe": "Recipe imported successfully:",
+    "viewRecipe": "View"
+  },
+  "imageImport": {
+    "title": "Import Recipe",
+    "importButton": "Import Recipe"
   },
   "home": {
     "title": "Home",

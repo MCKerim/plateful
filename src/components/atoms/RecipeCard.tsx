@@ -20,7 +20,11 @@ type Props = {
   averageRating: number | null;
 };
 
-export default function RecipeCard({ id, name, averageRating }: Readonly<Props>) {
+export default function RecipeCard({
+  id,
+  name,
+  averageRating,
+}: Readonly<Props>) {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
@@ -50,7 +54,7 @@ export default function RecipeCard({ id, name, averageRating }: Readonly<Props>)
 
         <div className="flex flex-col justify-between gap-2 p-2">
           <div className="flex justify-between">
-            <h1 className="second-font font-bold leading-tight text-md line-clamp-2">
+            <h1 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
               {name}
             </h1>
           </div>

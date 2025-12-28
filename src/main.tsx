@@ -9,6 +9,7 @@ import { store } from "./redux/store.ts";
 import { SupabaseProvider } from "./utils/supabase.tsx";
 import AppUrlListener from "./components/AppUrlListener.tsx";
 import { PostHogProvider } from "posthog-js/react";
+import { Toaster } from "./components/ui/sonner.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
@@ -27,6 +28,8 @@ createRoot(document.getElementById("root")!).render(
             <AppUrlListener />
 
             <App />
+
+            <Toaster />
           </PostHogProvider>
         </ThemeProvider>
       </SupabaseProvider>

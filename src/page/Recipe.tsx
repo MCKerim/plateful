@@ -308,7 +308,9 @@ export default function Recipe() {
       )}
 
       <div className="flex justify-between">
-        <h1 className="first-font text-2xl font-bold">{recipe?.name}</h1>
+        <h1 className="first-font text-2xl font-bold break-words w-full">
+          {recipe?.name}
+        </h1>
       </div>
 
       {recipeItems.length > 0 && (
