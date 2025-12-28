@@ -10,7 +10,7 @@ export async function planRecipe(
   try {
     const { error } = await supabase.from("meal_planning").insert({
       recipe_id: recipeId,
-      planned_date: plannedDate?.toLocaleDateString(),
+      planned_date: plannedDate?.toDateString(),
       days: days,
       household_id: householdId,
     });
