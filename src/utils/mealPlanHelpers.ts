@@ -1,5 +1,5 @@
-import supabase from "./supabase";
 import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
+import { useSupabase } from "./supabase";
 
 export async function planRecipe(
   recipeId: number,
@@ -8,6 +8,7 @@ export async function planRecipe(
   days: number
 ): Promise<{ success: boolean; error?: string }> {
   try {
+    const { supabase } = useSupabase();
     const { error } = await supabase.from("meal_planning").insert({
       recipe_id: recipeId,
       planned_date: plannedDate?.toDateString(),
@@ -31,6 +32,7 @@ export async function getMealPlanningInfo(
   recipeId: number
 ): Promise<{ data: MealPlanning | null; error?: string }> {
   try {
+    const { supabase } = useSupabase();
     const { data, error } = await supabase
       .from("meal_planning")
       .select("*")

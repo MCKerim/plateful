@@ -33,7 +33,6 @@ type MealPlannerItem = {
 
 export default function MealPlanner() {
   const { supabase } = useSupabase();
-  const { t, i18n } = useTranslation();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);

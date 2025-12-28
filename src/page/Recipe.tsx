@@ -243,6 +243,8 @@ export default function Recipe() {
 
       if (!result.success) {
         alert("Error planning recipe");
+      } else {
+        navigate("/planner");
       }
     });
   }
@@ -270,33 +272,7 @@ export default function Recipe() {
           {t("recipe.editRecipe")}
         </NavLink>
 
-        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
-      </div>
-    </>
-  );
-
-  return (
-    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
-      <div className="flex justify-between">
-        <h1 className="text-2xl font-bold">{recipe?.name}</h1>
-
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <div className="text-[20px] cursor-pointer">
-              <MoreVertIcon fontSize="inherit" />
-            </div>
-          </DropdownMenuTrigger>
-
-          <DropdownMenuContent>
-            <DropdownMenuGroup>
-              <NavLink to={`/recipe/edit/${recipe?.id}`}>
-                <DropdownMenuItem>
-                  <Pencil />
-
-          {t("recipe.editRecipe")}
-        </NavLink>
-
-        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
+        {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
       </div>
     </>
   );

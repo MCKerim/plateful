@@ -47,7 +47,7 @@ export default function Cookbook() {
   const searchTerm = useAppSelector(selectSearchTerm);
 
   useEffect(() => {
-    loadRecipes();
+    getRecipes();
   }, []);
 
   useEffect(() => {
