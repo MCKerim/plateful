@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
-import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
+//import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
   Select,
   SelectContent,
@@ -377,7 +377,7 @@ export default function AddRecipe() {
     }
   }*/
 
-  async function importRecipeData() {
+  /*async function importRecipeData() {
     if (!link) {
       alert("Please enter a link.");
       return;
@@ -417,7 +417,7 @@ export default function AddRecipe() {
         "An error occurred while importing the recipe data. Please try again."
       );
     }
-  }
+  }*/
 
   async function deleteRecipe() {
     if (!params.recipeId) return false;
