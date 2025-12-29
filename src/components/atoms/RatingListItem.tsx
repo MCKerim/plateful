@@ -1,18 +1,13 @@
 import { formatDateByLocale } from "@/lib/dateHelper";
 import { Button } from "../ui/button";
-import {
-  Edit,
-  EllipsisVertical,
-  MoreVertical,
-  Plus,
-  Trash2,
-} from "lucide-react";
+import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { RecipeRatingWithUser } from "./RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import DeleteDialog from "./DeleteDialog";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerTrigger,
@@ -67,14 +62,16 @@ export default function RatingListItem({
 
             <DrawerContent>
               <DrawerFooter className="gap-2 mb-8 mt-4">
-                <Button
-                  className="w-full"
-                  onClick={() => handleEditRating(rating)}
-                >
-                  <Edit size={16} />
+                <DrawerClose asChild>
+                  <Button
+                    className="w-full"
+                    onClick={() => handleEditRating(rating)}
+                  >
+                    <Edit size={16} />
 
-                  {t("common.edit")}
-                </Button>
+                    {t("common.edit")}
+                  </Button>
+                </DrawerClose>
 
                 <DeleteDialog
                   onDelete={() => handleDeleteRating(rating.id)}
