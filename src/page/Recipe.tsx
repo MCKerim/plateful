@@ -33,7 +33,7 @@ type RecipeItem = {
 
 export default function Recipe() {
   const { supabase } = useSupabase();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
 
@@ -124,7 +124,7 @@ export default function Recipe() {
   useEffect(() => {
     async function getRecipe() {
       if (!params.recipeId) return;
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
 
       const { data } = await supabase
         .from("recipes")
@@ -225,7 +225,7 @@ export default function Recipe() {
   useEffect(() => {
     async function getMealPlanningInfo() {
       if (!params.recipeId) return;
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
 
       const { data } = await supabase
         .from("meal_planning")
@@ -259,6 +259,7 @@ export default function Recipe() {
       await ratingService.deleteRating(ratingId);
     } catch (error) {
       // Revert on error
+      console.error("Failed to delete rating:", error);
       alert(t("rating.deleteError"));
       setRatings(previousRatings);
       const avgRating = RatingService.calculateAverage(previousRatings);
