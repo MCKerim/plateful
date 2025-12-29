@@ -1,10 +1,23 @@
 import { formatDateByLocale } from "@/lib/dateHelper";
 import { Button } from "../ui/button";
-import { Edit, Trash2 } from "lucide-react";
+import {
+  Edit,
+  EllipsisVertical,
+  MoreVertical,
+  Plus,
+  Trash2,
+} from "lucide-react";
 import { RecipeRatingWithUser } from "./RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import DeleteDialog from "./DeleteDialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from "../ui/drawer";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   rating: RecipeRatingWithUser;
@@ -19,6 +32,8 @@ export default function RatingListItem({
   handleEditRating,
   handleDeleteRating,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+
   return (
     <div className="mb-6" key={rating.id}>
       <div className="flex justify-between items-center">
@@ -43,17 +58,37 @@ export default function RatingListItem({
         </div>
 
         {canModify && (
-          <div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleEditRating(rating)}
-            >
-              <Edit size={16} />
-            </Button>
+          <Drawer>
+            <DrawerTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreVertical size={16} />
+              </Button>
+            </DrawerTrigger>
 
-            <DeleteDialog onDelete={() => handleDeleteRating(rating.id)} />
-          </div>
+            <DrawerContent>
+              <DrawerFooter className="gap-2 mb-8 mt-4">
+                <Button
+                  className="w-full"
+                  onClick={() => handleEditRating(rating)}
+                >
+                  <Edit size={16} />
+
+                  {t("common.edit")}
+                </Button>
+
+                <DeleteDialog
+                  onDelete={() => handleDeleteRating(rating.id)}
+                  customTrigger={
+                    <Button className="w-full" variant="destructive">
+                      <Trash2 size={16} />
+
+                      {t("common.delete")}
+                    </Button>
+                  }
+                />
+              </DrawerFooter>
+            </DrawerContent>
+          </Drawer>
         )}
       </div>
 

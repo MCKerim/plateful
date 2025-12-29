@@ -183,11 +183,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
           <DialogFooter>
             <Button onClick={saveButtonPressed} disabled={isSubmitting}>
-              {isSubmitting
-                ? t("rating.submitting")
-                : isEditMode
-                ? t("rating.update")
-                : t("rating.submit")}
+              {t("rating.submit")}
             </Button>
           </DialogFooter>
         </DialogContent>

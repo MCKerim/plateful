@@ -332,8 +332,7 @@
     "editTitle": "Edit your rating",
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
-    "submit": "Save",
-    "update": "Update"
+    "submit": "Save"
   },
   "categorys": {
     "category": "Category",

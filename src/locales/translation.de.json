@@ -331,8 +331,7 @@
     "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",
     "commentPlaceholder": "Dein Kommentar (optional)",
-    "submit": "Speichern",
-    "update": "Aktualisieren"
+    "submit": "Speichern"
   },
   "categorys": {
     "category": "Kategorie",

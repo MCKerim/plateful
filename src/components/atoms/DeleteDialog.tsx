@@ -13,9 +13,13 @@ import { Trash2 } from "lucide-react";
 
 type Props = {
   onDelete: () => void;
+  customTrigger?: React.ReactNode;
 };
 
-export default function DeleteDialog({ onDelete }: Readonly<Props>) {
+export default function DeleteDialog({
+  onDelete,
+  customTrigger,
+}: Readonly<Props>) {
   const { t } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -27,16 +31,16 @@ export default function DeleteDialog({ onDelete }: Readonly<Props>) {
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger>
-        <Button className="w-full hover:bg-destructive" variant="ghost">
-          <Trash2 size={20} />
-        </Button>
+        {customTrigger || (
+          <Button className="w-full hover:bg-destructive" variant="ghost">
+            <Trash2 size={20} />
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>
-            {t("common.deleteTitle")}
-          </DialogTitle>
+          <DialogTitle>{t("common.deleteTitle")}</DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">
