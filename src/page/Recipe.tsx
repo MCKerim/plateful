@@ -2,43 +2,28 @@ import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState, useRef } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
-import {
-  Pencil,
-  Link,
-  CalendarDays,
-  Edit,
-  Trash2,
-  MoreVertical,
-} from "lucide-react";
+import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
   RecipeRatingWithUser,
   RatingModalRef,
 } from "@/components/atoms/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
-import { formatDate as dateFnsFormatDate } from "date-fns";
-import { de } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { RatingService } from "@/lib/services/ratingService";
+import RatingListItem from "@/components/atoms/RatingListItem";
 
 type RecipeItem = {
   id: number;
@@ -97,16 +82,6 @@ export default function Recipe() {
         console.error("Failed to load ratings:", error);
       });
   }, [params.recipeId]);
-
-  const calculateAverageRating = (ratingsData: RecipeRatingWithUser[]) => {
-    const totalStars = ratingsData.reduce(
-      (acc, rating) => acc + rating.stars,
-      0
-    );
-    const avgStars =
-      ratingsData.length > 0 ? totalStars / ratingsData.length : null;
-    setAverageRating(avgStars);
-  };
 
   useEffect(() => {
     async function getAllRecipeImages() {
@@ -270,15 +245,6 @@ export default function Recipe() {
     getMealPlanningInfo();
   }, [params.recipeId]);
 
-  const formatDateByLocale = (date: string | Date) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateFnsFormatDate(
-      dateObj,
-      i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
-      { locale: i18n.language === "de" ? de : undefined }
-    );
-  };
-
   async function handleDeleteRating(ratingId: number) {
     // Optimistically update UI
     const previousRatings = ratings;
@@ -324,8 +290,8 @@ export default function Recipe() {
     });
   }
 
-  const canModifyRating = (rating: RecipeRatingWithUser) => {
-    return currentUser && rating.owner_id === currentUser.id;
+  const canModifyRating = (rating: RecipeRatingWithUser): boolean => {
+    return (currentUser && rating.owner_id === currentUser.id) || false;
   };
 
   const saveFooter = (
@@ -448,62 +414,15 @@ export default function Recipe() {
 
         {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
 
-        {ratings.map((rating) => {
-          const canModify = canModifyRating(rating);
-
-          return (
-            <div className="mb-6" key={rating.id}>
-              <div className="flex justify-between items-center">
-                <p className="font-semibold second-font">
-                  {rating.users.username}
-                </p>
-
-                <div className="flex items-center gap-2">
-                  <p className="text-sm text-muted-foreground">
-                    {formatDateByLocale(rating.created_at)}
-                  </p>
-
-                  {canModify && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreVertical size={16} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                          onClick={() => handleEditRating(rating)}
-                        >
-                          <Edit size={16} className="mr-2" />
-                          {t("rating.edit")}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteRating(rating.id)}
-                          className="text-destructive focus:text-destructive"
-                        >
-                          <Trash2 size={16} className="mr-2" />
-                          {t("rating.delete")}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                </div>
-              </div>
-
-              <div>
-                {Array.from({ length: 5 }, (_, index) => {
-                  return index < rating.stars ? (
-                    <StarIcon key={index} style={{ fontSize: "16px" }} />
-                  ) : (
-                    <StarBorderIcon key={index} style={{ fontSize: "16px" }} />
-                  );
-                })}
-              </div>
-
-              <p className="text-wrap break-words">{rating.note}</p>
-            </div>
-          );
-        })}
+        {ratings.map((rating) => (
+          <RatingListItem
+            key={rating.id}
+            canModify={canModifyRating(rating)}
+            rating={rating}
+            handleEditRating={handleEditRating}
+            handleDeleteRating={handleDeleteRating}
+          />
+        ))}
       </div>
     </Layout>
   );

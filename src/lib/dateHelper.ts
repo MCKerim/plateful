@@ -1,3 +1,7 @@
+import i18n from "@/i18n";
+import { formatDate } from "date-fns";
+import { de } from "date-fns/locale";
+
 const weekday = [
   "Sunday",
   "Monday",
@@ -32,7 +36,18 @@ export function toWeekday(date: Date): string {
   }
   dayAsWord += " • ";
 
-  const formattedDate = `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}.${date.getFullYear()}`;
+  const formattedDate = `${String(date.getDate()).padStart(2, "0")}.${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}.${date.getFullYear()}`;
 
   return prefix + dayAsWord + formattedDate;
 }
+
+export const formatDateByLocale = (date: string | Date) => {
+  const dateObj = typeof date === "string" ? new Date(date) : date;
+  return formatDate(
+    dateObj,
+    i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
+    { locale: i18n.language === "de" ? de : undefined }
+  );
+};
