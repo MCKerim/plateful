@@ -34,10 +34,46 @@ export default function RatingListItem({
       <div className="flex justify-between items-center">
         <p className="font-semibold second-font">{rating.users.username}</p>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <p className="text-sm text-muted-foreground">
             {formatDateByLocale(rating.created_at)}
           </p>
+
+          {canModify && (
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-6 w-6">
+                  <MoreVertical size={16} />
+                </Button>
+              </DrawerTrigger>
+
+              <DrawerContent>
+                <DrawerFooter className="gap-2 mb-8 mt-4">
+                  <DrawerClose asChild>
+                    <Button
+                      className="w-full"
+                      onClick={() => handleEditRating(rating)}
+                    >
+                      <Edit size={16} />
+
+                      {t("common.edit")}
+                    </Button>
+                  </DrawerClose>
+
+                  <DeleteDialog
+                    onDelete={() => handleDeleteRating(rating.id)}
+                    customTrigger={
+                      <Button className="w-full" variant="destructive">
+                        <Trash2 size={16} />
+
+                        {t("common.delete")}
+                      </Button>
+                    }
+                  />
+                </DrawerFooter>
+              </DrawerContent>
+            </Drawer>
+          )}
         </div>
       </div>
 
@@ -51,42 +87,6 @@ export default function RatingListItem({
             );
           })}
         </div>
-
-        {canModify && (
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <MoreVertical size={16} />
-              </Button>
-            </DrawerTrigger>
-
-            <DrawerContent>
-              <DrawerFooter className="gap-2 mb-8 mt-4">
-                <DrawerClose asChild>
-                  <Button
-                    className="w-full"
-                    onClick={() => handleEditRating(rating)}
-                  >
-                    <Edit size={16} />
-
-                    {t("common.edit")}
-                  </Button>
-                </DrawerClose>
-
-                <DeleteDialog
-                  onDelete={() => handleDeleteRating(rating.id)}
-                  customTrigger={
-                    <Button className="w-full" variant="destructive">
-                      <Trash2 size={16} />
-
-                      {t("common.delete")}
-                    </Button>
-                  }
-                />
-              </DrawerFooter>
-            </DrawerContent>
-          </Drawer>
-        )}
       </div>
 
       <p className="text-wrap break-words">{rating.note}</p>
