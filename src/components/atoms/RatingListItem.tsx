@@ -4,6 +4,7 @@ import { Edit, Trash2 } from "lucide-react";
 import { RecipeRatingWithUser } from "./RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
+import DeleteDialog from "./DeleteDialog";
 
 type Props = {
   rating: RecipeRatingWithUser;
@@ -51,14 +52,7 @@ export default function RatingListItem({
               <Edit size={16} />
             </Button>
 
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDeleteRating(rating.id)}
-              className="text-destructive focus:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
+            <DeleteDialog onDelete={() => handleDeleteRating(rating.id)} />
           </div>
         )}
       </div>
