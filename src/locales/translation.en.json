@@ -329,9 +329,11 @@
   "rating": {
     "rate": "Rate  this recipe",
     "title": "How did you like it?",
+    "editTitle": "Edit your rating",
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
-    "submit": "Save"
+    "submit": "Save",
+    "update": "Update"
   },
   "categorys": {
     "category": "Category",

@@ -328,9 +328,11 @@
   "rating": {
     "rate": "Bewerte dieses Rezept",
     "title": "Wie hat es dir geschmeckt?",
+    "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",
     "commentPlaceholder": "Dein Kommentar (optional)",
-    "submit": "Speichern"
+    "submit": "Speichern",
+    "update": "Aktualisieren"
   },
   "categorys": {
     "category": "Kategorie",
