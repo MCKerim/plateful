@@ -11,14 +11,7 @@ import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
-import {
-  format,
-  isSameDay,
-  isToday,
-  addWeeks,
-  subWeeks,
-  isSameWeek,
-} from "date-fns";
+import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 
 type Props = {
   onFinish: (selectedDates: Date[]) => void;
@@ -82,8 +75,8 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-      <DialogTrigger>
-        <Button className="w-full">
+      <DialogTrigger asChild>
+        <Button className="w-full" variant="accent">
           <CalendarDays />
 
           {t("recipe.planRecipe")}

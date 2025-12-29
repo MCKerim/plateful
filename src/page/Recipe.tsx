@@ -130,7 +130,7 @@ export default function Recipe() {
   useEffect(() => {
     async function getRecipe() {
       if (!params.recipeId) return;
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
 
       const { data } = await supabase
         .from("recipes")
@@ -211,15 +211,15 @@ export default function Recipe() {
   useEffect(() => {
     async function fetchMealPlanningInfo() {
       if (!params.recipeId) return;
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
 
       const result = await getMealPlanningInfo(recipeId);
 
-      if (!result.error) {
-        setLastMealPlan(result.data);
-      } else {
+      if (result.error) {
         console.error("Error fetching meal planning info:", result.error);
         setLastMealPlan(null);
+      } else {
+        setLastMealPlan(result.data);
       }
     }
 
@@ -241,10 +241,10 @@ export default function Recipe() {
     dates.forEach(async (date) => {
       const result = await planRecipe(recipe.id, householdId, date, 1);
 
-      if (!result.success) {
-        alert("Error planning recipe");
-      } else {
+      if (result.success) {
         navigate("/planner");
+      } else {
+        alert("Error planning recipe");
       }
     });
   }
@@ -351,8 +351,6 @@ export default function Recipe() {
           <StarIcon style={{ fontSize: "16px" }} />
         </div>
       </div>
-
-      {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
 
       {recipe?.link && (
         <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
