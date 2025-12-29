@@ -17,8 +17,7 @@ import { Textarea } from "../ui/textarea";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
 import { RecipeRatings } from "@/types/exportedDatabaseTypes.types";
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
+import { RatingService } from "@/lib/services/ratingService";
 
 type Props = {
   showTriggerButton?: boolean;
@@ -52,7 +51,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
     const { supabase } = useSupabase();
     const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const currentUser = useAppSelector(selectUser);
+    const ratingService = new RatingService(supabase);
 
     const [rating, setRating] = useState(1);
     const [note, setNote] = useState("");
@@ -100,40 +99,30 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       try {
         if (editingRating) {
           // Update existing rating
-          const { data, error } = await supabase
-            .from("recipe_ratings")
-            .update({ stars: rating, note: note })
-            .eq("id", editingRating.id)
-            .select("*, users(created_at, email, username)")
-            .single();
-
-          if (error) {
-            console.error("Error updating rating:", error.message);
-            alert("Failed to update rating");
-            setIsSubmitting(false);
-            return;
-          }
-
-          ratingUpdatedCallback(data);
+          const updatedRating = await ratingService.updateRating(
+            editingRating.id,
+            rating,
+            note
+          );
+          ratingUpdatedCallback(updatedRating);
           setIsDialogOpen(false);
         } else {
           // Create new rating
-          const { data, error } = await supabase
-            .from("recipe_ratings")
-            .insert([{ recipe_id: recipeId, stars: rating, note: note }])
-            .select("*, users(created_at, email, username)")
-            .single();
-
-          if (error) {
-            console.error("Error saving rating:", error.message);
-            alert("Failed to save rating");
-            setIsSubmitting(false);
-            return;
-          }
-
-          ratingSubmittedCallback(data);
+          const newRating = await ratingService.createRating(
+            recipeId,
+            rating,
+            note
+          );
+          ratingSubmittedCallback(newRating);
           setIsDialogOpen(false);
         }
+      } catch (error) {
+        alert(
+          isEditMode
+            ? "Failed to update rating. Please try again."
+            : "Failed to save rating. Please try again."
+        );
+        setIsSubmitting(false);
       } finally {
         setIsSubmitting(false);
       }

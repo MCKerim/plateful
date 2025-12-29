@@ -38,6 +38,7 @@ import { formatDate as dateFnsFormatDate } from "date-fns";
 import { de } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
+import { RatingService } from "@/lib/services/ratingService";
 
 type RecipeItem = {
   id: number;
@@ -53,6 +54,8 @@ export default function Recipe() {
 
   const householdId = useAppSelector(selectHouseholdId);
   const currentUser = useAppSelector(selectUser);
+
+  const ratingService = new RatingService(supabase);
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
@@ -83,16 +86,15 @@ export default function Recipe() {
     if (!params.recipeId) return;
     const recipeId = Number.parseInt(params.recipeId);
 
-    supabase
-      .from("recipe_ratings")
-      .select("*, users(created_at, email, username)")
-      .eq("recipe_id", recipeId)
-      .order("created_at", { ascending: false })
-      .then((response) => {
-        if (response.data) {
-          setRatings(response.data);
-          calculateAverageRating(response.data);
-        }
+    ratingService
+      .getRatingsByRecipeId(recipeId)
+      .then((data) => {
+        setRatings(data);
+        const avgRating = RatingService.calculateAverage(data);
+        setAverageRating(avgRating);
+      })
+      .catch((error) => {
+        console.error("Failed to load ratings:", error);
       });
   }, [params.recipeId]);
 
@@ -279,34 +281,22 @@ export default function Recipe() {
 
   async function handleDeleteRating(ratingId: number) {
     // Optimistically update UI
+    const previousRatings = ratings;
     setRatings((prevRatings) => {
       const updatedRatings = prevRatings.filter((r) => r.id !== ratingId);
-      calculateAverageRating(updatedRatings);
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
       return updatedRatings;
     });
 
-    // Delete from database
-    const { error } = await supabase
-      .from("recipe_ratings")
-      .delete()
-      .eq("id", ratingId);
-
-    if (error) {
-      console.error("Error deleting rating:", error.message);
+    try {
+      await ratingService.deleteRating(ratingId);
+    } catch (error) {
+      // Revert on error
       alert(t("rating.deleteError"));
-
-      // Revert optimistic update on error
-      const recipeId = Number.parseInt(params.recipeId!);
-      const response = await supabase
-        .from("recipe_ratings")
-        .select("*, users(created_at, email, username)")
-        .eq("recipe_id", recipeId)
-        .order("created_at", { ascending: false });
-
-      if (response.data) {
-        setRatings(response.data);
-        calculateAverageRating(response.data);
-      }
+      setRatings(previousRatings);
+      const avgRating = RatingService.calculateAverage(previousRatings);
+      setAverageRating(avgRating);
     }
   }
 
@@ -317,7 +307,8 @@ export default function Recipe() {
   function handleRatingSubmitted(newRating: RecipeRatingWithUser) {
     setRatings((prevRatings) => {
       const updatedRatings = [newRating, ...prevRatings];
-      calculateAverageRating(updatedRatings);
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
       return updatedRatings;
     });
   }
@@ -327,7 +318,8 @@ export default function Recipe() {
       const updatedRatings = prevRatings.map((r) =>
         r.id === updatedRating.id ? updatedRating : r
       );
-      calculateAverageRating(updatedRatings);
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
       return updatedRatings;
     });
   }
@@ -478,7 +470,6 @@ export default function Recipe() {
                           <MoreVertical size={16} />
                         </Button>
                       </DropdownMenuTrigger>
-
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem
                           onClick={() => handleEditRating(rating)}
@@ -486,7 +477,6 @@ export default function Recipe() {
                           <Edit size={16} className="mr-2" />
                           {t("rating.edit")}
                         </DropdownMenuItem>
-
                         <DropdownMenuItem
                           onClick={() => handleDeleteRating(rating.id)}
                           className="text-destructive focus:text-destructive"
