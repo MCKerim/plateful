@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import HotelClassIcon from "@mui/icons-material/HotelClass";
 import StarIcon from "@mui/icons-material/Star";
@@ -24,10 +24,12 @@ type Props = {
   showTriggerButton?: boolean;
   recipeId?: number;
   ratingSubmittedCallback?: (newRating: RecipeRatingWithUser) => void;
+  ratingUpdatedCallback?: (updatedRating: RecipeRatingWithUser) => void;
+  existingRating?: RecipeRatingWithUser | null;
 };
 
 export type RatingModalRef = {
-  open: () => void;
+  open: (rating?: RecipeRatingWithUser) => void;
 };
 
 export type RecipeRatingWithUser = RecipeRatings & {
@@ -42,55 +44,102 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       showTriggerButton = true,
       recipeId,
       ratingSubmittedCallback = () => {},
+      ratingUpdatedCallback = () => {},
+      existingRating = null,
     }: Readonly<Props>,
     ref
   ) => {
     const { supabase } = useSupabase();
     const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const currentUser = useAppSelector(selectUser); 
-
-    // Expose the `open` method via the ref
-    useImperativeHandle(ref, () => ({
-      open: () => setIsDialogOpen(true),
-    }));
+    const currentUser = useAppSelector(selectUser);
 
     const [rating, setRating] = useState(1);
     const [note, setNote] = useState("");
+    const [editingRating, setEditingRating] =
+      useState<RecipeRatingWithUser | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Expose the `open` method via the ref
+    useImperativeHandle(ref, () => ({
+      open: (ratingToEdit?: RecipeRatingWithUser) => {
+        if (ratingToEdit) {
+          setEditingRating(ratingToEdit);
+          setRating(ratingToEdit.stars);
+          setNote(ratingToEdit.note || "");
+        } else {
+          // Reset for new rating
+          setEditingRating(null);
+          setRating(1);
+          setNote("");
+        }
+        setIsDialogOpen(true);
+      },
+    }));
+
+    // Reset form when dialog closes
+    useEffect(() => {
+      if (!isDialogOpen) {
+        setNote("");
+        setRating(1);
+        setEditingRating(null);
+      }
+    }, [isDialogOpen]);
 
     function handleDialogOpenChange(isOpen: boolean) {
       setIsDialogOpen(isOpen);
-
-      setNote("");
-      setRating(1);
     }
 
     async function saveButtonPressed() {
-      if (!recipeId || rating < 1) {
+      if (!recipeId || rating < 1 || isSubmitting) {
         return;
       }
 
-      const { data, error } = await supabase
-        .from("recipe_ratings")
-        .insert([{ recipe_id: recipeId, stars: rating, note: note }])
-        .select()
-        .single();
+      setIsSubmitting(true);
 
-      if (error) {
-        console.error("Fehler beim Speichern der Bewertung:", error.message);
-        return;
+      try {
+        if (editingRating) {
+          // Update existing rating
+          const { data, error } = await supabase
+            .from("recipe_ratings")
+            .update({ stars: rating, note: note })
+            .eq("id", editingRating.id)
+            .select("*, users(created_at, email, username)")
+            .single();
+
+          if (error) {
+            console.error("Error updating rating:", error.message);
+            alert("Failed to update rating");
+            setIsSubmitting(false);
+            return;
+          }
+
+          ratingUpdatedCallback(data);
+          setIsDialogOpen(false);
+        } else {
+          // Create new rating
+          const { data, error } = await supabase
+            .from("recipe_ratings")
+            .insert([{ recipe_id: recipeId, stars: rating, note: note }])
+            .select("*, users(created_at, email, username)")
+            .single();
+
+          if (error) {
+            console.error("Error saving rating:", error.message);
+            alert("Failed to save rating");
+            setIsSubmitting(false);
+            return;
+          }
+
+          ratingSubmittedCallback(data);
+          setIsDialogOpen(false);
+        }
+      } finally {
+        setIsSubmitting(false);
       }
-
-      setIsDialogOpen(false);
-      setNote("");
-      setRating(1);
-
-      if (!currentUser) {
-        return;
-      }
-
-      ratingSubmittedCallback({...data, users: {username: currentUser.username}});
     }
+
+    const isEditMode = editingRating !== null;
 
     return (
       <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
@@ -98,7 +147,6 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
           <DialogTrigger className="w-full mb-2">
             <Button variant="secondary" className="w-full">
               <HotelClassIcon />
-
               {t("rating.rate")}
             </Button>
           </DialogTrigger>
@@ -106,7 +154,9 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{t("rating.title")}</DialogTitle>
+            <DialogTitle>
+              {isEditMode ? t("rating.editTitle") : t("rating.title")}
+            </DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col gap-4 py-4">
@@ -115,7 +165,11 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
                 const starValue = index + 1;
 
                 return (
-                  <button key={index} onClick={() => setRating(starValue)}>
+                  <button
+                    key={index}
+                    onClick={() => setRating(starValue)}
+                    type="button"
+                  >
                     {rating >= starValue ? (
                       <StarIcon fontSize="large" />
                     ) : (
@@ -139,7 +193,13 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
           </DialogDescription>
 
           <DialogFooter>
-            <Button onClick={saveButtonPressed}>{t("rating.submit")}</Button>
+            <Button onClick={saveButtonPressed} disabled={isSubmitting}>
+              {isSubmitting
+                ? t("rating.submitting")
+                : isEditMode
+                ? t("rating.update")
+                : t("rating.submit")}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
