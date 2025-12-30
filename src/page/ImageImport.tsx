@@ -6,9 +6,15 @@ import { useTranslation } from "react-i18next";
 import { ImagePicker } from "@/components/atoms/ImagePicker";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSupabase } from "@/utils/supabase";
+import { useNavigate } from "react-router";
 
 export default function ImageImport() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { supabase } = useSupabase();
+  const [isSaving, setIsSaving] = useState(false);
+  const [data, setData] = useState<any>(null);
   const [images, setImages] = useState<
     { file: File; preview: string; base64: string }[]
   >([]);
@@ -30,12 +36,67 @@ export default function ImageImport() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleStartImport = () => {
-    toast.error("Image import will work soon", {
-      position: "top-right",
-      richColors: true,
-    });
-  };
+  async function handleStartImport() {
+    if (images.length === 0) {
+      toast.error(t("imageImport.errors.noImages"), {
+        position: "top-right",
+        richColors: true,
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "recipe-from-image",
+        {
+          body: {
+            images: images.map((img) => img.base64),
+          },
+        }
+      );
+
+      if (error) {
+        console.error("Edge function returned error:", error);
+        toast.error(t("urlImport.errors.importFailed"), {
+          position: "top-right",
+          richColors: true,
+        });
+      } else {
+        console.log("recipe-from-image response:", data);
+        setData(data[0]);
+        toast.success(t("urlImport.success"), {
+          position: "top-right",
+          richColors: true,
+          action: {
+            label: t("urlImport.viewRecipe"),
+            onClick: () => {
+              navigate(`/recipe/${data[0].id}`);
+            },
+          },
+        });
+      }
+    } catch (err: unknown) {
+      console.error("Unexpected error calling recipe-from-image:", err);
+      toast.error(t("urlImport.errors.importFailed"), {
+        position: "top-right",
+        richColors: true,
+      });
+
+      try {
+        const anyErr = err as any;
+        if (anyErr?.response && typeof anyErr.response.text === "function") {
+          const text = await anyErr.response.text();
+          console.error("Edge function returned (raw text):", text);
+        }
+      } catch (error_) {
+        console.debug("Could not retrieve raw response from error.", error_);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   const saveFooter = (
     <>
