@@ -8,6 +8,8 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
+import LoadingDots from "@/components/atoms/LoadingDots";
+import RecipeCard from "@/components/atoms/RecipeCard";
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -107,6 +109,7 @@ export default function ImageImport() {
           className="w-full"
           variant="accent"
           onClick={() => handleStartImport()}
+          disabled={isSaving || data !== null}
         >
           {t("imageImport.importButton")}
         </Button>
@@ -116,40 +119,73 @@ export default function ImageImport() {
 
   return (
     <Layout showHeader={false} footer={saveFooter}>
-      <div className="flex justify-between w-full items-center mb-4">
+      <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold first-font">
           {t("imageImport.title")}
         </h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {images.map((image, index) => (
-          <div key={index} className="relative">
-            <AspectRatio ratio={16 / 9}>
-              <img
-                src={image.preview}
-                alt={`Uploaded ${index}`}
-                className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted-foreground"
-              />
-            </AspectRatio>
+      {!isSaving && !data && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            {images.map((image, index) => (
+              <div key={index} className="relative">
+                <AspectRatio ratio={16 / 9}>
+                  <img
+                    src={image.preview}
+                    alt={`Uploaded ${index}`}
+                    className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted-foreground"
+                  />
+                </AspectRatio>
 
-            <button
-              onClick={() => handleRemoveImage(index)}
-              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              aria-label="Delete image"
-            >
-              <Trash2 size={16} />
-            </button>
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  aria-label="Delete image"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <div className="mt-4">
-        <ImagePicker
-          onImageSelected={handleImageSelected}
-          onDeleteImage={() => {}}
-          uploading={false}
-        />
+          <div className="mt-4">
+            <ImagePicker
+              onImageSelected={handleImageSelected}
+              onDeleteImage={() => {}}
+              uploading={false}
+            />
+          </div>
+        </>
+      )}
+
+      <div className="flex items-center flex-1">
+        {isSaving && (
+          <div className="flex flex-col items-center justify-center w-full gap-8">
+            <LoadingDots />
+
+            <p className="second-font text-center">
+              {t("urlImport.importingMessage")}
+              <br />
+              {t("urlImport.importingDescription")}
+            </p>
+          </div>
+        )}
+
+        {data && (
+          <div className="flex flex-col w-full gap-4">
+            <h2 className="text-lg font-bold second-font">
+              {t("urlImport.importedRecipe")}
+            </h2>
+
+            <RecipeCard
+              key={data.id}
+              id={data.id}
+              name={data.name}
+              averageRating={null}
+            />
+          </div>
+        )}
       </div>
     </Layout>
   );
