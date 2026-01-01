@@ -26,3 +26,4 @@ export const { setUser } = userSlice.actions;
 export default userSlice.reducer;
 
 export const selectUser = (state: RootState) => state.user.user;
+export const selectUserLanguage = (state: RootState) => state.user.user?.language || localStorage.getItem('language');
