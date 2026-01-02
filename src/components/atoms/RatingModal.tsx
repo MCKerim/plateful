@@ -24,7 +24,6 @@ type Props = {
   recipeId?: number;
   ratingSubmittedCallback?: (newRating: RecipeRatingWithUser) => void;
   ratingUpdatedCallback?: (updatedRating: RecipeRatingWithUser) => void;
-  existingRating?: RecipeRatingWithUser | null;
 };
 
 export type RatingModalRef = {
@@ -44,7 +43,6 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       recipeId,
       ratingSubmittedCallback = () => {},
       ratingUpdatedCallback = () => {},
-      existingRating = null,
     }: Readonly<Props>,
     ref
   ) => {
