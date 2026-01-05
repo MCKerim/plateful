@@ -21,12 +21,14 @@ export default function ImageImport() {
   const [images, setImages] = useState<
     { file: File; preview: string; base64: string }[]
   >([]);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
   const handleImageSelected = async (
     file: File | undefined,
     previewUrl: string
   ) => {
     if (file && previewUrl) {
+      setIsLoadingImage(true);
       const compressedFile = await imageCompression(file, {
         maxWidthOrHeight: 900, // Good for recipe images
         maxSizeMB: 0.5, // Target max file size (MB)
@@ -42,6 +44,7 @@ export default function ImageImport() {
             ...prev,
             { file: compressedFile, preview: previewUrl, base64 },
           ]);
+          setIsLoadingImage(false);
         }
       };
       reader.readAsDataURL(compressedFile);
@@ -161,6 +164,16 @@ export default function ImageImport() {
                 </button>
               </div>
             ))}
+
+            {isLoadingImage && (
+              <div className="flex items-center justify-center rounded-md outline-dashed outline-2 outline-muted-foreground">
+                <AspectRatio ratio={16 / 9}>
+                  <div className="flex items-center justify-center w-full h-full">
+                    <LoadingDots />
+                  </div>
+                </AspectRatio>
+              </div>
+            )}
           </div>
 
           <div className="mt-4">
