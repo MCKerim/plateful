@@ -10,6 +10,7 @@ import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import LoadingDots from "@/components/atoms/LoadingDots";
 import RecipeCard from "@/components/atoms/RecipeCard";
+import imageCompression from "browser-image-compression";
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -21,16 +22,29 @@ export default function ImageImport() {
     { file: File; preview: string; base64: string }[]
   >([]);
 
-  const handleImageSelected = (file: File | undefined, previewUrl: string) => {
+  const handleImageSelected = async (
+    file: File | undefined,
+    previewUrl: string
+  ) => {
     if (file && previewUrl) {
+      const compressedFile = await imageCompression(file, {
+        maxWidthOrHeight: 900, // Good for recipe images
+        maxSizeMB: 0.5, // Target max file size (MB)
+        useWebWorker: true,
+        initialQuality: 0.85,
+      });
+
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
           const base64 = reader.result.toString();
-          setImages((prev) => [...prev, { file, preview: previewUrl, base64 }]);
+          setImages((prev) => [
+            ...prev,
+            { file: compressedFile, preview: previewUrl, base64 },
+          ]);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };
 
