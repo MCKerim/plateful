@@ -22,6 +22,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { CalendarOff, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  TouchSensor,
+  useDroppable,
+} from "@dnd-kit/core";
 
 type MealPlannerItem = {
   id: number;
@@ -39,11 +49,25 @@ export default function MealPlanner() {
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [draggedItemId, setDraggedItemId] = useState<number | null>(null);
-  const [dropTargetDate, setDropTargetDate] = useState<Date | null>(null);
+  const [activeItemId, setActiveItemId] = useState<number | null>(null);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
+
+  // Configure sensors for better touch support
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     getMealPlannerItems();
@@ -162,40 +186,30 @@ export default function MealPlanner() {
     );
   }
 
-  // Drag and Drop Handlers
-  function handleDragStart(itemId: number) {
-    setDraggedItemId(itemId);
-    console.log("Drag started for item:", itemId);
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    setActiveItemId(active.id as number);
   }
 
-  function handleDragOver(e: React.DragEvent, targetDate: Date) {
-    e.preventDefault();
-    setDropTargetDate(targetDate);
-  }
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
 
-  function handleDragLeave() {
-    setDropTargetDate(null);
-  }
+    if (!over) {
+      setActiveItemId(null);
+      return;
+    }
 
-  function handleDrop(e: React.DragEvent, targetDate: Date) {
-    e.preventDefault();
-    setDropTargetDate(null);
+    const draggedItem = plannedItems.find((item) => item.id === active.id);
+    if (!draggedItem) {
+      setActiveItemId(null);
+      return;
+    }
 
-    if (draggedItemId === null) return;
+    const targetDateStr = over.id as string;
+    const targetDate = new Date(targetDateStr);
 
-    const draggedItem = plannedItems.find((item) => item.id === draggedItemId);
-    if (!draggedItem) return;
-
-    console.log("Dropped item:", draggedItem.recipeName);
-    console.log("Target date:", format(targetDate, "EEE - dd.MM.yyyy"));
-
-    updatePlannedItemDate(draggedItemId, targetDate, draggedItem.days);
-    setDraggedItemId(null);
-  }
-
-  function handleDragEnd() {
-    setDraggedItemId(null);
-    setDropTargetDate(null);
+    updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
+    setActiveItemId(null);
   }
 
   function renderCorrectItem(plannedDate: Date) {
@@ -219,8 +233,7 @@ export default function MealPlanner() {
             showRateRecipeModal(item.recipeId);
           }}
           onRecipeDelete={(id) => deletePlannedItem(id)}
-          onDragStart={() => handleDragStart(item.id)}
-          onDragEnd={handleDragEnd}
+          isDragging={activeItemId === item.id}
         />
       );
     }
@@ -235,122 +248,144 @@ export default function MealPlanner() {
   }
 
   return (
-    <Layout>
-      <RatingModal
-        showTriggerButton={false}
-        ref={ratingModalRef}
-        recipeId={recipeToRate}
-      />
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <Layout>
+        <RatingModal
+          showTriggerButton={false}
+          ref={ratingModalRef}
+          recipeId={recipeToRate}
+        />
 
-      {/* Week Navigation */}
-      <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11">
-        <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
-          <ChevronLeft size={20} />
-        </Button>
+        {/* Week Navigation */}
+        <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11">
+          <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+            <ChevronLeft size={20} />
+          </Button>
 
-        <div className="flex flex-col items-center">
-          <h2 className="text-lg font-semibold">
-            {isSameWeek(currentWeek, new Date())
-              ? "Diese Woche"
-              : isSameWeek(currentWeek, addWeeks(new Date(), 1))
-              ? "Nächste Woche"
-              : isSameWeek(currentWeek, subWeeks(new Date(), 1))
-              ? "Letzte Woche"
-              : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
-                  getWeekdays(currentWeek)[6],
-                  "dd.MM"
-                )}`}
-          </h2>
+          <div className="flex flex-col items-center">
+            <h2 className="text-lg font-semibold">
+              {isSameWeek(currentWeek, new Date())
+                ? "Diese Woche"
+                : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+                ? "Nächste Woche"
+                : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                ? "Letzte Woche"
+                : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
+                    getWeekdays(currentWeek)[6],
+                    "dd.MM"
+                  )}`}
+            </h2>
 
-          {!isSameWeek(currentWeek, new Date()) && (
-            <Button
-              variant="link"
-              size="sm"
-              onClick={goToCurrentWeek}
-              className="h-auto p-0 text-xs text-muted-foreground"
-            >
-              Zur aktuellen Woche
-            </Button>
-          )}
+            {!isSameWeek(currentWeek, new Date()) && (
+              <Button
+                variant="link"
+                size="sm"
+                onClick={goToCurrentWeek}
+                className="h-auto p-0 text-xs text-muted-foreground"
+              >
+                Zur aktuellen Woche
+              </Button>
+            )}
 
-          {isSameWeek(currentWeek, new Date()) && (
-            <div className="h-[16px]"></div>
-          )}
+            {isSameWeek(currentWeek, new Date()) && (
+              <div className="h-[16px]"></div>
+            )}
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+            <ChevronRight size={20} />
+          </Button>
         </div>
 
-        <Button variant="ghost" size="sm" onClick={goToNextWeek}>
-          <ChevronRight size={20} />
-        </Button>
-      </div>
-
-      <div className="flex flex-col gap-2.5 mb-32">
-        {getWeekdays(currentWeek).map((day) => (
-          <div
-            key={format(day, "EEE - dd.MM")}
-            onDragOver={(e) => handleDragOver(e, day)}
-            onDragLeave={handleDragLeave}
-            onDrop={(e) => handleDrop(e, day)}
-            className={`transition-colors ${
-              dropTargetDate && isSameDay(dropTargetDate, day)
-                ? "bg-accent rounded-lg"
-                : ""
-            }`}
-          >
-            <p
-              className={
-                "px-2 mb-1 font-semibold rounded-full w-fit " +
-                (isToday(day) ? "bg-accent " : "")
-              }
-            >
-              {format(day, "EEE - dd.MM")}
-            </p>
-
-            {renderCorrectItem(day)}
-          </div>
-        ))}
-      </div>
-
-      <Accordion
-        type="single"
-        defaultValue="item-1"
-        collapsible
-        className="fixed w-full bg-background bottom-16"
-      >
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            <div className="flex items-center gap-1">
-              <CalendarOff size={20} /> Ohne Datum -{" "}
-              {getNotPlannedItems().length}
-            </div>
-          </AccordionTrigger>
-
-          <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
-            {getNotPlannedItems().map((item) => (
-              <div key={item.id} className="min-w-[400px]">
-                <MealPlannerItem
-                  id={item.id}
-                  recipeId={item.recipeId}
-                  recipeName={item.recipeName}
-                  date={item.planned_date}
-                  days={item.days}
-                  daysEaten={item.daysEaten}
-                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                  onUpdateDate={(id, newDate, newDays) =>
-                    updatePlannedItemDate(id, newDate, newDays)
+        <div className="flex flex-col gap-2.5 mb-32">
+          {getWeekdays(currentWeek).map((day) => {
+            const dayStr = day.toISOString();
+            return (
+              <DroppableDay key={dayStr} id={dayStr} date={day}>
+                <p
+                  className={
+                    "px-2 mb-1 font-semibold rounded-full w-fit " +
+                    (isToday(day) ? "bg-accent " : "")
                   }
-                  onRecipeEaten={(id) => {
-                    setDaysEaten(id, item.daysEaten + 1);
-                    showRateRecipeModal(item.recipeId);
-                  }}
-                  onRecipeDelete={deletePlannedItem}
-                  onDragStart={() => handleDragStart(item.id)}
-                  onDragEnd={handleDragEnd}
-                />
+                >
+                  {format(day, "EEE - dd.MM")}
+                </p>
+
+                {renderCorrectItem(day)}
+              </DroppableDay>
+            );
+          })}
+        </div>
+
+        <Accordion
+          type="single"
+          defaultValue="item-1"
+          collapsible
+          className="fixed w-full bg-background bottom-16"
+        >
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              <div className="flex items-center gap-1">
+                <CalendarOff size={20} /> Ohne Datum -{" "}
+                {getNotPlannedItems().length}
               </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </Layout>
+            </AccordionTrigger>
+
+            <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
+              {getNotPlannedItems().map((item) => (
+                <div key={item.id} className="min-w-[400px]">
+                  <MealPlannerItem
+                    key={item.id}
+                    id={item.id}
+                    recipeId={item.recipeId}
+                    recipeName={item.recipeName}
+                    date={item.planned_date}
+                    days={item.days}
+                    daysEaten={item.daysEaten}
+                    setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                    onUpdateDate={(id, newDate, newDays) =>
+                      updatePlannedItemDate(id, newDate, newDays)
+                    }
+                    onRecipeEaten={(id) => {
+                      setDaysEaten(id, item.daysEaten + 1);
+                      showRateRecipeModal(item.recipeId);
+                    }}
+                    onRecipeDelete={deletePlannedItem}
+                    isDragging={activeItemId === item.id}
+                  />
+                </div>
+              ))}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </Layout>
+    </DndContext>
+  );
+}
+
+function DroppableDay({
+  id,
+  date,
+  children,
+}: Readonly<{
+  id: string;
+  date: Date;
+  children: React.ReactNode;
+}>) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`transition-colors rounded-lg ${isOver ? "bg-accent" : ""}`}
+    >
+      {children}
+    </div>
   );
 }

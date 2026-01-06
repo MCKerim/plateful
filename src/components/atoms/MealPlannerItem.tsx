@@ -14,6 +14,8 @@ import {
 import { MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "./DeleteDialog";
 import { useTranslation } from "react-i18next";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 type Props = {
   id: number;
@@ -26,8 +28,7 @@ type Props = {
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
   onRecipeEaten: (id: number) => void;
   onRecipeDelete: (id: number) => void;
-  onDragStart?: () => void;
-  onDragEnd?: () => void;
+  isDragging?: boolean;
 };
 
 export default function MealPlannerItem({
@@ -39,13 +40,19 @@ export default function MealPlannerItem({
   setDaysEaten,
   onRecipeEaten,
   onRecipeDelete,
-  onDragStart,
-  onDragEnd,
+  isDragging = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: id,
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
 
   useEffect(() => {
     async function fetchImage() {
@@ -89,44 +96,31 @@ export default function MealPlannerItem({
     }
   }
 
-  function handleDragStart(e: React.DragEvent) {
-    setIsDragging(true);
-    e.dataTransfer.effectAllowed = "move";
-
-    onDragStart?.();
-  }
-
-  function handleDragEnd(e: React.DragEvent) {
-    setIsDragging(false);
-    onDragEnd?.();
-  }
-
   return (
     <Card
-      className={`h-[90px] flex items-center cursor-move transition-opacity ${
-        isDragging ? "opacity-50" : ""
+      ref={setNodeRef}
+      style={style}
+      className={`h-[90px] flex items-center touch-none transition-opacity ${
+        isDragging ? "opacity-30" : ""
       }`}
-      draggable
-      onDragStart={handleDragStart}
-      onDragEnd={handleDragEnd}
+      {...listeners}
+      {...attributes}
     >
       <img
         src={imageUrl || "/no-img.jpg"}
-        alt="Spaghetti"
-        className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75"
-        draggable={false}
+        alt="Recipe"
+        className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
       />
 
       <NavLink
-        className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3"
+        className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3 pointer-events-auto"
         to={`/recipe/${recipeId}`}
-        draggable={false}
       >
         {recipeName}
       </NavLink>
 
       <Button
-        className="flex gap-2 items-center me-1"
+        className="flex gap-2 items-center me-1 pointer-events-auto"
         variant="outline"
         onClick={eat}
       >
@@ -143,7 +137,7 @@ export default function MealPlannerItem({
 
       <Drawer>
         <DrawerTrigger asChild>
-          <Button className="me-2.5" variant="outline">
+          <Button className="me-2.5 pointer-events-auto" variant="outline">
             <MoreVertical size={16} />
           </Button>
         </DrawerTrigger>
