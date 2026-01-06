@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { CalendarOff, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router";
 
 type MealPlannerItem = {
   id: number;
@@ -33,6 +34,7 @@ type MealPlannerItem = {
 
 export default function MealPlanner() {
   const { supabase } = useSupabase();
+  const navigate = useNavigate();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -186,7 +188,8 @@ export default function MealPlanner() {
         />
       );
     }
-    return <MealPlannerAdd onClick={() => {}} />;
+
+    return <MealPlannerAdd onClick={() => navigate("/cookbook")} />;
   }
 
   function getNotPlannedItems() {
@@ -286,7 +289,7 @@ export default function MealPlanner() {
             <p
               className={
                 "px-2 mb-1 font-semibold rounded-full w-fit " +
-                (isToday(day) ? "bg-plateful " : "")
+                (isToday(day) ? "bg-accent " : "")
               }
             >
               {format(day, "EEE - dd.MM")}
