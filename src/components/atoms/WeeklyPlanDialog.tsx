@@ -12,13 +12,21 @@ import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
+import { enUS, es, fr, de } from "date-fns/locale";
 
 type Props = {
   onFinish: (selectedDates: Date[]) => void;
 };
 
+const locales = {
+  en: enUS,
+  es: es,
+  fr: fr,
+  de: de,
+};
+
 export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -132,7 +140,9 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
 
           {getWeekdays(currentWeek).map((day) => (
             <Button
-              key={format(day, "EEE - dd.MM")}
+              key={format(day, "EEE - dd.MM", {
+                locale: locales[i18n.language as keyof typeof locales] || enUS,
+              })}
               variant="outline"
               onClick={() => toggleWeekDate(day)}
               className={
@@ -141,7 +151,9 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
                   : ""
               }
             >
-              {format(day, "EEE - dd.MM")}
+              {format(day, "EEE - dd.MM", {
+                locale: locales[i18n.language as keyof typeof locales] || enUS,
+              })}
             </Button>
           ))}
 
