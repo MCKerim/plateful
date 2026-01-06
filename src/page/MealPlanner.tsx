@@ -32,6 +32,8 @@ import {
   TouchSensor,
   useDroppable,
 } from "@dnd-kit/core";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
 
 type MealPlannerItem = {
   id: number;
@@ -43,6 +45,7 @@ type MealPlannerItem = {
 };
 
 export default function MealPlanner() {
+  const { t } = useTranslation();
   const { supabase } = useSupabase();
   const navigate = useNavigate();
 
@@ -132,15 +135,20 @@ export default function MealPlanner() {
     newDate: Date | null,
     newDays: number
   ) {
+    const plannedDate = newDate ? newDate.toISOString() : null;
     const { error } = await supabase
       .from("meal_planning")
-      .update({ planned_date: newDate?.toISOString(), days: newDays })
+      .update({ planned_date: plannedDate, days: newDays })
       .eq("id", id);
 
     if (error) {
       console.error("Error while updating planned item date: ", error);
       alert("Error while updating planned item date");
     } else {
+      toast.success(t("recipe.planningSuccessful"), {
+        position: "top-right",
+        richColors: true,
+      });
       getMealPlannerItems();
     }
   }
@@ -225,14 +233,12 @@ export default function MealPlanner() {
           days={item.days}
           daysEaten={item.daysEaten}
           setDaysEaten={(days) => setDaysEaten(item.id, days)}
-          onUpdateDate={(id, newDate, newDays) =>
-            updatePlannedItemDate(id, newDate, newDays)
-          }
           onRecipeEaten={(id) => {
             setDaysEaten(id, item.daysEaten + 1);
             showRateRecipeModal(item.recipeId);
           }}
           onRecipeDelete={(id) => deletePlannedItem(id)}
+          onUpdateToNoDate={(id) => updatePlannedItemDate(id, null, 1)}
           isDragging={activeItemId === item.id}
         />
       );
@@ -347,14 +353,14 @@ export default function MealPlanner() {
                     days={item.days}
                     daysEaten={item.daysEaten}
                     setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                    onUpdateDate={(id, newDate, newDays) =>
-                      updatePlannedItemDate(id, newDate, newDays)
-                    }
                     onRecipeEaten={(id) => {
                       setDaysEaten(id, item.daysEaten + 1);
                       showRateRecipeModal(item.recipeId);
                     }}
                     onRecipeDelete={deletePlannedItem}
+                    onUpdateToNoDate={(id) =>
+                      updatePlannedItemDate(id, null, 1)
+                    }
                     isDragging={activeItemId === item.id}
                   />
                 </div>

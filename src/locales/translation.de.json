@@ -235,6 +235,10 @@
   "explore": {
     "title": "Erkunden"
   },
+  "mealPlannerItem": {
+    "removeDate": "Datum entfernen",
+    "remove": "Entfernen"
+  },
   "settings": {
     "title": "Einstellungen",
     "language": "Sprache",

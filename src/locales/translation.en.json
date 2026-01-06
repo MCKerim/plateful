@@ -183,6 +183,10 @@
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later."
   },
+  "mealPlannerItem": {
+    "removeDate": "Remove Date",
+    "remove": "Remove"
+  },
   "addRecipeDrawer": {
     "importFromUrl": {
       "label": "Import recipe from URL",

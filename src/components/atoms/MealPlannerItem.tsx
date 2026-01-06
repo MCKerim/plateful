@@ -7,11 +7,12 @@ import { useEffect, useState } from "react";
 import { useSupabase } from "@/utils/supabase";
 import {
   Drawer,
+  DrawerClose,
   DrawerContent,
   DrawerFooter,
   DrawerTrigger,
 } from "../ui/drawer";
-import { MoreVertical, Trash2 } from "lucide-react";
+import { CalendarOff, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "./DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
@@ -25,9 +26,9 @@ type Props = {
   days: number;
   daysEaten: number;
   setDaysEaten: (days: number) => void;
-  onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
   onRecipeEaten: (id: number) => void;
   onRecipeDelete: (id: number) => void;
+  onUpdateToNoDate: (id: number) => void;
   isDragging?: boolean;
 };
 
@@ -35,11 +36,13 @@ export default function MealPlannerItem({
   id,
   recipeId,
   recipeName,
+  date,
   days,
   daysEaten,
   setDaysEaten,
   onRecipeEaten,
   onRecipeDelete,
+  onUpdateToNoDate,
   isDragging = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
@@ -144,13 +147,26 @@ export default function MealPlannerItem({
 
         <DrawerContent>
           <DrawerFooter className="gap-2 mb-8 mt-4">
+            <DrawerClose asChild>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => onUpdateToNoDate(id)}
+                disabled={date === null}
+              >
+                <CalendarOff size={20} />
+
+                {t("mealPlannerItem.removeDate")}
+              </Button>
+            </DrawerClose>
+
             <DeleteDialog
               onDelete={() => onRecipeDelete(id)}
               customTrigger={
                 <Button className="w-full" variant="destructive">
                   <Trash2 size={16} />
 
-                  {t("common.delete")}
+                  {t("mealPlannerItem.remove")}
                 </Button>
               }
             />
