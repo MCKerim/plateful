@@ -177,7 +177,6 @@ export default function MealPlanner() {
           days={item.days}
           daysEaten={item.daysEaten}
           setDaysEaten={(days) => setDaysEaten(item.id, days)}
-          onDeleteDate={(id) => deletePlannedItem(id)}
           onUpdateDate={(id, newDate, newDays) =>
             updatePlannedItemDate(id, newDate, newDays)
           }
@@ -185,6 +184,7 @@ export default function MealPlanner() {
             setDaysEaten(id, item.daysEaten + 1);
             showRateRecipeModal(item.recipeId);
           }}
+          onRecipeDelete={(id) => deletePlannedItem(id)}
         />
       );
     }
@@ -325,7 +325,6 @@ export default function MealPlanner() {
                   days={item.days}
                   daysEaten={item.daysEaten}
                   setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                  onDeleteDate={(id) => deletePlannedItem(id)}
                   onUpdateDate={(id, newDate, newDays) =>
                     updatePlannedItemDate(id, newDate, newDays)
                   }
@@ -333,6 +332,7 @@ export default function MealPlanner() {
                     setDaysEaten(id, item.daysEaten + 1);
                     showRateRecipeModal(item.recipeId);
                   }}
+                  onRecipeDelete={deletePlannedItem}
                 />
               </div>
             ))}

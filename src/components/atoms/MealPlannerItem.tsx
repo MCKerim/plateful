@@ -5,6 +5,15 @@ import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useEffect, useState } from "react";
 import { useSupabase } from "@/utils/supabase";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from "../ui/drawer";
+import { MoreVertical, Trash2 } from "lucide-react";
+import DeleteDialog from "./DeleteDialog";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   id: number;
@@ -14,19 +23,22 @@ type Props = {
   days: number;
   daysEaten: number;
   setDaysEaten: (days: number) => void;
-  onDeleteDate: (id: number) => void;
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
   onRecipeEaten: (id: number) => void;
+  onRecipeDelete: (id: number) => void;
 };
 
 export default function MealPlannerItem({
+  id,
   recipeId,
   recipeName,
   days,
   daysEaten,
   setDaysEaten,
   onRecipeEaten,
+  onRecipeDelete,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -88,7 +100,7 @@ export default function MealPlannerItem({
       </NavLink>
 
       <Button
-        className="flex gap-2 items-center me-2.5"
+        className="flex gap-2 items-center me-1"
         variant="outline"
         onClick={eat}
       >
@@ -101,15 +113,30 @@ export default function MealPlannerItem({
             )}
           </>
         ))}
-
-        {/*<PlanDialog
-            isEdit
-            id={id}
-            initialDays={days}
-            onUpdateDate={onUpdateDate}
-            onDeleteDate={onDeleteDate}
-          />*/}
       </Button>
+
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button className="me-2.5" variant="outline">
+            <MoreVertical size={16} />
+          </Button>
+        </DrawerTrigger>
+
+        <DrawerContent>
+          <DrawerFooter className="gap-2 mb-8 mt-4">
+            <DeleteDialog
+              onDelete={() => onRecipeDelete(id)}
+              customTrigger={
+                <Button className="w-full" variant="destructive">
+                  <Trash2 size={16} />
+
+                  {t("common.delete")}
+                </Button>
+              }
+            />
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Card>
   );
 }
