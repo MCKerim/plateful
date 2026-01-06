@@ -4,7 +4,7 @@ import LanguageDetector from "i18next-browser-languagedetector";
 import enTranslation from "./locales/translation.en.json";
 import deTranslation from "./locales/translation.de.json";
 
-const isDev = import.meta.env.DEV
+const isDev = import.meta.env.DEV;
 
 i18n
   // detect user language
@@ -28,6 +28,6 @@ i18n
     interpolation: {
       escapeValue: false, // react already does escaping
     },
-  })
+  });
 
 export default i18n;

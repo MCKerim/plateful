@@ -79,6 +79,22 @@ export default function Settings() {
     setIsUsernameDialogOpen(false);
   };
 
+  async function updateLanguage(language: string) {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from("users")
+      .update({ language })
+      .eq("id", user.id);
+
+    if (error) {
+      console.error("Error updating language:", error);
+      return;
+    }
+
+    i18n.changeLanguage(language);
+  }
+
   return (
     <Layout>
       <h1 className="second-font text-2xl">{t("settings.title")}</h1>
@@ -91,7 +107,7 @@ export default function Settings() {
             <Button
               className="w-full"
               variant={i18n.language === "en" ? "default" : "secondary"}
-              onClick={() => i18n.changeLanguage("en")}
+              onClick={() => updateLanguage("en")}
             >
               English
             </Button>
@@ -99,7 +115,7 @@ export default function Settings() {
             <Button
               className="w-full"
               variant={i18n.language === "de" ? "default" : "secondary"}
-              onClick={() => i18n.changeLanguage("de")}
+              onClick={() => updateLanguage("de")}
             >
               Deutsch
             </Button>
@@ -207,9 +223,7 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">Info</h2>
 
-          <p className="text-sm">
-            v0.0.10 - Beta
-          </p>
+          <p className="text-sm">v0.0.10 - Beta</p>
 
           <div className="flex gap-2">
             <NavLink to="/privacy" className="w-full">
@@ -228,9 +242,7 @@ export default function Settings() {
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <div className="flex justify-between items-center border-b">
-            <h2 className="font-medium">
-              {t("settings.account")}
-            </h2>
+            <h2 className="font-medium">{t("settings.account")}</h2>
 
             <Button
               variant="ghost"

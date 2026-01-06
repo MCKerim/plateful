@@ -314,6 +314,7 @@
         "text": "Create a budget-friendly recipe"
       }
     },
+    "previewRecipe": "Preview recipe",
     "saveRecipe": "Save recipe",
     "saveRecipeError": "Error saving recipe. Please try again later.",
     "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
@@ -331,6 +332,7 @@
   "rating": {
     "rate": "Rate  this recipe",
     "title": "How did you like it?",
+    "editTitle": "Edit your rating",
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
     "submit": "Save"

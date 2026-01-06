@@ -6,23 +6,48 @@ import { useTranslation } from "react-i18next";
 import { ImagePicker } from "@/components/atoms/ImagePicker";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useSupabase } from "@/utils/supabase";
+import { useNavigate } from "react-router";
+import LoadingDots from "@/components/atoms/LoadingDots";
+import RecipeCard from "@/components/atoms/RecipeCard";
+import imageCompression from "browser-image-compression";
 
 export default function ImageImport() {
   const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { supabase } = useSupabase();
+  const [isSaving, setIsSaving] = useState(false);
+  const [data, setData] = useState<any>(null);
   const [images, setImages] = useState<
     { file: File; preview: string; base64: string }[]
   >([]);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
-  const handleImageSelected = (file: File | undefined, previewUrl: string) => {
+  const handleImageSelected = async (
+    file: File | undefined,
+    previewUrl: string
+  ) => {
     if (file && previewUrl) {
+      setIsLoadingImage(true);
+      const compressedFile = await imageCompression(file, {
+        maxWidthOrHeight: 900, // Good for recipe images
+        maxSizeMB: 0.5, // Target max file size (MB)
+        useWebWorker: true,
+        initialQuality: 0.85,
+      });
+
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
           const base64 = reader.result.toString();
-          setImages((prev) => [...prev, { file, preview: previewUrl, base64 }]);
+          setImages((prev) => [
+            ...prev,
+            { file: compressedFile, preview: previewUrl, base64 },
+          ]);
+          setIsLoadingImage(false);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };
 
@@ -30,12 +55,67 @@ export default function ImageImport() {
     setImages((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleStartImport = () => {
-    toast.error("Image import will work soon", {
-      position: "top-right",
-      richColors: true,
-    });
-  };
+  async function handleStartImport() {
+    if (images.length === 0) {
+      toast.error(t("imageImport.errors.noImages"), {
+        position: "top-right",
+        richColors: true,
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke(
+        "recipe-from-image",
+        {
+          body: {
+            images: images.map((img) => img.base64),
+          },
+        }
+      );
+
+      if (error) {
+        console.error("Edge function returned error:", error);
+        toast.error(t("urlImport.errors.importFailed"), {
+          position: "top-right",
+          richColors: true,
+        });
+      } else {
+        console.log("recipe-from-image response:", data);
+        setData(data[0]);
+        toast.success(t("urlImport.success"), {
+          position: "top-right",
+          richColors: true,
+          action: {
+            label: t("urlImport.viewRecipe"),
+            onClick: () => {
+              navigate(`/recipe/${data[0].id}`);
+            },
+          },
+        });
+      }
+    } catch (err: unknown) {
+      console.error("Unexpected error calling recipe-from-image:", err);
+      toast.error(t("urlImport.errors.importFailed"), {
+        position: "top-right",
+        richColors: true,
+      });
+
+      try {
+        const anyErr = err as any;
+        if (anyErr?.response && typeof anyErr.response.text === "function") {
+          const text = await anyErr.response.text();
+          console.error("Edge function returned (raw text):", text);
+        }
+      } catch (error_) {
+        console.debug("Could not retrieve raw response from error.", error_);
+      }
+    } finally {
+      setIsSaving(false);
+    }
+  }
 
   const saveFooter = (
     <>
@@ -46,6 +126,7 @@ export default function ImageImport() {
           className="w-full"
           variant="accent"
           onClick={() => handleStartImport()}
+          disabled={isSaving || data !== null}
         >
           {t("imageImport.importButton")}
         </Button>
@@ -55,40 +136,83 @@ export default function ImageImport() {
 
   return (
     <Layout showHeader={false} footer={saveFooter}>
-      <div className="flex justify-between w-full items-center mb-4">
+      <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold first-font">
           {t("imageImport.title")}
         </h1>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        {images.map((image, index) => (
-          <div key={index} className="relative">
-            <AspectRatio ratio={16 / 9}>
-              <img
-                src={image.preview}
-                alt={`Uploaded ${index}`}
-                className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted-foreground"
-              />
-            </AspectRatio>
+      {!isSaving && !data && (
+        <>
+          <div className="grid grid-cols-2 gap-4">
+            {images.map((image, index) => (
+              <div key={index} className="relative">
+                <AspectRatio ratio={16 / 9}>
+                  <img
+                    src={image.preview}
+                    alt={`Uploaded ${index}`}
+                    className="object-cover w-full h-full rounded-md outline-dashed outline-2 outline-muted-foreground"
+                  />
+                </AspectRatio>
 
-            <button
-              onClick={() => handleRemoveImage(index)}
-              className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-              aria-label="Delete image"
-            >
-              <Trash2 size={16} />
-            </button>
+                <button
+                  onClick={() => handleRemoveImage(index)}
+                  className="absolute top-2 right-2 bg-red-600 text-white rounded-full p-2 shadow-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                  aria-label="Delete image"
+                >
+                  <Trash2 size={16} />
+                </button>
+              </div>
+            ))}
+
+            {isLoadingImage && (
+              <div className="flex items-center justify-center rounded-md outline-dashed outline-2 outline-muted-foreground">
+                <AspectRatio ratio={16 / 9}>
+                  <div className="flex items-center justify-center w-full h-full">
+                    <LoadingDots />
+                  </div>
+                </AspectRatio>
+              </div>
+            )}
           </div>
-        ))}
-      </div>
 
-      <div className="mt-4">
-        <ImagePicker
-          onImageSelected={handleImageSelected}
-          onDeleteImage={() => {}}
-          uploading={false}
-        />
+          <div className="mt-4">
+            <ImagePicker
+              onImageSelected={handleImageSelected}
+              onDeleteImage={() => {}}
+              uploading={false}
+            />
+          </div>
+        </>
+      )}
+
+      <div className="flex items-center flex-1">
+        {isSaving && (
+          <div className="flex flex-col items-center justify-center w-full gap-8">
+            <LoadingDots />
+
+            <p className="second-font text-center">
+              {t("urlImport.importingMessage")}
+              <br />
+              {t("urlImport.importingDescription")}
+            </p>
+          </div>
+        )}
+
+        {data && (
+          <div className="flex flex-col w-full gap-4">
+            <h2 className="text-lg font-bold second-font">
+              {t("urlImport.importedRecipe")}
+            </h2>
+
+            <RecipeCard
+              key={data.id}
+              id={data.id}
+              name={data.name}
+              averageRating={null}
+            />
+          </div>
+        )}
       </div>
     </Layout>
   );

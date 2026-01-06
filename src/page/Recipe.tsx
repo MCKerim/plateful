@@ -4,27 +4,28 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
   RecipeRatingWithUser,
+  RatingModalRef,
 } from "@/components/atoms/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
-import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { selectUser } from "@/redux/slices/userSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
-import { formatDate as dateFnsFormatDate } from "date-fns";
-import { de } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
 import { toast } from "sonner";
+import { RatingService } from "@/lib/services/ratingService";
+import RatingListItem from "@/components/atoms/RatingListItem";
 
 type RecipeItem = {
   id: number;
@@ -34,11 +35,14 @@ type RecipeItem = {
 
 export default function Recipe() {
   const { supabase } = useSupabase();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
 
   const householdId = useAppSelector(selectHouseholdId);
+  const currentUser = useAppSelector(selectUser);
+
+  const ratingService = new RatingService(supabase);
 
   const [recipe, setRecipe] = useState<Recipes | null>(null);
   const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
@@ -46,8 +50,9 @@ export default function Recipe() {
   const [averageRating, setAverageRating] = useState<number | null>(null);
 
   const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
-
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+
+  const ratingModalRef = useRef<RatingModalRef>(null);
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -68,25 +73,15 @@ export default function Recipe() {
     if (!params.recipeId) return;
     const recipeId = Number.parseInt(params.recipeId);
 
-    supabase
-      .from("recipe_ratings")
-      .select("*, users(created_at, email, username)")
-      .eq("recipe_id", recipeId)
-      .order("created_at", { ascending: false })
-      .then((response) => {
-        if (response.data) {
-          setRatings(response.data);
-
-          const totalStars = response.data.reduce(
-            (acc, rating) => acc + rating.stars,
-            0
-          );
-
-          const avgStars =
-            response.data.length > 0 ? totalStars / response.data.length : null;
-
-          setAverageRating(avgStars);
-        }
+    ratingService
+      .getRatingsByRecipeId(recipeId)
+      .then((data) => {
+        setRatings(data);
+        const avgRating = RatingService.calculateAverage(data);
+        setAverageRating(avgRating);
+      })
+      .catch((error) => {
+        console.error("Failed to load ratings:", error);
       });
   }, [params.recipeId]);
 
@@ -255,13 +250,54 @@ export default function Recipe() {
     }
   }
 
-  const formatDateByLocale = (date: string | Date) => {
-    const dateObj = typeof date === "string" ? new Date(date) : date;
-    return dateFnsFormatDate(
-      dateObj,
-      i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
-      { locale: i18n.language === "de" ? de : undefined }
-    );
+  async function handleDeleteRating(ratingId: number) {
+    // Optimistically update UI
+    const previousRatings = ratings;
+    setRatings((prevRatings) => {
+      const updatedRatings = prevRatings.filter((r) => r.id !== ratingId);
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
+      return updatedRatings;
+    });
+
+    try {
+      await ratingService.deleteRating(ratingId);
+    } catch (error) {
+      // Revert on error
+      console.error("Failed to delete rating:", error);
+      alert(t("rating.deleteError"));
+      setRatings(previousRatings);
+      const avgRating = RatingService.calculateAverage(previousRatings);
+      setAverageRating(avgRating);
+    }
+  }
+
+  function handleEditRating(rating: RecipeRatingWithUser) {
+    ratingModalRef.current?.open(rating);
+  }
+
+  function handleRatingSubmitted(newRating: RecipeRatingWithUser) {
+    setRatings((prevRatings) => {
+      const updatedRatings = [newRating, ...prevRatings];
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
+      return updatedRatings;
+    });
+  }
+
+  function handleRatingUpdated(updatedRating: RecipeRatingWithUser) {
+    setRatings((prevRatings) => {
+      const updatedRatings = prevRatings.map((r) =>
+        r.id === updatedRating.id ? updatedRating : r
+      );
+      const avgRating = RatingService.calculateAverage(updatedRatings);
+      setAverageRating(avgRating);
+      return updatedRatings;
+    });
+  }
+
+  const canModifyRating = (rating: RecipeRatingWithUser): boolean => {
+    return (currentUser && rating.owner_id === currentUser.id) || false;
   };
 
   const saveFooter = (
@@ -274,7 +310,6 @@ export default function Recipe() {
           className={buttonVariants({ variant: "secondary" }) + " w-full"}
         >
           <Pencil />
-
           {t("recipe.editRecipe")}
         </NavLink>
 
@@ -294,7 +329,6 @@ export default function Recipe() {
           />
         </AspectRatio>
       ) : (
-        // if multiple images, turn on looping, image counter and arrows
         <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
           <AspectRatio ratio={16 / 9}>
             {imageUrls.map((item, index) => (
@@ -347,13 +381,11 @@ export default function Recipe() {
       <div className="flex justify-between">
         <div className="flex items-center gap-1">
           <CalendarDays size={16} />
-
           <p className="text-sm">{getMealPlanStatus(lastMealPlan, t)}</p>
         </div>
 
         <div className="flex items-center gap-0.5">
           <p className="text-sm">{formatRating(averageRating)}</p>
-
           <StarIcon style={{ fontSize: "16px" }} />
         </div>
       </div>
@@ -361,7 +393,6 @@ export default function Recipe() {
       {recipe?.link && (
         <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
           <Link />
-
           {t("recipe.toTheRecipe")}
         </NavLink>
       )}
@@ -377,26 +408,10 @@ export default function Recipe() {
         <Separator className="mb-2 mt-4" />
 
         <RatingModal
+          ref={ratingModalRef}
           recipeId={recipe?.id}
-          ratingSubmittedCallback={(newRating) => {
-            setRatings((prevRatings) => {
-              const updatedRatings = [newRating, ...prevRatings];
-
-              const totalStars = updatedRatings.reduce(
-                (acc, rating) => acc + rating.stars,
-                0
-              );
-
-              const avgStars =
-                updatedRatings.length > 0
-                  ? totalStars / updatedRatings.length
-                  : null;
-
-              setAverageRating(avgStars);
-
-              return updatedRatings;
-            });
-          }}
+          ratingSubmittedCallback={handleRatingSubmitted}
+          ratingUpdatedCallback={handleRatingUpdated}
         />
 
         <h2 className="first-font text-xl font-bold mb-1">
@@ -405,33 +420,15 @@ export default function Recipe() {
 
         {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
 
-        {ratings.map((rating) => {
-          return (
-            <div className="mb-6" key={rating.id}>
-              <div className="flex justify-between items-center">
-                <p className="font-semibold second-font">
-                  {rating.users.username}
-                </p>
-
-                <p className="text-sm text-muted-foreground">
-                  {formatDateByLocale(rating.created_at)}
-                </p>
-              </div>
-
-              <div>
-                {Array.from({ length: 5 }, (_, index) => {
-                  return index < rating.stars ? (
-                    <StarIcon style={{ fontSize: "16px" }} />
-                  ) : (
-                    <StarBorderIcon style={{ fontSize: "16px" }} />
-                  );
-                })}
-              </div>
-
-              <p className="text-wrap break-words">{rating.note}</p>
-            </div>
-          );
-        })}
+        {ratings.map((rating) => (
+          <RatingListItem
+            key={rating.id}
+            canModify={canModifyRating(rating)}
+            rating={rating}
+            handleEditRating={handleEditRating}
+            handleDeleteRating={handleDeleteRating}
+          />
+        ))}
       </div>
     </Layout>
   );
