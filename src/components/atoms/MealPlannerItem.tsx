@@ -1,4 +1,4 @@
-import { NavLink } from "react-router";
+import { useNavigate } from "react-router";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
@@ -46,6 +46,7 @@ export default function MealPlannerItem({
   isDragging = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
@@ -109,18 +110,22 @@ export default function MealPlannerItem({
       {...listeners}
       {...attributes}
     >
-      <img
-        src={imageUrl || "/no-img.jpg"}
-        alt="Recipe"
-        className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
-      />
-
-      <NavLink
-        className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3 pointer-events-auto"
-        to={`/recipe/${recipeId}`}
+      <button
+        onClick={() => {
+          navigate(`/recipe/${recipeId}`);
+        }}
+        className="text-left flex h-full flex-1 items-center min-w-0"
       >
-        {recipeName}
-      </NavLink>
+        <img
+          src={imageUrl || "/no-img.jpg"}
+          alt="Recipe"
+          className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
+        />
+
+        <p className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3 min-w-0">
+          {recipeName}
+        </p>
+      </button>
 
       <Button
         className="flex gap-2 items-center me-1 pointer-events-auto"
@@ -155,7 +160,6 @@ export default function MealPlannerItem({
                 disabled={date === null}
               >
                 <CalendarOff size={20} />
-
                 {t("mealPlannerItem.removeDate")}
               </Button>
             </DrawerClose>
@@ -165,7 +169,6 @@ export default function MealPlannerItem({
               customTrigger={
                 <Button className="w-full" variant="destructive">
                   <Trash2 size={16} />
-
                   {t("mealPlannerItem.remove")}
                 </Button>
               }
