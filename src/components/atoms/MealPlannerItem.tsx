@@ -26,6 +26,8 @@ type Props = {
   onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
   onRecipeEaten: (id: number) => void;
   onRecipeDelete: (id: number) => void;
+  onDragStart?: () => void;
+  onDragEnd?: () => void;
 };
 
 export default function MealPlannerItem({
@@ -37,10 +39,13 @@ export default function MealPlannerItem({
   setDaysEaten,
   onRecipeEaten,
   onRecipeDelete,
+  onDragStart,
+  onDragEnd,
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     async function fetchImage() {
@@ -84,17 +89,38 @@ export default function MealPlannerItem({
     }
   }
 
+  function handleDragStart(e: React.DragEvent) {
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = "move";
+
+    onDragStart?.();
+  }
+
+  function handleDragEnd(e: React.DragEvent) {
+    setIsDragging(false);
+    onDragEnd?.();
+  }
+
   return (
-    <Card className="h-[90px] flex items-center">
+    <Card
+      className={`h-[90px] flex items-center cursor-move transition-opacity ${
+        isDragging ? "opacity-50" : ""
+      }`}
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <img
         src={imageUrl || "/no-img.jpg"}
         alt="Spaghetti"
         className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75"
+        draggable={false}
       />
 
       <NavLink
         className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3"
         to={`/recipe/${recipeId}`}
+        draggable={false}
       >
         {recipeName}
       </NavLink>

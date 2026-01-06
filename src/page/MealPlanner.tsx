@@ -39,6 +39,8 @@ export default function MealPlanner() {
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [draggedItemId, setDraggedItemId] = useState<number | null>(null);
+  const [dropTargetDate, setDropTargetDate] = useState<Date | null>(null);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -82,10 +84,6 @@ export default function MealPlanner() {
       };
       newItems.push(newItem);
     });
-
-    //const twoDaysAgo = new Date();
-    //twoDaysAgo.setDate(twoDaysAgo.getDate() - 3);
-    //.filter((item) => item.date >= twoDaysAgo)
 
     setPlannedItems(newItems);
     setLoading(false);
@@ -164,6 +162,42 @@ export default function MealPlanner() {
     );
   }
 
+  // Drag and Drop Handlers
+  function handleDragStart(itemId: number) {
+    setDraggedItemId(itemId);
+    console.log("Drag started for item:", itemId);
+  }
+
+  function handleDragOver(e: React.DragEvent, targetDate: Date) {
+    e.preventDefault();
+    setDropTargetDate(targetDate);
+  }
+
+  function handleDragLeave() {
+    setDropTargetDate(null);
+  }
+
+  function handleDrop(e: React.DragEvent, targetDate: Date) {
+    e.preventDefault();
+    setDropTargetDate(null);
+
+    if (draggedItemId === null) return;
+
+    const draggedItem = plannedItems.find((item) => item.id === draggedItemId);
+    if (!draggedItem) return;
+
+    console.log("Dropped item:", draggedItem.recipeName);
+    console.log("Target date:", format(targetDate, "EEE - dd.MM.yyyy"));
+
+    updatePlannedItemDate(draggedItemId, targetDate, draggedItem.days);
+    setDraggedItemId(null);
+  }
+
+  function handleDragEnd() {
+    setDraggedItemId(null);
+    setDropTargetDate(null);
+  }
+
   function renderCorrectItem(plannedDate: Date) {
     const item = getMealPlannerItemByPlannedDate(plannedDate);
 
@@ -185,6 +219,8 @@ export default function MealPlanner() {
             showRateRecipeModal(item.recipeId);
           }}
           onRecipeDelete={(id) => deletePlannedItem(id)}
+          onDragStart={() => handleDragStart(item.id)}
+          onDragEnd={handleDragEnd}
         />
       );
     }
@@ -247,45 +283,19 @@ export default function MealPlanner() {
         </Button>
       </div>
 
-      {/*<Accordion
-        type="single"
-        defaultValue="item-1"
-        collapsible
-        className="sticky bg-background top-24"
-      >
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            <div className="flex items-center gap-1">Gemerkt</div>
-          </AccordionTrigger>
-
-          <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
-            {getNotPlannedItems().map((item) => (
-              <div key={item.id} className="min-w-[400px]">
-                <MealPlannerItem
-                  id={item.id}
-                  recipeId={item.recipeId}
-                  recipeName={item.recipeName}
-                  date={item.planned_date}
-                  days={item.days}
-                  daysEaten={item.daysEaten}
-                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                  onDeleteDate={(id) => deletePlannedItem(id)}
-                  onUpdateDate={(id, newDate, newDays) =>
-                    updatePlannedItemDate(id, newDate, newDays)
-                  }
-                  onRecipeEaten={(id) => {
-                    setDaysEaten(id, item.daysEaten + 1);
-                  }}
-                />
-              </div>
-            ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>*/}
-
       <div className="flex flex-col gap-2.5 mb-32">
         {getWeekdays(currentWeek).map((day) => (
-          <div key={format(day, "EEE - dd.MM")}>
+          <div
+            key={format(day, "EEE - dd.MM")}
+            onDragOver={(e) => handleDragOver(e, day)}
+            onDragLeave={handleDragLeave}
+            onDrop={(e) => handleDrop(e, day)}
+            className={`transition-colors ${
+              dropTargetDate && isSameDay(dropTargetDate, day)
+                ? "bg-accent rounded-lg"
+                : ""
+            }`}
+          >
             <p
               className={
                 "px-2 mb-1 font-semibold rounded-full w-fit " +
@@ -333,6 +343,8 @@ export default function MealPlanner() {
                     showRateRecipeModal(item.recipeId);
                   }}
                   onRecipeDelete={deletePlannedItem}
+                  onDragStart={() => handleDragStart(item.id)}
+                  onDragEnd={handleDragEnd}
                 />
               </div>
             ))}
