@@ -34,7 +34,7 @@ import {
 } from "@dnd-kit/core";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
-import { enUS, es, fr, de } from 'date-fns/locale'; 
+import { enUS, es, fr, de } from "date-fns/locale";
 
 type MealPlannerItem = {
   id: number;
@@ -49,7 +49,7 @@ const locales = {
   en: enUS,
   es: es,
   fr: fr,
-  de: de
+  de: de,
 };
 
 export default function MealPlanner() {
@@ -326,7 +326,10 @@ export default function MealPlanner() {
                     (isToday(day) ? "bg-accent " : "")
                   }
                 >
-                  {format(day, "EEE - dd.MM", { locale: locales[i18n.language as keyof typeof locales] || enUS })}
+                  {format(day, "EEE - dd.MM", {
+                    locale:
+                      locales[i18n.language as keyof typeof locales] || enUS,
+                  })}
                 </p>
 
                 {renderCorrectItem(day)}
@@ -351,7 +354,7 @@ export default function MealPlanner() {
 
             <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
               {getNotPlannedItems().map((item) => (
-                <div key={item.id} className="min-w-[400px]">
+                <div key={item.id} className="w-[400px]">
                   <MealPlannerItem
                     key={item.id}
                     id={item.id}

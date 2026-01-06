@@ -225,18 +225,28 @@ export default function Recipe() {
   async function finishPlanning(dates: Date[]) {
     if (!recipe || !householdId) return;
 
-    let success;
+    let isSuccess = false;
+
     if (dates.length === 0) {
-      success = (await planRecipe(recipe.id, householdId, null, 1, supabase))
-        .success;
+      const result = await planRecipe(
+        recipe.id,
+        householdId,
+        null,
+        1,
+        supabase
+      );
+      isSuccess = result?.success;
     } else {
-      dates.forEach(async (date) => {
-        success = (await planRecipe(recipe.id, householdId, date, 1, supabase))
-          .success;
-      });
+      const planningPromises = dates.map((date) =>
+        planRecipe(recipe.id, householdId, date, 1, supabase)
+      );
+
+      const results = await Promise.all(planningPromises);
+
+      isSuccess = results.every((res) => res?.success);
     }
 
-    if (success) {
+    if (isSuccess) {
       toast.success(t("recipe.planningSuccessful"), {
         position: "top-right",
         richColors: true,
