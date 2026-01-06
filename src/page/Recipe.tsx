@@ -24,6 +24,7 @@ import { de } from "date-fns/locale";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
+import { toast } from "sonner";
 
 type RecipeItem = {
   id: number;
@@ -229,24 +230,29 @@ export default function Recipe() {
   async function finishPlanning(dates: Date[]) {
     if (!recipe || !householdId) return;
 
+    let success;
     if (dates.length === 0) {
-      const result = await planRecipe(recipe.id, householdId, null, 1, supabase);
-
-      if (!result.success) {
-        alert("Error planning recipe");
-      }
-      return;
+      success = (await planRecipe(recipe.id, householdId, null, 1, supabase))
+        .success;
+    } else {
+      dates.forEach(async (date) => {
+        success = (await planRecipe(recipe.id, householdId, date, 1, supabase))
+          .success;
+      });
     }
 
-    dates.forEach(async (date) => {
-      const result = await planRecipe(recipe.id, householdId, date, 1, supabase);
-
-      if (result.success) {
-        navigate("/planner");
-      } else {
-        alert("Error planning recipe");
-      }
-    });
+    if (success) {
+      toast.success(t("recipe.planningSuccessful"), {
+        position: "top-right",
+        richColors: true,
+      });
+      navigate("/planner");
+    } else {
+      toast.error(t("recipe.planningFailed"), {
+        position: "top-right",
+        richColors: true,
+      });
+    }
   }
 
   const formatDateByLocale = (date: string | Date) => {
