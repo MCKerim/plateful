@@ -213,7 +213,7 @@ export default function Recipe() {
       if (!params.recipeId) return;
       const recipeId = Number.parseInt(params.recipeId);
 
-      const result = await getMealPlanningInfo(recipeId);
+      const result = await getMealPlanningInfo(recipeId, supabase);
 
       if (result.error) {
         console.error("Error fetching meal planning info:", result.error);
@@ -230,7 +230,7 @@ export default function Recipe() {
     if (!recipe || !householdId) return;
 
     if (dates.length === 0) {
-      const result = await planRecipe(recipe.id, householdId, null, 1);
+      const result = await planRecipe(recipe.id, householdId, null, 1, supabase);
 
       if (!result.success) {
         alert("Error planning recipe");
@@ -239,7 +239,7 @@ export default function Recipe() {
     }
 
     dates.forEach(async (date) => {
-      const result = await planRecipe(recipe.id, householdId, date, 1);
+      const result = await planRecipe(recipe.id, householdId, date, 1, supabase);
 
       if (result.success) {
         navigate("/planner");

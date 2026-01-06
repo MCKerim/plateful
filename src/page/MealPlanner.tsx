@@ -181,6 +181,7 @@ export default function MealPlanner() {
           }
           onRecipeEaten={(id) => {
             setDaysEaten(id, item.daysEaten + 1);
+            showRateRecipeModal(item.recipeId);
           }}
         />
       );
@@ -190,7 +191,7 @@ export default function MealPlanner() {
 
   function getNotPlannedItems() {
     return plannedItems.filter((item) => {
-      return item.planned_date === null;
+      return item.planned_date === null && item.daysEaten < item.days;
     });
   }
 
@@ -327,6 +328,7 @@ export default function MealPlanner() {
                   }
                   onRecipeEaten={(id) => {
                     setDaysEaten(id, item.daysEaten + 1);
+                    showRateRecipeModal(item.recipeId);
                   }}
                 />
               </div>
