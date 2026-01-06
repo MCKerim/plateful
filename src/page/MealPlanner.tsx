@@ -196,10 +196,14 @@ export default function MealPlanner() {
     setCurrentWeek(new Date());
   }
 
-  function getMealPlannerItemByPlannedDate(plannedDate: Date) {
-    return plannedItems.find(
-      (item) => item.planned_date && isSameDay(item.planned_date, plannedDate)
-    );
+  function getMealPlannerItemsByPlannedDate(
+    plannedDate: Date
+  ): MealPlannerItem[] {
+    return plannedItems.filter((item) => {
+      return (
+        item.planned_date !== null && isSameDay(item.planned_date, plannedDate)
+      );
+    });
   }
 
   function handleDragStart(event: DragStartEvent) {
@@ -229,26 +233,31 @@ export default function MealPlanner() {
   }
 
   function renderCorrectItem(plannedDate: Date) {
-    const item = getMealPlannerItemByPlannedDate(plannedDate);
+    const items = getMealPlannerItemsByPlannedDate(plannedDate);
 
-    if (item) {
+    if (items.length > 0) {
       return (
-        <MealPlannerItem
-          id={item.id}
-          recipeId={item.recipeId}
-          recipeName={item.recipeName}
-          date={item.planned_date}
-          days={item.days}
-          daysEaten={item.daysEaten}
-          setDaysEaten={(days) => setDaysEaten(item.id, days)}
-          onRecipeEaten={(id) => {
-            setDaysEaten(id, item.daysEaten + 1);
-            showRateRecipeModal(item.recipeId);
-          }}
-          onRecipeDelete={(id) => deletePlannedItem(id)}
-          onUpdateToNoDate={(id) => updatePlannedItemDate(id, null, 1)}
-          isDragging={activeItemId === item.id}
-        />
+        <ul className="flex flex-col gap-2">
+          {items.map((item) => (
+            <MealPlannerItem
+              key={item.id}
+              id={item.id}
+              recipeId={item.recipeId}
+              recipeName={item.recipeName}
+              date={item.planned_date}
+              days={item.days}
+              daysEaten={item.daysEaten}
+              setDaysEaten={(days) => setDaysEaten(item.id, days)}
+              onRecipeEaten={(id) => {
+                setDaysEaten(id, item.daysEaten + 1);
+                showRateRecipeModal(item.recipeId);
+              }}
+              onRecipeDelete={(id) => deletePlannedItem(id)}
+              onUpdateToNoDate={(id) => updatePlannedItemDate(id, null, 1)}
+              isDragging={activeItemId === item.id}
+            />
+          ))}
+        </ul>
       );
     }
 
