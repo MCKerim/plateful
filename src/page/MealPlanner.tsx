@@ -58,7 +58,6 @@ export default function MealPlanner() {
   const navigate = useNavigate();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [activeItemId, setActiveItemId] = useState<number | null>(null);
 
@@ -85,8 +84,6 @@ export default function MealPlanner() {
   }, []);
 
   async function getMealPlannerItems() {
-    setLoading(true);
-
     const { data } = await supabase
       .from("meal_planning")
       .select(
@@ -104,7 +101,6 @@ export default function MealPlanner() {
 
     if (!data) {
       setPlannedItems(newItems);
-      setLoading(false);
       return;
     }
 
@@ -121,7 +117,6 @@ export default function MealPlanner() {
     });
 
     setPlannedItems(newItems);
-    setLoading(false);
   }
 
   async function deletePlannedItem(id: number) {
@@ -328,7 +323,7 @@ export default function MealPlanner() {
           {getWeekdays(currentWeek).map((day) => {
             const dayStr = day.toISOString();
             return (
-              <DroppableDay key={dayStr} id={dayStr} date={day}>
+              <DroppableDay key={dayStr} id={dayStr}>
                 <p
                   className={
                     "px-2 mb-1 font-semibold rounded-full w-fit " +
@@ -395,11 +390,9 @@ export default function MealPlanner() {
 
 function DroppableDay({
   id,
-  date,
   children,
 }: Readonly<{
   id: string;
-  date: Date;
   children: React.ReactNode;
 }>) {
   const { isOver, setNodeRef } = useDroppable({

@@ -92,13 +92,9 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
       </DialogTrigger>
 
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Für wann möchtest du das Rezept planen?</DialogTitle>
-        </DialogHeader>
-
         <DialogDescription className="flex flex-col gap-2">
           {/* Week Navigation */}
-          <div className="sticky flex items-center justify-between px-2 pb-2 bg-background">
+          <div className="sticky flex items-center justify-between px-2 pb-2 h-[68px] pt-4 bg-background">
             <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
               <ChevronLeft size={20} />
             </Button>
@@ -126,10 +122,6 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
                 >
                   Zur aktuellen Woche
                 </Button>
-              )}
-
-              {isSameWeek(currentWeek, new Date()) && (
-                <div className="h-[16px]"></div>
               )}
             </div>
 
@@ -166,7 +158,7 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
           </Button>
 
           <Button className="mt-4" onClick={handleFinish}>
-            Fertig
+            {t("common.save")}
           </Button>
         </DialogDescription>
       </DialogContent>
