@@ -104,17 +104,17 @@ export default function MealPlannerItem({
     <Card
       ref={setNodeRef}
       style={style}
-      className={`h-[90px] flex items-center touch-none transition-opacity ${
+      className={`h-[90px] flex items-center transition-opacity ${
         isDragging ? "opacity-30" : ""
       }`}
+      {...listeners}
+      {...attributes}
     >
       <button
         onClick={() => {
           navigate(`/recipe/${recipeId}`);
         }}
         className="text-left flex h-full flex-1 items-center min-w-0"
-        {...listeners}
-        {...attributes}
       >
         <img
           src={imageUrl || "/no-img.jpg"}
