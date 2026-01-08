@@ -111,7 +111,10 @@ export default function Chatbot() {
         parts.push({ type: "input_text", text: inputValue.trim() });
       }
       for (const url of userMessage.images || []) {
-        parts.push({ type: "input_image", image_url: `data:image/jpeg;base64,${url}` });
+        parts.push({
+          type: "input_image",
+          image_url: `data:image/jpeg;base64,${url}`,
+        });
       }
 
       // Call the Supabase edge function
@@ -307,9 +310,7 @@ export default function Chatbot() {
               >
                 {message.role === "user" && (
                   <>
-                    <p className="text-sm">
-                      {message.content}
-                    </p>
+                    <p className="text-sm">{message.content}</p>
 
                     {/* optional images if present */}
                     {"images" in message &&
@@ -344,15 +345,21 @@ export default function Chatbot() {
                   message.toolOutputsForUI.length > 0 && (
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button
-                          variant="accent"
-                          size="sm"
-                          className="mt-2 w-full"
-                        >
-                          <span className="truncate">
+                        <div>
+                          <p className="second-font font-medium mt-2 border-t-[1px] border-dashed border-secondary-foreground pt-2 text-center">
                             {message.toolOutputsForUI[0].args.title}
-                          </span>
-                        </Button>
+                          </p>
+
+                          <Button
+                            variant="accent"
+                            size="sm"
+                            className="mt-2 w-full"
+                          >
+                            <span className="truncate">
+                              {t("chatbot.previewRecipe")}
+                            </span>
+                          </Button>
+                        </div>
                       </DialogTrigger>
 
                       <DialogContent>

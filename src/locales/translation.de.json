@@ -319,6 +319,7 @@
         "text": "Erstelle ein günstiges Rezept"
       }
     },
+    "previewRecipe": "Rezept überprüfen",
     "saveRecipe": "Rezept speichern",
     "saveRecipeError": "Fehler beim Speichern des rezepts. Bitte versuche es später erneut.",
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",

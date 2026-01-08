@@ -10,6 +10,7 @@ import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import LoadingDots from "@/components/atoms/LoadingDots";
 import RecipeCard from "@/components/atoms/RecipeCard";
+import imageCompression from "browser-image-compression";
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -20,17 +21,33 @@ export default function ImageImport() {
   const [images, setImages] = useState<
     { file: File; preview: string; base64: string }[]
   >([]);
+  const [isLoadingImage, setIsLoadingImage] = useState(false);
 
-  const handleImageSelected = (file: File | undefined, previewUrl: string) => {
+  const handleImageSelected = async (
+    file: File | undefined,
+    previewUrl: string
+  ) => {
     if (file && previewUrl) {
+      setIsLoadingImage(true);
+      const compressedFile = await imageCompression(file, {
+        maxWidthOrHeight: 900, // Good for recipe images
+        maxSizeMB: 0.5, // Target max file size (MB)
+        useWebWorker: true,
+        initialQuality: 0.85,
+      });
+
       const reader = new FileReader();
       reader.onload = () => {
         if (reader.result) {
           const base64 = reader.result.toString();
-          setImages((prev) => [...prev, { file, preview: previewUrl, base64 }]);
+          setImages((prev) => [
+            ...prev,
+            { file: compressedFile, preview: previewUrl, base64 },
+          ]);
+          setIsLoadingImage(false);
         }
       };
-      reader.readAsDataURL(file);
+      reader.readAsDataURL(compressedFile);
     }
   };
 
@@ -147,6 +164,16 @@ export default function ImageImport() {
                 </button>
               </div>
             ))}
+
+            {isLoadingImage && (
+              <div className="flex items-center justify-center rounded-md outline-dashed outline-2 outline-muted-foreground">
+                <AspectRatio ratio={16 / 9}>
+                  <div className="flex items-center justify-center w-full h-full">
+                    <LoadingDots />
+                  </div>
+                </AspectRatio>
+              </div>
+            )}
           </div>
 
           <div className="mt-4">
