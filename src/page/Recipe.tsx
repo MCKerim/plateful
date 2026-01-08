@@ -3,10 +3,10 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
+import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
 import { useEffect, useState, useRef } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
-import PlanDialog from "@/components/atoms/PlanDialog";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
@@ -22,6 +22,8 @@ import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
+import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
+import { toast } from "sonner";
 import { RatingService } from "@/lib/services/ratingService";
 import RatingListItem from "@/components/atoms/RatingListItem";
 
@@ -202,48 +204,61 @@ export default function Recipe() {
     }
   }
 
-  async function planRecipe(id: number, newDate: Date | null, newDays: number) {
-    if (!householdId) {
-      return;
-    }
-
-    const { error } = await supabase.from("meal_planning").insert({
-      recipe_id: id,
-      planned_date: newDate?.toISOString(),
-      days: newDays,
-      household_id: householdId,
-    });
-
-    if (error) {
-      console.error("Error while planning recipe: ", error);
-      alert("Error while planning recipe");
-    } else {
-      navigate("/planner");
-    }
-  }
-
   useEffect(() => {
-    async function getMealPlanningInfo() {
+    async function fetchMealPlanningInfo() {
       if (!params.recipeId) return;
       const recipeId = Number.parseInt(params.recipeId);
 
-      const { data } = await supabase
-        .from("meal_planning")
-        .select("*")
-        .eq("recipe_id", recipeId)
-        .order("created_at", { ascending: false })
-        .limit(1);
+      const result = await getMealPlanningInfo(recipeId, supabase);
 
-      if (data && data.length > 0) {
-        const latestPlan = data[0];
-        setLastMealPlan(latestPlan);
-      } else {
+      if (result.error) {
+        console.error("Error fetching meal planning info:", result.error);
         setLastMealPlan(null);
+      } else {
+        setLastMealPlan(result.data);
       }
     }
 
-    getMealPlanningInfo();
+    fetchMealPlanningInfo();
   }, [params.recipeId]);
+
+  async function finishPlanning(dates: Date[]) {
+    if (!recipe || !householdId) return;
+
+    let isSuccess = false;
+
+    if (dates.length === 0) {
+      const result = await planRecipe(
+        recipe.id,
+        householdId,
+        null,
+        1,
+        supabase
+      );
+      isSuccess = result?.success;
+    } else {
+      const planningPromises = dates.map((date) =>
+        planRecipe(recipe.id, householdId, date, 1, supabase)
+      );
+
+      const results = await Promise.all(planningPromises);
+
+      isSuccess = results.every((res) => res?.success);
+    }
+
+    if (isSuccess) {
+      toast.success(t("recipe.planningSuccessful"), {
+        position: "top-right",
+        richColors: true,
+      });
+      navigate("/planner");
+    } else {
+      toast.error(t("recipe.planningFailed"), {
+        position: "top-right",
+        richColors: true,
+      });
+    }
+  }
 
   async function handleDeleteRating(ratingId: number) {
     // Optimistically update UI
@@ -308,7 +323,7 @@ export default function Recipe() {
           {t("recipe.editRecipe")}
         </NavLink>
 
-        {recipe && <PlanDialog id={recipe?.id} onUpdateDate={planRecipe} />}
+        {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
       </div>
     </>
   );

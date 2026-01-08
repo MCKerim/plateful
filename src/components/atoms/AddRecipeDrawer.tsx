@@ -52,7 +52,7 @@ export default function AddNewRecipeDrawer({
 
   return (
     <Drawer>
-      <DrawerTrigger className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-plateful/90 active:scale-95">
+      <DrawerTrigger className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-accent/90 active:scale-95">
         <Plus size={34} />
       </DrawerTrigger>
 

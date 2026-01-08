@@ -43,6 +43,25 @@ export function toWeekday(date: Date): string {
   return prefix + dayAsWord + formattedDate;
 }
 
+// Returns an array of 1 week from Monday to Sunday (7 days total) for the week containing the given date
+export function getWeekdays(date: Date = new Date()): Date[] {
+  const weekdays = [];
+  const dayOfWeek = date.getDay();
+
+  // Calculate Monday of the week containing the given date
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - ((dayOfWeek + 6) % 7));
+
+  // Generate exactly 7 days starting from Monday
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    weekdays.push(day);
+  }
+
+  return weekdays;
+}
+
 export const formatDateByLocale = (date: string | Date) => {
   const dateObj = typeof date === "string" ? new Date(date) : date;
   return formatDate(

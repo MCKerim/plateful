@@ -179,7 +179,9 @@
     "toTheRecipe": "Zum Rezept",
     "planRecipe": "Rezept planen",
     "ratings": "Bewertungen",
-    "noRatings": "Keine Bewertungen"
+    "noRatings": "Keine Bewertungen",
+    "planningSuccessful": "Rezept erfolgreich geplant!",
+    "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut."
   },
   "addRecipeDrawer": {
     "importFromUrl": {
@@ -232,6 +234,10 @@
   },
   "explore": {
     "title": "Erkunden"
+  },
+  "mealPlannerItem": {
+    "removeDate": "Datum entfernen",
+    "remove": "Entfernen"
   },
   "settings": {
     "title": "Einstellungen",

@@ -2,37 +2,83 @@ import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import { useSupabase } from "@/utils/supabase";
-import { Separator } from "../components/ui/separator";
-import { format, addDays } from "date-fns";
-import { useTranslation } from "react-i18next";
-import { de, enUS } from "date-fns/locale";
+import {
+  format,
+  isSameDay,
+  isToday,
+  addWeeks,
+  subWeeks,
+  isSameWeek,
+} from "date-fns";
+import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
+import MealPlannerAdd from "@/components/atoms/MealPlannerAdd";
+import { getWeekdays } from "@/lib/dateHelper";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
-import Rive from "@rive-app/react-canvas";
+import { Button } from "@/components/ui/button";
+import { CalendarOff, ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router";
+import {
+  DndContext,
+  DragEndEvent,
+  DragStartEvent,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  TouchSensor,
+  useDroppable,
+} from "@dnd-kit/core";
+import { toast } from "sonner";
+import { useTranslation } from "react-i18next";
+import { enUS, es, fr, de } from "date-fns/locale";
 
 type MealPlannerItem = {
   id: number;
   recipeId: number;
   recipeName: string;
-  date: Date;
+  planned_date: Date | null;
   days: number;
   daysEaten: number;
 };
 
+const locales = {
+  en: enUS,
+  es: es,
+  fr: fr,
+  de: de,
+};
+
 export default function MealPlanner() {
-  const { supabase } = useSupabase();
   const { t, i18n } = useTranslation();
+  const { supabase } = useSupabase();
+  const navigate = useNavigate();
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [activeItemId, setActiveItemId] = useState<number | null>(null);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
+
+  // Configure sensors for better touch support
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 200,
+        tolerance: 8,
+      },
+    })
+  );
 
   useEffect(() => {
     getMealPlannerItems();
@@ -66,17 +112,13 @@ export default function MealPlanner() {
       const newItem: MealPlannerItem = {
         id: item.id,
         recipeId: item.recipes?.id ?? 1,
-        date: new Date(item.planned_date ?? ""),
+        planned_date: item.planned_date ? new Date(item.planned_date) : null,
         recipeName: item.recipes?.name ?? "no name",
         days: item.days,
         daysEaten: item.daysEaten,
       };
       newItems.push(newItem);
     });
-
-    //const twoDaysAgo = new Date();
-    //twoDaysAgo.setDate(twoDaysAgo.getDate() - 3);
-    //.filter((item) => item.date >= twoDaysAgo)
 
     setPlannedItems(newItems);
     setLoading(false);
@@ -101,42 +143,22 @@ export default function MealPlanner() {
     newDate: Date | null,
     newDays: number
   ) {
+    const plannedDate = newDate ? newDate.toISOString() : null;
     const { error } = await supabase
       .from("meal_planning")
-      .update({ planned_date: newDate?.toISOString(), days: newDays })
+      .update({ planned_date: plannedDate, days: newDays })
       .eq("id", id);
 
     if (error) {
       console.error("Error while updating planned item date: ", error);
       alert("Error while updating planned item date");
     } else {
+      toast.success(t("recipe.planningSuccessful"), {
+        position: "top-right",
+        richColors: true,
+      });
       getMealPlannerItems();
     }
-  }
-
-  function plannedDays() {
-    const sumDaysPlanned = plannedItems.reduce(
-      (accumulator, currentItem) => accumulator + currentItem.days,
-      0
-    );
-
-    const sumDaysEaten = plannedItems.reduce(
-      (accumulator, currentItem) => accumulator + currentItem.daysEaten,
-      0
-    );
-
-    return sumDaysPlanned - sumDaysEaten;
-  }
-
-  function getPlannedRangeFormatted() {
-    const currentLanguage = i18n.language;
-    const locale = currentLanguage === "de" ? de : enUS;
-
-    return `${format(new Date(), "EEEE, dd.MM", { locale })} - ${format(
-      addDays(new Date(), plannedDays()),
-      "EEEE, dd.MM",
-      { locale }
-    )}`;
   }
 
   async function setDaysEaten(id: number, newDaysEaten: number) {
@@ -162,103 +184,234 @@ export default function MealPlanner() {
     ratingModalRef.current?.open();
   }
 
-  return (
-    <Layout>
-      <RatingModal
-        showTriggerButton={false}
-        ref={ratingModalRef}
-        recipeId={recipeToRate}
-      />
+  function goToPreviousWeek() {
+    setCurrentWeek((prevWeek) => subWeeks(prevWeek, 1));
+  }
 
-      {plannedItems.filter((item) => {
-        return item.days > item.daysEaten;
-      }).length > 0 && (
-        <>
-          <p className="w-full text-center">
-            {t("dayWithCount", { count: plannedDays() })} •{" "}
-            {getPlannedRangeFormatted()}
-          </p>
+  function goToNextWeek() {
+    setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
+  }
 
-          <Separator />
-        </>
-      )}
+  function goToCurrentWeek() {
+    setCurrentWeek(new Date());
+  }
 
-      {loading && (
-        <div className="flex items-center justify-center flex-1 w-full space-x-2">
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
-          <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
-          <div className="w-2 h-2 rounded-full bg-primary animate-bounce-high"></div>
-        </div>
-      )}
+  function getMealPlannerItemsByPlannedDate(
+    plannedDate: Date
+  ): MealPlannerItem[] {
+    return plannedItems.filter((item) => {
+      return (
+        item.planned_date !== null && isSameDay(item.planned_date, plannedDate)
+      );
+    });
+  }
 
-      {!loading &&
-        plannedItems.filter((item) => {
-          return item.days > item.daysEaten;
-        }).length === 0 && (
-          <div className="flex flex-col items-center justify-center flex-1 w-full gap-2">
-            <div className="w-full h-[80px] mx-auto">
-              <Rive src="/plateful-character.riv" artboard="Sad" />
-            </div>
+  function handleDragStart(event: DragStartEvent) {
+    const { active } = event;
+    setActiveItemId(active.id as number);
+  }
 
-            <p className="flex justify-center italic font-bold">
-              {t("mealPlanner.nothingPlanned")}
-            </p>
-          </div>
-        )}
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
 
-      <div className="flex flex-col gap-2.5">
-        {plannedItems
-          .filter((item) => {
-            return item.days > item.daysEaten;
-          })
-          .map((item) => (
+    if (!over) {
+      setActiveItemId(null);
+      return;
+    }
+
+    const draggedItem = plannedItems.find((item) => item.id === active.id);
+    if (!draggedItem) {
+      setActiveItemId(null);
+      return;
+    }
+
+    const targetDateStr = over.id as string;
+    const targetDate = new Date(targetDateStr);
+
+    updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
+    setActiveItemId(null);
+  }
+
+  function renderCorrectItem(plannedDate: Date) {
+    const items = getMealPlannerItemsByPlannedDate(plannedDate);
+
+    if (items.length > 0) {
+      return (
+        <ul className="flex flex-col gap-2">
+          {items.map((item) => (
             <MealPlannerItem
               key={item.id}
               id={item.id}
               recipeId={item.recipeId}
               recipeName={item.recipeName}
-              date={item.date}
+              date={item.planned_date}
               days={item.days}
               daysEaten={item.daysEaten}
               setDaysEaten={(days) => setDaysEaten(item.id, days)}
-              onDeleteDate={deletePlannedItem}
-              onUpdateDate={updatePlannedItemDate}
-              onRecipeEaten={showRateRecipeModal}
+              onRecipeEaten={(id) => {
+                setDaysEaten(id, item.daysEaten + 1);
+                showRateRecipeModal(item.recipeId);
+              }}
+              onRecipeDelete={(id) => deletePlannedItem(id)}
+              onUpdateToNoDate={(id) => updatePlannedItemDate(id, null, 1)}
+              isDragging={activeItemId === item.id}
             />
           ))}
-      </div>
+        </ul>
+      );
+    }
 
-      <Accordion type="single" collapsible className="w-full">
-        <AccordionItem value="item-1">
-          <AccordionTrigger>
-            {t("mealPlanner.alreadyEaten")}
-          </AccordionTrigger>
+    return <MealPlannerAdd onClick={() => navigate("/cookbook")} />;
+  }
 
-          <AccordionContent className="flex flex-col gap-2.5">
-            {plannedItems
-              .filter((item) => {
-                return item.days <= item.daysEaten;
-              })
-              .reverse()
-              .slice(0, 10)
-              .map((item) => (
-                <MealPlannerItem
-                  key={item.id}
-                  id={item.id}
-                  recipeId={item.recipeId}
-                  recipeName={item.recipeName}
-                  date={item.date}
-                  days={item.days}
-                  daysEaten={item.daysEaten}
-                  setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                  onDeleteDate={deletePlannedItem}
-                  onUpdateDate={updatePlannedItemDate}
-                  onRecipeEaten={showRateRecipeModal}
-                />
+  function getNotPlannedItems() {
+    return plannedItems.filter((item) => {
+      return item.planned_date === null && item.daysEaten < item.days;
+    });
+  }
+
+  return (
+    <DndContext
+      sensors={sensors}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <Layout>
+        <RatingModal
+          showTriggerButton={false}
+          ref={ratingModalRef}
+          recipeId={recipeToRate}
+        />
+
+        {/* Week Navigation */}
+        <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11">
+          <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+            <ChevronLeft size={20} />
+          </Button>
+
+          <div className="flex flex-col items-center">
+            <h2 className="text-lg font-semibold">
+              {isSameWeek(currentWeek, new Date())
+                ? "Diese Woche"
+                : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+                ? "Nächste Woche"
+                : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                ? "Letzte Woche"
+                : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
+                    getWeekdays(currentWeek)[6],
+                    "dd.MM"
+                  )}`}
+            </h2>
+
+            {!isSameWeek(currentWeek, new Date()) && (
+              <Button
+                variant="link"
+                size="sm"
+                onClick={goToCurrentWeek}
+                className="h-auto p-0 text-xs text-muted-foreground"
+              >
+                Zur aktuellen Woche
+              </Button>
+            )}
+
+            {isSameWeek(currentWeek, new Date()) && (
+              <div className="h-[16px]"></div>
+            )}
+          </div>
+
+          <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+            <ChevronRight size={20} />
+          </Button>
+        </div>
+
+        <div className="flex flex-col gap-2.5 mb-32">
+          {getWeekdays(currentWeek).map((day) => {
+            const dayStr = day.toISOString();
+            return (
+              <DroppableDay key={dayStr} id={dayStr} date={day}>
+                <p
+                  className={
+                    "px-2 mb-1 font-semibold rounded-full w-fit " +
+                    (isToday(day) ? "bg-accent " : "")
+                  }
+                >
+                  {format(day, "EEE - dd.MM", {
+                    locale:
+                      locales[i18n.language as keyof typeof locales] || enUS,
+                  })}
+                </p>
+
+                {renderCorrectItem(day)}
+              </DroppableDay>
+            );
+          })}
+        </div>
+
+        <Accordion
+          type="single"
+          defaultValue="item-1"
+          collapsible
+          className="fixed w-full bg-background bottom-16"
+        >
+          <AccordionItem value="item-1">
+            <AccordionTrigger>
+              <div className="flex items-center gap-1">
+                <CalendarOff size={20} /> Ohne Datum -{" "}
+                {getNotPlannedItems().length}
+              </div>
+            </AccordionTrigger>
+
+            <AccordionContent className="flex gap-3 py-2 overflow-x-auto no-scrollbar">
+              {getNotPlannedItems().map((item) => (
+                <div key={item.id} className="w-[400px]">
+                  <MealPlannerItem
+                    key={item.id}
+                    id={item.id}
+                    recipeId={item.recipeId}
+                    recipeName={item.recipeName}
+                    date={item.planned_date}
+                    days={item.days}
+                    daysEaten={item.daysEaten}
+                    setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                    onRecipeEaten={(id) => {
+                      setDaysEaten(id, item.daysEaten + 1);
+                      showRateRecipeModal(item.recipeId);
+                    }}
+                    onRecipeDelete={deletePlannedItem}
+                    onUpdateToNoDate={(id) =>
+                      updatePlannedItemDate(id, null, 1)
+                    }
+                    isDragging={activeItemId === item.id}
+                  />
+                </div>
               ))}
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </Layout>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </Layout>
+    </DndContext>
+  );
+}
+
+function DroppableDay({
+  id,
+  date,
+  children,
+}: Readonly<{
+  id: string;
+  date: Date;
+  children: React.ReactNode;
+}>) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: id,
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`transition-colors rounded-lg ${isOver ? "bg-accent" : ""}`}
+    >
+      {children}
+    </div>
   );
 }

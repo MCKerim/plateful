@@ -1,10 +1,22 @@
-import { NavLink } from "react-router";
+import { useNavigate } from "react-router";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useEffect, useState } from "react";
 import { useSupabase } from "@/utils/supabase";
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerFooter,
+  DrawerTrigger,
+} from "../ui/drawer";
+import { CalendarOff, MoreVertical, Trash2 } from "lucide-react";
+import DeleteDialog from "./DeleteDialog";
+import { useTranslation } from "react-i18next";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 type Props = {
   id: number;
@@ -14,21 +26,37 @@ type Props = {
   days: number;
   daysEaten: number;
   setDaysEaten: (days: number) => void;
-  onDeleteDate: (id: number) => void;
-  onUpdateDate: (id: number, newDate: Date | null, newDays: number) => void;
   onRecipeEaten: (id: number) => void;
+  onRecipeDelete: (id: number) => void;
+  onUpdateToNoDate: (id: number) => void;
+  isDragging?: boolean;
 };
 
 export default function MealPlannerItem({
+  id,
   recipeId,
   recipeName,
+  date,
   days,
   daysEaten,
   setDaysEaten,
   onRecipeEaten,
+  onRecipeDelete,
+  onUpdateToNoDate,
+  isDragging = false,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: id,
+  });
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+  };
 
   useEffect(() => {
     async function fetchImage() {
@@ -73,47 +101,81 @@ export default function MealPlannerItem({
   }
 
   return (
-    <Card className="h-[90px] flex items-center">
-      <img
-        src={imageUrl || "/no-img.jpg"}
-        alt="Spaghetti"
-        className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75"
-      />
-
-      <NavLink
-        className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3"
-        to={`/recipe/${recipeId}`}
+    <Card
+      ref={setNodeRef}
+      style={style}
+      className={`h-[90px] flex items-center touch-none transition-opacity ${
+        isDragging ? "opacity-30" : ""
+      }`}
+    >
+      <button
+        onClick={() => {
+          navigate(`/recipe/${recipeId}`);
+        }}
+        className="text-left flex h-full flex-1 items-center min-w-0"
+        {...listeners}
+        {...attributes}
       >
-        {recipeName}
-      </NavLink>
+        <img
+          src={imageUrl || "/no-img.jpg"}
+          alt="Recipe"
+          className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
+        />
+
+        <p className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3 min-w-0">
+          {recipeName}
+        </p>
+      </button>
 
       <Button
-        className="flex gap-2 items-center me-2.5"
+        className="flex gap-2 items-center me-1 pointer-events-auto"
         variant="outline"
         onClick={eat}
       >
-        {Array.from({ length: days }, (_, index) => (
+        {Array.from({ length: 1 }, (_, index) => (
           <>
             {index < daysEaten ? (
               <NoMealsIcon style={{ fontSize: 24 }} />
             ) : (
               <RestaurantIcon style={{ fontSize: 24 }} />
             )}
-
-            {index < days - 1 && (
-              <span className="h-full border-r-2 rounded-full border-foreground"></span>
-            )}
           </>
         ))}
-
-        {/*<PlanDialog
-            isEdit
-            id={id}
-            initialDays={days}
-            onUpdateDate={onUpdateDate}
-            onDeleteDate={onDeleteDate}
-          />*/}
       </Button>
+
+      <Drawer>
+        <DrawerTrigger asChild>
+          <Button className="me-2.5 pointer-events-auto" variant="outline">
+            <MoreVertical size={16} />
+          </Button>
+        </DrawerTrigger>
+
+        <DrawerContent>
+          <DrawerFooter className="gap-2 mb-8 mt-4">
+            <DrawerClose asChild>
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => onUpdateToNoDate(id)}
+                disabled={date === null}
+              >
+                <CalendarOff size={20} />
+                {t("mealPlannerItem.removeDate")}
+              </Button>
+            </DrawerClose>
+
+            <DeleteDialog
+              onDelete={() => onRecipeDelete(id)}
+              customTrigger={
+                <Button className="w-full" variant="destructive">
+                  <Trash2 size={16} />
+                  {t("mealPlannerItem.remove")}
+                </Button>
+              }
+            />
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </Card>
   );
 }

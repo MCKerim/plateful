@@ -179,7 +179,13 @@
     "toTheRecipe": "To the recipe",
     "planRecipe": "Plan recipe",
     "ratings": "Ratings",
-    "noRatings": "No Ratings"
+    "noRatings": "No Ratings",
+    "planningSuccessful": "Recipe planned successfully!",
+    "planningFailed": "Error planning recipe. Please try again later."
+  },
+  "mealPlannerItem": {
+    "removeDate": "Remove Date",
+    "remove": "Remove"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
