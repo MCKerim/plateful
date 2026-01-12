@@ -108,19 +108,34 @@ export default function MealPlanner() {
   }, []);
 
   useEffect(() => {
-    if (activeItemId === null) {
-      // Re-enable scrolling when not dragging
-      document.body.style.overflow = "";
-      document.body.style.touchAction = "";
-    } else {
+    if (activeItemId !== null) {
       // Prevent scrolling when dragging
       document.body.style.overflow = "hidden";
       document.body.style.touchAction = "none";
+
+      // Also prevent overflow on the main scroll container
+      const mainContent = document.querySelector("main");
+      if (mainContent) {
+        mainContent.style.overflow = "hidden";
+      }
+    } else {
+      // Re-enable scrolling when not dragging
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+
+      const mainContent = document.querySelector("main");
+      if (mainContent) {
+        mainContent.style.overflow = "";
+      }
     }
 
     return () => {
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
+      const mainContent = document.querySelector("main");
+      if (mainContent) {
+        mainContent.style.overflow = "";
+      }
     };
   }, [activeItemId]);
 
@@ -262,6 +277,14 @@ export default function MealPlanner() {
     }
 
     const targetDateStr = over.id as string;
+
+    // Check if dropping on "no-date" zone
+    if (targetDateStr === "no-date-zone") {
+      updatePlannedItemDate(draggedItem.id, null, 1);
+      setActiveItemId(null);
+      return;
+    }
+
     const targetDate = new Date(targetDateStr);
 
     // Check if it's the same day - if so, do nothing
@@ -407,32 +430,34 @@ export default function MealPlanner() {
               </div>
             </AccordionTrigger>
 
-            <AccordionContent className="py-2">
-              <div className="flex gap-3 overflow-x-auto pb-2 px-1">
-                {getNotPlannedItems().map((item) => (
-                  <div key={item.id} className="flex-shrink-0 w-[280px]">
-                    <MealPlannerItem
-                      key={item.id}
-                      id={item.id}
-                      recipeId={item.recipeId}
-                      recipeName={item.recipeName}
-                      date={item.planned_date}
-                      days={item.days}
-                      daysEaten={item.daysEaten}
-                      setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                      onRecipeEaten={(id) => {
-                        setDaysEaten(id, item.daysEaten + 1);
-                        showRateRecipeModal(item.recipeId);
-                      }}
-                      onRecipeDelete={deletePlannedItem}
-                      onUpdateToNoDate={(id) =>
-                        updatePlannedItemDate(id, null, 1)
-                      }
-                      isDragging={activeItemId === item.id}
-                    />
-                  </div>
-                ))}
-              </div>
+            <AccordionContent className="">
+              <DroppableNoDateZone>
+                <div className="flex gap-3 overflow-x-auto pb-2 px-1">
+                  {getNotPlannedItems().map((item) => (
+                    <div key={item.id} className="flex-shrink-0 w-[280px]">
+                      <MealPlannerItem
+                        key={item.id}
+                        id={item.id}
+                        recipeId={item.recipeId}
+                        recipeName={item.recipeName}
+                        date={item.planned_date}
+                        days={item.days}
+                        daysEaten={item.daysEaten}
+                        setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                        onRecipeEaten={(id) => {
+                          setDaysEaten(id, item.daysEaten + 1);
+                          showRateRecipeModal(item.recipeId);
+                        }}
+                        onRecipeDelete={deletePlannedItem}
+                        onUpdateToNoDate={(id) =>
+                          updatePlannedItemDate(id, null, 1)
+                        }
+                        isDragging={activeItemId === item.id}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </DroppableNoDateZone>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
@@ -456,6 +481,27 @@ function DroppableDay({
     <div
       ref={setNodeRef}
       className={`transition-colors rounded-lg ${isOver ? "bg-accent" : ""}`}
+    >
+      {children}
+    </div>
+  );
+}
+
+function DroppableNoDateZone({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const { isOver, setNodeRef } = useDroppable({
+    id: "no-date-zone",
+  });
+
+  return (
+    <div
+      ref={setNodeRef}
+      className={`transition-colors rounded-lg min-h-[100px] ${
+        isOver ? "bg-accent" : ""
+      }`}
     >
       {children}
     </div>
