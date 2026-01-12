@@ -167,7 +167,8 @@
     "title": "Meal planner",
     "selectNumberOfDays": "Select the number of days",
     "alreadyEaten": "Recently eaten",
-    "nothingPlanned": "No recipes planned..."
+    "nothingPlanned": "No recipes planned...",
+    "dropToRemoveDate": "Without Date"
   },
   "cookbook": {
     "title": "Cookbook",

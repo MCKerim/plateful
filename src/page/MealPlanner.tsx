@@ -86,6 +86,9 @@ export default function MealPlanner() {
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [activeItemId, setActiveItemId] = useState<number | null>(null);
 
+  const [accordionValue, setAccordionValue] = useState<string>("item-1");
+  const previousAccordionValue = useRef<string>("item-1");
+
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
 
@@ -262,6 +265,8 @@ export default function MealPlanner() {
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
     setActiveItemId(active.id as number);
+    previousAccordionValue.current = accordionValue; // Save current state
+    setAccordionValue(""); // Collapse during drag
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -269,12 +274,14 @@ export default function MealPlanner() {
 
     if (!over) {
       setActiveItemId(null);
+      setAccordionValue(previousAccordionValue.current); // Restore previous state
       return;
     }
 
     const draggedItem = plannedItems.find((item) => item.id === active.id);
     if (!draggedItem) {
       setActiveItemId(null);
+      setAccordionValue(previousAccordionValue.current); // Restore previous state
       return;
     }
 
@@ -285,6 +292,7 @@ export default function MealPlanner() {
       // If already no date, do nothing
       if (draggedItem.planned_date === null) {
         setActiveItemId(null);
+        setAccordionValue(previousAccordionValue.current); // Restore previous state
         return;
       }
       setPlannedItems((items) =>
@@ -295,6 +303,7 @@ export default function MealPlanner() {
 
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItemId(null);
+      setAccordionValue(previousAccordionValue.current); // Restore previous state
       return;
     }
 
@@ -306,6 +315,7 @@ export default function MealPlanner() {
       isSameDay(draggedItem.planned_date, targetDate)
     ) {
       setActiveItemId(null);
+      setAccordionValue(previousAccordionValue.current); // Restore previous state
       return;
     }
 
@@ -319,6 +329,7 @@ export default function MealPlanner() {
 
     updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
     setActiveItemId(null);
+    setAccordionValue(previousAccordionValue.current); // Restore previous state
   }
 
   function renderCorrectItem(plannedDate: Date) {
@@ -365,6 +376,15 @@ export default function MealPlanner() {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       modifiers={[restrictToVerticalAxisAndWindow]}
+      autoScroll={{
+        threshold: {
+          x: 0,
+          y: 0.15, // Smaller threshold (15% from edge)
+        },
+        // Custom function to get the scroll container rect
+        // This helps avoid the drawer area
+        layoutShiftCompensation: false,
+      }}
     >
       <Layout>
         <RatingModal
@@ -437,51 +457,60 @@ export default function MealPlanner() {
           })}
         </div>
 
-        <Accordion
-          type="single"
-          defaultValue="item-1"
-          collapsible
-          className="fixed w-full bg-background bottom-16"
-        >
-          <AccordionItem value="item-1">
-            <AccordionTrigger>
-              <div className="flex items-center gap-1">
-                <CalendarOff size={20} /> Ohne Datum -{" "}
-                {getNotPlannedItems().length}
-              </div>
-            </AccordionTrigger>
-
-            <AccordionContent className="">
-              <DroppableNoDateZone>
-                <div className="flex gap-3 overflow-x-auto pb-2 px-1">
-                  {getNotPlannedItems().map((item) => (
-                    <div key={item.id} className="flex-shrink-0 w-[280px]">
-                      <MealPlannerItem
-                        key={item.id}
-                        id={item.id}
-                        recipeId={item.recipeId}
-                        recipeName={item.recipeName}
-                        date={item.planned_date}
-                        days={item.days}
-                        daysEaten={item.daysEaten}
-                        setDaysEaten={(days) => setDaysEaten(item.id, days)}
-                        onRecipeEaten={(id) => {
-                          setDaysEaten(id, item.daysEaten + 1);
-                          showRateRecipeModal(item.recipeId);
-                        }}
-                        onRecipeDelete={deletePlannedItem}
-                        onUpdateToNoDate={(id) =>
-                          updatePlannedItemDate(id, null, 1)
-                        }
-                        isDragging={activeItemId === item.id}
-                      />
-                    </div>
-                  ))}
+        {activeItemId ? (
+          <DroppableNoDateZone isMinimal>
+            <div className="flex items-center justify-center gap-2 text-muted-foreground">
+              <CalendarOff size={20} />
+              <span>{t("mealPlanner.dropToRemoveDate")}</span>
+            </div>
+          </DroppableNoDateZone>
+        ) : (
+          <Accordion
+            type="single"
+            value={accordionValue}
+            onValueChange={setAccordionValue}
+            collapsible
+            className="fixed w-full bg-background bottom-16"
+          >
+            <AccordionItem value="item-1">
+              <AccordionTrigger>
+                <div className="flex items-center gap-1">
+                  <CalendarOff size={20} /> Ohne Datum -{" "}
+                  {getNotPlannedItems().length}
                 </div>
-              </DroppableNoDateZone>
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
+              </AccordionTrigger>
+              <AccordionContent>
+                <DroppableNoDateZone>
+                  <div className="flex gap-3 overflow-x-auto pb-2 px-1">
+                    {getNotPlannedItems().map((item) => (
+                      <div key={item.id} className="flex-shrink-0 w-[280px]">
+                        <MealPlannerItem
+                          key={item.id}
+                          id={item.id}
+                          recipeId={item.recipeId}
+                          recipeName={item.recipeName}
+                          date={item.planned_date}
+                          days={item.days}
+                          daysEaten={item.daysEaten}
+                          setDaysEaten={(days) => setDaysEaten(item.id, days)}
+                          onRecipeEaten={(id) => {
+                            setDaysEaten(id, item.daysEaten + 1);
+                            showRateRecipeModal(item.recipeId);
+                          }}
+                          onRecipeDelete={deletePlannedItem}
+                          onUpdateToNoDate={(id) =>
+                            updatePlannedItemDate(id, null, 1)
+                          }
+                          isDragging={activeItemId === item.id}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </DroppableNoDateZone>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
       </Layout>
 
       <DragOverlay>
@@ -533,12 +562,27 @@ function DroppableDay({
 
 function DroppableNoDateZone({
   children,
+  isMinimal = false,
 }: Readonly<{
-  children: React.ReactNode;
+  children?: React.ReactNode;
+  isMinimal?: boolean;
 }>) {
   const { isOver, setNodeRef } = useDroppable({
     id: "no-date-zone",
   });
+
+  if (isMinimal) {
+    return (
+      <div
+        ref={setNodeRef}
+        className={`fixed bottom-16 left-0 right-0 z-50 p-4 transition-colors ${
+          isOver ? "bg-accent" : "bg-background"
+        }`}
+      >
+        {children} 
+      </div>
+    );
+  }
 
   return (
     <div
