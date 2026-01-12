@@ -25,6 +25,7 @@ import {
   DndContext,
   DragEndEvent,
   DragStartEvent,
+  DragOverEvent,
   useSensor,
   useSensors,
   PointerSensor,
@@ -86,7 +87,7 @@ export default function MealPlanner() {
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
     null
   );
-  const [isDrawerOpen, setIsDrawerOpen] = useState(true);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Default closed
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -109,6 +110,18 @@ export default function MealPlanner() {
   useEffect(() => {
     getMealPlannerItems();
   }, []);
+
+  // Open drawer by default only if there are unplanned items
+  useEffect(() => {
+    const unplannedItems = plannedItems.filter(
+      (item) => item.planned_date === null && item.daysEaten < item.days
+    );
+    if (unplannedItems.length > 0) {
+      setIsDrawerOpen(true);
+    } else {
+      setIsDrawerOpen(false);
+    }
+  }, [plannedItems.length]); // Only run when items count changes
 
   useEffect(() => {
     if (activeItem !== null) {
@@ -272,6 +285,15 @@ export default function MealPlanner() {
     }
   }
 
+  function handleDragOver(event: DragOverEvent) {
+    const { over } = event;
+
+    // Open drawer when hovering over the no-date drop zone
+    if (over?.id === "no-date-zone") {
+      setIsDrawerOpen(true);
+    }
+  }
+
   function handleDragEnd(event: DragEndEvent) {
     const { over } = event;
     const draggedItem = activeItem;
@@ -297,6 +319,7 @@ export default function MealPlanner() {
 
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItem(null);
+      // Drawer stays open since we just added an item
       return;
     }
 
@@ -308,6 +331,17 @@ export default function MealPlanner() {
     ) {
       setActiveItem(null);
       return;
+    }
+
+    // Check if dragging from drawer and it will be empty after
+    const isDraggingFromDrawer = draggedItem.planned_date === null;
+    if (isDraggingFromDrawer) {
+      const remainingUnplannedItems = getNotPlannedItems().filter(
+        (item) => item.id !== draggedItem.id
+      );
+      if (remainingUnplannedItems.length === 0) {
+        setIsDrawerOpen(false);
+      }
     }
 
     setPlannedItems((items) =>
@@ -371,6 +405,7 @@ export default function MealPlanner() {
     <DndContext
       sensors={sensors}
       onDragStart={handleDragStart}
+      onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
       modifiers={[restrictToVerticalAxisAndWindow]}
@@ -454,7 +489,7 @@ export default function MealPlanner() {
           })}
         </div>
 
-        {/* Bottom Drawer - Custom implementation instead of Accordion */}
+        {/* Bottom Drawer */}
         <div className="fixed bottom-16 left-0 right-0 z-40 bg-background border-t">
           {/* Show drop zone when dragging from calendar */}
           {activeItem && !isDraggingFromDrawer && (
