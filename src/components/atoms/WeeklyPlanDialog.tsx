@@ -1,9 +1,5 @@
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
@@ -128,24 +124,35 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
             </Button>
           </div>
 
-          {getWeekdays(currentWeek).map((day) => (
-            <Button
-              key={format(day, "EEE - dd.MM", {
-                locale: locales[i18n.language as keyof typeof locales] || enUS,
-              })}
-              variant="outline"
-              onClick={() => toggleWeekDate(day)}
-              className={
-                selectedDates.some((d) => isSameDay(d, day))
-                  ? "bg-accent text-accent-foreground"
-                  : ""
-              }
-            >
-              {format(day, "EEE - dd.MM", {
-                locale: locales[i18n.language as keyof typeof locales] || enUS,
-              })}
-            </Button>
-          ))}
+          {getWeekdays(currentWeek).map((day) => {
+            const isToday = isSameDay(day, new Date());
+            const isSelected = selectedDates.some((d) => isSameDay(d, day));
+
+            return (
+              <Button
+                key={format(day, "EEE - dd.MM", {
+                  locale:
+                    locales[i18n.language as keyof typeof locales] || enUS,
+                })}
+                variant="outline"
+                onClick={() => toggleWeekDate(day)}
+                className={`${
+                  isSelected ? "bg-accent text-accent-foreground" : ""
+                }`}
+              >
+                {isToday && (
+                  <span className="fixed left-8 rounded-full px-2 bg-primary text-primary-foreground">
+                    {t("common.today")}
+                  </span>
+                )}
+
+                {format(day, "EEE - dd.MM", {
+                  locale:
+                    locales[i18n.language as keyof typeof locales] || enUS,
+                })}
+              </Button>
+            );
+          })}
 
           <Button
             variant="secondary"
