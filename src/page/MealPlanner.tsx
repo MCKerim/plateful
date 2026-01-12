@@ -408,7 +408,7 @@ export default function MealPlanner() {
                 <p
                   className={
                     "px-2 mb-1 font-semibold rounded-full w-fit " +
-                    (isToday(day) ? "bg-accent " : "")
+                    (isToday(day) ? "bg-accent text-accent-foreground " : "")
                   }
                 >
                   {format(day, "EEE - dd.MM", {
