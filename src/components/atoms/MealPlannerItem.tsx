@@ -3,7 +3,7 @@ import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSupabase } from "@/utils/supabase";
 import {
   Drawer,
@@ -49,12 +49,97 @@ export default function MealPlannerItem({
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
+  const dragHandleRef = useRef<HTMLDivElement>(null);
+
   const { attributes, listeners, setNodeRef } = useDraggable({
     id: id,
     data: {
       type: "meal-planner-item",
     },
   });
+
+  // Custom touch handler to prevent scroll during long-press detection
+  useEffect(() => {
+    const element = dragHandleRef.current;
+    if (!element) return;
+
+    let touchStartY = 0;
+    let touchStartX = 0;
+    let longPressTimer: ReturnType<typeof setTimeout> | null = null;
+    let shouldPreventScroll = false;
+    let hasMoved = false;
+
+    const DELAY = 250; // Match your TouchSensor delay
+    const TOLERANCE = 10; // Slightly higher than sensor tolerance for smoother UX
+
+    const handleTouchStart = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      touchStartY = touch.clientY;
+      touchStartX = touch.clientX;
+      shouldPreventScroll = false;
+      hasMoved = false;
+
+      // Start timer - if user holds without moving, we'll prevent scroll
+      longPressTimer = setTimeout(() => {
+        if (!hasMoved) {
+          shouldPreventScroll = true;
+        }
+      }, DELAY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const touch = e.touches[0];
+      const deltaY = Math.abs(touch.clientY - touchStartY);
+      const deltaX = Math.abs(touch.clientX - touchStartX);
+
+      // If user moved beyond tolerance before timer fired
+      if (deltaY > TOLERANCE || deltaX > TOLERANCE) {
+        hasMoved = true;
+
+        // Cancel the long press timer
+        if (longPressTimer) {
+          clearTimeout(longPressTimer);
+          longPressTimer = null;
+        }
+
+        // If we haven't activated long press, allow scrolling
+        if (!shouldPreventScroll) {
+          return;
+        }
+      }
+
+      // Prevent scroll if long press is active OR if we're still in the detection phase
+      // and haven't moved beyond tolerance
+      if (shouldPreventScroll || (longPressTimer !== null && !hasMoved)) {
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+        longPressTimer = null;
+      }
+      shouldPreventScroll = false;
+      hasMoved = false;
+    };
+
+    // IMPORTANT: Use passive: false to be able to call preventDefault()
+    element.addEventListener("touchstart", handleTouchStart, { passive: true });
+    element.addEventListener("touchmove", handleTouchMove, { passive: false });
+    element.addEventListener("touchend", handleTouchEnd, { passive: true });
+    element.addEventListener("touchcancel", handleTouchEnd, { passive: true });
+
+    return () => {
+      element.removeEventListener("touchstart", handleTouchStart);
+      element.removeEventListener("touchmove", handleTouchMove);
+      element.removeEventListener("touchend", handleTouchEnd);
+      element.removeEventListener("touchcancel", handleTouchEnd);
+      if (longPressTimer) {
+        clearTimeout(longPressTimer);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     async function fetchImage() {
@@ -104,14 +189,21 @@ export default function MealPlannerItem({
       className={`h-[90px] flex items-center ${isDragging ? "invisible" : ""}`}
     >
       <div
-        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing touch-manipulation"
+        ref={dragHandleRef}
+        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing select-none"
+        style={{
+          // Use style for better WebView compatibility
+          WebkitUserSelect: "none",
+          WebkitTouchCallout: "none",
+        }}
         {...listeners}
         {...attributes}
       >
         <img
           src={imageUrl || "/no-img.jpg"}
           alt="Recipe"
-          className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
+          className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
+          draggable={false}
         />
 
         <button
@@ -136,13 +228,13 @@ export default function MealPlannerItem({
         }}
       >
         {Array.from({ length: 1 }, (_, index) => (
-          <>
+          <span key={index}>
             {index < daysEaten ? (
               <NoMealsIcon style={{ fontSize: 24 }} />
             ) : (
               <RestaurantIcon style={{ fontSize: 24 }} />
             )}
-          </>
+          </span>
         ))}
       </Button>
 
