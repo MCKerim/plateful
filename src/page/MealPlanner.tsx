@@ -94,13 +94,13 @@ export default function MealPlanner() {
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 8,
+        tolerance: 5,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 8,
+        tolerance: 5,
       },
     })
   );
@@ -414,7 +414,7 @@ export default function MealPlanner() {
           </Button>
         </div>
 
-        <div className="flex flex-col gap-2.5 mb-32">
+        <div className="flex flex-col gap-2.5 mb-64">
           {getWeekdays(currentWeek).map((day) => {
             const dayStr = day.toISOString();
             return (

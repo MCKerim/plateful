@@ -16,7 +16,6 @@ import { CalendarOff, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "./DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 
 type Props = {
   id: number;
@@ -105,7 +104,7 @@ export default function MealPlannerItem({
       className={`h-[90px] flex items-center ${isDragging ? "invisible" : ""}`}
     >
       <div
-        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing touch-none"
+        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing touch-manipulation"
         {...listeners}
         {...attributes}
       >
