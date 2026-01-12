@@ -32,10 +32,12 @@ import {
   TouchSensor,
   useDroppable,
   Modifier,
+  DragOverlay,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { enUS, es, fr, de } from "date-fns/locale";
+import { Card } from "@/components/ui/card";
 
 type MealPlannerItem = {
   id: number;
@@ -280,6 +282,11 @@ export default function MealPlanner() {
 
     // Check if dropping on "no-date" zone
     if (targetDateStr === "no-date-zone") {
+      // If already no date, do nothing
+      if (draggedItem.planned_date === null) {
+        setActiveItemId(null);
+        return;
+      }
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItemId(null);
       return;
@@ -462,6 +469,29 @@ export default function MealPlanner() {
           </AccordionItem>
         </Accordion>
       </Layout>
+
+      <DragOverlay>
+        {activeItemId && (
+          <Card className="h-[90px] w-[380px] flex items-center shadow-2xl opacity-90">
+            {(() => {
+              const item = plannedItems.find((i) => i.id === activeItemId);
+              if (!item) return null;
+
+              return (
+                <>
+                  <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
+
+                  <div className="flex-1 px-2.5">
+                    <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
+                      {item.recipeName}
+                    </p>
+                  </div>
+                </>
+              );
+            })()}
+          </Card>
+        )}
+      </DragOverlay>
     </DndContext>
   );
 }

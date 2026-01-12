@@ -58,7 +58,7 @@ export default function MealPlannerItem({
   });
 
   const style = {
-    transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
+    transform: isDragging ? undefined : CSS.Translate.toString(transform),
   };
 
   useEffect(() => {
@@ -107,9 +107,7 @@ export default function MealPlannerItem({
     <Card
       ref={setNodeRef}
       style={style}
-      className={`h-[90px] flex items-center transition-opacity ${
-        isDragging ? "opacity-30" : ""
-      }`}
+      className={`h-[90px] flex items-center ${isDragging ? "invisible" : ""}`}
     >
       <div
         className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing touch-none"
