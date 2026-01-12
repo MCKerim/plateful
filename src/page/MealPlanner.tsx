@@ -264,6 +264,15 @@ export default function MealPlanner() {
     const targetDateStr = over.id as string;
     const targetDate = new Date(targetDateStr);
 
+    // Check if it's the same day - if so, do nothing
+    if (
+      draggedItem.planned_date &&
+      isSameDay(draggedItem.planned_date, targetDate)
+    ) {
+      setActiveItemId(null);
+      return;
+    }
+
     updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
     setActiveItemId(null);
   }
