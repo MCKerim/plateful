@@ -52,10 +52,13 @@ export default function MealPlannerItem({
 
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: id,
+    data: {
+      type: "meal-planner-item",
+    },
   });
 
   const style = {
-    transform: CSS.Translate.toString(transform),
+    transform: transform ? `translate3d(0, ${transform.y}px, 0)` : undefined,
   };
 
   useEffect(() => {
@@ -109,7 +112,7 @@ export default function MealPlannerItem({
       }`}
     >
       <div
-        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing"
+        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing touch-none"
         {...listeners}
         {...attributes}
       >

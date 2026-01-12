@@ -31,6 +31,7 @@ import {
   PointerSensor,
   TouchSensor,
   useDroppable,
+  Modifier,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
@@ -52,6 +53,28 @@ const locales = {
   de: de,
 };
 
+const restrictToVerticalAxisAndWindow: Modifier = ({
+  transform,
+  draggingNodeRect,
+  windowRect,
+}) => {
+  if (!draggingNodeRect || !windowRect) {
+    return transform;
+  }
+
+  return {
+    ...transform,
+    x: 0, // Force horizontal movement to 0
+    y: Math.max(
+      Math.min(
+        transform.y,
+        windowRect.height - draggingNodeRect.top - draggingNodeRect.height
+      ),
+      -draggingNodeRect.top
+    ),
+  };
+};
+
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
   const { supabase } = useSupabase();
@@ -69,13 +92,13 @@ export default function MealPlanner() {
     useSensor(PointerSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 8,
       },
     })
   );
@@ -83,6 +106,23 @@ export default function MealPlanner() {
   useEffect(() => {
     getMealPlannerItems();
   }, []);
+
+  useEffect(() => {
+    if (activeItemId === null) {
+      // Re-enable scrolling when not dragging
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    } else {
+      // Prevent scrolling when dragging
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    }
+
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [activeItemId]);
 
   async function getMealPlannerItems() {
     const { data } = await supabase
@@ -271,6 +311,7 @@ export default function MealPlanner() {
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      modifiers={[restrictToVerticalAxisAndWindow]}
     >
       <Layout>
         <RatingModal
