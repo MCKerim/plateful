@@ -66,7 +66,7 @@ const restrictToVerticalAxisAndWindow: Modifier = ({
 
   return {
     ...transform,
-    x: 0, // Force horizontal movement to 0
+    x: 0,
     y: Math.max(
       Math.min(
         transform.y,
@@ -84,7 +84,9 @@ export default function MealPlanner() {
 
   const [plannedItems, setPlannedItems] = useState<MealPlannerItem[]>([]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [activeItemId, setActiveItemId] = useState<number | null>(null);
+
+  // Store the full active item data, not just the ID
+  const [activeItem, setActiveItem] = useState<MealPlannerItem | null>(null);
 
   const [accordionValue, setAccordionValue] = useState<string>("item-1");
   const previousAccordionValue = useRef<string>("item-1");
@@ -92,7 +94,6 @@ export default function MealPlanner() {
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
 
-  // Configure sensors for long press drag activation
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
@@ -113,18 +114,15 @@ export default function MealPlanner() {
   }, []);
 
   useEffect(() => {
-    if (activeItemId !== null) {
-      // Prevent scrolling when dragging
+    if (activeItem !== null) {
       document.body.style.overflow = "hidden";
       document.body.style.touchAction = "none";
 
-      // Also prevent overflow on the main scroll container
       const mainContent = document.querySelector("main");
       if (mainContent) {
         mainContent.style.overflow = "hidden";
       }
     } else {
-      // Re-enable scrolling when not dragging
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
 
@@ -142,7 +140,7 @@ export default function MealPlanner() {
         mainContent.style.overflow = "";
       }
     };
-  }, [activeItemId]);
+  }, [activeItem]);
 
   async function getMealPlannerItems() {
     const { data } = await supabase
@@ -208,11 +206,14 @@ export default function MealPlanner() {
     if (error) {
       console.error("Error while updating planned item date: ", error);
       alert("Error while updating planned item date");
+      // Refetch to restore correct state on error
+      getMealPlannerItems();
     } else {
       toast.success(t("recipe.planningSuccessful"), {
         position: "top-right",
         richColors: true,
       });
+      // Refetch to ensure consistency
       getMealPlannerItems();
     }
   }
@@ -264,37 +265,40 @@ export default function MealPlanner() {
 
   function handleDragStart(event: DragStartEvent) {
     const { active } = event;
-    setActiveItemId(active.id as number);
-    previousAccordionValue.current = accordionValue; // Save current state
-    setAccordionValue(""); // Collapse during drag
+
+    // Find and store the complete item data
+    const item = plannedItems.find((i) => i.id === active.id);
+    if (item) {
+      // Create a copy of the item to prevent issues if plannedItems updates
+      setActiveItem({ ...item });
+    }
+
+    previousAccordionValue.current = accordionValue;
+    setAccordionValue("");
   }
 
   function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
+    const { over } = event; // Removed 'active' since we use activeItem instead
 
-    if (!over) {
-      setActiveItemId(null);
-      setAccordionValue(previousAccordionValue.current); // Restore previous state
-      return;
-    }
+    // Always clear active item at the end
+    const draggedItem = activeItem;
 
-    const draggedItem = plannedItems.find((item) => item.id === active.id);
-    if (!draggedItem) {
-      setActiveItemId(null);
-      setAccordionValue(previousAccordionValue.current); // Restore previous state
+    if (!over || !draggedItem) {
+      setActiveItem(null);
+      setAccordionValue(previousAccordionValue.current);
       return;
     }
 
     const targetDateStr = over.id as string;
 
-    // Check if dropping on "no-date" zone
     if (targetDateStr === "no-date-zone") {
-      // If already no date, do nothing
       if (draggedItem.planned_date === null) {
-        setActiveItemId(null);
-        setAccordionValue(previousAccordionValue.current); // Restore previous state
+        setActiveItem(null);
+        setAccordionValue(previousAccordionValue.current);
         return;
       }
+
+      // Optimistic update
       setPlannedItems((items) =>
         items.map((item) =>
           item.id === draggedItem.id ? { ...item, planned_date: null } : item
@@ -302,23 +306,23 @@ export default function MealPlanner() {
       );
 
       updatePlannedItemDate(draggedItem.id, null, 1);
-      setActiveItemId(null);
-      setAccordionValue(previousAccordionValue.current); // Restore previous state
+      setActiveItem(null);
+      setAccordionValue(previousAccordionValue.current);
       return;
     }
 
     const targetDate = new Date(targetDateStr);
 
-    // Check if it's the same day - if so, do nothing
     if (
       draggedItem.planned_date &&
       isSameDay(draggedItem.planned_date, targetDate)
     ) {
-      setActiveItemId(null);
-      setAccordionValue(previousAccordionValue.current); // Restore previous state
+      setActiveItem(null);
+      setAccordionValue(previousAccordionValue.current);
       return;
     }
 
+    // Optimistic update
     setPlannedItems((items) =>
       items.map((item) =>
         item.id === draggedItem.id
@@ -328,8 +332,15 @@ export default function MealPlanner() {
     );
 
     updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
-    setActiveItemId(null);
-    setAccordionValue(previousAccordionValue.current); // Restore previous state
+    setActiveItem(null);
+    setAccordionValue(previousAccordionValue.current);
+  }
+
+  function handleDragCancel() {
+    // Removed unused 'event' parameter
+    // Reset everything on cancel
+    setActiveItem(null);
+    setAccordionValue(previousAccordionValue.current);
   }
 
   function renderCorrectItem(plannedDate: Date) {
@@ -354,7 +365,7 @@ export default function MealPlanner() {
               }}
               onRecipeDelete={(id) => deletePlannedItem(id)}
               onUpdateToNoDate={(id) => updatePlannedItemDate(id, null, 1)}
-              isDragging={activeItemId === item.id}
+              isDragging={activeItem?.id === item.id}
             />
           ))}
         </ul>
@@ -364,7 +375,7 @@ export default function MealPlanner() {
     return <MealPlannerAdd onClick={() => navigate("/cookbook")} />;
   }
 
-  function getNotPlannedItems() {
+  function getNotPlannedItems(): MealPlannerItem[] {
     return plannedItems.filter((item) => {
       return item.planned_date === null && item.daysEaten < item.days;
     });
@@ -375,14 +386,13 @@ export default function MealPlanner() {
       sensors={sensors}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
       modifiers={[restrictToVerticalAxisAndWindow]}
       autoScroll={{
         threshold: {
           x: 0,
-          y: 0.15, // Smaller threshold (15% from edge)
+          y: 0.15,
         },
-        // Custom function to get the scroll container rect
-        // This helps avoid the drawer area
         layoutShiftCompensation: false,
       }}
     >
@@ -457,7 +467,7 @@ export default function MealPlanner() {
           })}
         </div>
 
-        {activeItemId ? (
+        {activeItem ? (
           <DroppableNoDateZone isMinimal>
             <div className="flex items-center justify-center gap-2 text-muted-foreground">
               <CalendarOff size={20} />
@@ -501,7 +511,6 @@ export default function MealPlanner() {
                           onUpdateToNoDate={(id) =>
                             updatePlannedItemDate(id, null, 1)
                           }
-                          isDragging={activeItemId === item.id}
                         />
                       </div>
                     ))}
@@ -513,25 +522,21 @@ export default function MealPlanner() {
         )}
       </Layout>
 
-      <DragOverlay>
-        {activeItemId && (
-          <Card className="h-[90px] flex items-center shadow-2xl opacity-90">
-            {(() => {
-              const item = plannedItems.find((i) => i.id === activeItemId);
-              if (!item) return null;
-
-              return (
-                <>
-                  <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
-
-                  <div className="flex-1 px-2.5">
-                    <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
-                      {item.recipeName}
-                    </p>
-                  </div>
-                </>
-              );
-            })()}
+      {/* DragOverlay now uses stored activeItem data - won't break when original unmounts */}
+      <DragOverlay
+        dropAnimation={{
+          duration: 200,
+          easing: "ease",
+        }}
+      >
+        {activeItem && (
+          <Card className="h-[90px] flex items-center shadow-2xl opacity-95 border-2 border-primary">
+            <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
+            <div className="flex-1 px-2.5">
+              <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
+                {activeItem.recipeName}
+              </p>
+            </div>
           </Card>
         )}
       </DragOverlay>
@@ -553,7 +558,9 @@ function DroppableDay({
   return (
     <div
       ref={setNodeRef}
-      className={`transition-colors rounded-lg ${isOver ? "bg-accent" : ""}`}
+      className={`transition-colors rounded-lg p-1 ${
+        isOver ? "bg-accent" : ""
+      }`}
     >
       {children}
     </div>
@@ -575,11 +582,13 @@ function DroppableNoDateZone({
     return (
       <div
         ref={setNodeRef}
-        className={`fixed bottom-16 left-0 right-0 z-50 p-4 transition-colors ${
-          isOver ? "bg-accent" : "bg-background"
+        className={`fixed bottom-16 left-0 right-0 z-50 p-4 transition-colors border-t-2 ${
+          isOver
+            ? "bg-accent border-primary"
+            : "bg-background border-transparent"
         }`}
       >
-        {children} 
+        {children}
       </div>
     );
   }
