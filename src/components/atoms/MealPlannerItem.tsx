@@ -107,14 +107,11 @@ export default function MealPlannerItem({
       className={`h-[90px] flex items-center transition-opacity ${
         isDragging ? "opacity-30" : ""
       }`}
-      {...listeners}
-      {...attributes}
     >
-      <button
-        onClick={() => {
-          navigate(`/recipe/${recipeId}`);
-        }}
-        className="text-left flex h-full flex-1 items-center min-w-0"
+      <div
+        className="flex h-full flex-1 items-center min-w-0 cursor-grab active:cursor-grabbing"
+        {...listeners}
+        {...attributes}
       >
         <img
           src={imageUrl || "/no-img.jpg"}
@@ -122,15 +119,26 @@ export default function MealPlannerItem({
           className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none"
         />
 
-        <p className="second-font flex-1 text-md font-semibold px-2.5 break-words leading-tight line-clamp-3 min-w-0">
-          {recipeName}
-        </p>
-      </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/recipe/${recipeId}`);
+          }}
+          className="text-left flex-1 px-2.5 min-w-0 h-full flex items-center"
+        >
+          <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3 w-full">
+            {recipeName}
+          </p>
+        </button>
+      </div>
 
       <Button
-        className="flex gap-2 items-center me-1 pointer-events-auto"
+        className="flex gap-2 items-center me-1"
         variant="outline"
-        onClick={eat}
+        onClick={(e) => {
+          e.stopPropagation();
+          eat();
+        }}
       >
         {Array.from({ length: 1 }, (_, index) => (
           <>
@@ -145,7 +153,7 @@ export default function MealPlannerItem({
 
       <Drawer>
         <DrawerTrigger asChild>
-          <Button className="me-2.5 pointer-events-auto" variant="outline">
+          <Button className="me-2.5" variant="outline">
             <MoreVertical size={16} />
           </Button>
         </DrawerTrigger>
