@@ -287,6 +287,12 @@ export default function MealPlanner() {
         setActiveItemId(null);
         return;
       }
+      setPlannedItems((items) =>
+        items.map((item) =>
+          item.id === draggedItem.id ? { ...item, planned_date: null } : item
+        )
+      );
+
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItemId(null);
       return;
@@ -302,6 +308,14 @@ export default function MealPlanner() {
       setActiveItemId(null);
       return;
     }
+
+    setPlannedItems((items) =>
+      items.map((item) =>
+        item.id === draggedItem.id
+          ? { ...item, planned_date: targetDate }
+          : item
+      )
+    );
 
     updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
     setActiveItemId(null);
@@ -472,7 +486,7 @@ export default function MealPlanner() {
 
       <DragOverlay>
         {activeItemId && (
-          <Card className="h-[90px] w-[380px] flex items-center shadow-2xl opacity-90">
+          <Card className="h-[90px] flex items-center shadow-2xl opacity-90">
             {(() => {
               const item = plannedItems.find((i) => i.id === activeItemId);
               if (!item) return null;

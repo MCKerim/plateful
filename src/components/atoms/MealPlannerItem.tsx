@@ -50,16 +50,12 @@ export default function MealPlannerItem({
   const { supabase } = useSupabase();
   const [imageUrl, setImageUrl] = useState<string | null>(null);
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef } = useDraggable({
     id: id,
     data: {
       type: "meal-planner-item",
     },
   });
-
-  const style = {
-    transform: isDragging ? undefined : CSS.Translate.toString(transform),
-  };
 
   useEffect(() => {
     async function fetchImage() {
@@ -106,7 +102,6 @@ export default function MealPlannerItem({
   return (
     <Card
       ref={setNodeRef}
-      style={style}
       className={`h-[90px] flex items-center ${isDragging ? "invisible" : ""}`}
     >
       <div
