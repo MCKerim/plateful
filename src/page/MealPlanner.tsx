@@ -1,7 +1,6 @@
 import MealPlannerItem from "@/components/atoms/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
-import { useSupabase } from "@/utils/supabase";
 import {
   format,
   isSameDay,
@@ -30,8 +29,6 @@ import {
   useSensors,
   PointerSensor,
   TouchSensor,
-  useDroppable,
-  Modifier,
   DragOverlay,
 } from "@dnd-kit/core";
 import { toast } from "sonner";
@@ -39,24 +36,16 @@ import { useTranslation } from "react-i18next";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
-type MealPlannerItemType = {
-  id: number;
-  recipeId: number;
-  recipeName: string;
-  planned_date: Date | null;
-  days: number;
-  daysEaten: number;
-};
-
-type MealPlanningRaw = {
-  id: number;
-  planned_date: string | null;
-  days: number;
-  daysEaten: number;
-  recipes: { id: number; name: string } | null;
-};
+import { restrictToVerticalAxisAndWindow } from "@/lib/dnd-modifiers";
+import { DroppableNoDateZone } from "@/components/mealPlanner/droppableNoDateZone/DroppableNoDateZone";
+import { DroppableDay } from "@/components/mealPlanner/droppableDay/DroppableDay";
+import {
+  useDeletePlannedItem,
+  useMealPlannerItems,
+  useSetDaysEaten,
+  useUpdatePlannedItemDate,
+} from "@/hooks/meal-planning";
+import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 
 const locales = {
   en: enUS,
@@ -64,217 +53,6 @@ const locales = {
   fr: fr,
   de: de,
 };
-
-const restrictToVerticalAxisAndWindow: Modifier = ({
-  transform,
-  draggingNodeRect,
-  windowRect,
-}) => {
-  if (!draggingNodeRect || !windowRect) {
-    return transform;
-  }
-
-  return {
-    ...transform,
-    x: 0,
-    y: Math.max(
-      Math.min(
-        transform.y,
-        windowRect.height - draggingNodeRect.top - draggingNodeRect.height
-      ),
-      -draggingNodeRect.top
-    ),
-  };
-};
-
-function transformMealPlannerData(
-  data: MealPlanningRaw[]
-): MealPlannerItemType[] {
-  return data.map((item) => ({
-    id: item.id,
-    recipeId: item.recipes?.id ?? 1,
-    planned_date: item.planned_date ? new Date(item.planned_date) : null,
-    recipeName: item.recipes?.name ?? "no name",
-    days: item.days,
-    daysEaten: item.daysEaten,
-  }));
-}
-
-// Custom hook for fetching meal planner items
-function useMealPlannerItems(currentWeek: Date) {
-  const { supabase } = useSupabase();
-  const weekDays = getWeekdays(currentWeek);
-  const weekStart = new Date(weekDays[0]);
-  const weekEnd = new Date(weekDays[6]);
-
-  weekStart.setHours(0, 0, 0, 0);
-  weekEnd.setHours(23, 59, 59, 999);
-
-  return useQuery({
-    queryKey: ["meal-planning", "list", weekStart.toISOString()],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("meal_planning")
-        .select(
-          `
-          id,
-          planned_date,
-          days,
-          daysEaten,
-          recipes (id, name)
-        `
-        )
-        .or(
-          `planned_date.is.null,and(planned_date.gte.${weekStart.toISOString()},planned_date.lte.${weekEnd.toISOString()})`
-        )
-        .order("created_at", { ascending: true });
-
-      if (error) throw error;
-      return transformMealPlannerData(data as MealPlanningRaw[]);
-    },
-    staleTime: 1000 * 60 * 5, // 5 minutes
-  });
-}
-
-// Mutation for deleting planned items
-function useDeletePlannedItem() {
-  const { supabase } = useSupabase();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (id: number) => {
-      const { error } = await supabase
-        .from("meal_planning")
-        .delete()
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onMutate: async (id: number) => {
-      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
-
-      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
-        queryKey: ["mealPlanner"],
-      });
-
-      queryClient.setQueriesData<MealPlannerItemType[]>(
-        { queryKey: ["mealPlanner"] },
-        (old) => old?.filter((item) => item.id !== id)
-      );
-
-      return { previousData };
-    },
-    onError: (_err, _id, context) => {
-      context?.previousData.forEach(([queryKey, data]) => {
-        queryClient.setQueryData(queryKey, data);
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
-    },
-  });
-}
-
-// Mutation for updating planned item date
-function useUpdatePlannedItemDate() {
-  const { supabase } = useSupabase();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      newDate,
-      newDays,
-    }: {
-      id: number;
-      newDate: Date | null;
-      newDays: number;
-    }) => {
-      const plannedDate = newDate ? newDate.toISOString() : null;
-      const { error } = await supabase
-        .from("meal_planning")
-        .update({ planned_date: plannedDate, days: newDays })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onMutate: async ({ id, newDate, newDays }) => {
-      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
-
-      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
-        queryKey: ["mealPlanner"],
-      });
-
-      queryClient.setQueriesData<MealPlannerItemType[]>(
-        { queryKey: ["mealPlanner"] },
-        (old) =>
-          old?.map((item) =>
-            item.id === id
-              ? { ...item, planned_date: newDate, days: newDays }
-              : item
-          )
-      );
-
-      return { previousData };
-    },
-    onError: (_err, _variables, context) => {
-      context?.previousData.forEach(([queryKey, data]) => {
-        queryClient.setQueryData(queryKey, data);
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
-    },
-  });
-}
-
-// Mutation for updating days eaten
-function useSetDaysEaten() {
-  const { supabase } = useSupabase();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      id,
-      newDaysEaten,
-    }: {
-      id: number;
-      newDaysEaten: number;
-    }) => {
-      const { error } = await supabase
-        .from("meal_planning")
-        .update({ daysEaten: newDaysEaten })
-        .eq("id", id);
-
-      if (error) throw error;
-    },
-    onMutate: async ({ id, newDaysEaten }) => {
-      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
-
-      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
-        queryKey: ["mealPlanner"],
-      });
-
-      queryClient.setQueriesData<MealPlannerItemType[]>(
-        { queryKey: ["mealPlanner"] },
-        (old) =>
-          old?.map((item) =>
-            item.id === id ? { ...item, daysEaten: newDaysEaten } : item
-          )
-      );
-
-      return { previousData };
-    },
-    onError: (_err, _variables, context) => {
-      context?.previousData.forEach(([queryKey, data]) => {
-        queryClient.setQueryData(queryKey, data);
-      });
-    },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
-    },
-  });
-}
 
 function MealPlannerItemSkeleton() {
   return (
@@ -310,7 +88,7 @@ export default function MealPlanner() {
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
 
-  // React Query hooks
+  // React Query hooks - clean and simple!
   const { data: plannedItems = [], isLoading } =
     useMealPlannerItems(currentWeek);
   const deleteMutation = useDeletePlannedItem();
@@ -332,15 +110,70 @@ export default function MealPlanner() {
     })
   );
 
-  // Open drawer by default only if there are unplanned items
+  // Derived state
+  const notPlannedItems = plannedItems.filter(
+    (item) => item.planned_date === null && item.daysEaten < item.days
+  );
+  const isDraggingFromDrawer = activeItem?.planned_date === null;
+
+  // Auto-open drawer when there are unplanned items
   useEffect(() => {
-    const unplannedItems = getNotPlannedItems();
-    if (unplannedItems.length > 0) {
-      setIsDrawerOpen(true);
-    } else {
-      setIsDrawerOpen(false);
-    }
-  }, [plannedItems.length]);
+    setIsDrawerOpen(notPlannedItems.length > 0);
+  }, [notPlannedItems.length]);
+
+  // Handlers
+  function handleDelete(id: number) {
+    deleteMutation.mutate(id, {
+      onError: () =>
+        toast.error(t("mealPlanner.deleteError"), {
+          position: "top-right",
+          richColors: true,
+        }),
+    });
+  }
+
+  function handleUpdateDate(id: number, newDate: Date | null, newDays: number) {
+    updateDateMutation.mutate(
+      { id, newDate, newDays },
+      {
+        onSuccess: () =>
+          toast.success(t("recipe.planningSuccessful"), {
+            position: "top-right",
+            richColors: true,
+          }),
+        onError: () =>
+          toast.error(t("recipe.planningFailed"), {
+            position: "top-right",
+            richColors: true,
+          }),
+      }
+    );
+  }
+
+  function handleSetDaysEaten(id: number, newDaysEaten: number) {
+    setDaysEatenMutation.mutate(
+      { id, newDaysEaten },
+      {
+        onError: () =>
+          toast.error(t("mealPlanner.updateError"), {
+            position: "top-right",
+            richColors: true,
+          }),
+      }
+    );
+  }
+
+  function handleRecipeEaten(item: MealPlannerItemType) {
+    handleSetDaysEaten(item.id, item.daysEaten + 1);
+    setRecipeToRate(item.recipeId);
+    ratingModalRef.current?.open();
+  }
+
+  function getItemsByDate(date: Date) {
+    return plannedItems.filter(
+      (item) => item.planned_date && isSameDay(item.planned_date, date)
+    );
+  }
 
   useEffect(() => {
     if (activeItem !== null) {
@@ -371,46 +204,6 @@ export default function MealPlanner() {
     };
   }, [activeItem]);
 
-  function deletePlannedItem(id: number) {
-    deleteMutation.mutate(id, {
-      onError: () => {
-        toast.error(t("mealPlanner.deleteError"));
-      },
-    });
-  }
-
-  function updatePlannedItemDate(
-    id: number,
-    newDate: Date | null,
-    newDays: number
-  ) {
-    updateDateMutation.mutate(
-      { id, newDate, newDays },
-      {
-        onSuccess: () => {
-          toast.success(t("recipe.planningSuccessful"), {
-            position: "top-right",
-            richColors: true,
-          });
-        },
-        onError: () => {
-          toast.error(t("recipe.planningFailed"));
-        },
-      }
-    );
-  }
-
-  function setDaysEaten(id: number, newDaysEaten: number) {
-    setDaysEatenMutation.mutate(
-      { id, newDaysEaten },
-      {
-        onError: () => {
-          toast.error(t("mealPlanner.updateError"));
-        },
-      }
-    );
-  }
-
   function showRateRecipeModal(recipeId: number) {
     setRecipeToRate(recipeId);
     ratingModalRef.current?.open();
@@ -428,83 +221,43 @@ export default function MealPlanner() {
     setCurrentWeek(new Date());
   }
 
-  function getMealPlannerItemsByPlannedDate(
-    plannedDate: Date
-  ): MealPlannerItemType[] {
-    return plannedItems.filter((item) => {
-      return (
-        item.planned_date !== null && isSameDay(item.planned_date, plannedDate)
-      );
-    });
-  }
-
-  // Unplanned items: no date AND not fully eaten
-  function getNotPlannedItems(): MealPlannerItemType[] {
-    return plannedItems.filter((item) => {
-      return item.planned_date === null && item.daysEaten < item.days;
-    });
-  }
-
+  // DnD handlers
   function handleDragStart(event: DragStartEvent) {
-    const { active } = event;
-    const item = plannedItems.find((i) => i.id === active.id);
-    if (item) {
-      setActiveItem({ ...item });
-    }
+    const item = plannedItems.find((i) => i.id === event.active.id);
+    if (item) setActiveItem({ ...item });
   }
 
   function handleDragOver(event: DragOverEvent) {
-    const { over } = event;
-
-    if (over?.id === "no-date-zone") {
-      setIsDrawerOpen(true);
-    }
+    if (event.over?.id === "no-date-zone") setIsDrawerOpen(true);
   }
 
   function handleDragEnd(event: DragEndEvent) {
     const { over } = event;
-    const draggedItem = activeItem;
-
-    if (!over || !draggedItem) {
+    if (!over || !activeItem) {
       setActiveItem(null);
       return;
     }
 
-    const targetDateStr = over.id as string;
+    const targetId = over.id as string;
 
-    if (targetDateStr === "no-date-zone") {
-      if (draggedItem.planned_date === null) {
-        setActiveItem(null);
-        return;
+    if (targetId === "no-date-zone") {
+      if (activeItem.planned_date !== null) {
+        handleUpdateDate(activeItem.id, null, 1);
       }
-
-      updatePlannedItemDate(draggedItem.id, null, 1);
-      setActiveItem(null);
-      return;
-    }
-
-    const targetDate = new Date(targetDateStr);
-
-    if (
-      draggedItem.planned_date &&
-      isSameDay(draggedItem.planned_date, targetDate)
-    ) {
-      setActiveItem(null);
-      return;
-    }
-
-    // Check if dragging from drawer and it will be empty after
-    const isDraggingFromDrawer = draggedItem.planned_date === null;
-    if (isDraggingFromDrawer) {
-      const remainingUnplannedItems = getNotPlannedItems().filter(
-        (item) => item.id !== draggedItem.id
-      );
-      if (remainingUnplannedItems.length === 0) {
-        setIsDrawerOpen(false);
+    } else {
+      const targetDate = new Date(targetId);
+      if (
+        !activeItem.planned_date ||
+        !isSameDay(activeItem.planned_date, targetDate)
+      ) {
+        // Close drawer if it will be empty
+        if (isDraggingFromDrawer && notPlannedItems.length === 1) {
+          setIsDrawerOpen(false);
+        }
+        handleUpdateDate(activeItem.id, targetDate, activeItem.days);
       }
     }
 
-    updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
     setActiveItem(null);
   }
 
@@ -522,36 +275,17 @@ export default function MealPlanner() {
         date={item.planned_date}
         days={item.days}
         daysEaten={item.daysEaten}
-        setDaysEaten={(days) => setDaysEaten(item.id, days)}
+        setDaysEaten={(days) => handleSetDaysEaten(item.id, days)}
         onRecipeEaten={() => {
-          setDaysEaten(item.id, item.daysEaten + 1);
+          handleRecipeEaten(item);
           showRateRecipeModal(item.recipeId);
         }}
-        onRecipeDelete={() => deletePlannedItem(item.id)}
-        onUpdateToNoDate={() => updatePlannedItemDate(item.id, null, 1)}
+        onRecipeDelete={() => handleDelete(item.id)}
+        onUpdateToNoDate={() => handleUpdateDate(item.id, null, 1)}
         isDragging={activeItem?.id === item.id}
       />
     );
   }
-
-  function renderCorrectItem(plannedDate: Date) {
-    const items = getMealPlannerItemsByPlannedDate(plannedDate);
-
-    if (items.length > 0) {
-      return (
-        <ul className="flex flex-col gap-2">
-          {items.map((item) => (
-            <li key={item.id}>{renderMealPlannerItem(item)}</li>
-          ))}
-        </ul>
-      );
-    }
-
-    return <MealPlannerAdd onClick={() => navigate("/cookbook")} />;
-  }
-
-  const notPlannedItems = getNotPlannedItems();
-  const isDraggingFromDrawer = activeItem?.planned_date === null;
 
   return (
     <DndContext
@@ -571,9 +305,9 @@ export default function MealPlanner() {
     >
       <Layout>
         <RatingModal
-          showTriggerButton={false}
           ref={ratingModalRef}
           recipeId={recipeToRate}
+          showTriggerButton={false}
         />
 
         {/* Week Navigation */}
@@ -621,31 +355,47 @@ export default function MealPlanner() {
         <div className="flex flex-col gap-2.5 mb-64 p-2">
           {isLoading ? (
             <>
-              {[...Array(7)].map((_, index) => (
+              {[...new Array(7)].map((_, index) => (
                 <DayCardSkeleton key={index} />
               ))}
             </>
           ) : (
-            getWeekdays(currentWeek).map((day) => {
-              const dayStr = day.toISOString();
-              return (
-                <DroppableDay key={dayStr} id={dayStr}>
-                  <p
-                    className={
-                      "px-2 mb-1 font-semibold rounded-full w-fit " +
-                      (isToday(day) ? "bg-accent text-accent-foreground " : "")
-                    }
-                  >
-                    {format(day, "EEE - dd.MM", {
-                      locale:
-                        locales[i18n.language as keyof typeof locales] || enUS,
-                    })}
-                  </p>
+            getWeekdays(currentWeek).map((day) => (
+              <DroppableDay key={day.toISOString()} id={day.toISOString()}>
+                <p
+                  className={`px-2 mb-1 font-semibold rounded-full w-fit ${
+                    isToday(day) ? "bg-accent text-accent-foreground" : ""
+                  }`}
+                >
+                  {format(day, "EEE - dd.MM", {
+                    locale:
+                      locales[i18n.language as keyof typeof locales] || enUS,
+                  })}
+                </p>
 
-                  {renderCorrectItem(day)}
-                </DroppableDay>
-              );
-            })
+                {getItemsByDate(day).length > 0 ? (
+                  <ul className="flex flex-col gap-2">
+                    {getItemsByDate(day).map((item) => (
+                      <li key={item.id}>
+                        <MealPlannerItem
+                          {...item}
+                          date={item.planned_date}
+                          setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
+                          onRecipeEaten={() => handleRecipeEaten(item)}
+                          onRecipeDelete={() => handleDelete(item.id)}
+                          onUpdateToNoDate={() =>
+                            handleUpdateDate(item.id, null, 1)
+                          }
+                          isDragging={activeItem?.id === item.id}
+                        />
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <MealPlannerAdd onClick={() => navigate("/cookbook")} />
+                )}
+              </DroppableDay>
+            ))
           )}
         </div>
 
@@ -727,6 +477,7 @@ export default function MealPlanner() {
         {activeItem && (
           <Card className="h-[90px] flex items-center shadow-2xl opacity-95 border-2 border-primary">
             <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
+
             <div className="flex-1 px-2.5">
               <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
                 {activeItem.recipeName}
@@ -736,47 +487,5 @@ export default function MealPlanner() {
         )}
       </DragOverlay>
     </DndContext>
-  );
-}
-
-function DroppableDay({
-  id,
-  children,
-}: Readonly<{
-  id: string;
-  children: React.ReactNode;
-}>) {
-  const { isOver, setNodeRef } = useDroppable({
-    id: id,
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`transition-colors rounded-lg p-1 min-h-[50px] ${
-        isOver ? "bg-accent ring-2 ring-primary" : ""
-      }`}
-    >
-      {children}
-    </div>
-  );
-}
-
-function DroppableNoDateZone({
-  children,
-}: Readonly<{
-  children?: React.ReactNode;
-}>) {
-  const { isOver, setNodeRef } = useDroppable({
-    id: "no-date-zone",
-  });
-
-  return (
-    <div
-      ref={setNodeRef}
-      className={`transition-colors ${isOver ? "bg-accent" : "bg-background"}`}
-    >
-      {children}
-    </div>
   );
 }
