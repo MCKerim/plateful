@@ -1,5 +1,3 @@
-//import AddRecipeItemMenu from "@/components/atoms/AddRecipeItemMenu";
-//import ShoppingItem from "@/components/atoms/ShoppingItem";
 import { ImagePicker } from "@/components/atoms/ImagePicker";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
@@ -13,7 +11,6 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import imageCompression from "browser-image-compression";
-//import { getTikTokPreview, urlToFile } from "@/lib/recipeImportHelper";
 import {
   Select,
   SelectContent,
@@ -25,11 +22,6 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/atoms/DeleteDialog";
-
-/*type RecipeItem = {
-  itemName: string;
-  amount: string;
-};*/
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();
@@ -49,7 +41,6 @@ export default function AddRecipe() {
     filterCategoryId === 0 ? null : filterCategoryId
   );
 
-  //const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageSupabaseUrl, setImageSupabaseUrl] = useState<string>("");
@@ -192,17 +183,6 @@ export default function AddRecipe() {
     });
   }, [params.recipeId, searchParams]);
 
-  /*function addItem(name: string, amount: string) {
-    console.log("Adding item: ", name, amount);
-    setRecipeItems([...recipeItems, { itemName: name, amount }]);
-  }
-
-  function removeItem(index: number) {
-    const newItems = [...recipeItems];
-    newItems.splice(index, 1);
-    setRecipeItems(newItems);
-  }*/
-
   async function uploadToSupabase(file: File) {
     setImageUploading(true);
     const fileExt = file.name.split(".").pop();
@@ -268,7 +248,7 @@ export default function AddRecipe() {
 
     if (params.recipeId) {
       // Update existing recipe
-      const recipeId = parseInt(params.recipeId);
+      const recipeId = Number.parseInt(params.recipeId);
       const { data, error } = await supabase
         .from("recipes")
         .update({
@@ -281,11 +261,7 @@ export default function AddRecipe() {
         .select();
       if (!error && data) {
         // If a new image was uploaded, move it to the correct folder if needed
-        if (
-          imageFile &&
-          imageSupabaseUrl &&
-          imageSupabaseUrl.includes("temp")
-        ) {
+        if (imageFile && imageSupabaseUrl?.includes("temp")) {
           const newPath = `recipe_${recipeId}/${imageSupabaseUrl
             .split("/")
             .pop()}`;
@@ -330,99 +306,10 @@ export default function AddRecipe() {
     }
   }
 
-  /*async function saveItems() {
-    const newItemsToInsert = recipeItems.map((item) => ({
-      name: item.itemName,
-    }));
-
-    const { data, error } = await supabase
-      .from("item")
-      .insert(newItemsToInsert)
-      .select();
-
-    if (error) {
-      console.error(error);
-      alert("An error occurred. Please try again.");
-      return null;
-    }
-    return data;
-  }*/
-
-  /*async function saveRecipeItems(recipeId: number) {
-    const newInsertedItems = await saveItems();
-
-    if (!newInsertedItems) {
-      return;
-    }
-
-    if (newInsertedItems) {
-      const recipeItemsToInsert = newInsertedItems.map((item, index) => ({
-        recipe_id: recipeId,
-        item_id: item.id,
-        amount: recipeItems[index].amount,
-      }));
-
-      const { error } = await supabase
-        .from("recipe_items")
-        .insert(recipeItemsToInsert)
-        .select();
-
-      if (error) {
-        console.error(error);
-        alert("An error occurred. Please try again.");
-        return;
-      } else {
-        navigate(`/recipe/${recipeId}`);
-      }
-    }
-  }*/
-
-  /*async function importRecipeData() {
-    if (!link) {
-      alert("Please enter a link.");
-      return;
-    }
-
-    try {
-      const data = await getTikTokPreview(link);
-      if (!data) {
-        alert("Failed to fetch TikTok preview. Please check the link.");
-        return;
-      }
-
-      setTitle(data.title.trim().substring(0, 90) || "");
-      setDescription(data.title.trim() || "");
-
-      const file = await urlToFile(data.thumbnail_url, "tiktok-preview.jpg");
-      if (!file) {
-        alert("Failed to convert TikTok preview image to file.");
-        return;
-      }
-
-      const compressedFile = await imageCompression(file, {
-        maxWidthOrHeight: 900,
-        maxSizeMB: 0.5,
-        useWebWorker: true,
-        initialQuality: 0.85,
-      });
-
-      setImageFile(compressedFile);
-      setImagePreview(data.thumbnail_url); // Use the original preview URL for display
-
-      const path = await uploadToSupabase(compressedFile);
-      setImageSupabaseUrl(path ?? "");
-    } catch (error) {
-      console.error("Error importing TikTok recipe data:", error);
-      alert(
-        "An error occurred while importing the recipe data. Please try again."
-      );
-    }
-  }*/
-
   async function deleteRecipe() {
     if (!params.recipeId) return false;
 
-    const recipeId = parseInt(params.recipeId);
+    const recipeId = Number.parseInt(params.recipeId);
 
     // Delete all images from storage for this recipe
     const { data: files, error: listError } = await supabase.storage
@@ -548,24 +435,6 @@ export default function AddRecipe() {
             autoComplete="off"
           />
         </div>
-
-        {/*<div className="flex flex-col w-full gap-2">
-          <h2 className="mt-2 font-bold text-md">{t("ingredients")}</h2>
-
-          {recipeItems.map((recipeItem, index) => (
-            <ShoppingItem
-              key={"item-" + index}
-              id={0}
-              name={recipeItem.itemName}
-              amount={recipeItem.amount}
-              bought={false}
-              onClick={() => removeItem(index)}
-              onEdit={() => {}}
-            />
-          ))}
-
-          <AddRecipeItemMenu onItemAdded={addItem} />
-        </div>*/}
       </div>
     </Layout>
   );

@@ -4,9 +4,8 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
-import { MealPlanning, Recipes } from "@/types/exportedDatabaseTypes.types";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
@@ -26,6 +25,7 @@ import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
 import { toast } from "sonner";
 import { RatingService } from "@/lib/services/ratingService";
 import RatingListItem from "@/components/atoms/RatingListItem";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 type RecipeItem = {
   id: number;
@@ -38,21 +38,107 @@ export default function Recipe() {
   const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const householdId = useAppSelector(selectHouseholdId);
   const currentUser = useAppSelector(selectUser);
+  const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
 
   const ratingService = new RatingService(supabase);
+  const ratingModalRef = useRef<RatingModalRef>(null);
 
-  const [recipe, setRecipe] = useState<Recipes | null>(null);
-  const [recipeItems, setRecipeItems] = useState<RecipeItem[]>([]);
-  const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
+  // Local state for ratings to allow instant UI updates (optimistic)
+  const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
   const [averageRating, setAverageRating] = useState<number | null>(null);
 
-  const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
-  const [imageUrls, setImageUrls] = useState<string[]>([]);
+  // --- REACT QUERY HOOKS ---
 
-  const ratingModalRef = useRef<RatingModalRef>(null);
+  // 1. Fetch Recipe Details
+  const { data: recipe } = useQuery({
+    queryKey: ["recipe", recipeId],
+    queryFn: async () => {
+      if (!recipeId) return null;
+      const { data } = await supabase
+        .from("recipes")
+        .select("*")
+        .eq("id", recipeId)
+        .single();
+      return data;
+    },
+    enabled: !!recipeId,
+  });
+
+  // 2. Fetch Recipe Items (Ingredients)
+  const { data: recipeItems = [] } = useQuery({
+    queryKey: ["recipe-items", recipeId],
+    queryFn: async () => {
+      if (!recipeId) return [];
+      const { data } = await supabase
+        .from("recipe_items")
+        .select(`id, recipe_id, amount, item ( id, name )`)
+        .eq("recipe_id", recipeId)
+        .order("created_at", { ascending: false });
+
+      return (data || []).map((item) => ({
+        id: item.item.id,
+        itemName: item.item.name,
+        amount: item.amount,
+      }));
+    },
+    enabled: !!recipeId,
+  });
+
+  // 3. Fetch Images
+  const { data: imageUrls = [] } = useQuery({
+    queryKey: ["recipe-images", recipeId],
+    queryFn: async () => {
+      if (!recipeId) return [];
+      const { data, error } = await supabase.storage
+        .from("recipeimages")
+        .list(`recipe_${recipeId}/`);
+
+      if (error || !data) return [];
+
+      const urls = await Promise.all(
+        data.map(async (file) => {
+          const { data: signedUrlData } = await supabase.storage
+            .from("recipeimages")
+            .createSignedUrl(`recipe_${recipeId}/${file.name}`, 3600);
+          return signedUrlData?.signedUrl || null;
+        })
+      );
+      return urls.filter((url): url is string => url !== null);
+    },
+    enabled: !!recipeId,
+  });
+
+  // 4. Fetch Meal Planning Info
+  const { data: lastMealPlan } = useQuery({
+    queryKey: ["meal-planning-info", recipeId],
+    queryFn: async () => {
+      if (!recipeId) return null;
+      const result = await getMealPlanningInfo(recipeId, supabase);
+      return result.data || null;
+    },
+    enabled: !!recipeId,
+  });
+
+  // 5. Fetch Ratings (Initial Load)
+  useQuery({
+    queryKey: ["ratings", recipeId],
+    queryFn: async () => {
+      if (!recipeId) return [];
+      const data = await ratingService.getRatingsByRecipeId(recipeId);
+      setRatings(data);
+      setAverageRating(RatingService.calculateAverage(data));
+      return data;
+    },
+    enabled: !!recipeId,
+    // We only fetch once on mount to populate local state
+    staleTime: 1000 * 60 * 5,
+  });
+
+  // --- EFFECTS ---
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -61,132 +147,15 @@ export default function Recipe() {
         globalThis.history.back();
       }
     };
-
     globalThis.addEventListener("popstate", handlePopState);
-
-    return () => {
-      globalThis.removeEventListener("popstate", handlePopState);
-    };
+    return () => globalThis.removeEventListener("popstate", handlePopState);
   }, []);
 
-  useEffect(() => {
-    if (!params.recipeId) return;
-    const recipeId = Number.parseInt(params.recipeId);
-
-    ratingService
-      .getRatingsByRecipeId(recipeId)
-      .then((data) => {
-        setRatings(data);
-        const avgRating = RatingService.calculateAverage(data);
-        setAverageRating(avgRating);
-      })
-      .catch((error) => {
-        console.error("Failed to load ratings:", error);
-      });
-  }, [params.recipeId]);
-
-  useEffect(() => {
-    async function getAllRecipeImages() {
-      const { data, error } = await supabase.storage
-        .from("recipeimages")
-        .list(`recipe_${params.recipeId}/`);
-
-      if (error) {
-        console.error("Error fetching images: ", error);
-        return;
-      }
-
-      if (data) {
-        const urls = await Promise.all(
-          data.map(async (file) => {
-            const { data: signedUrlData, error: signedUrlError } =
-              await supabase.storage
-                .from("recipeimages")
-                .createSignedUrl(
-                  `recipe_${params.recipeId}/${file.name}`,
-                  3600
-                );
-
-            if (signedUrlError) {
-              console.error("Error creating signed URL: ", signedUrlError);
-              return null;
-            }
-
-            return signedUrlData?.signedUrl;
-          })
-        );
-
-        setImageUrls(urls.filter((url) => url !== null));
-      }
-    }
-
-    getAllRecipeImages();
-  }, [params.recipeId]);
-
-  useEffect(() => {
-    async function getRecipe() {
-      if (!params.recipeId) return;
-      const recipeId = Number.parseInt(params.recipeId);
-
-      const { data } = await supabase
-        .from("recipes")
-        .select("*")
-        .eq("id", recipeId);
-
-      if (!data) {
-        setRecipe(null);
-        return;
-      }
-
-      setRecipe(data[0]);
-    }
-
-    getRecipe();
-  }, [params.recipeId]);
-
-  useEffect(() => {
-    async function getRecipeItems() {
-      if (!recipe) return;
-
-      const { data } = await supabase
-        .from("recipe_items")
-        .select(
-          `
-        id,
-        recipe_id,
-        amount,
-        item ( id, name )
-      `
-        )
-        .eq("recipe_id", recipe.id)
-        .order("created_at", { ascending: false });
-
-      const newRecipeItems: RecipeItem[] = [];
-
-      if (!data) {
-        setRecipeItems(newRecipeItems);
-        return;
-      }
-
-      data.forEach((recipeItem) => {
-        const newRecipeItem: RecipeItem = {
-          id: recipeItem.item.id,
-          itemName: recipeItem.item.name,
-          amount: recipeItem.amount,
-        };
-        newRecipeItems.push(newRecipeItem);
-      });
-      console.log("Items: ", newRecipeItems);
-      setRecipeItems(newRecipeItems);
-    }
-
-    getRecipeItems();
-  }, [recipe]);
+  // --- ACTIONS ---
 
   async function addItemsToShoppingList() {
-    console.log("Adding items to shopping list: ", recipeItems);
     const itemsToInsert = recipeItems.map((recipeItem) => ({
-      shopping_list_id: 1,
+      shopping_list_id: 1, // You might want to get this dynamically
       item_id: recipeItem.id,
       amount: recipeItem.amount,
       bought: false,
@@ -197,30 +166,12 @@ export default function Recipe() {
       .insert(itemsToInsert);
 
     if (error) {
-      console.error("Error adding items to shopping list: ", error);
-      alert("Error adding items to shopping list");
+      console.error("Error adding items: ", error);
+      toast.error(t("common.error"));
     } else {
-      alert("Items added to shopping list");
+      toast.success(t("shoppingList.addedSuccess"));
     }
   }
-
-  useEffect(() => {
-    async function fetchMealPlanningInfo() {
-      if (!params.recipeId) return;
-      const recipeId = Number.parseInt(params.recipeId);
-
-      const result = await getMealPlanningInfo(recipeId, supabase);
-
-      if (result.error) {
-        console.error("Error fetching meal planning info:", result.error);
-        setLastMealPlan(null);
-      } else {
-        setLastMealPlan(result.data);
-      }
-    }
-
-    fetchMealPlanningInfo();
-  }, [params.recipeId]);
 
   async function finishPlanning(dates: Date[]) {
     if (!recipe || !householdId) return;
@@ -240,9 +191,7 @@ export default function Recipe() {
       const planningPromises = dates.map((date) =>
         planRecipe(recipe.id, householdId, date, 1, supabase)
       );
-
       const results = await Promise.all(planningPromises);
-
       isSuccess = results.every((res) => res?.success);
     }
 
@@ -251,6 +200,11 @@ export default function Recipe() {
         position: "top-right",
         richColors: true,
       });
+
+      // KEY FIX: Invalidate queries so the dialog and planner page update instantly
+      queryClient.invalidateQueries({ queryKey: ["meal-planning"] });
+      queryClient.invalidateQueries({ queryKey: ["meal-planning-info"] });
+
       navigate("/planner");
     } else {
       toast.error(t("recipe.planningFailed"), {
@@ -260,25 +214,23 @@ export default function Recipe() {
     }
   }
 
+  // --- RATING HANDLERS (Optimistic UI) ---
+
   async function handleDeleteRating(ratingId: number) {
-    // Optimistically update UI
     const previousRatings = ratings;
-    setRatings((prevRatings) => {
-      const updatedRatings = prevRatings.filter((r) => r.id !== ratingId);
-      const avgRating = RatingService.calculateAverage(updatedRatings);
-      setAverageRating(avgRating);
-      return updatedRatings;
+    setRatings((prev) => {
+      const updated = prev.filter((r) => r.id !== ratingId);
+      setAverageRating(RatingService.calculateAverage(updated));
+      return updated;
     });
 
     try {
       await ratingService.deleteRating(ratingId);
     } catch (error) {
-      // Revert on error
       console.error("Failed to delete rating:", error);
-      alert(t("rating.deleteError"));
+      toast.error(t("rating.deleteError"));
       setRatings(previousRatings);
-      const avgRating = RatingService.calculateAverage(previousRatings);
-      setAverageRating(avgRating);
+      setAverageRating(RatingService.calculateAverage(previousRatings));
     }
   }
 
@@ -287,22 +239,20 @@ export default function Recipe() {
   }
 
   function handleRatingSubmitted(newRating: RecipeRatingWithUser) {
-    setRatings((prevRatings) => {
-      const updatedRatings = [newRating, ...prevRatings];
-      const avgRating = RatingService.calculateAverage(updatedRatings);
-      setAverageRating(avgRating);
-      return updatedRatings;
+    setRatings((prev) => {
+      const updated = [newRating, ...prev];
+      setAverageRating(RatingService.calculateAverage(updated));
+      return updated;
     });
   }
 
   function handleRatingUpdated(updatedRating: RecipeRatingWithUser) {
-    setRatings((prevRatings) => {
-      const updatedRatings = prevRatings.map((r) =>
+    setRatings((prev) => {
+      const updated = prev.map((r) =>
         r.id === updatedRating.id ? updatedRating : r
       );
-      const avgRating = RatingService.calculateAverage(updatedRatings);
-      setAverageRating(avgRating);
-      return updatedRatings;
+      setAverageRating(RatingService.calculateAverage(updated));
+      return updated;
     });
   }
 
@@ -313,7 +263,6 @@ export default function Recipe() {
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
-
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
         <NavLink
           to={`/recipe/edit/${recipe?.id}`}
@@ -327,6 +276,8 @@ export default function Recipe() {
       </div>
     </>
   );
+
+  if (!recipe) return null; // Or a loading spinner
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
@@ -358,14 +309,13 @@ export default function Recipe() {
 
       <div className="flex justify-between">
         <h1 className="first-font text-2xl font-bold break-words w-full">
-          {recipe?.name}
+          {recipe.name}
         </h1>
       </div>
 
       {recipeItems.length > 0 && (
         <>
-          <h2 className="mt-2 font-bold text-md">Ingredients</h2>
-
+          <h2 className="mt-2 font-bold text-md">{t("recipe.ingredients")}</h2>
           {recipeItems.map((recipeItem, index) => (
             <ShoppingItem
               key={"item-" + index}
@@ -377,21 +327,20 @@ export default function Recipe() {
               onEdit={() => {}}
             />
           ))}
-
           <Button
             className="w-full"
             variant="secondary"
             onClick={addItemsToShoppingList}
           >
-            Add items to shopping list
+            {t("shoppingList.addItems")}
           </Button>
         </>
       )}
 
-      <div className="flex justify-between">
+      <div className="flex justify-between mt-2">
         <div className="flex items-center gap-1">
           <CalendarDays size={16} />
-          <p className="text-sm">{getMealPlanStatus(lastMealPlan, t)}</p>
+          <p className="text-sm">{lastMealPlan && getMealPlanStatus(lastMealPlan, t)}</p>
         </div>
 
         <div className="flex items-center gap-0.5">
@@ -400,7 +349,7 @@ export default function Recipe() {
         </div>
       </div>
 
-      {recipe?.link && (
+      {recipe.link && (
         <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
           <Link />
           {t("recipe.toTheRecipe")}
@@ -410,7 +359,7 @@ export default function Recipe() {
       <Separator />
 
       <MarkdownRenderer
-        content={recipe?.description || ""}
+        content={recipe.description || ""}
         className="font-medium"
       />
 
@@ -419,7 +368,7 @@ export default function Recipe() {
 
         <RatingModal
           ref={ratingModalRef}
-          recipeId={recipe?.id}
+          recipeId={recipe.id}
           ratingSubmittedCallback={handleRatingSubmitted}
           ratingUpdatedCallback={handleRatingUpdated}
         />
