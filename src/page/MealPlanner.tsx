@@ -490,7 +490,7 @@ export default function MealPlanner() {
         </div>
 
         {/* Bottom Drawer */}
-        <div className="fixed bottom-16 left-0 right-0 z-40 bg-background border-t">
+        <div className="fixed bottom-16 left-0 right-0 z-40 bg-background border-t max-w-lg mx-auto">
           {/* Show drop zone when dragging from calendar */}
           {activeItem && !isDraggingFromDrawer && (
             <DroppableNoDateZone>
