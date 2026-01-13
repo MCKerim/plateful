@@ -168,7 +168,9 @@
     "selectNumberOfDays": "Select the number of days",
     "alreadyEaten": "Recently eaten",
     "nothingPlanned": "No recipes planned...",
-    "dropToRemoveDate": "Without Date"
+    "dropToRemoveDate": "Without Date",
+    "noDate": "No Date",
+    "noUnplannedRecipes": "no unplanned recipes"
   },
   "cookbook": {
     "title": "Cookbook",

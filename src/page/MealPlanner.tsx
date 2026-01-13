@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type MealPlannerItemType = {
   id: number;
@@ -77,6 +78,27 @@ const restrictToVerticalAxisAndWindow: Modifier = ({
   };
 };
 
+function MealPlannerItemSkeleton() {
+  return (
+    <Card className="h-[90px] flex items-center">
+      <Skeleton className="h-full w-[74px] rounded-l-lg rounded-r-none" />
+      <div className="flex-1 px-2.5 space-y-2">
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+    </Card>
+  );
+}
+
+function DayCardSkeleton() {
+  return (
+    <div className="p-1 min-h-[50px]">
+      <Skeleton className="h-5 w-24 mb-2 rounded-full" />
+      <MealPlannerItemSkeleton />
+    </div>
+  );
+}
+
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
   const { supabase } = useSupabase();
@@ -87,7 +109,8 @@ export default function MealPlanner() {
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
     null
   );
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false); // Default closed
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -107,21 +130,20 @@ export default function MealPlanner() {
     })
   );
 
+  // Fetch when week changes
   useEffect(() => {
     getMealPlannerItems();
-  }, []);
+  }, [currentWeek]);
 
   // Open drawer by default only if there are unplanned items
   useEffect(() => {
-    const unplannedItems = plannedItems.filter(
-      (item) => item.planned_date === null && item.daysEaten < item.days
-    );
+    const unplannedItems = getNotPlannedItems();
     if (unplannedItems.length > 0) {
       setIsDrawerOpen(true);
     } else {
       setIsDrawerOpen(false);
     }
-  }, [plannedItems.length]); // Only run when items count changes
+  }, [plannedItems.length]);
 
   useEffect(() => {
     if (activeItem !== null) {
@@ -153,7 +175,17 @@ export default function MealPlanner() {
   }, [activeItem]);
 
   async function getMealPlannerItems() {
-    const { data } = await supabase
+    setIsLoading(true);
+
+    const weekDays = getWeekdays(currentWeek);
+    const weekStart = new Date(weekDays[0]);
+    const weekEnd = new Date(weekDays[6]);
+
+    // Set time to start/end of day for proper range
+    weekStart.setHours(0, 0, 0, 0);
+    weekEnd.setHours(23, 59, 59, 999);
+
+    const { data, error } = await supabase
       .from("meal_planning")
       .select(
         `
@@ -164,31 +196,42 @@ export default function MealPlanner() {
         recipes (id, name)
       `
       )
+      .or(
+        `planned_date.is.null,and(planned_date.gte.${weekStart.toISOString()},planned_date.lte.${weekEnd.toISOString()})`
+      )
       .order("created_at", { ascending: true });
 
-    const newItems: MealPlannerItemType[] = [];
-
-    if (!data) {
-      setPlannedItems(newItems);
+    if (error) {
+      console.error("Error fetching meal planner items:", error);
+      setIsLoading(false);
       return;
     }
 
-    data.forEach((item) => {
-      const newItem: MealPlannerItemType = {
-        id: item.id,
-        recipeId: item.recipes?.id ?? 1,
-        planned_date: item.planned_date ? new Date(item.planned_date) : null,
-        recipeName: item.recipes?.name ?? "no name",
-        days: item.days,
-        daysEaten: item.daysEaten,
-      };
-      newItems.push(newItem);
-    });
+    const newItems: MealPlannerItemType[] = [];
+
+    if (data) {
+      data.forEach((item) => {
+        const newItem: MealPlannerItemType = {
+          id: item.id,
+          recipeId: item.recipes?.id ?? 1,
+          planned_date: item.planned_date ? new Date(item.planned_date) : null,
+          recipeName: item.recipes?.name ?? "no name",
+          days: item.days,
+          daysEaten: item.daysEaten,
+        };
+        newItems.push(newItem);
+      });
+    }
 
     setPlannedItems(newItems);
+    setIsLoading(false);
   }
 
   async function deletePlannedItem(id: number) {
+    // Optimistic update
+    const previousItems = [...plannedItems];
+    setPlannedItems(plannedItems.filter((item) => item.id !== id));
+
     const { error } = await supabase
       .from("meal_planning")
       .delete()
@@ -196,9 +239,8 @@ export default function MealPlanner() {
 
     if (error) {
       console.error("Error while deleting planned item: ", error);
-      alert("Error while deleting planned item");
-    } else {
-      setPlannedItems(plannedItems.filter((item) => item.id !== id));
+      toast.error(t("mealPlanner.deleteError"));
+      setPlannedItems(previousItems); // Revert on error
     }
   }
 
@@ -207,6 +249,7 @@ export default function MealPlanner() {
     newDate: Date | null,
     newDays: number
   ) {
+    // Optimistic update already done in handleDragEnd
     const plannedDate = newDate ? newDate.toISOString() : null;
     const { error } = await supabase
       .from("meal_planning")
@@ -215,18 +258,25 @@ export default function MealPlanner() {
 
     if (error) {
       console.error("Error while updating planned item date: ", error);
-      alert("Error while updating planned item date");
-      getMealPlannerItems();
+      toast.error(t("recipe.planningFailed"));
+      getMealPlannerItems(); // Only refetch on error to revert
     } else {
       toast.success(t("recipe.planningSuccessful"), {
         position: "top-right",
         richColors: true,
       });
-      getMealPlannerItems();
     }
   }
 
   async function setDaysEaten(id: number, newDaysEaten: number) {
+    // Optimistic update
+    const previousItems = [...plannedItems];
+    setPlannedItems((prevItems) =>
+      prevItems.map((item) =>
+        item.id === id ? { ...item, daysEaten: newDaysEaten } : item
+      )
+    );
+
     const { error } = await supabase
       .from("meal_planning")
       .update({ daysEaten: newDaysEaten })
@@ -234,13 +284,8 @@ export default function MealPlanner() {
 
     if (error) {
       console.error("Error while updating daysEaten: ", error);
-      alert("Error while updating daysEaten");
-    } else {
-      setPlannedItems((prevItems) =>
-        prevItems.map((item) =>
-          item.id === id ? { ...item, daysEaten: newDaysEaten } : item
-        )
-      );
+      toast.error(t("mealPlanner.updateError"));
+      setPlannedItems(previousItems); // Revert on error
     }
   }
 
@@ -271,6 +316,7 @@ export default function MealPlanner() {
     });
   }
 
+  // Unplanned items: no date AND not fully eaten
   function getNotPlannedItems(): MealPlannerItemType[] {
     return plannedItems.filter((item) => {
       return item.planned_date === null && item.daysEaten < item.days;
@@ -288,7 +334,6 @@ export default function MealPlanner() {
   function handleDragOver(event: DragOverEvent) {
     const { over } = event;
 
-    // Open drawer when hovering over the no-date drop zone
     if (over?.id === "no-date-zone") {
       setIsDrawerOpen(true);
     }
@@ -311,6 +356,7 @@ export default function MealPlanner() {
         return;
       }
 
+      // Optimistic update
       setPlannedItems((items) =>
         items.map((item) =>
           item.id === draggedItem.id ? { ...item, planned_date: null } : item
@@ -319,7 +365,6 @@ export default function MealPlanner() {
 
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItem(null);
-      // Drawer stays open since we just added an item
       return;
     }
 
@@ -344,6 +389,7 @@ export default function MealPlanner() {
       }
     }
 
+    // Optimistic update
     setPlannedItems((items) =>
       items.map((item) =>
         item.id === draggedItem.id
@@ -433,11 +479,11 @@ export default function MealPlanner() {
           <div className="flex flex-col items-center">
             <h2 className="text-lg font-semibold">
               {isSameWeek(currentWeek, new Date())
-                ? "Diese Woche"
+                ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
-                ? "Nächste Woche"
+                ? t("mealPlanner.nextWeek")
                 : isSameWeek(currentWeek, subWeeks(new Date(), 1))
-                ? "Letzte Woche"
+                ? t("mealPlanner.lastWeek")
                 : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
                     getWeekdays(currentWeek)[6],
                     "dd.MM"
@@ -451,7 +497,7 @@ export default function MealPlanner() {
                 onClick={goToCurrentWeek}
                 className="h-auto p-0 text-xs text-muted-foreground"
               >
-                Zur aktuellen Woche
+                {t("mealPlanner.goToCurrentWeek")}
               </Button>
             )}
 
@@ -467,26 +513,36 @@ export default function MealPlanner() {
 
         {/* Calendar Days */}
         <div className="flex flex-col gap-2.5 mb-64 p-2">
-          {getWeekdays(currentWeek).map((day) => {
-            const dayStr = day.toISOString();
-            return (
-              <DroppableDay key={dayStr} id={dayStr}>
-                <p
-                  className={
-                    "px-2 mb-1 font-semibold rounded-full w-fit " +
-                    (isToday(day) ? "bg-accent text-accent-foreground " : "")
-                  }
-                >
-                  {format(day, "EEE - dd.MM", {
-                    locale:
-                      locales[i18n.language as keyof typeof locales] || enUS,
-                  })}
-                </p>
+          {isLoading ? (
+            // Loading skeletons
+            <>
+              {[...Array(7)].map((_, index) => (
+                <DayCardSkeleton key={index} />
+              ))}
+            </>
+          ) : (
+            // Actual content
+            getWeekdays(currentWeek).map((day) => {
+              const dayStr = day.toISOString();
+              return (
+                <DroppableDay key={dayStr} id={dayStr}>
+                  <p
+                    className={
+                      "px-2 mb-1 font-semibold rounded-full w-fit " +
+                      (isToday(day) ? "bg-accent text-accent-foreground " : "")
+                    }
+                  >
+                    {format(day, "EEE - dd.MM", {
+                      locale:
+                        locales[i18n.language as keyof typeof locales] || enUS,
+                    })}
+                  </p>
 
-                {renderCorrectItem(day)}
-              </DroppableDay>
-            );
-          })}
+                  {renderCorrectItem(day)}
+                </DroppableDay>
+              );
+            })
+          )}
         </div>
 
         {/* Bottom Drawer */}
@@ -512,7 +568,7 @@ export default function MealPlanner() {
                 <div className="flex items-center gap-2">
                   <CalendarOff size={20} />
                   <span className="font-medium">
-                    Ohne Datum - {notPlannedItems.length}
+                    {t("mealPlanner.noDate")} - {notPlannedItems.length}
                   </span>
                 </div>
                 <ChevronDown
@@ -523,14 +579,22 @@ export default function MealPlanner() {
                 />
               </button>
 
-              {/* Drawer Content - Always mounted, visibility controlled by CSS */}
+              {/* Drawer Content */}
               <div
                 className={`overflow-hidden transition-all duration-200 ${
                   isDrawerOpen ? "max-h-[200px]" : "max-h-0"
                 }`}
               >
                 <div className="p-2">
-                  {notPlannedItems.length > 0 ? (
+                  {isLoading ? (
+                    <div className="flex gap-3 overflow-x-auto pb-2">
+                      {[...Array(2)].map((_, index) => (
+                        <div key={index} className="flex-shrink-0 w-[280px]">
+                          <MealPlannerItemSkeleton />
+                        </div>
+                      ))}
+                    </div>
+                  ) : notPlannedItems.length > 0 ? (
                     <div className="flex gap-3 overflow-x-auto pb-2">
                       {notPlannedItems.map((item) => (
                         <div key={item.id} className="flex-shrink-0 w-[280px]">
@@ -540,7 +604,7 @@ export default function MealPlanner() {
                     </div>
                   ) : (
                     <p className="text-center text-muted-foreground py-4">
-                      {t("mealPlanner.noUnplannedItems")}
+                      {t("mealPlanner.noUnplannedRecipes")}
                     </p>
                   )}
                 </div>
