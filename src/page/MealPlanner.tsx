@@ -111,7 +111,7 @@ function useMealPlannerItems(currentWeek: Date) {
   weekEnd.setHours(23, 59, 59, 999);
 
   return useQuery({
-    queryKey: ["mealPlanner", weekStart.toISOString()],
+    queryKey: ["meal-planning", "list", weekStart.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("meal_planning")

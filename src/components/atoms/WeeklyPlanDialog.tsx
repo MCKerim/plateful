@@ -7,7 +7,7 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query"; // Import keepPreviousData
 import { useSupabase } from "@/utils/supabase";
 import { Skeleton } from "../ui/skeleton";
 
@@ -37,7 +37,8 @@ function usePlannedItemsForWeek(currentWeek: Date, enabled: boolean) {
   weekEnd.setHours(23, 59, 59, 999);
 
   return useQuery({
-    queryKey: ["plannedItemsSummary", weekStart.toISOString()],
+    // UNIFIED QUERY KEY: Start with 'meal-planning'
+    queryKey: ["meal-planning", "summary", weekStart.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("meal_planning")
@@ -59,7 +60,7 @@ function usePlannedItemsForWeek(currentWeek: Date, enabled: boolean) {
       })) as PlannedItemSummary[];
     },
     enabled,
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -80,7 +81,7 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
   const [withoutDate, setWithoutDate] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
-  const { data: plannedItems = [], isLoading } = usePlannedItemsForWeek(
+  const { data: plannedItems = [], isFetching } = usePlannedItemsForWeek(
     currentWeek,
     isDialogOpen
   );
@@ -100,7 +101,6 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
   function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
 
-    // Reset state when closing
     if (!isOpen) {
       setSelectedDates([]);
       setWithoutDate(false);
@@ -229,21 +229,17 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
                 </div>
 
                 {/* Show planned items */}
-                {isLoading ? (
-                  <Skeleton className="h-4 w-32" />
-                ) : (
-                  hasPlannedItems && (
-                    <div className="w-full flex flex-wrap gap-1">
-                      {plannedForDay.map((item, index) => (
-                        <span
-                          key={index}
-                          className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground truncate max-w-[150px]"
-                        >
-                          {item.recipe_name}
-                        </span>
-                      ))}
-                    </div>
-                  )
+                {hasPlannedItems && (
+                  <div className="w-full flex flex-wrap gap-1">
+                    {plannedForDay.map((item, index) => (
+                      <span
+                        key={index}
+                        className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground truncate max-w-[150px]"
+                      >
+                        {item.recipe_name}
+                      </span>
+                    ))}
+                  </div>
                 )}
               </Button>
             );
