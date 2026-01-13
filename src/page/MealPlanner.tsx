@@ -708,7 +708,7 @@ export default function MealPlanner() {
                     </div>
                   ) : (
                     <p className="text-center text-muted-foreground py-4">
-                      {t("mealPlanner.noUnplannedItems")}
+                      {t("mealPlanner.noUnplannedRecipes")}
                     </p>
                   )}
                 </div>

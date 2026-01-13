@@ -176,7 +176,9 @@
     "nextWeek": "Nächste Woche",
     "lastWeek": "Letzte Woche",
     "deleteError": "Fehler beim Löschen",
-    "updateError": "Fehler beim Aktualisieren"
+    "updateError": "Fehler beim Aktualisieren",
+    "planned": "Geplant",
+    "selectDayOrWithoutDate": "Bitte wählen Sie einen Tag aus oder wählen Sie „Ohne Datum“."
   },
   "cookbook": {
     "title": "Kochbuch",

@@ -176,7 +176,9 @@
     "nextWeek": "Next Week",
     "lastWeek": "Letzte Woche",
     "deleteError": "Error deleting item",
-    "updateError": "Error updating item"
+    "updateError": "Error updating item",
+    "planned": "planned",
+    "selectDayOrWithoutDate": "Please select a day or choose 'Without date'"
   },
   "cookbook": {
     "title": "Cookbook",

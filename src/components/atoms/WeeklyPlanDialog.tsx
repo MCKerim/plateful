@@ -7,9 +7,17 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import { useSupabase } from "@/utils/supabase";
+import { Skeleton } from "../ui/skeleton";
 
 type Props = {
   onFinish: (selectedDates: Date[]) => void;
+};
+
+type PlannedItemSummary = {
+  planned_date: string;
+  recipe_name: string;
 };
 
 const locales = {
@@ -19,14 +27,63 @@ const locales = {
   de: de,
 };
 
+function usePlannedItemsForWeek(currentWeek: Date, enabled: boolean) {
+  const { supabase } = useSupabase();
+  const weekDays = getWeekdays(currentWeek);
+  const weekStart = new Date(weekDays[0]);
+  const weekEnd = new Date(weekDays[6]);
+
+  weekStart.setHours(0, 0, 0, 0);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  return useQuery({
+    queryKey: ["plannedItemsSummary", weekStart.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("meal_planning")
+        .select(
+          `
+          planned_date,
+          recipes (name)
+        `
+        )
+        .gte("planned_date", weekStart.toISOString())
+        .lte("planned_date", weekEnd.toISOString())
+        .order("planned_date", { ascending: true });
+
+      if (error) throw error;
+
+      return (data || []).map((item) => ({
+        planned_date: item.planned_date,
+        recipe_name: item.recipes?.name ?? "Unknown",
+      })) as PlannedItemSummary[];
+    },
+    enabled,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+  });
+}
+
+function getPlannedItemsForDate(
+  plannedItems: PlannedItemSummary[],
+  date: Date
+): PlannedItemSummary[] {
+  return plannedItems.filter(
+    (item) => item.planned_date && isSameDay(new Date(item.planned_date), date)
+  );
+}
+
 export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(new Date());
+
+  const { data: plannedItems = [], isLoading } = usePlannedItemsForWeek(
+    currentWeek,
+    isDialogOpen
+  );
 
   function goToPreviousWeek() {
     setCurrentWeek((prevWeek) => subWeeks(prevWeek, 1));
@@ -42,6 +99,13 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
 
   function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
+
+    // Reset state when closing
+    if (!isOpen) {
+      setSelectedDates([]);
+      setWithoutDate(false);
+      setCurrentWeek(new Date());
+    }
   }
 
   function toggleWeekDate(date: Date) {
@@ -67,7 +131,7 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
 
   function handleFinish() {
     if (selectedDates.length === 0 && !withoutDate) {
-      alert("Bitte wähle einen Tag aus oder wähle 'Ohne Datum'");
+      alert(t("mealPlanner.selectDayOrWithoutDate"));
       return;
     }
 
@@ -80,7 +144,6 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
       <DialogTrigger asChild>
         <Button className="w-full" variant="accent">
           <CalendarDays />
-
           {t("recipe.planRecipe")}
         </Button>
       </DialogTrigger>
@@ -96,11 +159,11 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
             <div className="flex flex-col items-center">
               <h2 className="text-lg font-semibold">
                 {isSameWeek(currentWeek, new Date())
-                  ? "Diese Woche"
+                  ? t("mealPlanner.thisWeek")
                   : isSameWeek(currentWeek, addWeeks(new Date(), 1))
-                  ? "Nächste Woche"
+                  ? t("mealPlanner.nextWeek")
                   : isSameWeek(currentWeek, subWeeks(new Date(), 1))
-                  ? "Letzte Woche"
+                  ? t("mealPlanner.lastWeek")
                   : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
                       getWeekdays(currentWeek)[6],
                       "dd.MM"
@@ -114,7 +177,7 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
                   onClick={goToCurrentWeek}
                   className="h-auto p-0 text-xs text-muted-foreground"
                 >
-                  Zur aktuellen Woche
+                  {t("mealPlanner.goToCurrentWeek")}
                 </Button>
               )}
             </div>
@@ -124,44 +187,82 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
             </Button>
           </div>
 
+          {/* Day Buttons */}
           {getWeekdays(currentWeek).map((day) => {
             const isToday = isSameDay(day, new Date());
             const isSelected = selectedDates.some((d) => isSameDay(d, day));
+            const plannedForDay = getPlannedItemsForDate(plannedItems, day);
+            const hasPlannedItems = plannedForDay.length > 0;
 
             return (
               <Button
-                key={format(day, "EEE - dd.MM", {
-                  locale:
-                    locales[i18n.language as keyof typeof locales] || enUS,
-                })}
+                key={day.toISOString()}
                 variant="outline"
                 onClick={() => toggleWeekDate(day)}
-                className={`${
-                  isSelected ? "bg-accent text-accent-foreground" : ""
+                className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
+                  isSelected
+                    ? "bg-accent text-accent-foreground ring-2 ring-primary"
+                    : ""
                 }`}
               >
-                {isToday && (
-                  <span className="fixed left-8 rounded-full px-2 bg-primary text-primary-foreground">
-                    {t("common.today")}
-                  </span>
-                )}
+                <div className="w-full flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    {isToday && (
+                      <span className="rounded-full px-2 py-0.5 text-xs bg-primary text-primary-foreground">
+                        {t("common.today")}
+                      </span>
+                    )}
+                    <span>
+                      {format(day, "EEE - dd.MM", {
+                        locale:
+                          locales[i18n.language as keyof typeof locales] ||
+                          enUS,
+                      })}
+                    </span>
+                  </div>
 
-                {format(day, "EEE - dd.MM", {
-                  locale:
-                    locales[i18n.language as keyof typeof locales] || enUS,
-                })}
+                  {hasPlannedItems && (
+                    <span className="text-xs text-muted-foreground">
+                      {plannedForDay.length} {t("mealPlanner.planned")}
+                    </span>
+                  )}
+                </div>
+
+                {/* Show planned items */}
+                {isLoading ? (
+                  <Skeleton className="h-4 w-32" />
+                ) : (
+                  hasPlannedItems && (
+                    <div className="w-full flex flex-wrap gap-1">
+                      {plannedForDay.map((item, index) => (
+                        <span
+                          key={index}
+                          className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground truncate max-w-[150px]"
+                        >
+                          {item.recipe_name}
+                        </span>
+                      ))}
+                    </div>
+                  )
+                )}
               </Button>
             );
           })}
 
+          {/* Without Date Button */}
           <Button
             variant="secondary"
-            className={withoutDate ? "bg-accent text-accent-foreground" : ""}
+            className={
+              withoutDate
+                ? "bg-accent text-accent-foreground ring-2 ring-primary"
+                : ""
+            }
             onClick={toggleWithoutDate}
           >
-            Ohne Datum
+            {t("mealPlanner.noDate")}
           </Button>
 
+          {/* Save Button */}
           <Button className="mt-4" onClick={handleFinish}>
             {t("common.save")}
           </Button>
