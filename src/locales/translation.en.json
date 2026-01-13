@@ -168,9 +168,15 @@
     "selectNumberOfDays": "Select the number of days",
     "alreadyEaten": "Recently eaten",
     "nothingPlanned": "No recipes planned...",
-    "dropToRemoveDate": "Without Date",
+    "dropToRemoveDate": "Drop here to remove date",
     "noDate": "No Date",
-    "noUnplannedRecipes": "no unplanned recipes"
+    "noUnplannedRecipes": "no unplanned recipes",
+    "goToCurrentWeek": "go to current week",
+    "thisWeek": "This Week",
+    "nextWeek": "Next Week",
+    "lastWeek": "Letzte Woche",
+    "deleteError": "Error deleting item",
+    "updateError": "Error updating item"
   },
   "cookbook": {
     "title": "Cookbook",

@@ -39,6 +39,7 @@ import { useTranslation } from "react-i18next";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type MealPlannerItemType = {
   id: number;
@@ -47,6 +48,14 @@ type MealPlannerItemType = {
   planned_date: Date | null;
   days: number;
   daysEaten: number;
+};
+
+type MealPlanningRaw = {
+  id: number;
+  planned_date: string | null;
+  days: number;
+  daysEaten: number;
+  recipes: { id: number; name: string } | null;
 };
 
 const locales = {
@@ -78,6 +87,195 @@ const restrictToVerticalAxisAndWindow: Modifier = ({
   };
 };
 
+function transformMealPlannerData(
+  data: MealPlanningRaw[]
+): MealPlannerItemType[] {
+  return data.map((item) => ({
+    id: item.id,
+    recipeId: item.recipes?.id ?? 1,
+    planned_date: item.planned_date ? new Date(item.planned_date) : null,
+    recipeName: item.recipes?.name ?? "no name",
+    days: item.days,
+    daysEaten: item.daysEaten,
+  }));
+}
+
+// Custom hook for fetching meal planner items
+function useMealPlannerItems(currentWeek: Date) {
+  const { supabase } = useSupabase();
+  const weekDays = getWeekdays(currentWeek);
+  const weekStart = new Date(weekDays[0]);
+  const weekEnd = new Date(weekDays[6]);
+
+  weekStart.setHours(0, 0, 0, 0);
+  weekEnd.setHours(23, 59, 59, 999);
+
+  return useQuery({
+    queryKey: ["mealPlanner", weekStart.toISOString()],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("meal_planning")
+        .select(
+          `
+          id,
+          planned_date,
+          days,
+          daysEaten,
+          recipes (id, name)
+        `
+        )
+        .or(
+          `planned_date.is.null,and(planned_date.gte.${weekStart.toISOString()},planned_date.lte.${weekEnd.toISOString()})`
+        )
+        .order("created_at", { ascending: true });
+
+      if (error) throw error;
+      return transformMealPlannerData(data as MealPlanningRaw[]);
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+  });
+}
+
+// Mutation for deleting planned items
+function useDeletePlannedItem() {
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (id: number) => {
+      const { error } = await supabase
+        .from("meal_planning")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onMutate: async (id: number) => {
+      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
+
+      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
+        queryKey: ["mealPlanner"],
+      });
+
+      queryClient.setQueriesData<MealPlannerItemType[]>(
+        { queryKey: ["mealPlanner"] },
+        (old) => old?.filter((item) => item.id !== id)
+      );
+
+      return { previousData };
+    },
+    onError: (_err, _id, context) => {
+      context?.previousData.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
+    },
+  });
+}
+
+// Mutation for updating planned item date
+function useUpdatePlannedItemDate() {
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      newDate,
+      newDays,
+    }: {
+      id: number;
+      newDate: Date | null;
+      newDays: number;
+    }) => {
+      const plannedDate = newDate ? newDate.toISOString() : null;
+      const { error } = await supabase
+        .from("meal_planning")
+        .update({ planned_date: plannedDate, days: newDays })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onMutate: async ({ id, newDate, newDays }) => {
+      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
+
+      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
+        queryKey: ["mealPlanner"],
+      });
+
+      queryClient.setQueriesData<MealPlannerItemType[]>(
+        { queryKey: ["mealPlanner"] },
+        (old) =>
+          old?.map((item) =>
+            item.id === id
+              ? { ...item, planned_date: newDate, days: newDays }
+              : item
+          )
+      );
+
+      return { previousData };
+    },
+    onError: (_err, _variables, context) => {
+      context?.previousData.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
+    },
+  });
+}
+
+// Mutation for updating days eaten
+function useSetDaysEaten() {
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      newDaysEaten,
+    }: {
+      id: number;
+      newDaysEaten: number;
+    }) => {
+      const { error } = await supabase
+        .from("meal_planning")
+        .update({ daysEaten: newDaysEaten })
+        .eq("id", id);
+
+      if (error) throw error;
+    },
+    onMutate: async ({ id, newDaysEaten }) => {
+      await queryClient.cancelQueries({ queryKey: ["mealPlanner"] });
+
+      const previousData = queryClient.getQueriesData<MealPlannerItemType[]>({
+        queryKey: ["mealPlanner"],
+      });
+
+      queryClient.setQueriesData<MealPlannerItemType[]>(
+        { queryKey: ["mealPlanner"] },
+        (old) =>
+          old?.map((item) =>
+            item.id === id ? { ...item, daysEaten: newDaysEaten } : item
+          )
+      );
+
+      return { previousData };
+    },
+    onError: (_err, _variables, context) => {
+      context?.previousData.forEach(([queryKey, data]) => {
+        queryClient.setQueryData(queryKey, data);
+      });
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: ["mealPlanner"] });
+    },
+  });
+}
+
 function MealPlannerItemSkeleton() {
   return (
     <Card className="h-[90px] flex items-center">
@@ -101,19 +299,23 @@ function DayCardSkeleton() {
 
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
-  const { supabase } = useSupabase();
   const navigate = useNavigate();
 
-  const [plannedItems, setPlannedItems] = useState<MealPlannerItemType[]>([]);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
     null
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
+
+  // React Query hooks
+  const { data: plannedItems = [], isLoading } =
+    useMealPlannerItems(currentWeek);
+  const deleteMutation = useDeletePlannedItem();
+  const updateDateMutation = useUpdatePlannedItemDate();
+  const setDaysEatenMutation = useSetDaysEaten();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -129,11 +331,6 @@ export default function MealPlanner() {
       },
     })
   );
-
-  // Fetch when week changes
-  useEffect(() => {
-    getMealPlannerItems();
-  }, [currentWeek]);
 
   // Open drawer by default only if there are unplanned items
   useEffect(() => {
@@ -174,119 +371,44 @@ export default function MealPlanner() {
     };
   }, [activeItem]);
 
-  async function getMealPlannerItems() {
-    setIsLoading(true);
-
-    const weekDays = getWeekdays(currentWeek);
-    const weekStart = new Date(weekDays[0]);
-    const weekEnd = new Date(weekDays[6]);
-
-    // Set time to start/end of day for proper range
-    weekStart.setHours(0, 0, 0, 0);
-    weekEnd.setHours(23, 59, 59, 999);
-
-    const { data, error } = await supabase
-      .from("meal_planning")
-      .select(
-        `
-        id,
-        planned_date,
-        days,
-        daysEaten,
-        recipes (id, name)
-      `
-      )
-      .or(
-        `planned_date.is.null,and(planned_date.gte.${weekStart.toISOString()},planned_date.lte.${weekEnd.toISOString()})`
-      )
-      .order("created_at", { ascending: true });
-
-    if (error) {
-      console.error("Error fetching meal planner items:", error);
-      setIsLoading(false);
-      return;
-    }
-
-    const newItems: MealPlannerItemType[] = [];
-
-    if (data) {
-      data.forEach((item) => {
-        const newItem: MealPlannerItemType = {
-          id: item.id,
-          recipeId: item.recipes?.id ?? 1,
-          planned_date: item.planned_date ? new Date(item.planned_date) : null,
-          recipeName: item.recipes?.name ?? "no name",
-          days: item.days,
-          daysEaten: item.daysEaten,
-        };
-        newItems.push(newItem);
-      });
-    }
-
-    setPlannedItems(newItems);
-    setIsLoading(false);
+  function deletePlannedItem(id: number) {
+    deleteMutation.mutate(id, {
+      onError: () => {
+        toast.error(t("mealPlanner.deleteError"));
+      },
+    });
   }
 
-  async function deletePlannedItem(id: number) {
-    // Optimistic update
-    const previousItems = [...plannedItems];
-    setPlannedItems(plannedItems.filter((item) => item.id !== id));
-
-    const { error } = await supabase
-      .from("meal_planning")
-      .delete()
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error while deleting planned item: ", error);
-      toast.error(t("mealPlanner.deleteError"));
-      setPlannedItems(previousItems); // Revert on error
-    }
-  }
-
-  async function updatePlannedItemDate(
+  function updatePlannedItemDate(
     id: number,
     newDate: Date | null,
     newDays: number
   ) {
-    // Optimistic update already done in handleDragEnd
-    const plannedDate = newDate ? newDate.toISOString() : null;
-    const { error } = await supabase
-      .from("meal_planning")
-      .update({ planned_date: plannedDate, days: newDays })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error while updating planned item date: ", error);
-      toast.error(t("recipe.planningFailed"));
-      getMealPlannerItems(); // Only refetch on error to revert
-    } else {
-      toast.success(t("recipe.planningSuccessful"), {
-        position: "top-right",
-        richColors: true,
-      });
-    }
+    updateDateMutation.mutate(
+      { id, newDate, newDays },
+      {
+        onSuccess: () => {
+          toast.success(t("recipe.planningSuccessful"), {
+            position: "top-right",
+            richColors: true,
+          });
+        },
+        onError: () => {
+          toast.error(t("recipe.planningFailed"));
+        },
+      }
+    );
   }
 
-  async function setDaysEaten(id: number, newDaysEaten: number) {
-    // Optimistic update
-    const previousItems = [...plannedItems];
-    setPlannedItems((prevItems) =>
-      prevItems.map((item) =>
-        item.id === id ? { ...item, daysEaten: newDaysEaten } : item
-      )
+  function setDaysEaten(id: number, newDaysEaten: number) {
+    setDaysEatenMutation.mutate(
+      { id, newDaysEaten },
+      {
+        onError: () => {
+          toast.error(t("mealPlanner.updateError"));
+        },
+      }
     );
-
-    const { error } = await supabase
-      .from("meal_planning")
-      .update({ daysEaten: newDaysEaten })
-      .eq("id", id);
-
-    if (error) {
-      console.error("Error while updating daysEaten: ", error);
-      toast.error(t("mealPlanner.updateError"));
-      setPlannedItems(previousItems); // Revert on error
-    }
   }
 
   function showRateRecipeModal(recipeId: number) {
@@ -356,13 +478,6 @@ export default function MealPlanner() {
         return;
       }
 
-      // Optimistic update
-      setPlannedItems((items) =>
-        items.map((item) =>
-          item.id === draggedItem.id ? { ...item, planned_date: null } : item
-        )
-      );
-
       updatePlannedItemDate(draggedItem.id, null, 1);
       setActiveItem(null);
       return;
@@ -388,15 +503,6 @@ export default function MealPlanner() {
         setIsDrawerOpen(false);
       }
     }
-
-    // Optimistic update
-    setPlannedItems((items) =>
-      items.map((item) =>
-        item.id === draggedItem.id
-          ? { ...item, planned_date: targetDate }
-          : item
-      )
-    );
 
     updatePlannedItemDate(draggedItem.id, targetDate, draggedItem.days);
     setActiveItem(null);
@@ -514,14 +620,12 @@ export default function MealPlanner() {
         {/* Calendar Days */}
         <div className="flex flex-col gap-2.5 mb-64 p-2">
           {isLoading ? (
-            // Loading skeletons
             <>
               {[...Array(7)].map((_, index) => (
                 <DayCardSkeleton key={index} />
               ))}
             </>
           ) : (
-            // Actual content
             getWeekdays(currentWeek).map((day) => {
               const dayStr = day.toISOString();
               return (
@@ -604,7 +708,7 @@ export default function MealPlanner() {
                     </div>
                   ) : (
                     <p className="text-center text-muted-foreground py-4">
-                      {t("mealPlanner.noUnplannedRecipes")}
+                      {t("mealPlanner.noUnplannedItems")}
                     </p>
                   )}
                 </div>

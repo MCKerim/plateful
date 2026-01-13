@@ -168,9 +168,15 @@
     "selectNumberOfDays": "Wähle die anzahl der Tage aus",
     "alreadyEaten": "Zuletzt gegessen",
     "nothingPlanned": "Keine Rezepte geplant...",
-    "dropToRemoveDate": "Ohne Datum",
+    "dropToRemoveDate": "Hier ablegen, um das Datum zu entfernen",
     "noDate": "Ohne Datum",
-    "noUnplannedRecipes": "Keine ungeplanten Rezepte"
+    "noUnplannedRecipes": "Keine ungeplanten Rezepte",
+    "goToCurrentWeek": "Zur aktuellen Woche",
+    "thisWeek": "Diese Woche",
+    "nextWeek": "Nächste Woche",
+    "lastWeek": "Letzte Woche",
+    "deleteError": "Fehler beim Löschen",
+    "updateError": "Fehler beim Aktualisieren"
   },
   "cookbook": {
     "title": "Kochbuch",
