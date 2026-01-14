@@ -1,4 +1,4 @@
-import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 

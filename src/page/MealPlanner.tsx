@@ -1,4 +1,4 @@
-import MealPlannerItem from "@/components/atoms/mealPlannerItem/MealPlannerItem";
+import MealPlannerItem from "@/components/mealPlanner/mealPlannerItem/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -46,7 +46,7 @@ import {
   useUpdatePlannedItemDate,
 } from "@/hooks/meal-planning";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
-import MealPlannerItemSkeleton from "@/components/atoms/mealPlannerItem/MealPlannerItemSkeleton";
+import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
 
 const locales = {
   en: enUS,

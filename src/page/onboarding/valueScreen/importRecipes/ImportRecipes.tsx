@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import "./ImportRecipes.css";
-import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
+import PhoneMockup from "@/components/atoms/onboarding/phoneMockup/PhoneMockup";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import { useTranslation } from "react-i18next";
 

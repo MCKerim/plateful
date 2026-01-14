@@ -16,8 +16,4 @@ export const queryKeys = {
     all: ["ratings"] as const,
     byRecipe: (recipeId: number) => ["ratings", "recipe", recipeId] as const,
   },
-  shoppingList: {
-    all: ["shopping-list"] as const,
-    items: (listId: number) => ["shopping-list", listId, "items"] as const,
-  },
 } as const;

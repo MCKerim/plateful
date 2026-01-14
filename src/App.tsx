@@ -1,5 +1,4 @@
 import { Route, Routes, Navigate, useNavigate } from "react-router";
-import ShoppingList from "./page/ShoppingList";
 import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
 import AddRecipe from "./page/AddRecipe";
@@ -347,7 +346,6 @@ function App() {
         element={isLoggedIn() ? <InvitePage /> : <SignUp />}
       />
 
-      <Route path="/lists" element={routeToCorrectPage(<ShoppingList />)} />
       <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
       <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />

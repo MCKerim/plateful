@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
 
 export default function EmailVerification() {

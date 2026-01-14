@@ -1,4 +1,4 @@
-import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
 
 type Props = {
   nextButtonLabel?: string;

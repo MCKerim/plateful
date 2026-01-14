@@ -1,5 +1,5 @@
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
-import InviteLink from "@/components/ui/inviteLink/InviteLink";
+import InviteLink from "@/components/atoms/inviteLink/InviteLink";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 

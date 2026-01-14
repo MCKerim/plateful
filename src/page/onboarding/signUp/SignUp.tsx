@@ -1,4 +1,4 @@
-import OnboardingButton from "@/components/ui/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";

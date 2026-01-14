@@ -7,9 +7,8 @@ import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
-import { useQuery } from "@tanstack/react-query"; // Import keepPreviousData
+import { useQuery } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
-import { Skeleton } from "../ui/skeleton";
 
 type Props = {
   onFinish: (selectedDates: Date[]) => void;
@@ -81,7 +80,7 @@ export default function WeeklyPlanDialog({ onFinish }: Readonly<Props>) {
   const [withoutDate, setWithoutDate] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(new Date());
 
-  const { data: plannedItems = [], isFetching } = usePlannedItemsForWeek(
+  const { data: plannedItems = [] } = usePlannedItemsForWeek(
     currentWeek,
     isDialogOpen
   );

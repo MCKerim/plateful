@@ -1,5 +1,5 @@
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
-import PhoneMockup from "@/components/ui/onboarding/phoneMockup/PhoneMockup";
+import PhoneMockup from "@/components/atoms/onboarding/phoneMockup/PhoneMockup";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";

@@ -28,7 +28,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import InviteLink from "@/components/ui/inviteLink/InviteLink";
+import InviteLink from "@/components/atoms/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 

@@ -13,7 +13,7 @@ import {
   DrawerTrigger,
 } from "../../ui/drawer";
 import { CalendarOff, MoreVertical, Trash2 } from "lucide-react";
-import DeleteDialog from "../DeleteDialog";
+import DeleteDialog from "../../atoms/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 

@@ -11,7 +11,7 @@ export default function CircleTransition({
   isVisible, 
   onComplete, 
   duration = 1.0
-}: CircleTransitionProps) {
+}: Readonly<CircleTransitionProps>) {
   const [isAnimating, setIsAnimating] = useState(false);
 
   useEffect(() => {
