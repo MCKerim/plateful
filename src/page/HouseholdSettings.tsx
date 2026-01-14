@@ -1,13 +1,11 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useSupabase } from "@/utils/supabase";
-import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import {
   selectHousehold,
   selectHouseholdMembers,
-  setHousehold,
 } from "@/redux/slices/householdSlice";
 import {
   CircleMinus,
@@ -31,11 +29,14 @@ import {
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import {
+  useUpdateHouseholdName,
+  useRemoveMember,
+  useLeaveHousehold,
+} from "@/hooks/household";
 
 export default function HouseholdSettings() {
-  const { supabase } = useSupabase();
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
   const household = useAppSelector(selectHousehold);
   const householdMembers = useAppSelector(selectHouseholdMembers);
@@ -45,22 +46,27 @@ export default function HouseholdSettings() {
   const [isEditingName, setIsEditingName] = useState(false);
   const [editedName, setEditedName] = useState("");
 
-  async function removeMember(memberId: string) {
+  const updateHouseholdName = useUpdateHouseholdName();
+  const removeMemberMutation = useRemoveMember();
+  const leaveHouseholdMutation = useLeaveHousehold();
+
+  function handleRemoveMember(memberId: string) {
     if (!household || !user?.household_id || memberId === user.id) {
       return;
     }
 
-    const { error } = await supabase
-      .from("users")
-      .update({ household_id: null })
-      .eq("id", memberId);
-
-    if (error) {
-      console.error("Fehler beim Entfernen des Mitglieds:", error);
-      alert(t("householdSettings.errors.removeMemberFailed"));
-    } else {
-      alert(t("householdSettings.success.memberRemoved"));
-    }
+    removeMemberMutation.mutate(
+      { memberId },
+      {
+        onSuccess: () => {
+          alert(t("householdSettings.success.memberRemoved"));
+        },
+        onError: (error) => {
+          console.error("Fehler beim Entfernen des Mitglieds:", error);
+          alert(t("householdSettings.errors.removeMemberFailed"));
+        },
+      }
+    );
   }
 
   function leaveHousehold() {
@@ -72,19 +78,19 @@ export default function HouseholdSettings() {
       return;
     }
 
-    supabase
-      .from("users")
-      .update({ household_id: null })
-      .eq("id", user.id)
-      .then(({ error }) => {
-        if (error) {
+    leaveHouseholdMutation.mutate(
+      { userId: user.id },
+      {
+        onSuccess: () => {
+          setShowLeaveConfirmation(false);
+        },
+        onError: (error) => {
           console.error("Fehler beim Verlassen des Haushalts:", error);
           alert(t("householdSettings.errors.leaveHouseholdFailed"));
-        } else {
-          dispatch(setHousehold(null));
-        }
-        setShowLeaveConfirmation(false);
-      });
+          setShowLeaveConfirmation(false);
+        },
+      }
+    );
   }
 
   function deleteHousehold() {
@@ -107,25 +113,24 @@ export default function HouseholdSettings() {
     setEditedName("");
   }
 
-  async function saveHouseholdName() {
+  function saveHouseholdName() {
     if (!household || !editedName.trim()) {
       return;
     }
 
-    const { error } = await supabase
-      .from("household")
-      .update({ name: editedName.trim() })
-      .eq("id", household.id);
-
-    if (error) {
-      console.error("Error updating household name:", error);
-      alert(t("householdSettings.errors.updateNameFailed"));
-    } else {
-      // Update the household in Redux store
-      dispatch(setHousehold({ ...household, name: editedName.trim() }));
-      setIsEditingName(false);
-      setEditedName("");
-    }
+    updateHouseholdName.mutate(
+      { householdId: household.id, name: editedName.trim() },
+      {
+        onSuccess: () => {
+          setIsEditingName(false);
+          setEditedName("");
+        },
+        onError: (error) => {
+          console.error("Error updating household name:", error);
+          alert(t("householdSettings.errors.updateNameFailed"));
+        },
+      }
+    );
   }
 
   if (!household) {
@@ -194,7 +199,7 @@ export default function HouseholdSettings() {
             variant="secondary"
             key={member.id}
             className="flex items-center justify-between"
-            onClick={() => removeMember(member.id)}
+            onClick={() => handleRemoveMember(member.id)}
           >
             {member.username} - {member.email}
             {member.id === user?.id ? (
