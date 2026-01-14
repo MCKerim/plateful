@@ -1,8 +1,7 @@
 import RecipeCard from "@/components/general/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import { useSupabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
@@ -20,102 +19,36 @@ import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/general/CategoryButton";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
-
-export type Recipe = {
-  id: number;
-  recipeName: string;
-  description: string;
-  category?: number | null;
-  created_at: string;
-  avg_rating: number | null;
-};
+import { useRecipes } from "@/hooks/cookbook";
+import { CookbookRecipe } from "@/types/cookbook.types";
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
-  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   useScrollRestoration("cookbook-scroll");
 
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [searchResults, setSearchResults] = useState<Recipe[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: recipes = [], isLoading } = useRecipes();
 
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
   const searchTerm = useAppSelector(selectSearchTerm);
 
-  useEffect(() => {
-    getRecipes();
-  }, []);
+  const [searchResults, setSearchResults] = useState<CookbookRecipe[]>([]);
+
+  const fuse = useMemo(
+    () =>
+      new Fuse(recipes, {
+        keys: ["recipeName"],
+        includeScore: true,
+        threshold: 0.4,
+        distance: 100,
+      }),
+    [recipes]
+  );
 
   useEffect(() => {
-    handleSearch();
-  }, [searchTerm, sorting, categoryId, recipes]);
-
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      event.preventDefault();
-      dispatch(resetFilter());
-      navigate("/cookbook");
-    };
-
-    globalThis.addEventListener("popstate", handlePopState);
-
-    return () => {
-      globalThis.removeEventListener("popstate", handlePopState);
-    };
-  }, []);
-
-  async function getRecipes() {
-    const { data } = await supabase.from("recipes").select(`
-        id,
-        name,
-        description,
-        category,
-        created_at,
-        recipe_ratings(stars)
-      `);
-
-    const newRecipes: Recipe[] = [];
-
-    if (!data) {
-      setRecipes([]);
-      setLoading(false);
-      return;
-    }
-
-    data.forEach((recipe) => {
-      const newRecipe: Recipe = {
-        id: recipe.id,
-        recipeName: recipe.name,
-        description: recipe.description ?? "",
-        category: recipe.category,
-        created_at: recipe.created_at,
-        avg_rating:
-          recipe.recipe_ratings.length > 0
-            ? recipe.recipe_ratings.reduce(
-                (sum, rating) => sum + rating.stars,
-                0
-              ) / recipe.recipe_ratings.length
-            : null,
-      };
-      newRecipes.push(newRecipe);
-    });
-
-    setRecipes(newRecipes);
-    setLoading(false);
-  }
-
-  const fuse = new Fuse(recipes, {
-    keys: ["recipeName"],
-    includeScore: true, // Provides a score for how good the match is
-    threshold: 0.4, // Lower threshold = more strict matching
-    distance: 100, // Maximum distance for a match
-  });
-
-  const handleSearch = async () => {
     let searchedRecipes = [...recipes];
 
     if (searchTerm.trim() !== "") {
@@ -123,9 +56,7 @@ export default function Cookbook() {
       searchedRecipes = results.map((result) => result.item);
     }
 
-    if (categoryId === null || categoryId === 0) {
-      // 0 means all categories
-    } else {
+    if (categoryId !== null && categoryId !== 0) {
       searchedRecipes = searchedRecipes.filter(
         (recipe) => recipe.category === categoryId
       );
@@ -150,7 +81,21 @@ export default function Cookbook() {
     });
 
     setSearchResults(searchedRecipes);
-  };
+  }, [searchTerm, sorting, categoryId, recipes, fuse]);
+
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      event.preventDefault();
+      dispatch(resetFilter());
+      navigate("/cookbook");
+    };
+
+    globalThis.addEventListener("popstate", handlePopState);
+
+    return () => {
+      globalThis.removeEventListener("popstate", handlePopState);
+    };
+  }, [dispatch, navigate]);
 
   function handleURLImportClicked() {
     navigate(`/urlImport`);
@@ -168,7 +113,6 @@ export default function Cookbook() {
     navigate(`/recipe/add${params}`);
   }
 
-  // searchbar: pr-8 fixed bottom-[4.5rem]
   return (
     <Layout>
       <div className="sticky z-20 flex items-center w-full gap-1 my-1 top-14">
@@ -229,7 +173,7 @@ export default function Cookbook() {
         </div>
       )}
 
-      {loading && categoryId !== null && (
+      {isLoading && categoryId !== null && (
         <div className="flex items-center justify-center flex-1 w-full space-x-2">
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.4s]"></div>
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce-high [animation-delay:-0.2s]"></div>
@@ -238,7 +182,7 @@ export default function Cookbook() {
       )}
 
       {(categoryId !== null || searchTerm.trim() !== "") &&
-        !loading &&
+        !isLoading &&
         searchResults.length === 0 && (
           <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
             <div className="w-full h-[80px] mx-auto">

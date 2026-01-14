@@ -8,6 +8,7 @@ export const queryKeys = {
   },
   recipes: {
     all: ["recipes"] as const,
+    list: ["recipes", "list"] as const,
     detail: (id: number) => ["recipes", id] as const,
     items: (id: number) => ["recipes", id, "items"] as const,
     images: (id: number) => ["recipes", id, "images"] as const,
