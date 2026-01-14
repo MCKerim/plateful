@@ -1,7 +1,6 @@
-import ShoppingItem from "@/components/atoms/ShoppingItem";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
 import { useEffect, useRef, useState } from "react";
@@ -27,12 +26,6 @@ import { RatingService } from "@/lib/services/ratingService";
 import RatingListItem from "@/components/atoms/RatingListItem";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
-type RecipeItem = {
-  id: number;
-  itemName: string;
-  amount: string;
-};
-
 export default function Recipe() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
@@ -47,13 +40,9 @@ export default function Recipe() {
   const ratingService = new RatingService(supabase);
   const ratingModalRef = useRef<RatingModalRef>(null);
 
-  // Local state for ratings to allow instant UI updates (optimistic)
   const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
   const [averageRating, setAverageRating] = useState<number | null>(null);
 
-  // --- REACT QUERY HOOKS ---
-
-  // 1. Fetch Recipe Details
   const { data: recipe } = useQuery({
     queryKey: ["recipe", recipeId],
     queryFn: async () => {
@@ -68,27 +57,6 @@ export default function Recipe() {
     enabled: !!recipeId,
   });
 
-  // 2. Fetch Recipe Items (Ingredients)
-  const { data: recipeItems = [] } = useQuery({
-    queryKey: ["recipe-items", recipeId],
-    queryFn: async () => {
-      if (!recipeId) return [];
-      const { data } = await supabase
-        .from("recipe_items")
-        .select(`id, recipe_id, amount, item ( id, name )`)
-        .eq("recipe_id", recipeId)
-        .order("created_at", { ascending: false });
-
-      return (data || []).map((item) => ({
-        id: item.item.id,
-        itemName: item.item.name,
-        amount: item.amount,
-      }));
-    },
-    enabled: !!recipeId,
-  });
-
-  // 3. Fetch Images
   const { data: imageUrls = [] } = useQuery({
     queryKey: ["recipe-images", recipeId],
     queryFn: async () => {
@@ -112,7 +80,6 @@ export default function Recipe() {
     enabled: !!recipeId,
   });
 
-  // 4. Fetch Meal Planning Info
   const { data: lastMealPlan } = useQuery({
     queryKey: ["meal-planning-info", recipeId],
     queryFn: async () => {
@@ -123,7 +90,6 @@ export default function Recipe() {
     enabled: !!recipeId,
   });
 
-  // 5. Fetch Ratings (Initial Load)
   useQuery({
     queryKey: ["ratings", recipeId],
     queryFn: async () => {
@@ -134,11 +100,8 @@ export default function Recipe() {
       return data;
     },
     enabled: !!recipeId,
-    // We only fetch once on mount to populate local state
     staleTime: 1000 * 60 * 5,
   });
-
-  // --- EFFECTS ---
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -150,28 +113,6 @@ export default function Recipe() {
     globalThis.addEventListener("popstate", handlePopState);
     return () => globalThis.removeEventListener("popstate", handlePopState);
   }, []);
-
-  // --- ACTIONS ---
-
-  async function addItemsToShoppingList() {
-    const itemsToInsert = recipeItems.map((recipeItem) => ({
-      shopping_list_id: 1, // You might want to get this dynamically
-      item_id: recipeItem.id,
-      amount: recipeItem.amount,
-      bought: false,
-    }));
-
-    const { error } = await supabase
-      .from("shopping_list_items")
-      .insert(itemsToInsert);
-
-    if (error) {
-      console.error("Error adding items: ", error);
-      toast.error(t("common.error"));
-    } else {
-      toast.success(t("shoppingList.addedSuccess"));
-    }
-  }
 
   async function finishPlanning(dates: Date[]) {
     if (!recipe || !householdId) return;
@@ -213,8 +154,6 @@ export default function Recipe() {
       });
     }
   }
-
-  // --- RATING HANDLERS (Optimistic UI) ---
 
   async function handleDeleteRating(ratingId: number) {
     const previousRatings = ratings;
@@ -263,6 +202,7 @@ export default function Recipe() {
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
+
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
         <NavLink
           to={`/recipe/edit/${recipe?.id}`}
@@ -312,30 +252,6 @@ export default function Recipe() {
           {recipe.name}
         </h1>
       </div>
-
-      {recipeItems.length > 0 && (
-        <>
-          <h2 className="mt-2 font-bold text-md">{t("recipe.ingredients")}</h2>
-          {recipeItems.map((recipeItem, index) => (
-            <ShoppingItem
-              key={"item-" + index}
-              id={recipeItem.id}
-              name={recipeItem.itemName}
-              amount={recipeItem.amount}
-              bought={false}
-              onClick={() => {}}
-              onEdit={() => {}}
-            />
-          ))}
-          <Button
-            className="w-full"
-            variant="secondary"
-            onClick={addItemsToShoppingList}
-          >
-            {t("shoppingList.addItems")}
-          </Button>
-        </>
-      )}
 
       <div className="flex justify-between mt-2">
         <div className="flex items-center gap-1">
