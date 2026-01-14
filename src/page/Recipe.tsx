@@ -1,9 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { buttonVariants } from "@/components/ui/button";
-import { useSupabase } from "@/utils/supabase";
-import { getMealPlanningInfo, planRecipe } from "@/utils/mealPlanHelpers";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { NavLink, useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
@@ -22,86 +20,34 @@ import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
-import { RatingService } from "@/lib/services/ratingService";
 import RatingListItem from "@/components/general/RatingListItem";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRecipe, useRecipeImages } from "@/hooks/recipe";
+import {
+  useRecipeMealPlanInfo,
+  usePlanRecipe,
+} from "@/hooks/meal-planning";
+import { useRecipeRatings, useDeleteRating } from "@/hooks/ratings";
 
 export default function Recipe() {
-  const { supabase } = useSupabase();
   const { t } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
   const householdId = useAppSelector(selectHouseholdId);
   const currentUser = useAppSelector(selectUser);
   const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
 
-  const ratingService = new RatingService(supabase);
   const ratingModalRef = useRef<RatingModalRef>(null);
 
-  const [ratings, setRatings] = useState<RecipeRatingWithUser[]>([]);
-  const [averageRating, setAverageRating] = useState<number | null>(null);
+  // Queries
+  const { data: recipe } = useRecipe(recipeId);
+  const { data: imageUrls = [] } = useRecipeImages(recipeId);
+  const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
+  const { ratings, averageRating } = useRecipeRatings(recipeId);
 
-  const { data: recipe } = useQuery({
-    queryKey: ["recipe", recipeId],
-    queryFn: async () => {
-      if (!recipeId) return null;
-      const { data } = await supabase
-        .from("recipes")
-        .select("*")
-        .eq("id", recipeId)
-        .single();
-      return data;
-    },
-    enabled: !!recipeId,
-  });
-
-  const { data: imageUrls = [] } = useQuery({
-    queryKey: ["recipe-images", recipeId],
-    queryFn: async () => {
-      if (!recipeId) return [];
-      const { data, error } = await supabase.storage
-        .from("recipeimages")
-        .list(`recipe_${recipeId}/`);
-
-      if (error || !data) return [];
-
-      const urls = await Promise.all(
-        data.map(async (file) => {
-          const { data: signedUrlData } = await supabase.storage
-            .from("recipeimages")
-            .createSignedUrl(`recipe_${recipeId}/${file.name}`, 3600);
-          return signedUrlData?.signedUrl || null;
-        })
-      );
-      return urls.filter((url): url is string => url !== null);
-    },
-    enabled: !!recipeId,
-  });
-
-  const { data: lastMealPlan } = useQuery({
-    queryKey: ["meal-planning-info", recipeId],
-    queryFn: async () => {
-      if (!recipeId) return null;
-      const result = await getMealPlanningInfo(recipeId, supabase);
-      return result.data || null;
-    },
-    enabled: !!recipeId,
-  });
-
-  useQuery({
-    queryKey: ["ratings", recipeId],
-    queryFn: async () => {
-      if (!recipeId) return [];
-      const data = await ratingService.getRatingsByRecipeId(recipeId);
-      setRatings(data);
-      setAverageRating(RatingService.calculateAverage(data));
-      return data;
-    },
-    enabled: !!recipeId,
-    staleTime: 1000 * 60 * 5,
-  });
+  // Mutations
+  const planRecipeMutation = usePlanRecipe();
+  const deleteRatingMutation = useDeleteRating();
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -117,37 +63,33 @@ export default function Recipe() {
   async function finishPlanning(dates: Date[]) {
     if (!recipe || !householdId) return;
 
-    let isSuccess = false;
+    try {
+      if (dates.length === 0) {
+        await planRecipeMutation.mutateAsync({
+          recipeId: recipe.id,
+          householdId,
+          plannedDate: null,
+          days: 1,
+        });
+      } else {
+        await Promise.all(
+          dates.map((date) =>
+            planRecipeMutation.mutateAsync({
+              recipeId: recipe.id,
+              householdId,
+              plannedDate: date,
+              days: 1,
+            })
+          )
+        );
+      }
 
-    if (dates.length === 0) {
-      const result = await planRecipe(
-        recipe.id,
-        householdId,
-        null,
-        1,
-        supabase
-      );
-      isSuccess = result?.success;
-    } else {
-      const planningPromises = dates.map((date) =>
-        planRecipe(recipe.id, householdId, date, 1, supabase)
-      );
-      const results = await Promise.all(planningPromises);
-      isSuccess = results.every((res) => res?.success);
-    }
-
-    if (isSuccess) {
       toast.success(t("recipe.planningSuccessful"), {
         position: "top-right",
         richColors: true,
       });
-
-      // KEY FIX: Invalidate queries so the dialog and planner page update instantly
-      queryClient.invalidateQueries({ queryKey: ["meal-planning"] });
-      queryClient.invalidateQueries({ queryKey: ["meal-planning-info"] });
-
       navigate("/planner");
-    } else {
+    } catch {
       toast.error(t("recipe.planningFailed"), {
         position: "top-right",
         richColors: true,
@@ -155,44 +97,21 @@ export default function Recipe() {
     }
   }
 
-  async function handleDeleteRating(ratingId: number) {
-    const previousRatings = ratings;
-    setRatings((prev) => {
-      const updated = prev.filter((r) => r.id !== ratingId);
-      setAverageRating(RatingService.calculateAverage(updated));
-      return updated;
-    });
+  function handleDeleteRating(ratingId: number) {
+    if (!recipeId) return;
 
-    try {
-      await ratingService.deleteRating(ratingId);
-    } catch (error) {
-      console.error("Failed to delete rating:", error);
-      toast.error(t("rating.deleteError"));
-      setRatings(previousRatings);
-      setAverageRating(RatingService.calculateAverage(previousRatings));
-    }
+    deleteRatingMutation.mutate(
+      { ratingId, recipeId },
+      {
+        onError: () => {
+          toast.error(t("rating.deleteError"));
+        },
+      }
+    );
   }
 
   function handleEditRating(rating: RecipeRatingWithUser) {
     ratingModalRef.current?.open(rating);
-  }
-
-  function handleRatingSubmitted(newRating: RecipeRatingWithUser) {
-    setRatings((prev) => {
-      const updated = [newRating, ...prev];
-      setAverageRating(RatingService.calculateAverage(updated));
-      return updated;
-    });
-  }
-
-  function handleRatingUpdated(updatedRating: RecipeRatingWithUser) {
-    setRatings((prev) => {
-      const updated = prev.map((r) =>
-        r.id === updatedRating.id ? updatedRating : r
-      );
-      setAverageRating(RatingService.calculateAverage(updated));
-      return updated;
-    });
   }
 
   const canModifyRating = (rating: RecipeRatingWithUser): boolean => {
@@ -217,7 +136,7 @@ export default function Recipe() {
     </>
   );
 
-  if (!recipe) return null; // Or a loading spinner
+  if (!recipe) return null;
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
@@ -256,7 +175,9 @@ export default function Recipe() {
       <div className="flex justify-between mt-2">
         <div className="flex items-center gap-1">
           <CalendarDays size={16} />
-          <p className="text-sm">{lastMealPlan && getMealPlanStatus(lastMealPlan, t)}</p>
+          <p className="text-sm">
+            {lastMealPlan && getMealPlanStatus(lastMealPlan, t)}
+          </p>
         </div>
 
         <div className="flex items-center gap-0.5">
@@ -282,12 +203,7 @@ export default function Recipe() {
       <div>
         <Separator className="mb-2 mt-4" />
 
-        <RatingModal
-          ref={ratingModalRef}
-          recipeId={recipe.id}
-          ratingSubmittedCallback={handleRatingSubmitted}
-          ratingUpdatedCallback={handleRatingUpdated}
-        />
+        <RatingModal ref={ratingModalRef} recipeId={recipe.id} />
 
         <h2 className="first-font text-xl font-bold mb-1">
           {t("recipe.ratings")}

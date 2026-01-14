@@ -15,15 +15,13 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { useTranslation } from "react-i18next";
-import { useSupabase } from "@/utils/supabase";
 import { RecipeRatings } from "@/types/exportedDatabaseTypes.types";
-import { RatingService } from "@/lib/services/ratingService";
+import { useCreateRating, useUpdateRating } from "@/hooks/ratings";
+import { toast } from "sonner";
 
 type Props = {
   showTriggerButton?: boolean;
   recipeId?: number;
-  ratingSubmittedCallback?: (newRating: RecipeRatingWithUser) => void;
-  ratingUpdatedCallback?: (updatedRating: RecipeRatingWithUser) => void;
 };
 
 export type RatingModalRef = {
@@ -37,27 +35,21 @@ export type RecipeRatingWithUser = RecipeRatings & {
 };
 
 const RatingModal = forwardRef<RatingModalRef, Props>(
-  (
-    {
-      showTriggerButton = true,
-      recipeId,
-      ratingSubmittedCallback = () => {},
-      ratingUpdatedCallback = () => {},
-    }: Readonly<Props>,
-    ref
-  ) => {
-    const { supabase } = useSupabase();
+  ({ showTriggerButton = true, recipeId }: Readonly<Props>, ref) => {
     const { t } = useTranslation();
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-    const ratingService = new RatingService(supabase);
 
     const [rating, setRating] = useState(1);
     const [note, setNote] = useState("");
     const [editingRating, setEditingRating] =
       useState<RecipeRatingWithUser | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // Expose the `open` method via the ref
+    const createRatingMutation = useCreateRating();
+    const updateRatingMutation = useUpdateRating();
+
+    const isSubmitting =
+      createRatingMutation.isPending || updateRatingMutation.isPending;
+
     useImperativeHandle(ref, () => ({
       open: (ratingToEdit?: RecipeRatingWithUser) => {
         if (ratingToEdit) {
@@ -65,7 +57,6 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
           setRating(ratingToEdit.stars);
           setNote(ratingToEdit.note || "");
         } else {
-          // Reset for new rating
           setEditingRating(null);
           setRating(1);
           setNote("");
@@ -74,7 +65,6 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       },
     }));
 
-    // Reset form when dialog closes
     useEffect(() => {
       if (!isDialogOpen) {
         setNote("");
@@ -87,42 +77,44 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       setIsDialogOpen(isOpen);
     }
 
-    async function saveButtonPressed() {
+    function saveButtonPressed() {
       if (!recipeId || rating < 1 || isSubmitting) {
         return;
       }
 
-      setIsSubmitting(true);
-
-      try {
-        if (editingRating) {
-          // Update existing rating
-          const updatedRating = await ratingService.updateRating(
-            editingRating.id,
-            rating,
-            note
-          );
-          ratingUpdatedCallback(updatedRating);
-          setIsDialogOpen(false);
-        } else {
-          // Create new rating
-          const newRating = await ratingService.createRating(
+      if (editingRating) {
+        updateRatingMutation.mutate(
+          {
+            ratingId: editingRating.id,
             recipeId,
-            rating,
-            note
-          );
-          ratingSubmittedCallback(newRating);
-          setIsDialogOpen(false);
-        }
-      } catch (error) {
-        alert(
-          isEditMode
-            ? "Failed to update rating. Please try again."
-            : "Failed to save rating. Please try again."
+            stars: rating,
+            note,
+          },
+          {
+            onSuccess: () => {
+              setIsDialogOpen(false);
+            },
+            onError: () => {
+              toast.error(t("rating.updateError"));
+            },
+          }
         );
-        setIsSubmitting(false);
-      } finally {
-        setIsSubmitting(false);
+      } else {
+        createRatingMutation.mutate(
+          {
+            recipeId,
+            stars: rating,
+            note,
+          },
+          {
+            onSuccess: () => {
+              setIsDialogOpen(false);
+            },
+            onError: () => {
+              toast.error(t("rating.createError"));
+            },
+          }
+        );
       }
     }
 

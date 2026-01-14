@@ -22,6 +22,12 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/general/DeleteDialog";
+import {
+  useRecipeForEdit,
+  useCreateRecipe,
+  useUpdateRecipe,
+  useDeleteRecipe,
+} from "@/hooks/recipe";
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();
@@ -47,6 +53,14 @@ export default function AddRecipe() {
   const [imageUploading, setImageUploading] = useState(false);
 
   const navigate = useNavigate();
+
+  const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
+
+  // React Query hooks
+  const { recipe, imageInfo } = useRecipeForEdit(recipeId);
+  const createRecipeMutation = useCreateRecipe();
+  const updateRecipeMutation = useUpdateRecipe();
+  const deleteRecipeMutation = useDeleteRecipe();
 
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
@@ -134,54 +148,33 @@ export default function AddRecipe() {
     extractSharedData();
   }, [searchUrl, searchTitle, searchText]);
 
-  // Fetch recipe data if editing
+  // Populate form when recipe data is loaded (edit mode)
   useEffect(() => {
-    async function tryGetRecipe(): Promise<boolean> {
-      if (!params.recipeId) return false;
-
-      const recipeId = Number.parseInt(params.recipeId);
-      const { data } = await supabase
-        .from("recipes")
-        .select("*")
-        .eq("id", recipeId);
-
-      if (!data || data.length === 0) {
-        return false;
-      }
-
-      setTitle(data[0].name);
-      setDescription(data[0].description ?? "");
-      setLink(data[0].link ?? "");
-      setCategory(data[0].category);
-
-      // Fetch image from storage
-      const { data: files, error } = await supabase.storage
-        .from("recipeimages")
-        .list(`recipe_${recipeId}/`);
-
-      if (!error && files && files.length > 0) {
-        // Get signed URL for the first image
-        const { data: signedUrlData } = await supabase.storage
-          .from("recipeimages")
-          .createSignedUrl(`recipe_${recipeId}/${files[0].name}`, 3600);
-        setImagePreview(signedUrlData?.signedUrl ?? "");
-        setImageSupabaseUrl(`recipe_${recipeId}/${files[0].name}`);
-      } else {
-        setImagePreview("");
-        setImageSupabaseUrl("");
-      }
-      return true;
+    if (recipe) {
+      setTitle(recipe.name);
+      setDescription(recipe.description ?? "");
+      setLink(recipe.link ?? "");
+      setCategory(recipe.category);
     }
+  }, [recipe]);
 
-    tryGetRecipe().then((hasFound) => {
-      if (hasFound) return;
+  // Populate image when image info is loaded (edit mode)
+  useEffect(() => {
+    if (imageInfo) {
+      setImagePreview(imageInfo.signedUrl);
+      setImageSupabaseUrl(imageInfo.path);
+    }
+  }, [imageInfo]);
 
+  // Handle recipeNameFromSearch when not editing
+  useEffect(() => {
+    if (!recipeId) {
       const recipeNameFromSearch = searchParams.get("recipeNameFromSearch");
       if (recipeNameFromSearch !== null) {
         setTitle(recipeNameFromSearch.trim());
       }
-    });
-  }, [params.recipeId, searchParams]);
+    }
+  }, [recipeId, searchParams]);
 
   async function uploadToSupabase(file: File) {
     setImageUploading(true);
@@ -246,91 +239,79 @@ export default function AddRecipe() {
       return;
     }
 
-    if (params.recipeId) {
+    if (recipeId) {
       // Update existing recipe
-      const recipeId = Number.parseInt(params.recipeId);
-      const { data, error } = await supabase
-        .from("recipes")
-        .update({
+      updateRecipeMutation.mutate(
+        {
+          recipeId,
           name: title,
           description,
           link,
           category,
-        })
-        .eq("id", recipeId)
-        .select();
-      if (!error && data) {
-        // If a new image was uploaded, move it to the correct folder if needed
-        if (imageFile && imageSupabaseUrl?.includes("temp")) {
-          const newPath = `recipe_${recipeId}/${imageSupabaseUrl
-            .split("/")
-            .pop()}`;
-          await supabase.storage
-            .from("recipeimages")
-            .move(imageSupabaseUrl, newPath);
+        },
+        {
+          onSuccess: async () => {
+            // If a new image was uploaded, move it to the correct folder if needed
+            if (imageFile && imageSupabaseUrl?.includes("temp")) {
+              const newPath = `recipe_${recipeId}/${imageSupabaseUrl
+                .split("/")
+                .pop()}`;
+              await supabase.storage
+                .from("recipeimages")
+                .move(imageSupabaseUrl, newPath);
+            }
+            navigate(`/recipe/${recipeId}`, { replace: true });
+          },
+          onError: (error) => {
+            console.error(error);
+            alert("An error occurred. Please try again.");
+          },
         }
-        navigate(`/recipe/${recipeId}`, { replace: true });
-      } else {
-        console.error(error);
-        alert("An error occurred. Please try again.");
-      }
+      );
     } else {
       // Insert new recipe
-      const { data, error } = await supabase
-        .from("recipes")
-        .insert([
-          {
-            name: title,
-            description,
-            link,
-            household_id: householdId,
-            category,
+      createRecipeMutation.mutate(
+        {
+          name: title,
+          description,
+          link,
+          category,
+          householdId: householdId!,
+        },
+        {
+          onSuccess: async (data) => {
+            // If an image was uploaded, move it to the correct folder with the new recipe id
+            if (imageFile && imageSupabaseUrl) {
+              const newPath = `recipe_${data.id}/${imageSupabaseUrl
+                .split("/")
+                .pop()}`;
+              await supabase.storage
+                .from("recipeimages")
+                .move(imageSupabaseUrl, newPath);
+            }
+            navigate(`/recipe/${data.id}`, { replace: true });
           },
-        ])
-        .select();
-      if (!error && data) {
-        // If an image was uploaded, move it to the correct folder with the new recipe id
-        if (imageFile && imageSupabaseUrl) {
-          const newPath = `recipe_${data[0].id}/${imageSupabaseUrl
-            .split("/")
-            .pop()}`;
-          await supabase.storage
-            .from("recipeimages")
-            .move(imageSupabaseUrl, newPath);
+          onError: (error) => {
+            console.error(error);
+            alert("An error occurred. Please try again.");
+          },
         }
-        navigate(`/recipe/${data[0].id}`, { replace: true });
-      } else {
-        console.error(error);
-        alert("An error occurred. Please try again.");
-      }
+      );
     }
   }
 
-  async function deleteRecipe() {
-    if (!params.recipeId) return false;
+  function deleteRecipe() {
+    if (!recipeId) return;
 
-    const recipeId = Number.parseInt(params.recipeId);
-
-    // Delete all images from storage for this recipe
-    const { data: files, error: listError } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipeId}/`);
-    if (!listError && files && files.length > 0) {
-      const paths = files.map((file) => `recipe_${recipeId}/${file.name}`);
-      await supabase.storage.from("recipeimages").remove(paths);
-    }
-
-    const { error } = await supabase
-      .from("recipes")
-      .delete()
-      .eq("id", recipeId);
-
-    if (error) {
-      console.error("Error while deleting recipe: ", error);
-      alert("Error while deleting recipe");
-    } else {
-      navigate("/cookbook");
-    }
+    deleteRecipeMutation.mutate(recipeId, {
+      onSuccess: () => {
+        navigate("/cookbook");
+      },
+      onError: (error) => {
+        console.error("Error while deleting recipe: ", error);
+        alert("Error while deleting recipe");
+      },
+    });
   }
 
   const saveFooter = (

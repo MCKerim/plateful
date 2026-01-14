@@ -6,6 +6,7 @@ import {
   PlannedItemSummary,
   PlannedItemSummaryRaw,
 } from "@/types/meal-planning.types";
+import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 
 export const mealPlanningApi = {
   async getItemsForWeek(
@@ -112,5 +113,20 @@ export const mealPlanningApi = {
     });
 
     if (error) throw error;
+  },
+
+  async getInfoByRecipe(
+    supabase: SupabaseClient,
+    recipeId: number
+  ): Promise<MealPlanning | null> {
+    const { data, error } = await supabase
+      .from("meal_planning")
+      .select("*")
+      .eq("recipe_id", recipeId)
+      .order("created_at", { ascending: false })
+      .limit(1);
+
+    if (error) throw error;
+    return data && data.length > 0 ? data[0] : null;
   },
 };
