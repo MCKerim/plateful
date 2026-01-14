@@ -17,6 +17,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { useUpdateUsername, useUpdateLanguage } from "@/hooks/user";
 
 export default function Settings() {
   const { supabase } = useSupabase();
@@ -24,6 +25,9 @@ export default function Settings() {
   const user = useAppSelector(selectUser);
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [newUsername, setNewUsername] = useState(user?.username || "");
+
+  const updateUsernameMutation = useUpdateUsername();
+  const updateLanguageMutation = useUpdateLanguage();
 
   useEffect(() => {
     // Benutzeridentifikation mit Canny
@@ -55,7 +59,7 @@ export default function Settings() {
     }
   };
 
-  const updateUsername = async () => {
+  function handleUpdateUsername() {
     if (newUsername.trim() === "" || !user) {
       alert(t("settings.usernameCannotBeEmpty"));
       return;
@@ -66,33 +70,33 @@ export default function Settings() {
       return;
     }
 
-    const { error } = await supabase
-      .from("users")
-      .update({ username: newUsername })
-      .eq("id", user.id);
+    updateUsernameMutation.mutate(
+      { userId: user.id, username: newUsername },
+      {
+        onSuccess: () => {
+          setIsUsernameDialogOpen(false);
+        },
+        onError: (error) => {
+          console.error("Error updating username:", error);
+        },
+      }
+    );
+  }
 
-    if (error) {
-      console.error("Error updating username:", error);
-      return;
-    }
-
-    setIsUsernameDialogOpen(false);
-  };
-
-  async function updateLanguage(language: string) {
+  function handleUpdateLanguage(language: string) {
     if (!user) return;
 
-    const { error } = await supabase
-      .from("users")
-      .update({ language })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Error updating language:", error);
-      return;
-    }
-
-    i18n.changeLanguage(language);
+    updateLanguageMutation.mutate(
+      { userId: user.id, language },
+      {
+        onSuccess: () => {
+          i18n.changeLanguage(language);
+        },
+        onError: (error) => {
+          console.error("Error updating language:", error);
+        },
+      }
+    );
   }
 
   return (
@@ -107,7 +111,7 @@ export default function Settings() {
             <Button
               className="w-full"
               variant={i18n.language === "en" ? "default" : "secondary"}
-              onClick={() => updateLanguage("en")}
+              onClick={() => handleUpdateLanguage("en")}
             >
               English
             </Button>
@@ -115,7 +119,7 @@ export default function Settings() {
             <Button
               className="w-full"
               variant={i18n.language === "de" ? "default" : "secondary"}
-              onClick={() => updateLanguage("de")}
+              onClick={() => handleUpdateLanguage("de")}
             >
               Deutsch
             </Button>
@@ -288,7 +292,7 @@ export default function Settings() {
                 {t("common.cancel")}
               </Button>
 
-              <Button className="w-full" onClick={updateUsername}>
+              <Button className="w-full" onClick={handleUpdateUsername}>
                 {t("common.save")}
               </Button>
             </div>

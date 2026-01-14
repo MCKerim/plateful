@@ -44,4 +44,32 @@ export const userApi = {
 
     return data as HouseholdMember[];
   },
+
+  async updateUsername(
+    supabase: SupabaseClient<Database>,
+    params: { userId: string; username: string }
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("users")
+      .update({ username: params.username })
+      .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
+  async updateLanguage(
+    supabase: SupabaseClient<Database>,
+    params: { userId: string; language: string }
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("users")
+      .update({ language: params.language })
+      .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
 };
