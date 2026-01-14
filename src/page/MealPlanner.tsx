@@ -1,4 +1,4 @@
-import MealPlannerItem from "@/components/atoms/MealPlannerItem";
+import MealPlannerItem from "@/components/atoms/mealPlannerItem/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -46,6 +46,7 @@ import {
   useUpdatePlannedItemDate,
 } from "@/hooks/meal-planning";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
+import MealPlannerItemSkeleton from "@/components/atoms/mealPlannerItem/MealPlannerItemSkeleton";
 
 const locales = {
   en: enUS,
@@ -54,22 +55,11 @@ const locales = {
   de: de,
 };
 
-function MealPlannerItemSkeleton() {
-  return (
-    <Card className="h-[90px] flex items-center">
-      <Skeleton className="h-full w-[74px] rounded-l-lg rounded-r-none" />
-      <div className="flex-1 px-2.5 space-y-2">
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-3 w-1/2" />
-      </div>
-    </Card>
-  );
-}
-
 function DayCardSkeleton() {
   return (
     <div className="p-1 min-h-[50px]">
       <Skeleton className="h-5 w-24 mb-2 rounded-full" />
+
       <MealPlannerItemSkeleton />
     </div>
   );
@@ -176,21 +166,21 @@ export default function MealPlanner() {
   }
 
   useEffect(() => {
-    if (activeItem !== null) {
-      document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
-
-      const mainContent = document.querySelector("main");
-      if (mainContent) {
-        mainContent.style.overflow = "hidden";
-      }
-    } else {
+    if (activeItem === null) {
       document.body.style.overflow = "";
       document.body.style.touchAction = "";
 
       const mainContent = document.querySelector("main");
       if (mainContent) {
         mainContent.style.overflow = "";
+      }
+    } else {
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+
+      const mainContent = document.querySelector("main");
+      if (mainContent) {
+        mainContent.style.overflow = "hidden";
       }
     }
 
@@ -265,28 +255,6 @@ export default function MealPlanner() {
     setActiveItem(null);
   }
 
-  function renderMealPlannerItem(item: MealPlannerItemType) {
-    return (
-      <MealPlannerItem
-        key={item.id}
-        id={item.id}
-        recipeId={item.recipeId}
-        recipeName={item.recipeName}
-        date={item.planned_date}
-        days={item.days}
-        daysEaten={item.daysEaten}
-        setDaysEaten={(days) => handleSetDaysEaten(item.id, days)}
-        onRecipeEaten={() => {
-          handleRecipeEaten(item);
-          showRateRecipeModal(item.recipeId);
-        }}
-        onRecipeDelete={() => handleDelete(item.id)}
-        onUpdateToNoDate={() => handleUpdateDate(item.id, null, 1)}
-        isDragging={activeItem?.id === item.id}
-      />
-    );
-  }
-
   return (
     <DndContext
       sensors={sensors}
@@ -355,7 +323,7 @@ export default function MealPlanner() {
         <div className="flex flex-col gap-2.5 mb-64 p-2">
           {isLoading ? (
             <>
-              {[...new Array(7)].map((_, index) => (
+              {[new Array(7)].map((_, index) => (
                 <DayCardSkeleton key={index} />
               ))}
             </>
@@ -442,7 +410,7 @@ export default function MealPlanner() {
                 <div className="p-2">
                   {isLoading ? (
                     <div className="flex gap-3 overflow-x-auto pb-2">
-                      {[...Array(2)].map((_, index) => (
+                      {[new Array(2)].map((_, index) => (
                         <div key={index} className="flex-shrink-0 w-[280px]">
                           <MealPlannerItemSkeleton />
                         </div>
@@ -452,7 +420,27 @@ export default function MealPlanner() {
                     <div className="flex gap-3 overflow-x-auto pb-2">
                       {notPlannedItems.map((item) => (
                         <div key={item.id} className="flex-shrink-0 w-[280px]">
-                          {renderMealPlannerItem(item)}
+                          <MealPlannerItem
+                            key={item.id}
+                            id={item.id}
+                            recipeId={item.recipeId}
+                            recipeName={item.recipeName}
+                            date={item.planned_date}
+                            days={item.days}
+                            daysEaten={item.daysEaten}
+                            setDaysEaten={(days) =>
+                              handleSetDaysEaten(item.id, days)
+                            }
+                            onRecipeEaten={() => {
+                              handleRecipeEaten(item);
+                              showRateRecipeModal(item.recipeId);
+                            }}
+                            onRecipeDelete={() => handleDelete(item.id)}
+                            onUpdateToNoDate={() =>
+                              handleUpdateDate(item.id, null, 1)
+                            }
+                            isDragging={activeItem?.id === item.id}
+                          />
                         </div>
                       ))}
                     </div>

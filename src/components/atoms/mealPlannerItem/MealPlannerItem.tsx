@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
-import { Card } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card } from "../../ui/card";
+import { Button } from "../../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useEffect, useState, useRef } from "react";
@@ -11,9 +11,9 @@ import {
   DrawerContent,
   DrawerFooter,
   DrawerTrigger,
-} from "../ui/drawer";
+} from "../../ui/drawer";
 import { CalendarOff, MoreVertical, Trash2 } from "lucide-react";
-import DeleteDialog from "./DeleteDialog";
+import DeleteDialog from "../DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 
