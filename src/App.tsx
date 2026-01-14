@@ -10,13 +10,9 @@ import { useEffect, useState } from "react";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
-import { useAppDispatch, useAppSelector } from "./redux/hooks";
-import { selectUser, setUser } from "./redux/slices/userSlice";
-import {
-  selectHouseholdId,
-  setHousehold,
-  setHouseholdMembers,
-} from "./redux/slices/householdSlice";
+import { useAppSelector } from "./redux/hooks";
+import { selectUser } from "./redux/slices/userSlice";
+import { selectHouseholdId } from "./redux/slices/householdSlice";
 import Welcome from "./page/onboarding/welcome/Welcome";
 import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
@@ -47,18 +43,18 @@ import {
 } from "@capawesome/capacitor-app-update";
 import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
-import posthog from "posthog-js";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
+import { useUserData } from "./hooks/user";
 
 function App() {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
-  const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+  const { fetchUserData } = useUserData();
 
   useEffect(() => {
     const checkForUpdates = async () => {
@@ -144,57 +140,7 @@ function App() {
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
-
-    if (userId) {
-      const { data: userData, error: userError } = await supabase
-        .from("users")
-        .select("*, household:household_id(*)")
-        .eq("id", userId)
-        .single();
-
-      if (userError) {
-        console.error("Error fetching user data:", userError);
-
-        dispatch(setUser(null));
-        dispatch(setHousehold(null));
-        dispatch(setHouseholdMembers(null));
-
-        posthog.reset();
-      } else {
-        dispatch(setUser(userData));
-        dispatch(setHousehold(userData.household ?? null));
-
-        posthog.identify(userData.id, {
-          email: userData.email,
-          username: userData.username,
-        });
-
-        if (!userData.household_id) {
-          setLoading(false);
-          return;
-        }
-
-        // get household members
-        const { data: membersData, error: membersError } = await supabase
-          .from("users")
-          .select("id, email, username")
-          .eq("household_id", userData.household_id);
-
-        if (membersError) {
-          console.error("Error fetching household members:", membersError);
-          setLoading(false);
-          return;
-        }
-
-        dispatch(setHouseholdMembers(membersData));
-      }
-    } else {
-      dispatch(setUser(null));
-      dispatch(setHousehold(null));
-      dispatch(setHouseholdMembers(null));
-      posthog.reset();
-    }
-
+    await fetchUserData(userId);
     setLoading(false);
   }
 
