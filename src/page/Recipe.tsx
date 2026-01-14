@@ -10,20 +10,20 @@ import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
   RecipeRatingWithUser,
   RatingModalRef,
-} from "@/components/atoms/RatingModal";
+} from "@/components/general/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
-import MarkdownRenderer from "@/components/atoms/MarkdownRenderer";
+import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { formatRating } from "@/lib/formatRatingHelper";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
-import WeeklyPlanDialog from "@/components/atoms/WeeklyPlanDialog";
+import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
 import { RatingService } from "@/lib/services/ratingService";
-import RatingListItem from "@/components/atoms/RatingListItem";
+import RatingListItem from "@/components/general/RatingListItem";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export default function Recipe() {

@@ -1,4 +1,4 @@
-import { ImagePicker } from "@/components/atoms/ImagePicker";
+import { ImagePicker } from "@/components/general/ImagePicker";
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
-import DeleteDialog from "@/components/atoms/DeleteDialog";
+import DeleteDialog from "@/components/general/DeleteDialog";
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();

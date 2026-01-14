@@ -1,5 +1,5 @@
-import BottomNav from "../atoms/BottomNav";
-import Header from "../atoms/Header";
+import BottomNav from "../general/BottomNav";
+import Header from "../general/Header";
 
 type Props = {
   showHeader?: boolean;

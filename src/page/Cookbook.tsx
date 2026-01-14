@@ -1,4 +1,4 @@
-import RecipeCard from "@/components/atoms/RecipeCard";
+import RecipeCard from "@/components/general/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
 import { useSupabase } from "@/utils/supabase";
@@ -7,7 +7,7 @@ import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
 import Rive from "@rive-app/react-canvas";
-import SortingModal from "@/components/atoms/SortingModal";
+import SortingModal from "@/components/general/SortingModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   resetFilter,
@@ -17,9 +17,9 @@ import {
   setSearchTerm,
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
-import CategoryButton from "@/components/atoms/CategoryButton";
+import CategoryButton from "@/components/general/CategoryButton";
 import { useScrollRestoration } from "@/hooks/useScrollRestoration";
-import AddNewRecipeDrawer from "@/components/atoms/AddRecipeDrawer";
+import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 
 export type Recipe = {
   id: number;

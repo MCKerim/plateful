@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { RotateCcw, ImagePlus, X } from "lucide-react";
 import Layout from "../components/layout/Layout";
-import MarkdownRenderer from "../components/atoms/MarkdownRenderer";
+import MarkdownRenderer from "../components/general/MarkdownRenderer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";

@@ -9,8 +9,8 @@ import {
   subWeeks,
   isSameWeek,
 } from "date-fns";
-import RatingModal, { RatingModalRef } from "@/components/atoms/RatingModal";
-import MealPlannerAdd from "@/components/atoms/MealPlannerAdd";
+import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
+import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import { getWeekdays } from "@/lib/dateHelper";
 import { Button } from "@/components/ui/button";
 import {

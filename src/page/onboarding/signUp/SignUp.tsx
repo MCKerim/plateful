@@ -1,9 +1,9 @@
-import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
-import CircleTransition from "@/components/atoms/CircleTransition";
+import CircleTransition from "@/components/general/CircleTransition";
 import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';

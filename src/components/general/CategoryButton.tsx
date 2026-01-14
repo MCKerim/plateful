@@ -1,6 +1,6 @@
 import { useAppDispatch } from "@/redux/hooks";
 import { setCategoryId } from "@/redux/slices/filterAndSortingSlice";
-import { useTheme } from "@/components/atoms/theme-provider";
+import { useTheme } from "@/components/general/theme-provider";
 
 type Props = {
   id: number;

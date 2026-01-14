@@ -3,13 +3,13 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { ImagePicker } from "@/components/atoms/ImagePicker";
+import { ImagePicker } from "@/components/general/ImagePicker";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
-import LoadingDots from "@/components/atoms/LoadingDots";
-import RecipeCard from "@/components/atoms/RecipeCard";
+import LoadingDots from "@/components/general/LoadingDots";
+import RecipeCard from "@/components/general/RecipeCard";
 import imageCompression from "browser-image-compression";
 
 export default function ImageImport() {

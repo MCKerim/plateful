@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
-import LoadingDots from "@/components/atoms/LoadingDots";
+import LoadingDots from "@/components/general/LoadingDots";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router";
-import RecipeCard from "@/components/atoms/RecipeCard";
+import RecipeCard from "@/components/general/RecipeCard";
 
 export default function URLImport() {
   const { t } = useTranslation();

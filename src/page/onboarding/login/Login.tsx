@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { useSupabase } from "@/utils/supabase";
-import OnboardingButton from "@/components/atoms/onboarding/onboardingButton/OnboardingButton";
+import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 

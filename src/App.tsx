@@ -28,7 +28,7 @@ import Home from "./page/Home";
 import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import Chatbot from "./page/Chatbot";
-import LoadingScreen from "./components/atoms/LoadingScreen";
+import LoadingScreen from "./components/general/LoadingScreen";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
 import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";

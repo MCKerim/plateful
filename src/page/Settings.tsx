@@ -1,5 +1,5 @@
 import Layout from "@/components/layout/Layout";
-import { ModeToggle } from "@/components/atoms/mode-toggle";
+import { ModeToggle } from "@/components/general/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
@@ -223,7 +223,7 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">Info</h2>
 
-          <p className="text-sm">v0.0.11 - Beta</p>
+          <p className="text-sm">v0.0.12 - Beta</p>
 
           <div className="flex gap-2">
             <NavLink to="/privacy" className="w-full">

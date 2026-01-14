@@ -1,5 +1,5 @@
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
-import PhoneMockup from "@/components/atoms/onboarding/phoneMockup/PhoneMockup";
+import PhoneMockup from "@/components/onboarding/phoneMockup/PhoneMockup";
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";

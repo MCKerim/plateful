@@ -1,5 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { RecipeRatingWithUser } from "@/components/atoms/RatingModal";
+import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
 export class RatingService {
   constructor(private readonly supabase: SupabaseClient) {}
