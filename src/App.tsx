@@ -21,7 +21,6 @@ import JoinHousehold from "./page/onboarding/joinHousehold/JoinHousehold";
 import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
 import NotFound from "./page/NotFound";
 import Home from "./page/Home";
-import Explore from "./page/Explore";
 import Cookbook from "./page/Cookbook";
 import Chatbot from "./page/Chatbot";
 import LoadingScreen from "./components/general/LoadingScreen";
@@ -293,7 +292,6 @@ function App() {
       />
 
       <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
-      <Route path="/explore" element={routeToCorrectPage(<Explore />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
       <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
       <Route path="/home" element={routeToCorrectPage(<Home />)} />
