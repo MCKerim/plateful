@@ -11,6 +11,7 @@ import {
 } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
+import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { getWeekdays } from "@/lib/dateHelper";
 import { Button } from "@/components/ui/button";
 import {
@@ -77,6 +78,10 @@ export default function MealPlanner() {
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
+  const [editingRecipe, setEditingRecipe] = useState<{
+    id: number;
+    name: string;
+  } | null>(null);
 
   // React Query hooks - clean and simple!
   const { data: plannedItems = [], isLoading } =
@@ -157,6 +162,10 @@ export default function MealPlanner() {
     handleSetDaysEaten(item.id, item.daysEaten + 1);
     setRecipeToRate(item.recipeId);
     ratingModalRef.current?.open();
+  }
+
+  function handleEditPlan(recipeId: number, recipeName: string) {
+    setEditingRecipe({ id: recipeId, name: recipeName });
   }
 
   function getItemsByDate(date: Date) {
@@ -278,6 +287,16 @@ export default function MealPlanner() {
           showTriggerButton={false}
         />
 
+        {/* Weekly Plan Dialog for editing */}
+        <WeeklyPlanDialog
+          recipeId={editingRecipe?.id ?? 0}
+          recipeName={editingRecipe?.name ?? ""}
+          open={editingRecipe !== null}
+          onOpenChange={(open) => !open && setEditingRecipe(null)}
+          trigger={null}
+          navigateOnSuccess={false}
+        />
+
         {/* Week Navigation */}
         <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11 z-10">
           <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
@@ -347,12 +366,11 @@ export default function MealPlanner() {
                       <li key={item.id}>
                         <MealPlannerItem
                           {...item}
-                          date={item.planned_date}
                           setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
                           onRecipeEaten={() => handleRecipeEaten(item)}
                           onRecipeDelete={() => handleDelete(item.id)}
-                          onUpdateToNoDate={() =>
-                            handleUpdateDate(item.id, null, 1)
+                          onEditPlan={() =>
+                            handleEditPlan(item.recipeId, item.recipeName)
                           }
                           isDragging={activeItem?.id === item.id}
                         />
@@ -425,7 +443,6 @@ export default function MealPlanner() {
                             id={item.id}
                             recipeId={item.recipeId}
                             recipeName={item.recipeName}
-                            date={item.planned_date}
                             days={item.days}
                             daysEaten={item.daysEaten}
                             setDaysEaten={(days) =>
@@ -436,8 +453,8 @@ export default function MealPlanner() {
                               showRateRecipeModal(item.recipeId);
                             }}
                             onRecipeDelete={() => handleDelete(item.id)}
-                            onUpdateToNoDate={() =>
-                              handleUpdateDate(item.id, null, 1)
+                            onEditPlan={() =>
+                              handleEditPlan(item.recipeId, item.recipeName)
                             }
                             isDragging={activeItem?.id === item.id}
                           />

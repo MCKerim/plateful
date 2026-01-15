@@ -7,6 +7,8 @@
     "deleteConfirmation": "This action cannot be undone.",
     "cancel": "Cancel",
     "save": "Save",
+    "saving": "Saving...",
+    "error": "An error occurred",
     "commingSoon": "Comming soon...",
     "selectImage": "Select image",
     "selectImageSource": "Select image source",
@@ -178,7 +180,9 @@
     "deleteError": "Error deleting item",
     "updateError": "Error updating item",
     "planned": "planned",
-    "selectDayOrWithoutDate": "Please select a day or choose 'Without date'"
+    "selectDayOrWithoutDate": "Please select a day or choose 'Without date'",
+    "alreadyPlanned": "Already planned",
+    "willBeRemoved": "Will be removed"
   },
   "cookbook": {
     "title": "Cookbook",
@@ -195,7 +199,7 @@
     "planningFailed": "Error planning recipe. Please try again later."
   },
   "mealPlannerItem": {
-    "removeDate": "Remove Date",
+    "editPlan": "Edit Plan",
     "remove": "Remove"
   },
   "addRecipeDrawer": {

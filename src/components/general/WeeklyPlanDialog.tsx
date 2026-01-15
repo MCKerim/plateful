@@ -5,7 +5,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { useState, useEffect, useCallback, ReactNode } from "react";
+import { useState, useEffect, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper";
@@ -20,12 +20,6 @@ import {
   useRecipePlansForWeek,
   useSaveRecipePlans,
 } from "@/hooks/meal-planning";
-import { RecipePlanEntry } from "@/types/meal-planning.types";
-
-type OriginalPlan = {
-  id: number;
-  date: Date;
-};
 
 type Props = {
   recipeId: number;
@@ -79,20 +73,16 @@ export default function WeeklyPlanDialog({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [currentWeek, setCurrentWeek] = useState(new Date());
-  const [originalPlansByWeek, setOriginalPlansByWeek] = useState<
-    Map<string, OriginalPlan[]>
-  >(new Map());
+  // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(
     new Set()
   );
 
-  // Fetch all planned items summary (for showing other recipes on each day)
-  const { data: plannedItems = [] } = usePlannedItemsSummary(
-    currentWeek,
-    isDialogOpen
-  );
+  // Fetch all planned items summary (for showing recipes on each day - includes recipe names)
+  const { data: plannedItems = [], isFetching: isFetchingPlannedItems } =
+    usePlannedItemsSummary(currentWeek, isDialogOpen);
 
-  // Fetch existing plans for THIS recipe in the current week
+  // Fetch existing plans for THIS recipe in the current week (needed for IDs to delete)
   const { data: recipePlans = [] } = useRecipePlansForWeek(
     recipeId,
     currentWeek,
@@ -102,69 +92,84 @@ export default function WeeklyPlanDialog({
   // Mutation for saving
   const saveMutation = useSaveRecipePlans();
 
-  // Get week key for tracking
-  const getWeekKey = useCallback((week: Date) => {
-    const weekDays = getWeekdays(week);
-    const weekStart = new Date(weekDays[0]);
-    weekStart.setHours(0, 0, 0, 0);
-    return weekStart.toISOString();
-  }, []);
+  // Check if a date has THIS recipe planned (using the always-fresh plannedItems data)
+  function isDatePlannedForThisRecipe(date: Date): boolean {
+    const itemsForDay = getPlannedItemsForDate(plannedItems, date);
+    return itemsForDay.some((item) => item.recipe_name === recipeName);
+  }
 
-  // Initialize selections when recipe plans are fetched for a week
+  // Get the plan ID for a specific date (from recipePlans which has IDs)
+  function getPlanIdForDate(date: Date): number | null {
+    const plan = recipePlans.find(
+      (p) => p.planned_date && isSameDay(p.planned_date, date)
+    );
+    return plan?.id ?? null;
+  }
+
+  // Reset state when dialog closes
   useEffect(() => {
-    if (!isDialogOpen || recipePlans.length === 0) return;
+    if (!isDialogOpen) {
+      setSelectedDates([]);
+      setWithoutDate(false);
+      setCurrentWeek(new Date());
+      setInitializedWeeks(new Set());
+    }
+  }, [isDialogOpen]);
 
-    const weekKey = getWeekKey(currentWeek);
+  // Reset when recipe changes
+  useEffect(() => {
+    setSelectedDates([]);
+    setWithoutDate(false);
+    setCurrentWeek(new Date());
+    setInitializedWeeks(new Set());
+  }, [recipeId]);
 
-    // Only initialize once per week
+  // Initialize/update selected dates when week changes or data loads
+  // This adds already-planned dates for weeks that haven't been initialized yet
+  useEffect(() => {
+    // Don't initialize while data is still being fetched for this week
+    if (!isDialogOpen || isFetchingPlannedItems) return;
+
+    const weekKey = getWeekdays(currentWeek)[0].toISOString();
+
+    // Skip if this week has already been initialized
     if (initializedWeeks.has(weekKey)) return;
 
-    // Store original plans for this week
-    const plansForWeek: OriginalPlan[] = recipePlans
-      .filter((plan): plan is RecipePlanEntry & { planned_date: Date } =>
-        plan.planned_date !== null
-      )
-      .map((plan) => ({
-        id: plan.id,
-        date: plan.planned_date,
-      }));
+    // Find all days in current week that have this recipe planned
+    const weekDays = getWeekdays(currentWeek);
+    const alreadyPlannedDates = weekDays.filter((day) =>
+      isDatePlannedForThisRecipe(day)
+    );
 
-    if (plansForWeek.length > 0) {
-      setOriginalPlansByWeek((prev) => {
-        const newMap = new Map(prev);
-        newMap.set(weekKey, plansForWeek);
-        return newMap;
-      });
-
-      // Pre-select the dates
+    // Add the already-planned dates to selectedDates (without duplicates)
+    if (alreadyPlannedDates.length > 0) {
       setSelectedDates((prev) => {
         const newDates = [...prev];
-        for (const plan of plansForWeek) {
-          if (!newDates.some((d) => isSameDay(d, plan.date))) {
-            newDates.push(plan.date);
+        for (const date of alreadyPlannedDates) {
+          if (!newDates.some((d) => isSameDay(d, date))) {
+            newDates.push(date);
           }
         }
         return newDates;
       });
     }
 
+    // Mark this week as initialized
     setInitializedWeeks((prev) => new Set(prev).add(weekKey));
-  }, [recipePlans, isDialogOpen, currentWeek, getWeekKey, initializedWeeks]);
+  }, [
+    isDialogOpen,
+    plannedItems,
+    currentWeek,
+    initializedWeeks,
+    recipeName,
+    isFetchingPlannedItems,
+  ]);
 
   function handleOpenChange(open: boolean) {
     if (isControlled) {
       controlledOnOpenChange?.(open);
     } else {
       setInternalOpen(open);
-    }
-
-    if (!open) {
-      // Reset state when closing
-      setSelectedDates([]);
-      setWithoutDate(false);
-      setCurrentWeek(new Date());
-      setOriginalPlansByWeek(new Map());
-      setInitializedWeeks(new Set());
     }
   }
 
@@ -201,16 +206,6 @@ export default function WeeklyPlanDialog({
     setWithoutDate(updatedWithoutDate);
   }
 
-  // Check if a date has an existing plan for THIS recipe
-  function hasExistingPlanForDate(date: Date): boolean {
-    for (const plans of originalPlansByWeek.values()) {
-      if (plans.some((p) => isSameDay(p.date, date))) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   async function handleSave() {
     if (!householdId) {
       toast.error(t("common.error"));
@@ -222,19 +217,28 @@ export default function WeeklyPlanDialog({
       return;
     }
 
-    // Collect all original dates from all weeks
-    const allOriginalPlans: OriginalPlan[] = [];
-    originalPlansByWeek.forEach((plans) => {
-      allOriginalPlans.push(...plans);
-    });
+    // Get all days in current week that have this recipe planned
+    const weekDays = getWeekdays(currentWeek);
+    const currentlyPlannedDates = weekDays.filter((day) =>
+      isDatePlannedForThisRecipe(day)
+    );
 
     // Determine what to add and remove
-    const planIdsToRemove = allOriginalPlans
-      .filter((op) => !selectedDates.some((d) => isSameDay(d, op.date)))
-      .map((op) => op.id);
+    const planIdsToRemove: number[] = [];
+    for (const plannedDate of currentlyPlannedDates) {
+      const isStillSelected = selectedDates.some((d) =>
+        isSameDay(d, plannedDate)
+      );
+      if (!isStillSelected) {
+        const planId = getPlanIdForDate(plannedDate);
+        if (planId) {
+          planIdsToRemove.push(planId);
+        }
+      }
+    }
 
     const datesToAdd = selectedDates.filter(
-      (date) => !allOriginalPlans.some((op) => isSameDay(op.date, date))
+      (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date))
     );
 
     // Check if there are actual changes
@@ -333,7 +337,8 @@ export default function WeeklyPlanDialog({
           const isSelected = selectedDates.some((d) => isSameDay(d, day));
           const plannedForDay = getPlannedItemsForDate(plannedItems, day);
           const hasPlannedItems = plannedForDay.length > 0;
-          const hasExistingPlan = hasExistingPlanForDate(day);
+          // Use the fresh plannedItems data to check if this recipe is planned
+          const hasExistingPlan = isDatePlannedForThisRecipe(day);
 
           return (
             <Button
@@ -374,9 +379,7 @@ export default function WeeklyPlanDialog({
               {hasExistingPlan && (
                 <span
                   className={`text-xs ${
-                    isSelected
-                      ? "text-accent-foreground"
-                      : "text-destructive"
+                    isSelected ? "text-accent-foreground" : "text-destructive"
                   }`}
                 >
                   {isSelected

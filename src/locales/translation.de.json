@@ -7,6 +7,8 @@
     "deleteConfirmation": "Diese Aktion kann nicht rückgängig gemacht werden.",
     "cancel": "Abbrechen",
     "save": "Speichern",
+    "saving": "Speichern...",
+    "error": "Ein Fehler ist aufgetreten",
     "commingSoon": "Demnächst verfügbar...",
     "selectImage": "Bild auswählen",
     "selectImageSource": "Bildquelle auswählen",
@@ -178,7 +180,9 @@
     "deleteError": "Fehler beim Löschen",
     "updateError": "Fehler beim Aktualisieren",
     "planned": "Geplant",
-    "selectDayOrWithoutDate": "Bitte wählen Sie einen Tag aus oder wählen Sie „Ohne Datum“."
+    "selectDayOrWithoutDate": "Bitte wählen Sie einen Tag aus oder wählen Sie 'Ohne Datum'.",
+    "alreadyPlanned": "Bereits geplant",
+    "willBeRemoved": "Wird entfernt"
   },
   "cookbook": {
     "title": "Kochbuch",
@@ -247,7 +251,7 @@
     "title": "Erkunden"
   },
   "mealPlannerItem": {
-    "removeDate": "Datum entfernen",
+    "editPlan": "Plan bearbeiten",
     "remove": "Entfernen"
   },
   "settings": {
