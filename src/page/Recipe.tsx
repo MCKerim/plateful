@@ -138,7 +138,7 @@ export default function Recipe() {
         <div className="flex items-center gap-1">
           <CalendarDays size={16} />
           <p className="text-sm">
-            {lastMealPlan && getMealPlanStatus(lastMealPlan, t)}
+            {getMealPlanStatus(lastMealPlan ?? null, t)}
           </p>
         </div>
 

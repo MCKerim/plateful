@@ -1,13 +1,11 @@
-// src/api/meal-planning.api.ts
-
 import { SupabaseClient } from "@supabase/supabase-js";
 import {
   MealPlannerItemRaw,
   PlannedItemSummary,
   PlannedItemSummaryRaw,
   RecipePlanEntryRaw,
+  RecipeMealPlanInfo,
 } from "@/types/meal-planning.types";
-import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 
 export const mealPlanningApi = {
   async getItemsForWeek(
@@ -119,16 +117,54 @@ export const mealPlanningApi = {
   async getInfoByRecipe(
     supabase: SupabaseClient,
     recipeId: number
-  ): Promise<MealPlanning | null> {
+  ): Promise<RecipeMealPlanInfo> {
+    const today = new Date();
+    // Use local date string to avoid timezone issues
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+    // Get all meal plans for this recipe, ascending so closest date comes first
     const { data, error } = await supabase
       .from("meal_planning")
       .select("*")
       .eq("recipe_id", recipeId)
-      .order("created_at", { ascending: false })
-      .limit(1);
+      .order("planned_date", { ascending: true, nullsFirst: true });
 
     if (error) throw error;
-    return data && data.length > 0 ? data[0] : null;
+
+    if (!data || data.length === 0) {
+      return { activePlan: null, lastPlannedDate: null };
+    }
+
+    // Separate plans into categories
+    const plansWithoutDate = data.filter((p) => p.planned_date === null);
+    const futurePlans = data.filter(
+      (p) => p.planned_date !== null && p.planned_date >= todayStr
+    );
+
+    // Find active plan: first check for closest future/today date, then check no-date plans
+    // futurePlans are already sorted ascending, so first one is closest
+    let activePlan = futurePlans.length > 0 ? futurePlans[0] : null;
+
+    // If no future plan, check for a no-date plan that's not fully eaten
+    if (!activePlan) {
+      activePlan =
+        plansWithoutDate.find((plan) => plan.daysEaten < plan.days) ?? null;
+    }
+
+    // Find the most recent past planned_date (for "last planned" display)
+    const pastPlansWithDates = data.filter(
+      (p) => p.planned_date !== null && p.planned_date < todayStr
+    );
+    // Get the most recent past date (last item since ascending order)
+    const lastPlannedDate =
+      pastPlansWithDates.length > 0
+        ? pastPlansWithDates[pastPlansWithDates.length - 1].planned_date
+        : null;
+
+    return {
+      activePlan: activePlan ?? null,
+      lastPlannedDate,
+    };
   },
 
   async getPlansForRecipeInWeek(

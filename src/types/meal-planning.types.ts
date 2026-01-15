@@ -55,3 +55,13 @@ export type SaveRecipePlansResult = {
   added: number;
   removed: number;
 };
+
+export type RecipeMealPlanInfo = {
+  activePlan: {
+    id: number;
+    planned_date: string | null;
+    days: number;
+    daysEaten: number;
+  } | null;
+  lastPlannedDate: string | null;
+};
