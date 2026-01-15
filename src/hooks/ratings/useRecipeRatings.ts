@@ -6,6 +6,7 @@ import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
 function calculateAverage(ratings: RecipeRatingWithUser[]): number | null {
   if (ratings.length === 0) return null;
+
   const totalStars = ratings.reduce((acc, rating) => acc + rating.stars, 0);
   return totalStars / ratings.length;
 }
