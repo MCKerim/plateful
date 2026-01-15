@@ -9,7 +9,7 @@ export function transformMealPlannerItems(
   return raw.map((item) => ({
     id: item.id,
     recipeId: item.recipes?.id ?? 0,
-    recipeName: item.recipes?.name ?? "Unknown",
+    recipeName: item.recipes?.name ?? "-",
     planned_date: item.planned_date ? new Date(item.planned_date) : null,
     days: item.days,
     daysEaten: item.daysEaten,

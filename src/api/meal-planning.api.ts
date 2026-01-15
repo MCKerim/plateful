@@ -56,7 +56,7 @@ export const mealPlanningApi = {
       )
       .map((item) => ({
         planned_date: item.planned_date,
-        recipe_name: item.recipes?.name ?? "Unknown",
+        recipe_name: item.recipes?.name ?? "-",
       }));
   },
 
