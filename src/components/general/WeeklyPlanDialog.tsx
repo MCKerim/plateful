@@ -36,7 +36,6 @@ function usePlannedItemsForWeek(currentWeek: Date, enabled: boolean) {
   weekEnd.setHours(23, 59, 59, 999);
 
   return useQuery({
-    // UNIFIED QUERY KEY: Start with 'meal-planning'
     queryKey: ["meal-planning", "summary", weekStart.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
