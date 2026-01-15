@@ -1,23 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database.types";
 
-export async function fetchRecipeAvgRating(
-  supabase: SupabaseClient<Database>,
-  recipeId: number
-): Promise<number | null> {
-  const { data } = await supabase
-    .from("recipe_ratings")
-    .select("stars")
-    .eq("recipe_id", recipeId);
-
-  if (!data || data.length === 0) {
-    return null;
-  }
-
-  const totalStars = data.reduce((acc, rating) => acc + rating.stars, 0);
-  return totalStars / data.length;
-}
-
 export async function fetchRecipeImage(
   supabase: SupabaseClient<Database>,
   recipeId: number

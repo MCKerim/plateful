@@ -4,7 +4,7 @@ import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
-import { useNativeCamera } from "../../hooks/useNativeCamera";
+import { useNativeCamera } from "../../hooks/general/useNativeCamera";
 import { AlertCircle } from "lucide-react";
 
 interface ImagePickerProps {

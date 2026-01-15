@@ -17,7 +17,7 @@ import {
 } from "@/redux/slices/filterAndSortingSlice";
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
 import CategoryButton from "@/components/general/CategoryButton";
-import { useScrollRestoration } from "@/hooks/useScrollRestoration";
+import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import { useRecipes } from "@/hooks/cookbook";
 import { CookbookRecipe } from "@/types/cookbook.types";
