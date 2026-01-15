@@ -21,7 +21,10 @@ export function useDeletePlannedItem() {
 
       queryClient.setQueriesData<MealPlannerItem[]>(
         { queryKey: queryKeys.mealPlanning.all },
-        (old) => old?.filter((item) => item.id !== id)
+        (old) => {
+          if (!old || !Array.isArray(old)) return old;
+          return old.filter((item) => item.id !== id);
+        }
       );
 
       return { previousData };

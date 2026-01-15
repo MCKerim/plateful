@@ -38,7 +38,7 @@ export function useSaveRecipePlans() {
             supabase,
             params.recipeId,
             params.householdId,
-            date.toDateString(),
+            date.toISOString(),
             1
           )
         );
@@ -64,8 +64,11 @@ export function useSaveRecipePlans() {
         removed: params.planIdsToRemove.length,
       };
     },
+    onSuccess: async () => {
+      // Wait for all meal planning queries to be refetched before completing
+      await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
+    },
     onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
       queryClient.invalidateQueries({
         queryKey: queryKeys.mealPlanning.info(variables.recipeId),
       });

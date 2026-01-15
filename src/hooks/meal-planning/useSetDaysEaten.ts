@@ -27,10 +27,12 @@ export function useSetDaysEaten() {
 
       queryClient.setQueriesData<MealPlannerItem[]>(
         { queryKey: queryKeys.mealPlanning.all },
-        (old) =>
-          old?.map((item) =>
+        (old) => {
+          if (!old || !Array.isArray(old)) return old;
+          return old.map((item) =>
             item.id === id ? { ...item, daysEaten: newDaysEaten } : item
-          )
+          );
+        }
       );
 
       return { previousData };

@@ -25,12 +25,14 @@ export function useUpdatePlannedItemDate() {
 
       queryClient.setQueriesData<MealPlannerItem[]>(
         { queryKey: queryKeys.mealPlanning.all },
-        (old) =>
-          old?.map((item) =>
+        (old) => {
+          if (!old || !Array.isArray(old)) return old;
+          return old.map((item) =>
             item.id === id
               ? { ...item, planned_date: newDate, days: newDays }
               : item
-          )
+          );
+        }
       );
 
       return { previousData };
