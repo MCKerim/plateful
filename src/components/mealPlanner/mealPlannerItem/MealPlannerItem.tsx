@@ -3,7 +3,7 @@ import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -45,6 +45,7 @@ export default function MealPlannerItem({
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: imageUrl } = useRecipeFirstImage(recipeId);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const dragHandleRef = useRef<HTMLDivElement>(null);
 
@@ -206,7 +207,7 @@ export default function MealPlannerItem({
         ))}
       </Button>
 
-      <Drawer>
+      <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
           <Button className="me-2.5" variant="outline">
             <MoreVertical size={16} />
@@ -227,7 +228,10 @@ export default function MealPlannerItem({
             </DrawerClose>
 
             <DeleteDialog
-              onDelete={() => onRecipeDelete(id)}
+              onDelete={() => {
+                setIsDrawerOpen(false);
+                onRecipeDelete(id);
+              }}
               customTrigger={
                 <Button className="w-full" variant="destructive">
                   <Trash2 size={16} />

@@ -212,11 +212,6 @@ export default function WeeklyPlanDialog({
       return;
     }
 
-    if (selectedDates.length === 0 && !withoutDate) {
-      toast.error(t("mealPlanner.selectDayOrWithoutDate"));
-      return;
-    }
-
     // Get all days in current week that have this recipe planned
     const weekDays = getWeekdays(currentWeek);
     const currentlyPlannedDates = weekDays.filter((day) =>
@@ -240,6 +235,12 @@ export default function WeeklyPlanDialog({
     const datesToAdd = selectedDates.filter(
       (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date))
     );
+
+    // Only show error if nothing is selected AND there's nothing to remove (i.e., no changes)
+    if (selectedDates.length === 0 && !withoutDate && planIdsToRemove.length === 0) {
+      toast.error(t("mealPlanner.selectDayOrWithoutDate"));
+      return;
+    }
 
     // Check if there are actual changes
     const hasChanges =
