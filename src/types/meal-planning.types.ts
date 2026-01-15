@@ -37,3 +37,21 @@ export type CreateMealPlanParams = {
   date: Date | null;
   days: number;
 };
+
+export type RecipePlanEntry = {
+  id: number;
+  planned_date: Date | null;
+  days: number;
+};
+
+export type RecipePlanEntryRaw = {
+  id: number;
+  planned_date: string | null;
+  days: number;
+};
+
+export type SaveRecipePlansResult = {
+  success: boolean;
+  added: number;
+  removed: number;
+};

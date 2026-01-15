@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { NavLink, useParams, useNavigate } from "react-router";
+import { NavLink, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays } from "lucide-react";
 import RatingModal, {
@@ -11,7 +11,6 @@ import RatingModal, {
 } from "@/components/general/RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import { useAppSelector } from "@/redux/hooks";
-import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
@@ -22,18 +21,13 @@ import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
 import RatingListItem from "@/components/general/RatingListItem";
 import { useRecipe, useRecipeImages } from "@/hooks/recipe";
-import {
-  useRecipeMealPlanInfo,
-  usePlanRecipe,
-} from "@/hooks/meal-planning";
+import { useRecipeMealPlanInfo } from "@/hooks/meal-planning";
 import { useRecipeRatings, useDeleteRating } from "@/hooks/ratings";
 
 export default function Recipe() {
   const { t } = useTranslation();
   const params = useParams();
-  const navigate = useNavigate();
 
-  const householdId = useAppSelector(selectHouseholdId);
   const currentUser = useAppSelector(selectUser);
   const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
 
@@ -46,7 +40,6 @@ export default function Recipe() {
   const { ratings, averageRating } = useRecipeRatings(recipeId);
 
   // Mutations
-  const planRecipeMutation = usePlanRecipe();
   const deleteRatingMutation = useDeleteRating();
 
   useEffect(() => {
@@ -59,43 +52,6 @@ export default function Recipe() {
     globalThis.addEventListener("popstate", handlePopState);
     return () => globalThis.removeEventListener("popstate", handlePopState);
   }, []);
-
-  async function finishPlanning(dates: Date[]) {
-    if (!recipe || !householdId) return;
-
-    try {
-      if (dates.length === 0) {
-        await planRecipeMutation.mutateAsync({
-          recipeId: recipe.id,
-          householdId,
-          plannedDate: null,
-          days: 1,
-        });
-      } else {
-        await Promise.all(
-          dates.map((date) =>
-            planRecipeMutation.mutateAsync({
-              recipeId: recipe.id,
-              householdId,
-              plannedDate: date,
-              days: 1,
-            })
-          )
-        );
-      }
-
-      toast.success(t("recipe.planningSuccessful"), {
-        position: "top-right",
-        richColors: true,
-      });
-      navigate("/planner");
-    } catch {
-      toast.error(t("recipe.planningFailed"), {
-        position: "top-right",
-        richColors: true,
-      });
-    }
-  }
 
   function handleDeleteRating(ratingId: number) {
     if (!recipeId) return;
@@ -131,7 +87,13 @@ export default function Recipe() {
           {t("recipe.editRecipe")}
         </NavLink>
 
-        {recipe && <WeeklyPlanDialog onFinish={finishPlanning} />}
+        {recipe && (
+          <WeeklyPlanDialog
+            recipeId={recipe.id}
+            recipeName={recipe.name}
+            navigateOnSuccess={true}
+          />
+        )}
       </div>
     </>
   );
