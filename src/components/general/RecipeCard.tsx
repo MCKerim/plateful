@@ -3,16 +3,11 @@ import { Card } from "../ui/card";
 import StarIcon from "@mui/icons-material/Star";
 import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
-import { useEffect, useState } from "react";
-import { useSupabase } from "@/utils/supabase";
-import { MealPlanning } from "@/types/exportedDatabaseTypes.types";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper";
 import { useTranslation } from "react-i18next";
 import { formatRating } from "@/lib/formatRatingHelper";
-import {
-  fetchRecipeImage,
-  fetchRecipeLastPlanned,
-} from "@/lib/data/dataHelper";
+import { useRecipeFirstImage } from "@/hooks/recipe";
+import { useRecipeMealPlanInfo } from "@/hooks/meal-planning";
 
 type Props = {
   id: number;
@@ -25,17 +20,11 @@ export default function RecipeCard({
   name,
   averageRating,
 }: Readonly<Props>) {
-  const { supabase } = useSupabase();
   const { t } = useTranslation();
-  const [lastMealPlan, setLastMealPlan] = useState<MealPlanning | null>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { data: imageUrl } = useRecipeFirstImage(id);
+  const { data: lastMealPlan } = useRecipeMealPlanInfo(id);
 
   const TAGS: string[] = [];
-
-  useEffect(() => {
-    fetchRecipeImage(supabase, id).then((url) => setImageUrl(url));
-    fetchRecipeLastPlanned(supabase, id).then((plan) => setLastMealPlan(plan));
-  }, [id]);
 
   function renderTagPills() {
     return TAGS.map((tag, index) => (
@@ -67,7 +56,7 @@ export default function RecipeCard({
             <div className="flex items-center gap-1">
               <CalendarDays size={16} />
 
-              <p className="text-xs">{getMealPlanStatus(lastMealPlan, t)}</p>
+              <p className="text-xs">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
             </div>
 
             <div className="flex items-center">

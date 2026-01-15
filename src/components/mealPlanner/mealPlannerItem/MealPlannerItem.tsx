@@ -3,8 +3,7 @@ import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
-import { useEffect, useState, useRef } from "react";
-import { useSupabase } from "@/utils/supabase";
+import { useEffect, useRef } from "react";
 import {
   Drawer,
   DrawerClose,
@@ -16,6 +15,7 @@ import { CalendarDays, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
+import { useRecipeFirstImage } from "@/hooks/recipe";
 
 type Props = {
   id: number;
@@ -44,8 +44,7 @@ export default function MealPlannerItem({
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { supabase } = useSupabase();
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const { data: imageUrl } = useRecipeFirstImage(recipeId);
 
   const dragHandleRef = useRef<HTMLDivElement>(null);
 
@@ -138,35 +137,6 @@ export default function MealPlannerItem({
       }
     };
   }, []);
-
-  useEffect(() => {
-    async function fetchImage() {
-      const { data, error } = await supabase.storage
-        .from("recipeimages")
-        .list(`recipe_${recipeId}/`);
-
-      if (error) {
-        console.error("Error fetching images: ", error);
-        return;
-      }
-
-      if (data && data.length > 0) {
-        const { data: signedUrlData, error: signedUrlError } =
-          await supabase.storage
-            .from("recipeimages")
-            .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, 3600);
-
-        if (signedUrlError) {
-          console.error("Error creating signed URL: ", signedUrlError);
-          return;
-        }
-
-        setImageUrl(signedUrlData?.signedUrl || null);
-      }
-    }
-
-    fetchImage();
-  }, [recipeId]);
 
   function eat() {
     if (daysEaten + 1 > days) {

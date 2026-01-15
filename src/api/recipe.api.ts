@@ -37,6 +37,23 @@ export const recipeApi = {
     return data;
   },
 
+  async getFirstImage(
+    supabase: SupabaseClient,
+    recipeId: number
+  ): Promise<string | null> {
+    const { data, error } = await supabase.storage
+      .from("recipeimages")
+      .list(`recipe_${recipeId}/`);
+
+    if (error || !data || data.length === 0) return null;
+
+    const { data: signedUrlData } = await supabase.storage
+      .from("recipeimages")
+      .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, 3600);
+
+    return signedUrlData?.signedUrl ?? null;
+  },
+
   async getImages(
     supabase: SupabaseClient,
     recipeId: number
