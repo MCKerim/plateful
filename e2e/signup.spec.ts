@@ -17,7 +17,7 @@ test.describe("Sign Up Page", () => {
 
     const title = page.locator("h1");
     await expect(title).toBeVisible();
-    await expect(title).toContainText("Congratulations");
+    await expect(title).toContainText("Plateful");
 
     // Check for the two signup buttons
     const googleButton = page.getByRole("button", { name: /google/i });
