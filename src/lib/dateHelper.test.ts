@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { toWeekday, getWeekdays, formatDateByLocale } from "./dateHelper";
+import { toWeekday, getWeekdays } from "./dateHelper";
 
 // Mock i18n module
 vi.mock("@/i18n", () => ({

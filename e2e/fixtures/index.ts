@@ -14,6 +14,7 @@ export const test = base.extend<CustomFixtures>({
   authenticatedPage: async ({ page, context }, use) => {
     const defaultScenario = createDefaultScenario();
     await setupAuthentication(page, context, defaultScenario);
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(page);
   },
 
@@ -23,6 +24,7 @@ export const test = base.extend<CustomFixtures>({
       const scenario = createScenarioFromOptions(options);
       await setupAuthentication(page, context, scenario);
     };
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     await use(setup);
   },
 });

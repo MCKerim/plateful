@@ -1,4 +1,4 @@
-import { Page, BrowserContext } from "@playwright/test";
+import { Page } from "@playwright/test";
 
 // Mock data types aligned with database schema
 export type MockUser = {

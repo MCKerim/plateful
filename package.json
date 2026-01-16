@@ -13,6 +13,8 @@
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
+    "test:all": "npm run lint && npm run test:run && npm run test:e2e",
+    "ci": "npm run lint && npm run test:run && npm run test:e2e -- --project=chromium",
     "preview": "vite preview",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/logo.png",
     "generate-supabase-types": "npx supabase gen types typescript --project-id upupcsgufoejppoietiu --schema public > src/types/database.types.ts",
