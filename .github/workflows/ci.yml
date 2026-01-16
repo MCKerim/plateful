@@ -65,8 +65,10 @@ jobs:
         run: npm run test:e2e -- --project=chromium
         env:
           CI: true
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          # Use actual Supabase URL (needed for proper localStorage key)
+          # All API calls are intercepted by Playwright route handlers
+          VITE_SUPABASE_URL: https://upupcsgufoejppoietiu.supabase.co
+          VITE_SUPABASE_ANON_KEY: mock-anon-key-for-e2e-tests
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
