@@ -44,10 +44,20 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
 
   // Recipes endpoint
   await page.route("**/rest/v1/recipes?*", async (route) => {
+    // Transform recipes to include recipe_ratings array (expected by cookbook API)
+    const recipesWithRatings = scenario.recipes.map((recipe) => ({
+      id: recipe.id,
+      name: recipe.name,
+      description: recipe.description,
+      category: recipe.category,
+      created_at: recipe.created_at,
+      recipe_ratings: recipe.avg_rating ? [{ stars: recipe.avg_rating }] : [],
+    }));
+
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(scenario.recipes),
+      body: JSON.stringify(recipesWithRatings),
     });
   });
 
