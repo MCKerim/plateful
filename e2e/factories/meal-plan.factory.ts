@@ -19,7 +19,11 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
     id,
     recipe_id: overrides?.recipe_id ?? 1,
     household_id: overrides?.household_id ?? 1,
-    planned_date: overrides?.planned_date ?? formatDate(new Date()),
+    // Use 'in' check to distinguish between explicit null and undefined
+    planned_date:
+      overrides && "planned_date" in overrides
+        ? overrides.planned_date ?? null
+        : formatDate(new Date()),
     days: overrides?.days ?? 1,
     daysEaten: overrides?.daysEaten ?? 0,
     created_at: overrides?.created_at ?? new Date().toISOString(),
