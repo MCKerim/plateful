@@ -6,7 +6,7 @@ import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Pencil, Link, CalendarDays, Bot } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
-import { resetChat, setRecipeContext } from "@/redux/slices/chatbotSlice";
+import { resetChat } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
   RecipeRatingWithUser,
   RatingModalRef,
@@ -81,14 +81,7 @@ export default function Recipe() {
   function handleAskChatbot() {
     if (!recipe) return;
     dispatch(resetChat());
-    dispatch(
-      setRecipeContext({
-        id: recipe.id,
-        name: recipe.name,
-        description: recipe.description,
-      })
-    );
-    navigate("/chatbot");
+    navigate(`/chatbot?recipeId=${recipe.id}`);
   }
 
   const saveFooter = (

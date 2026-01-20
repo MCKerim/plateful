@@ -14,13 +14,12 @@ import {
   addMessages,
   setIsTyping,
   resetChat,
-  setRecipeContext,
   ChatMessage,
   setPreviousResponseId,
   selectPreviousResponseId,
-  selectRecipeContext,
 } from "@/redux/slices/chatbotSlice";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import { useRecipe } from "@/hooks/recipe";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
@@ -50,12 +49,17 @@ export default function Chatbot() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const messages = useAppSelector(selectMessages);
   const previousResponseId = useAppSelector(selectPreviousResponseId);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
-  const recipeContext = useAppSelector(selectRecipeContext);
+
+  // Get recipe context from URL param
+  const recipeIdParam = searchParams.get("recipeId");
+  const recipeId = recipeIdParam ? Number.parseInt(recipeIdParam) : null;
+  const { data: recipeContext } = useRecipe(recipeId);
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
@@ -110,9 +114,9 @@ export default function Chatbot() {
     dispatch(addMessage(userMessage));
     setInputValue("");
     setSelectedImagesAsbase64([]);
-    // Clear recipe context after first message (like images)
+    // Clear recipe context from URL after first message (like images)
     if (isFirstMessageWithContext) {
-      dispatch(setRecipeContext(null));
+      setSearchParams({});
     }
     dispatch(setIsTyping(true));
 
