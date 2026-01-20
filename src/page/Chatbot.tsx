@@ -14,6 +14,7 @@ import {
   addMessages,
   setIsTyping,
   resetChat,
+  setRecipeContext,
   ChatMessage,
   setPreviousResponseId,
   selectPreviousResponseId,
@@ -94,22 +95,31 @@ export default function Chatbot() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() && selectedImagesAsbase64.length === 0) return;
 
+    // Check if this is the first message with recipe context
+    const isFirstMessageWithContext = messages.length === 0 && recipeContext;
+
     // Show the user message in the UI right away
-    const userMessage: ChatMessage & { images?: string[] } = {
-      role: "user",
-      content: inputValue || "",
-      images: selectedImagesAsbase64,
-    };
+    const userMessage: ChatMessage & { images?: string[]; recipeName?: string } =
+      {
+        role: "user",
+        content: inputValue || "",
+        images: selectedImagesAsbase64,
+        ...(isFirstMessageWithContext && { recipeName: recipeContext.name }),
+      };
 
     dispatch(addMessage(userMessage));
     setInputValue("");
     setSelectedImagesAsbase64([]);
+    // Clear recipe context after first message (like images)
+    if (isFirstMessageWithContext) {
+      dispatch(setRecipeContext(null));
+    }
     dispatch(setIsTyping(true));
 
     try {
       // Build the text content - prepend context if this is first message and we have context
       let textContent = inputValue.trim();
-      if (messages.length === 0 && recipeContext) {
+      if (isFirstMessageWithContext) {
         const descriptionPreview = recipeContext.description
           ? recipeContext.description.substring(0, 300)
           : "No description";
@@ -238,16 +248,6 @@ export default function Chatbot() {
         </Button>
       }
     >
-      {/* Recipe Context Banner */}
-      {recipeContext && (
-        <div className="bg-accent rounded-lg px-4 py-3 mb-4 border border-accent-foreground/20">
-          <p className="text-xs text-muted-foreground mb-1">
-            {t("chatbot.askingAbout")}
-          </p>
-          <p className="font-semibold truncate">{recipeContext.name}</p>
-        </div>
-      )}
-
       {/* Chat BG */}
       {visibleMessages.length === 0 && (
         <div className="absolute flex-col items-center justify-center w-full gap-2 -translate-x-1/2 left-1/2">
@@ -332,6 +332,13 @@ export default function Chatbot() {
               >
                 {message.role === "user" && (
                   <>
+                    {/* Recipe context chip if present */}
+                    {"recipeName" in message && (message as any).recipeName && (
+                      <div className="bg-primary-foreground/20 rounded px-2 py-1 text-xs mb-2 inline-block">
+                        {(message as any).recipeName}
+                      </div>
+                    )}
+
                     <p className="text-sm">{message.content}</p>
 
                     {/* optional images if present */}
@@ -458,9 +465,17 @@ export default function Chatbot() {
 
       {/* Input Area */}
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
-        {/* small strip of selected image previews before sending */}
-        {selectedImagesAsbase64.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-2">
+        {/* Recipe context and image previews before sending */}
+        {(recipeContext || selectedImagesAsbase64.length > 0) && (
+          <div className="flex gap-2 flex-wrap mb-2 items-center">
+            {/* Recipe context chip */}
+            {recipeContext && (
+              <div className="bg-accent rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
+                <span className="truncate">{recipeContext.name}</span>
+              </div>
+            )}
+
+            {/* Image previews */}
             {selectedImagesAsbase64.map((imageAsBase64, i) => (
               <button
                 key={i}
