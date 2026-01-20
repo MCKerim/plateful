@@ -208,7 +208,7 @@
     "noRatings": "Keine Bewertungen",
     "planningSuccessful": "Rezept erfolgreich geplant!",
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
-    "askChatbot": "KI fragen"
+    "askChatbot": "KI-Koch fragen"
   },
   "addRecipeDrawer": {
     "importFromUrl": {

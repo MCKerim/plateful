@@ -208,7 +208,7 @@
     "noRatings": "No Ratings",
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later.",
-    "askChatbot": "Ask AI"
+    "askChatbot": "Ask AI-Chef"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",

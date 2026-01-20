@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, MessageSquare } from "lucide-react";
+import { Pencil, Link, CalendarDays, Bot } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, setRecipeContext } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -101,7 +101,7 @@ export default function Recipe() {
           className="w-full"
           onClick={handleAskChatbot}
         >
-          <MessageSquare />
+          <Bot />
           {t("recipe.askChatbot")}
         </Button>
 
