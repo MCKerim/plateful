@@ -207,7 +207,8 @@
     "ratings": "Bewertungen",
     "noRatings": "Keine Bewertungen",
     "planningSuccessful": "Rezept erfolgreich geplant!",
-    "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut."
+    "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
+    "askChatbot": "KI fragen"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
@@ -339,6 +340,7 @@
   },
   "chatbot": {
     "greeting": "Wie kann ich dir helfen?",
+    "askingAbout": "Frage zu",
     "suggestions": {
       "suggestion1": {
         "label": "Erstelle ein gesundes Rezept",

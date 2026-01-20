@@ -14,9 +14,11 @@ import {
   addMessages,
   setIsTyping,
   resetChat,
+  setRecipeContext,
   ChatMessage,
   setPreviousResponseId,
   selectPreviousResponseId,
+  selectRecipeContext,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -53,6 +55,7 @@ export default function Chatbot() {
   const previousResponseId = useAppSelector(selectPreviousResponseId);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
+  const recipeContext = useAppSelector(selectRecipeContext);
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
@@ -105,10 +108,20 @@ export default function Chatbot() {
     dispatch(setIsTyping(true));
 
     try {
+      // Build the text content - prepend context if this is first message and we have context
+      let textContent = inputValue.trim();
+      if (messages.length === 0 && recipeContext) {
+        const descriptionPreview = recipeContext.description
+          ? recipeContext.description.substring(0, 300)
+          : "No description";
+        const contextPrefix = `[Recipe Context: "${recipeContext.name}" - ${descriptionPreview}]\n\n`;
+        textContent = contextPrefix + textContent;
+      }
+
       // Build vision content parts for the server
       const parts: VisionPart[] = [];
-      if (inputValue.trim()) {
-        parts.push({ type: "input_text", text: inputValue.trim() });
+      if (textContent) {
+        parts.push({ type: "input_text", text: textContent });
       }
       for (const url of userMessage.images || []) {
         parts.push({
@@ -171,6 +184,15 @@ export default function Chatbot() {
     dispatch(resetChat());
     setInputValue("");
     setSelectedImagesAsbase64([]);
+    // Clear recipeId from URL if present
+    if (recipeContext) {
+      navigate("/chatbot", { replace: true });
+    }
+  };
+
+  const handleClearContext = () => {
+    dispatch(setRecipeContext(null));
+    navigate("/chatbot", { replace: true });
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
@@ -226,6 +248,25 @@ export default function Chatbot() {
         </Button>
       }
     >
+      {/* Recipe Context Banner */}
+      {recipeContext && (
+        <div className="bg-accent/50 rounded-lg px-3 py-2 mb-2 flex items-center justify-between">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm font-medium truncate">
+              {t("chatbot.askingAbout")}: {recipeContext.name}
+            </span>
+          </div>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="shrink-0 h-6 w-6"
+            onClick={handleClearContext}
+          >
+            <X size={14} />
+          </Button>
+        </div>
+      )}
+
       {/* Chat BG */}
       {visibleMessages.length === 0 && (
         <div className="absolute flex-col items-center justify-center w-full gap-2 -translate-x-1/2 left-1/2">

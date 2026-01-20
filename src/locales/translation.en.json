@@ -207,7 +207,8 @@
     "ratings": "Ratings",
     "noRatings": "No Ratings",
     "planningSuccessful": "Recipe planned successfully!",
-    "planningFailed": "Error planning recipe. Please try again later."
+    "planningFailed": "Error planning recipe. Please try again later.",
+    "askChatbot": "Ask AI"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
@@ -332,6 +333,7 @@
   },
   "chatbot": {
     "greeting": "How can I help you today?",
+    "askingAbout": "Asking about",
     "suggestions": {
       "suggestion1": {
         "label": "Create a healthy recipe",
