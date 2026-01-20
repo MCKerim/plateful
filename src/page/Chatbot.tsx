@@ -250,20 +250,11 @@ export default function Chatbot() {
     >
       {/* Recipe Context Banner */}
       {recipeContext && (
-        <div className="bg-accent/50 rounded-lg px-3 py-2 mb-2 flex items-center justify-between">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="text-sm font-medium truncate">
-              {t("chatbot.askingAbout")}: {recipeContext.name}
-            </span>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="shrink-0 h-6 w-6"
-            onClick={handleClearContext}
-          >
-            <X size={14} />
-          </Button>
+        <div className="bg-accent rounded-lg px-4 py-3 mb-4 border border-accent-foreground/20">
+          <p className="text-xs text-muted-foreground mb-1">
+            {t("chatbot.askingAbout")}
+          </p>
+          <p className="font-semibold truncate">{recipeContext.name}</p>
         </div>
       )}
 
