@@ -14,7 +14,6 @@ import {
   addMessages,
   setIsTyping,
   resetChat,
-  setRecipeContext,
   ChatMessage,
   setPreviousResponseId,
   selectPreviousResponseId,
@@ -184,15 +183,6 @@ export default function Chatbot() {
     dispatch(resetChat());
     setInputValue("");
     setSelectedImagesAsbase64([]);
-    // Clear recipeId from URL if present
-    if (recipeContext) {
-      navigate("/chatbot", { replace: true });
-    }
-  };
-
-  const handleClearContext = () => {
-    dispatch(setRecipeContext(null));
-    navigate("/chatbot", { replace: true });
   };
 
   function handleMessageSuggestionButton(suggestion: string) {

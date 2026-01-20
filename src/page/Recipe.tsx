@@ -88,7 +88,7 @@ export default function Recipe() {
         description: recipe.description,
       })
     );
-    navigate(`/chatbot?recipeId=${recipe.id}`);
+    navigate("/chatbot");
   }
 
   const saveFooter = (
