@@ -305,6 +305,8 @@
     "scanQrOrShareLink": "Scan the QR code or share the link",
     "leaveHousehold": "Leave Household",
     "deleteHousehold": "Delete Household",
+    "editHouseholdName": "Edit Household Name",
+    "enterNewHouseholdName": "Enter new household name",
     "confirmations": {
       "leaveHousehold": {
         "title": "Leave Household",

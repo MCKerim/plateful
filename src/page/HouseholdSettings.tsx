@@ -14,8 +14,6 @@ import {
   House,
   UserRoundPlus,
   LogOut,
-  Check,
-  X,
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -25,6 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
@@ -43,7 +42,7 @@ export default function HouseholdSettings() {
 
   const [showLeaveConfirmation, setShowLeaveConfirmation] = useState(false);
   const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
-  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditNameDialogOpen, setIsEditNameDialogOpen] = useState(false);
   const [editedName, setEditedName] = useState("");
 
   const updateHouseholdName = useUpdateHouseholdName();
@@ -105,12 +104,7 @@ export default function HouseholdSettings() {
 
   function startEditingName() {
     setEditedName(household?.name || "");
-    setIsEditingName(true);
-  }
-
-  function cancelEditingName() {
-    setIsEditingName(false);
-    setEditedName("");
+    setIsEditNameDialogOpen(true);
   }
 
   function saveHouseholdName() {
@@ -122,7 +116,7 @@ export default function HouseholdSettings() {
       { householdId: household.id, name: editedName.trim() },
       {
         onSuccess: () => {
-          setIsEditingName(false);
+          setIsEditNameDialogOpen(false);
           setEditedName("");
         },
         onError: (error) => {
@@ -142,45 +136,12 @@ export default function HouseholdSettings() {
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-1 gap-2">
           <House />
-
-          {isEditingName ? (
-            <div className="flex items-center flex-1 gap-2">
-              <Input
-                value={editedName}
-                onChange={(e) => setEditedName(e.target.value)}
-                className="px-2 py-1 text-2xl font-bold"
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    saveHouseholdName();
-                  } else if (e.key === "Escape") {
-                    cancelEditingName();
-                  }
-                }}
-                autoFocus
-              />
-
-              <Button
-                size="sm"
-                onClick={saveHouseholdName}
-                disabled={!editedName.trim()}
-              >
-                <Check size={16} />
-              </Button>
-
-              <Button size="sm" variant="outline" onClick={cancelEditingName}>
-                <X size={16} />
-              </Button>
-            </div>
-          ) : (
-            <h1 className="text-2xl font-bold">{household.name}</h1>
-          )}
+          <h1 className="text-2xl font-bold">{household.name}</h1>
         </div>
 
-        {!isEditingName && (
-          <Button size="sm" variant="ghost" onClick={startEditingName}>
-            <Pencil size={16} />
-          </Button>
-        )}
+        <Button size="sm" variant="ghost" onClick={startEditingName}>
+          <Pencil size={16} />
+        </Button>
       </div>
 
       <p>
@@ -252,6 +213,36 @@ export default function HouseholdSettings() {
           <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
         </Button>
       </div>
+
+      <Dialog open={isEditNameDialogOpen} onOpenChange={setIsEditNameDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("householdSettings.editHouseholdName")}</DialogTitle>
+          </DialogHeader>
+
+          <Input
+            value={editedName}
+            onChange={(e) => setEditedName(e.target.value)}
+            placeholder={t("householdSettings.enterNewHouseholdName")}
+          />
+
+          <DialogFooter>
+            <div className="flex gap-2 w-full">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => setIsEditNameDialogOpen(false)}
+              >
+                {t("common.cancel")}
+              </Button>
+
+              <Button className="w-full" onClick={saveHouseholdName}>
+                {t("common.save")}
+              </Button>
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Leave Household Confirmation Dialog */}
       <Dialog
