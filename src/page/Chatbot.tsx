@@ -19,7 +19,7 @@ import {
   selectPreviousResponseId,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
-import { useRecipe } from "@/hooks/recipe";
+import { useRecipe, useUpdateRecipe } from "@/hooks/recipe";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
@@ -60,6 +60,10 @@ export default function Chatbot() {
   const recipeIdParam = searchParams.get("recipeId");
   const recipeId = recipeIdParam ? Number.parseInt(recipeIdParam) : null;
   const { data: recipeContext } = useRecipe(recipeId);
+
+  // State to preserve recipe ID after URL is cleared (for edit functionality)
+  const [editingRecipeId, setEditingRecipeId] = useState<number | null>(null);
+  const updateRecipeMutation = useUpdateRecipe();
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
@@ -115,7 +119,9 @@ export default function Chatbot() {
     setInputValue("");
     setSelectedImagesAsbase64([]);
     // Clear recipe context from URL after first message (like images)
+    // But preserve the ID for potential edit operations
     if (isFirstMessageWithContext) {
+      setEditingRecipeId(recipeId);
       setSearchParams({});
     }
     dispatch(setIsTyping(true));
@@ -235,6 +241,35 @@ export default function Chatbot() {
     } else {
       console.error(error);
       alert(t("chatbot.saveRecipeError"));
+    }
+  }
+
+  async function saveEditedRecipe(
+    recipeId: number,
+    title: string,
+    description: string,
+    category: string
+  ) {
+    console.log("Updating recipe:", recipeId, title, category);
+    let categoryId = getCategoryIdByTranslatedEnglishName(category);
+
+    if (categoryId === null) {
+      console.error("Invalid category:", category);
+      categoryId = 5;
+    }
+
+    try {
+      await updateRecipeMutation.mutateAsync({
+        recipeId,
+        name: title,
+        description,
+        link: recipeContext?.link ?? "",
+        category: categoryId,
+      });
+      navigate(`/recipe/${recipeId}`);
+    } catch (error) {
+      console.error(error);
+      alert(t("chatbot.updateRecipeError"));
     }
   }
 
@@ -375,75 +410,92 @@ export default function Chatbot() {
 
                 {message.role === "assistant" &&
                   message.toolOutputsForUI &&
-                  message.toolOutputsForUI.length > 0 && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div>
-                          <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
-                            {message.toolOutputsForUI[0].args.title}
-                          </p>
+                  message.toolOutputsForUI.length > 0 && (() => {
+                    const toolOutput = message.toolOutputsForUI[0];
+                    const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
 
-                          <Button
-                            variant="accent"
-                            size="sm"
-                            className="mt-2 w-full"
-                          >
-                            <span className="truncate">
-                              {t("chatbot.previewRecipe")}
-                            </span>
-                          </Button>
-                        </div>
-                      </DialogTrigger>
+                    return (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <div>
+                            <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
+                              {toolOutput.args.title}
+                            </p>
 
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle className="second-font text-lg font-bold mt-2">
-                            {message.toolOutputsForUI[0].args.title}
-                          </DialogTitle>
-
-                          <DialogDescription className="text-sm font-medium text-muted-foreground">
-                            {message.toolOutputsForUI[0].args.category}
-                          </DialogDescription>
-                        </DialogHeader>
-
-                        <ScrollArea className="max-h-[60vh] rounded-md border p-2">
-                          <MarkdownRenderer
-                            content={
-                              message.toolOutputsForUI[0].args.description || ""
-                            }
-                            className="font-medium"
-                          />
-                        </ScrollArea>
-
-                        <div className="text-sm text-muted-foreground">
-                          {t("chatbot.saveRecipePrompt")}
-                        </div>
-
-                        <DialogFooter className="flex-row w-full gap-2">
-                          <DialogClose className="w-full">
-                            <Button variant="secondary" className="w-full">
-                              {t("common.cancel")}
+                            <Button
+                              variant="accent"
+                              size="sm"
+                              className="mt-2 w-full"
+                            >
+                              <span className="truncate">
+                                {isEditProposal
+                                  ? t("chatbot.previewEditedRecipe")
+                                  : t("chatbot.previewRecipe")}
+                              </span>
                             </Button>
-                          </DialogClose>
+                          </div>
+                        </DialogTrigger>
 
-                          <Button
-                            className="w-full"
-                            variant="accent"
-                            onClick={() =>
-                              saveSuggestedRecipe(
-                                message.toolOutputsForUI[0].args.title ?? "",
-                                message.toolOutputsForUI[0].args.description ??
-                                  "",
-                                message.toolOutputsForUI[0].args.category
-                              )
-                            }
-                          >
-                            {t("common.save")}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
-                  )}
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle className="second-font text-lg font-bold mt-2">
+                              {toolOutput.args.title}
+                            </DialogTitle>
+
+                            <DialogDescription className="text-sm font-medium text-muted-foreground">
+                              {toolOutput.args.category}
+                            </DialogDescription>
+                          </DialogHeader>
+
+                          <ScrollArea className="max-h-[60vh] rounded-md border p-2">
+                            <MarkdownRenderer
+                              content={toolOutput.args.description || ""}
+                              className="font-medium"
+                            />
+                          </ScrollArea>
+
+                          <div className="text-sm text-muted-foreground">
+                            {isEditProposal
+                              ? t("chatbot.updateRecipePrompt")
+                              : t("chatbot.saveRecipePrompt")}
+                          </div>
+
+                          <DialogFooter className="flex-row w-full gap-2">
+                            <DialogClose className="w-full">
+                              <Button variant="secondary" className="w-full">
+                                {t("common.cancel")}
+                              </Button>
+                            </DialogClose>
+
+                            <Button
+                              className="w-full"
+                              variant="accent"
+                              onClick={() => {
+                                if (isEditProposal && editingRecipeId) {
+                                  saveEditedRecipe(
+                                    editingRecipeId,
+                                    toolOutput.args.title ?? "",
+                                    toolOutput.args.description ?? "",
+                                    toolOutput.args.category
+                                  );
+                                } else {
+                                  saveSuggestedRecipe(
+                                    toolOutput.args.title ?? "",
+                                    toolOutput.args.description ?? "",
+                                    toolOutput.args.category
+                                  );
+                                }
+                              }}
+                            >
+                              {isEditProposal
+                                ? t("common.update")
+                                : t("common.save")}
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    );
+                  })()}
               </div>
             </div>
           </div>
