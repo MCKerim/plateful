@@ -125,7 +125,7 @@ export default function Chatbot() {
       let textContent = inputValue.trim();
       if (isFirstMessageWithContext) {
         const descriptionPreview = recipeContext.description
-          ? recipeContext.description.substring(0, 300)
+          ? recipeContext.description
           : "No description";
         const contextPrefix = `[Recipe Context: "${recipeContext.name}" - ${descriptionPreview}]\n\n`;
         textContent = contextPrefix + textContent;
@@ -338,7 +338,7 @@ export default function Chatbot() {
                   <>
                     {/* Recipe context chip if present */}
                     {"recipeName" in message && (message as any).recipeName && (
-                      <div className="bg-primary-foreground/20 rounded px-2 py-1 text-xs mb-2 inline-block">
+                      <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
                         {(message as any).recipeName}
                       </div>
                     )}
@@ -379,7 +379,7 @@ export default function Chatbot() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <div>
-                          <p className="second-font font-medium mt-2 border-t-[1px] border-dashed border-secondary-foreground pt-2 text-center">
+                          <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
                             {message.toolOutputsForUI[0].args.title}
                           </p>
 
@@ -474,7 +474,7 @@ export default function Chatbot() {
           <div className="flex gap-2 flex-wrap mb-2 items-center">
             {/* Recipe context chip */}
             {recipeContext && (
-              <div className="bg-accent rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
+              <div className="bg-accent text-accent-foreground second-font font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
                 <span className="truncate">{recipeContext.name}</span>
               </div>
             )}
