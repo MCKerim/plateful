@@ -19,7 +19,7 @@ export function usePlannedItemsSummary(currentWeek: Date, enabled: boolean) {
     queryFn: () =>
       mealPlanningApi.getSummaryForWeek(supabase, weekStart, weekEnd),
     enabled,
-    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 30, // Poll every 30s for household sync
     placeholderData: keepPreviousData,
   });
 }

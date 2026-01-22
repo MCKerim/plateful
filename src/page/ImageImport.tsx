@@ -11,11 +11,14 @@ import { useNavigate } from "react-router";
 import LoadingDots from "@/components/general/LoadingDots";
 import RecipeCard from "@/components/general/RecipeCard";
 import imageCompression from "browser-image-compression";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 export default function ImageImport() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<any>(null);
   const [images, setImages] = useState<
@@ -85,6 +88,7 @@ export default function ImageImport() {
       } else {
         console.log("recipe-from-image response:", data);
         setData(data[0]);
+        await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
         toast.success(t("urlImport.success"), {
           position: "top-right",
           richColors: true,

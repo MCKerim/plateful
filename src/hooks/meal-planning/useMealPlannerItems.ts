@@ -25,7 +25,7 @@ export function useMealPlannerItems(currentWeek: Date) {
       );
       return transformMealPlannerItems(data);
     },
-    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 30, // Poll every 30s for household sync
     placeholderData: keepPreviousData,
   });
 }
