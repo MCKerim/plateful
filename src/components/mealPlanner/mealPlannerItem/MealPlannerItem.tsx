@@ -15,7 +15,7 @@ import { CalendarDays, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
-import { useRecipeFirstImage } from "@/hooks/recipe";
+import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 
 type Props = {
   id: number;
