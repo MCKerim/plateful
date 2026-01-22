@@ -165,30 +165,6 @@ export default function Settings() {
               {t("settings.suggestFeatureOrReportBug")}
             </Button>
           </NavLink>
-
-          <NavLink
-            data-canny-link
-            to="https://plateful.canny.io/changelog"
-            target="blank"
-          >
-            <Button variant="secondary" className="w-full">
-              <Newspaper />
-
-              {t("settings.whatsNew")}
-            </Button>
-          </NavLink>
-
-          <NavLink
-            data-canny-link
-            to="https://plateful.canny.io"
-            target="blank"
-          >
-            <Button variant="secondary" className="w-full">
-              <Map />
-
-              {t("settings.viewRoadmap")}
-            </Button>
-          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
