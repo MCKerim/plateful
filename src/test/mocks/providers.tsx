@@ -47,7 +47,7 @@ export function TestProviders({
   children,
   preloadedState = {},
   queryClient,
-}: TestProvidersProps) {
+}: Readonly<TestProvidersProps>) {
   const store = createTestStore(preloadedState);
   const client = queryClient ?? createTestQueryClient();
 

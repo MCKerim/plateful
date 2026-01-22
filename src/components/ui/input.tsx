@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Send, X } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/cn";
 
 export interface InputProps extends React.ComponentProps<"input"> {
   onDelete?: () => void;

@@ -12,7 +12,7 @@ import {
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { Button } from "@/components/ui/button";
 import {
   CalendarOff,

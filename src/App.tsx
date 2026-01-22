@@ -18,7 +18,7 @@ import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
 import InviteMembers from "./page/onboarding/inviteMembers/InviteMembers";
 import JoinHousehold from "./page/onboarding/joinHousehold/JoinHousehold";
-import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
+import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure/routeToCorrectPagePure";
 import NotFound from "./page/NotFound";
 import Home from "./page/Home";
 import Cookbook from "./page/Cookbook";

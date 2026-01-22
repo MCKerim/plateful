@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper";
+import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import {

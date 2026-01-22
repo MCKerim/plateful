@@ -8,7 +8,7 @@ import {
 import { useState, useEffect, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { useNavigate } from "react-router";

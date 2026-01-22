@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { toWeekday, getWeekdays } from "./dateHelper";
+import { getWeekdays, toWeekday } from "./dateHelper";
 
 // Mock i18n module
 vi.mock("@/i18n", () => ({
@@ -154,7 +154,9 @@ describe("dateHelper", () => {
         default: { language: "en" },
       }));
       const { formatDateByLocale: formatEn } = await import("./dateHelper");
+
       const result = formatEn(new Date(2024, 5, 15));
+
       expect(result).toBe("06/15/2024");
     });
 
@@ -163,7 +165,9 @@ describe("dateHelper", () => {
         default: { language: "de" },
       }));
       const { formatDateByLocale: formatDe } = await import("./dateHelper");
+
       const result = formatDe(new Date(2024, 5, 15));
+
       expect(result).toBe("15.06.2024");
     });
 
@@ -172,7 +176,9 @@ describe("dateHelper", () => {
         default: { language: "en" },
       }));
       const { formatDateByLocale: formatEn } = await import("./dateHelper");
+
       const result = formatEn("2024-06-15");
+
       expect(result).toMatch(/\d{2}\/\d{2}\/\d{4}/);
     });
   });

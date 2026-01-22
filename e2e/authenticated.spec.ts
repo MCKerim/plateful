@@ -1,7 +1,5 @@
 import { test, expect } from "./fixtures";
 
-// All authentication and API mocking is now handled by fixtures!
-
 test.describe("Authenticated User Flows", () => {
   test("should access cookbook page when authenticated", async ({
     authenticatedPage,
@@ -50,7 +48,7 @@ test.describe("Authenticated User Flows", () => {
       timeout: 10000,
     });
 
-    // Find and click navigation to planner (usually bottom nav)
+    // Find and click navigation to planner
     const plannerNav = authenticatedPage
       .locator('a[href="/planner"], button')
       .filter({ hasText: /plan/i })
