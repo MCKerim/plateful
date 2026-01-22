@@ -52,7 +52,7 @@
     "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-separator": "^1.1.8",
-    "@radix-ui/react-slot": "^1.2.3",
+    "@radix-ui/react-slot": "^1.2.4",
     "@reduxjs/toolkit": "^2.8.2",
     "@rive-app/react-canvas": "^4.21.4",
     "@supabase/supabase-js": "^2.47.13",

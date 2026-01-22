@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as SeparatorPrimitive from "@radix-ui/react-separator";
 
-import { cn } from "@/lib/cn";
+import { cn } from "@/lib/utils";
 
 interface SeparatorProps
   extends React.ComponentPropsWithoutRef<typeof SeparatorPrimitive.Root> {
@@ -20,7 +20,7 @@ const Separator = React.forwardRef<
       children,
       ...props
     },
-    ref
+    ref,
   ) => {
     if (!children) {
       return (
@@ -31,7 +31,7 @@ const Separator = React.forwardRef<
           className={cn(
             "shrink-0 bg-border",
             orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-            className
+            className,
           )}
           {...props}
         />
@@ -43,7 +43,7 @@ const Separator = React.forwardRef<
       <div
         className={cn(
           "flex items-center w-full",
-          orientation === "vertical" && "flex-col h-full"
+          orientation === "vertical" && "flex-col h-full",
         )}
       >
         <SeparatorPrimitive.Root
@@ -52,7 +52,7 @@ const Separator = React.forwardRef<
           className={cn(
             "shrink-0 bg-border",
             orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-            orientation === "horizontal" ? "flex-1" : "flex-none"
+            orientation === "horizontal" ? "flex-1" : "flex-none",
           )}
         />
 
@@ -66,12 +66,12 @@ const Separator = React.forwardRef<
           className={cn(
             "shrink-0 bg-border",
             orientation === "horizontal" ? "h-[1px] w-full" : "h-full w-[1px]",
-            orientation === "horizontal" ? "flex-1" : "flex-none"
+            orientation === "horizontal" ? "flex-1" : "flex-none",
           )}
         />
       </div>
     );
-  }
+  },
 );
 Separator.displayName = "Separator";
 
