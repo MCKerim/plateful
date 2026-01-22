@@ -473,10 +473,8 @@ export default function Chatbot() {
         )}
 
         <div className="flex items-end gap-2">
-          {/* tiny image button */}
-
           <Field>
-            <InputGroup>
+            <InputGroup className="bg-background">
               <InputGroupTextarea
                 placeholder={t("chatbot.inputPlaceholder")}
                 value={inputValue}
@@ -495,6 +493,7 @@ export default function Chatbot() {
                   size="icon"
                   onClick={handlePickImagesClick}
                   title={t("common.uploadImage")}
+                  className="rounded-full"
                 >
                   <ImagePlus className="w-5 h-5" />
                 </Button>
@@ -505,7 +504,7 @@ export default function Chatbot() {
                   size="icon"
                   onClick={handleSendMessage}
                   title={t("common.send")}
-                  className="ml-auto"
+                  className="ml-auto rounded-full"
                 >
                   <Send className="w-5 h-5" />
                 </Button>
