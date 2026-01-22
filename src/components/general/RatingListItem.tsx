@@ -1,4 +1,4 @@
-import { formatDateByLocale } from "@/lib/dateHelper";
+import { formatDateByLocale } from "@/lib/dateHelper/dateHelper";
 import { Button } from "../ui/button";
 import { Edit, MoreVertical, Trash2 } from "lucide-react";
 import { RecipeRatingWithUser } from "./RatingModal";

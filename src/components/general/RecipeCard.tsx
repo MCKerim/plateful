@@ -3,11 +3,11 @@ import { Card } from "../ui/card";
 import StarIcon from "@mui/icons-material/Star";
 import TagPill from "./TagPill";
 import { CalendarDays } from "lucide-react";
-import { getMealPlanStatus } from "@/lib/mealPlanHelper";
+import { getMealPlanStatus } from "@/lib/mealPlanHelper/mealPlanHelper";
 import { useTranslation } from "react-i18next";
-import { formatRating } from "@/lib/formatRatingHelper";
-import { useRecipeFirstImage } from "@/hooks/recipe";
-import { useRecipeMealPlanInfo } from "@/hooks/meal-planning";
+import { formatRating } from "@/lib/formateRatingHelper/formatRatingHelper";
+import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
+import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
 
 type Props = {
   id: number;

@@ -64,6 +64,7 @@ export function getWeekdays(date: Date = new Date()): Date[] {
 
 export const formatDateByLocale = (date: string | Date) => {
   const dateObj = typeof date === "string" ? new Date(date) : date;
+
   return formatDate(
     dateObj,
     i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",

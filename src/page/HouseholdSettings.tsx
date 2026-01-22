@@ -29,11 +29,9 @@ import {
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
-import {
-  useUpdateHouseholdName,
-  useRemoveMember,
-  useLeaveHousehold,
-} from "@/hooks/household";
+import { useUpdateHouseholdName } from "@/hooks/household/useUpdateHouseholdName";
+import { useRemoveMember } from "@/hooks/household/useRemoveMember";
+import { useLeaveHousehold } from "@/hooks/household/useLeaveHousehold";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();

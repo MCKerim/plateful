@@ -8,18 +8,16 @@ import {
 import { useState, useEffect, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import {
-  usePlannedItemsSummary,
-  useRecipePlansForWeek,
-  useSaveRecipePlans,
-} from "@/hooks/meal-planning";
+import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
+import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
+import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
 
 type Props = {
   recipeId: number;

@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper";
+import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 
 type VisionPart =
   | { type: "input_text"; text: string }
