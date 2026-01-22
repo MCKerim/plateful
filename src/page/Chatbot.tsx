@@ -36,7 +36,8 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper";
+import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -48,6 +49,7 @@ export default function Chatbot() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
+  const createRecipe = useCreateRecipe();
 
   const messages = useAppSelector(selectMessages);
   const previousResponseId = useAppSelector(selectPreviousResponseId);
@@ -182,7 +184,6 @@ export default function Chatbot() {
     description: string,
     category: string
   ) {
-    console.log("Saving suggested recipe:", title, category);
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -190,23 +191,21 @@ export default function Chatbot() {
       categoryId = 5;
     }
 
-    // Insert new recipe
-    const { data, error } = await supabase
-      .from("recipes")
-      .insert([
-        {
-          name: title,
-          description,
-          link: null,
-          household_id: householdId,
-          category: categoryId,
-        },
-      ])
-      .select();
+    if (!householdId) {
+      alert(t("chatbot.saveRecipeError"));
+      return;
+    }
 
-    if (!error && data) {
-      navigate(`/recipe/${data[0].id}`);
-    } else {
+    try {
+      const newRecipe = await createRecipe.mutateAsync({
+        name: title,
+        description,
+        link: "",
+        householdId,
+        category: categoryId,
+      });
+      navigate(`/recipe/${newRecipe.id}`);
+    } catch (error) {
       console.error(error);
       alert(t("chatbot.saveRecipeError"));
     }

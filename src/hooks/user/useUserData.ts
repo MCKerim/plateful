@@ -1,4 +1,5 @@
 import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/userSlice";
 import {
@@ -12,6 +13,7 @@ import posthog from "posthog-js";
 export function useUserData() {
   const { supabase } = useSupabase();
   const dispatch = useAppDispatch();
+  const queryClient = useQueryClient();
 
   const fetchUserData = useCallback(
     async (userId: string | null): Promise<void> => {
@@ -19,6 +21,7 @@ export function useUserData() {
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
+        queryClient.clear();
         posthog.reset();
         return;
       }
@@ -59,7 +62,7 @@ export function useUserData() {
         posthog.reset();
       }
     },
-    [supabase, dispatch]
+    [supabase, dispatch, queryClient]
   );
 
   return { fetchUserData };

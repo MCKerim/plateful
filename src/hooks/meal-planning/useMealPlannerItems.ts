@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 import { transformMealPlannerItems } from "@/lib/transformers/meal-planning.transformer";
@@ -25,7 +25,7 @@ export function useMealPlannerItems(currentWeek: Date) {
       );
       return transformMealPlannerItems(data);
     },
-    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 30, // Poll every 30s for household sync
     placeholderData: keepPreviousData,
   });
 }

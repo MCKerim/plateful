@@ -1,6 +1,6 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 import { RecipePlanEntry } from "@/types/meal-planning.types";
@@ -41,7 +41,6 @@ export function useRecipePlansForWeek(
       }));
     },
     enabled: enabled && recipeId !== null,
-    staleTime: 1000 * 60 * 5,
     placeholderData: keepPreviousData,
   });
 }

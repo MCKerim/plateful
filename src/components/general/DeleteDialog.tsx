@@ -32,7 +32,7 @@ export default function DeleteDialog({
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger asChild>
         {customTrigger || (
-          <Button className="w-full hover:bg-destructive" variant="ghost">
+          <Button className="hover:bg-destructive" variant="ghost">
             <Trash2 size={20} />
           </Button>
         )}

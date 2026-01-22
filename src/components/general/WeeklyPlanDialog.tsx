@@ -2,24 +2,21 @@ import { Button } from "../ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useState, useEffect, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
-import { getWeekdays } from "@/lib/dateHelper";
+import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import {
-  usePlannedItemsSummary,
-  useRecipePlansForWeek,
-  useSaveRecipePlans,
-} from "@/hooks/meal-planning";
+import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
+import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
+import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
 
 type Props = {
   recipeId: number;
@@ -44,11 +41,10 @@ const locales = {
 
 function getPlannedItemsForDate(
   plannedItems: { planned_date: string; recipe_name: string }[],
-  date: Date
+  date: Date,
 ) {
   return plannedItems.filter(
-    (item) =>
-      item.planned_date && isSameDay(new Date(item.planned_date), date)
+    (item) => item.planned_date && isSameDay(new Date(item.planned_date), date),
   );
 }
 
@@ -75,7 +71,7 @@ export default function WeeklyPlanDialog({
   const [currentWeek, setCurrentWeek] = useState(new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   // Fetch all planned items summary (for showing recipes on each day - includes recipe names)
@@ -86,7 +82,7 @@ export default function WeeklyPlanDialog({
   const { data: recipePlans = [] } = useRecipePlansForWeek(
     recipeId,
     currentWeek,
-    isDialogOpen
+    isDialogOpen,
   );
 
   // Mutation for saving
@@ -101,7 +97,7 @@ export default function WeeklyPlanDialog({
   // Get the plan ID for a specific date (from recipePlans which has IDs)
   function getPlanIdForDate(date: Date): number | null {
     const plan = recipePlans.find(
-      (p) => p.planned_date && isSameDay(p.planned_date, date)
+      (p) => p.planned_date && isSameDay(p.planned_date, date),
     );
     return plan?.id ?? null;
   }
@@ -138,7 +134,7 @@ export default function WeeklyPlanDialog({
     // Find all days in current week that have this recipe planned
     const weekDays = getWeekdays(currentWeek);
     const alreadyPlannedDates = weekDays.filter((day) =>
-      isDatePlannedForThisRecipe(day)
+      isDatePlannedForThisRecipe(day),
     );
 
     // Add the already-planned dates to selectedDates (without duplicates)
@@ -215,14 +211,14 @@ export default function WeeklyPlanDialog({
     // Get all days in current week that have this recipe planned
     const weekDays = getWeekdays(currentWeek);
     const currentlyPlannedDates = weekDays.filter((day) =>
-      isDatePlannedForThisRecipe(day)
+      isDatePlannedForThisRecipe(day),
     );
 
     // Determine what to add and remove
     const planIdsToRemove: number[] = [];
     for (const plannedDate of currentlyPlannedDates) {
       const isStillSelected = selectedDates.some((d) =>
-        isSameDay(d, plannedDate)
+        isSameDay(d, plannedDate),
       );
       if (!isStillSelected) {
         const planId = getPlanIdForDate(plannedDate);
@@ -233,11 +229,15 @@ export default function WeeklyPlanDialog({
     }
 
     const datesToAdd = selectedDates.filter(
-      (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date))
+      (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date)),
     );
 
     // Only show error if nothing is selected AND there's nothing to remove (i.e., no changes)
-    if (selectedDates.length === 0 && !withoutDate && planIdsToRemove.length === 0) {
+    if (
+      selectedDates.length === 0 &&
+      !withoutDate &&
+      planIdsToRemove.length === 0
+    ) {
       toast.error(t("mealPlanner.selectDayOrWithoutDate"));
       return;
     }
@@ -288,12 +288,7 @@ export default function WeeklyPlanDialog({
   );
 
   const dialogContent = (
-    <DialogContent className="sm:max-w-[425px]">
-      <DialogTitle className="flex items-center gap-2">
-        <CalendarDays size={20} />
-        <span className="truncate">{recipeName}</span>
-      </DialogTitle>
-
+    <DialogContent>
       <div className="flex flex-col gap-2">
         {/* Week Navigation */}
         <div className="sticky flex items-center justify-between px-2 pb-2 h-[68px] pt-4 bg-background">
@@ -302,7 +297,7 @@ export default function WeeklyPlanDialog({
           </Button>
 
           <div className="flex flex-col items-center">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-bold second-font">
               {isSameWeek(currentWeek, new Date())
                 ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
@@ -311,7 +306,7 @@ export default function WeeklyPlanDialog({
                 ? t("mealPlanner.lastWeek")
                 : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
                     getWeekdays(currentWeek)[6],
-                    "dd.MM"
+                    "dd.MM",
                   )}`}
             </h2>
 
@@ -320,7 +315,7 @@ export default function WeeklyPlanDialog({
                 variant="link"
                 size="sm"
                 onClick={goToCurrentWeek}
-                className="h-auto p-0 text-xs text-muted-foreground"
+                className="h-auto p-0 text-xs text-muted-foreground italic"
               >
                 {t("mealPlanner.goToCurrentWeek")}
               </Button>
@@ -348,57 +343,31 @@ export default function WeeklyPlanDialog({
               onClick={() => toggleWeekDate(day)}
               className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
                 isSelected
-                  ? "bg-accent text-accent-foreground ring-2 ring-primary"
+                  ? "bg-accent text-accent-foreground border-accent"
                   : hasExistingPlan
-                  ? "border-destructive border-2"
+                  ? "border-destructive"
                   : ""
               }`}
             >
-              <div className="w-full flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  {isToday && (
-                    <span className="rounded-full px-2 py-0.5 text-xs bg-primary text-primary-foreground">
-                      {t("common.today")}
-                    </span>
-                  )}
-                  <span>
-                    {format(day, "EEE - dd.MM", {
-                      locale:
-                        locales[i18n.language as keyof typeof locales] || enUS,
-                    })}
-                  </span>
-                </div>
+              <p className="font-bold">
+                {format(day, "EEE - dd.MM", {
+                  locale:
+                    locales[i18n.language as keyof typeof locales] || enUS,
+                })}
 
-                {hasPlannedItems && (
-                  <span className="text-xs text-muted-foreground">
-                    {plannedForDay.length} {t("mealPlanner.planned")}
-                  </span>
-                )}
-              </div>
-
-              {/* Show existing plan indicator for this recipe */}
-              {hasExistingPlan && (
-                <span
-                  className={`text-xs ${
-                    isSelected ? "text-accent-foreground" : "text-destructive"
-                  }`}
-                >
-                  {isSelected
-                    ? t("mealPlanner.alreadyPlanned")
-                    : t("mealPlanner.willBeRemoved")}
-                </span>
-              )}
+                {isToday && ` - ${t("common.today")}`}
+              </p>
 
               {/* Show planned items */}
               {hasPlannedItems && (
-                <div className="w-full flex flex-wrap gap-1">
+                <div className="w-full flex flex-wrap gap-1 pl-2">
                   {plannedForDay.map((item, index) => (
-                    <span
+                    <p
                       key={index}
-                      className="text-xs px-2 py-0.5 rounded-full bg-muted text-muted-foreground truncate max-w-[150px]"
+                      className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
                     >
                       {item.recipe_name}
-                    </span>
+                    </p>
                   ))}
                 </div>
               )}
@@ -411,7 +380,7 @@ export default function WeeklyPlanDialog({
           variant="secondary"
           className={
             withoutDate
-              ? "bg-accent text-accent-foreground ring-2 ring-primary"
+              ? "bg-accent text-accent-foreground"
               : ""
           }
           onClick={toggleWithoutDate}

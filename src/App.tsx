@@ -18,7 +18,7 @@ import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
 import InviteMembers from "./page/onboarding/inviteMembers/InviteMembers";
 import JoinHousehold from "./page/onboarding/joinHousehold/JoinHousehold";
-import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure";
+import { routeToCorrectPagePure } from "./lib/routeToCorrectPagePure/routeToCorrectPagePure";
 import NotFound from "./page/NotFound";
 import Home from "./page/Home";
 import Cookbook from "./page/Cookbook";
@@ -44,7 +44,7 @@ import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
-import { useUserData } from "./hooks/user";
+import { useUserData } from "./hooks/user/useUserData";
 
 function App() {
   const { t } = useTranslation();
