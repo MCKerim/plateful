@@ -7,18 +7,7 @@ on:
     branches: [main, staging]
 
 jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-      - run: npm ci
-
   lint:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +19,6 @@ jobs:
       - run: npm run lint
 
   unit-tests:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -42,7 +30,6 @@ jobs:
       - run: npm run test:run
 
   e2e-tests:
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -51,7 +38,7 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm ci
-      
+
       - name: Cache Playwright Binaries
         uses: actions/cache@v4
         id: playwright-cache
@@ -79,7 +66,7 @@ jobs:
           retention-days: 7
 
   build:
-    needs: [lint, unit-tests, e2e-tests] 
+    needs: [lint, unit-tests, e2e-tests]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
