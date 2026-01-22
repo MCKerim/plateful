@@ -65,13 +65,7 @@ export function useSaveRecipePlans() {
       };
     },
     onSuccess: async () => {
-      // Wait for all meal planning queries to be refetched before completing
       await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
-    },
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.mealPlanning.info(variables.recipeId),
-      });
     },
   });
 }

@@ -11,10 +11,8 @@ export function useCreateRecipe() {
     mutationFn: async (params: CreateRecipeParams) => {
       return recipeApi.create(supabase, params);
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.all,
-      });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
     },
   });
 }

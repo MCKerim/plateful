@@ -42,8 +42,8 @@ export function useUpdatePlannedItemDate() {
         queryClient.setQueryData(queryKey, data);
       });
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
     },
   });
 }

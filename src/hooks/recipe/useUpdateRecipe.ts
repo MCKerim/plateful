@@ -11,16 +11,13 @@ export function useUpdateRecipe() {
     mutationFn: async (params: UpdateRecipeParams) => {
       return recipeApi.update(supabase, params);
     },
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.detail(variables.recipeId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.images(variables.recipeId),
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.all,
-      });
+    onSettled: async (_data, _error, variables) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.detail(variables.recipeId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(variables.recipeId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all }),
+      ]);
     },
   });
 }

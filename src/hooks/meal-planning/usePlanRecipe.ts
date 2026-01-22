@@ -25,11 +25,8 @@ export function usePlanRecipe() {
         params.days
       );
     },
-    onSettled: (_data, _error, variables) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.mealPlanning.info(variables.recipeId),
-      });
+    onSettled: async () => {
+      await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
     },
   });
 }
