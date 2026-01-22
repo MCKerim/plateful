@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import RecipeCard from "@/components/general/RecipeCard";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+import { readClipboardText } from "@/utils/nativeClipboard";
 
 export default function URLImport() {
   const { t } = useTranslation();
@@ -31,7 +32,7 @@ export default function URLImport() {
     } else {
       async function autoPasteFromClipboard() {
         try {
-          const text = await navigator.clipboard.readText();
+          const text = await readClipboardText();
           if (text.startsWith("http://") || text.startsWith("https://")) {
             setUrlInput(text);
             toast.success(t("urlImport.linkPastedFromClipboard"), {

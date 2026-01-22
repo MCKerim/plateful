@@ -27,6 +27,7 @@
     "@capacitor/browser": "^7.0.1",
     "@capacitor/camera": "^7.0.1",
     "@capacitor/cli": "^7.0.1",
+    "@capacitor/clipboard": "^7.0.3",
     "@capacitor/core": "^7.0.1",
     "@capacitor/ios": "^7.0.1",
     "@capacitor/share": "^7.0.2",
