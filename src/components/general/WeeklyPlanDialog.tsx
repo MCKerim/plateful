@@ -15,11 +15,9 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import {
-  usePlannedItemsSummary,
-  useRecipePlansForWeek,
-  useSaveRecipePlans,
-} from "@/hooks/meal-planning";
+import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
+import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
+import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
 
 type Props = {
   recipeId: number;

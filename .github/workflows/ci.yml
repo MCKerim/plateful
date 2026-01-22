@@ -79,7 +79,6 @@ jobs:
           retention-days: 7
 
   build:
-    # Now build only runs if EVERYTHING else (including E2E) passes
     needs: [lint, unit-tests, e2e-tests] 
     runs-on: ubuntu-latest
     steps:
@@ -91,5 +90,5 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_SUPABASE_URL: https://upupcsgufoejppoietiu.supabase.co
+          VITE_SUPABASE_ANON_KEY: mock-anon-key-for-e2e-tests

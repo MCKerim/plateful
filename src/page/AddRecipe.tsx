@@ -22,12 +22,10 @@ import {
 import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/general/DeleteDialog";
-import {
-  useRecipeForEdit,
-  useCreateRecipe,
-  useUpdateRecipe,
-  useDeleteRecipe,
-} from "@/hooks/recipe";
+import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
+import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
+import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
+import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();

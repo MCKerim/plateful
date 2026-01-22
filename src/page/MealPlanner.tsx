@@ -40,12 +40,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { restrictToVerticalAxisAndWindow } from "@/lib/dnd-modifiers";
 import { DroppableNoDateZone } from "@/components/mealPlanner/droppableNoDateZone/DroppableNoDateZone";
 import { DroppableDay } from "@/components/mealPlanner/droppableDay/DroppableDay";
-import {
-  useDeletePlannedItem,
-  useMealPlannerItems,
-  useSetDaysEaten,
-  useUpdatePlannedItemDate,
-} from "@/hooks/meal-planning";
+import { useDeletePlannedItem } from "@/hooks/meal-planning/useDeletePlannedItem";
+import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
+import { useSetDaysEaten } from "@/hooks/meal-planning/useSetDaysEaten";
+import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlannedItemDate";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
 

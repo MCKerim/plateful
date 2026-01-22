@@ -19,7 +19,7 @@ import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper/re
 import CategoryButton from "@/components/general/CategoryButton";
 import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
-import { useRecipes } from "@/hooks/cookbook";
+import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import { CookbookRecipe } from "@/types/cookbook.types";
 
 export default function Cookbook() {

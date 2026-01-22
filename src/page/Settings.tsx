@@ -17,7 +17,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { useUpdateUsername, useUpdateLanguage } from "@/hooks/user";
+import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
+import { useUpdateLanguage } from "@/hooks/user/useUpdateLanguage";
 
 export default function Settings() {
   const { supabase } = useSupabase();

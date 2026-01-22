@@ -38,6 +38,9 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 ### Path Alias
 Use `@/` to import from `src/` (configured in vite.config.ts and tsconfig.json).
 
+### No Barrel Files
+Do not create `index.ts` barrel files for re-exporting. Import directly from source files instead (e.g., `@/hooks/recipe/useRecipe` not `@/hooks/recipe`).
+
 ### Key Directory Structure
 - `src/page/` - Route page components (MealPlanner, Recipe, Cookbook, Chatbot, etc.)
 - `src/components/ui/` - shadcn/ui base components
