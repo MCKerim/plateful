@@ -219,7 +219,6 @@ export default function MealPlannerItem({
             <DrawerClose asChild>
               <Button
                 className="w-full"
-                variant="secondary"
                 onClick={onEditPlan}
               >
                 <CalendarDays size={20} />
