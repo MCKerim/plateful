@@ -11,11 +11,12 @@ export interface TextareaProps extends React.ComponentProps<"textarea"> {
     | "previous"
     | "search"
     | "send";
-  rows?: number; // Default to 1 row
+  rows?: number;
+  maxHeight?: number;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, enterKeyHint, rows = 3, ...props }, ref) => {
+  ({ className, enterKeyHint, rows = 3, maxHeight, ...props }, ref) => {
     const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
     const adjustHeight = React.useCallback(() => {
@@ -26,12 +27,20 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           globalThis.pageYOffset || document.documentElement.scrollTop;
 
         textarea.style.height = "auto";
-        textarea.style.height = `${textarea.scrollHeight}px`;
+        const newHeight = textarea.scrollHeight;
+
+        if (maxHeight && newHeight > maxHeight) {
+          textarea.style.height = `${maxHeight}px`;
+          textarea.style.overflowY = "auto";
+        } else {
+          textarea.style.height = `${newHeight}px`;
+          textarea.style.overflowY = "hidden";
+        }
 
         // Restore scroll position to prevent jumping
         globalThis.scrollTo(0, scrollTop);
       }
-    }, []);
+    }, [maxHeight]);
 
     React.useImperativeHandle(ref, () => textareaRef.current!, []);
 
@@ -54,7 +63,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         onInput={handleInput}
         enterKeyHint={enterKeyHint}
         className={cn(
-          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none overflow-hidden",
+          "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none",
           className,
         )}
       />

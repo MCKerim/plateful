@@ -15,11 +15,16 @@ export const useNativeCamera = (): UseNativeCameraResult => {
       const hasCamera = perms.camera === "granted";
       const photos = perms.photos;
       const hasPhotos = photos === "granted" || photos === "limited";
-      
+
       if (hasCamera && hasPhotos) return true;
-      
-      const req = await Camera.requestPermissions({ permissions: ["camera", "photos"] });
-      return req.camera === "granted" && (req.photos === "granted" || req.photos === "limited");
+
+      const req = await Camera.requestPermissions({
+        permissions: ["camera", "photos"],
+      });
+      return (
+        req.camera === "granted" &&
+        (req.photos === "granted" || req.photos === "limited")
+      );
     } catch {
       return false;
     }
@@ -37,16 +42,20 @@ export const useNativeCamera = (): UseNativeCameraResult => {
     return new File([bytes], filename, { type: mime });
   };
 
-  const takePhoto = async (): Promise<{ file: File; dataUrl: string } | null> => {
+  const takePhoto = async (): Promise<{
+    file: File;
+    dataUrl: string;
+  } | null> => {
     try {
       const photo = await Camera.getPhoto({
         quality: 80,
         allowEditing: false,
         source: CameraSource.Prompt,
         resultType: CameraResultType.DataUrl,
-        promptLabelHeader: t("common.selectImageSource"),
-        promptLabelPhoto: t("common.gallery"),
-        promptLabelPicture: t("common.camera"),
+        promptLabelHeader: t("common.cameraPrompt.header"),
+        promptLabelCancel: t("common.cameraPrompt.cancel"),
+        promptLabelPhoto: t("common.cameraPrompt.photo"),
+        promptLabelPicture: t("common.cameraPrompt.picture"),
       });
 
       if (!photo?.dataUrl) return null;

@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { RotateCcw, ImagePlus, X } from "lucide-react";
+import { RotateCcw, ImagePlus, X, Send } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/general/MarkdownRenderer";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
@@ -38,6 +37,13 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
+import { Field } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -73,11 +79,15 @@ export default function Chatbot() {
 
   const handlePickImagesClick = async () => {
     const image = await Camera.getPhoto({
-      quality: 70,
+      quality: 80,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Prompt,
       saveToGallery: false,
+      promptLabelHeader: t("common.cameraPrompt.header"),
+      promptLabelCancel: t("common.cameraPrompt.cancel"),
+      promptLabelPhoto: t("common.cameraPrompt.photo"),
+      promptLabelPicture: t("common.cameraPrompt.picture"),
     });
 
     if (!image.base64String) {
@@ -182,7 +192,7 @@ export default function Chatbot() {
   async function saveSuggestedRecipe(
     title: string,
     description: string,
-    category: string
+    category: string,
   ) {
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
@@ -245,7 +255,7 @@ export default function Chatbot() {
               size="sm"
               onClick={() =>
                 handleMessageSuggestionButton(
-                  t("chatbot.suggestions.suggestion1.text")
+                  t("chatbot.suggestions.suggestion1.text"),
                 )
               }
             >
@@ -259,7 +269,7 @@ export default function Chatbot() {
                 size="sm"
                 onClick={() =>
                   handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion2.text")
+                    t("chatbot.suggestions.suggestion2.text"),
                   )
                 }
               >
@@ -272,7 +282,7 @@ export default function Chatbot() {
                 size="sm"
                 onClick={() =>
                   handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion3.text")
+                    t("chatbot.suggestions.suggestion3.text"),
                   )
                 }
               >
@@ -325,7 +335,7 @@ export default function Chatbot() {
                                 alt={`upload-${i}`}
                                 className="rounded-md border w-16 h-16 object-cover"
                               />
-                            )
+                            ),
                           )}
                         </div>
                       )}
@@ -400,7 +410,7 @@ export default function Chatbot() {
                                 message.toolOutputsForUI[0].args.title ?? "",
                                 message.toolOutputsForUI[0].args.description ??
                                   "",
-                                message.toolOutputsForUI[0].args.category
+                                message.toolOutputsForUI[0].args.category,
                               )
                             }
                           >
@@ -462,30 +472,46 @@ export default function Chatbot() {
           </div>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-2">
           {/* tiny image button */}
-          <Button
-            type="button"
-            variant="secondary"
-            size="icon"
-            onClick={handlePickImagesClick}
-            title={t("common.uploadImage")}
-          >
-            <ImagePlus className="w-5 h-5" />
-          </Button>
 
-          <Input
-            type="text"
-            className="flex-1 w-full rounded-full"
-            showSubmitButton
-            placeholder={t("chatbot.inputPlaceholder")}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isTyping}
-            onSubmit={handleSendMessage}
-            maxLength={3000}
-          />
+          <Field>
+            <InputGroup>
+              <InputGroupTextarea
+                placeholder={t("chatbot.inputPlaceholder")}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isTyping}
+                onSubmit={handleSendMessage}
+                maxLength={3000}
+                rows={1}
+              />
+
+              <InputGroupAddon align="block-end">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  onClick={handlePickImagesClick}
+                  title={t("common.uploadImage")}
+                >
+                  <ImagePlus className="w-5 h-5" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="accent"
+                  size="icon"
+                  onClick={handleSendMessage}
+                  title={t("common.send")}
+                  className="ml-auto"
+                >
+                  <Send className="w-5 h-5" />
+                </Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
         </div>
       </div>
     </Layout>

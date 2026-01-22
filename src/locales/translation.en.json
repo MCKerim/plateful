@@ -11,9 +11,12 @@
     "error": "An error occurred",
     "commingSoon": "Comming soon...",
     "selectImage": "Select image",
-    "selectImageSource": "Select image source",
-    "gallery": "Gallery",
-    "camera": "Camera",
+    "cameraPrompt": {
+      "header": "Add Photo",
+      "cancel": "Cancel",
+      "photo": "From Gallery",
+      "picture": "Take Photo"
+    },
     "uploading": "Uploading...",
     "planned": "Planned",
     "today": "Today",
@@ -350,7 +353,7 @@
     "saveRecipe": "Save recipe",
     "saveRecipeError": "Error saving recipe. Please try again later.",
     "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
-    "inputPlaceholder": "Ask about recipes or tips!",
+    "inputPlaceholder": "Ask about recipes or tips...",
     "saveRecipePrompt": "Save this recipe or ask for changes"
   },
   "bottomNav": {
