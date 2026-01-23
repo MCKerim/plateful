@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { RotateCcw, ImagePlus, X, Send } from "lucide-react";
+import { RotateCcw, ImagePlus, X, ArrowUp } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/general/MarkdownRenderer";
 import { Button } from "@/components/ui/button";
@@ -617,49 +617,45 @@ description: ${recipeContext.description ?? "No description"}
           </div>
         )}
 
-        <div className="flex items-end gap-2">
-          {/* tiny image button */}
+        <Field>
+          <InputGroup className="rounded-2xl">
+            <InputGroupTextarea
+              placeholder={t("chatbot.inputPlaceholder")}
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={isTyping}
+              onSubmit={handleSendMessage}
+              maxLength={3000}
+              maxHeight={200}
+              rows={1}
+            />
 
-          <Field>
-            <InputGroup>
-              <InputGroupTextarea
-                placeholder={t("chatbot.inputPlaceholder")}
-                value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={isTyping}
-                onSubmit={handleSendMessage}
-                maxLength={3000}
-                maxHeight={200}
-                rows={1}
-              />
+            <InputGroupAddon align="block-end" className="px-2 pb-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="icon"
+                onClick={handlePickImagesClick}
+                title={t("common.uploadImage")}
+                className="rounded-full"
+              >
+                <ImagePlus />
+              </Button>
 
-              <InputGroupAddon align="block-end">
-                <Button
-                  type="button"
-                  variant="secondary"
-                  size="icon"
-                  onClick={handlePickImagesClick}
-                  title={t("common.uploadImage")}
-                  className="rounded-full"
-                >
-                  <ImagePlus className="w-5 h-5" />
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="accent"
-                  size="icon"
-                  onClick={handleSendMessage}
-                  title={t("common.send")}
-                  className="ml-auto rounded-full"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
-              </InputGroupAddon>
-            </InputGroup>
-          </Field>
-        </div>
+              <Button
+                type="button"
+                variant="accent"
+                size="icon"
+                onClick={handleSendMessage}
+                title={t("common.send")}
+                className="ml-auto rounded-full"
+              >
+                <ArrowUp className="!size-5" />
+              </Button>
+            </InputGroupAddon>
+          </InputGroup>
+        </Field>
       </div>
     </Layout>
   );
