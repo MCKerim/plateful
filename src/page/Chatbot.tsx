@@ -337,7 +337,9 @@ description: ${recipeContext.description ?? "No description"}
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      if (!isTyping) {
+        handleSendMessage();
+      }
     }
   };
 
@@ -485,7 +487,7 @@ description: ${recipeContext.description ?? "No description"}
       )}
 
       {/* Messages Container */}
-      <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mb-60">
         {visibleMessages.map((message, index) => (
           <div
             key={`${message.role}-${index}`}
@@ -618,13 +620,12 @@ description: ${recipeContext.description ?? "No description"}
         )}
 
         <Field>
-          <InputGroup className="rounded-2xl">
+          <InputGroup className="rounded-2xl bg-background">
             <InputGroupTextarea
               placeholder={t("chatbot.inputPlaceholder")}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              disabled={isTyping}
               onSubmit={handleSendMessage}
               maxLength={3000}
               maxHeight={200}
@@ -648,6 +649,7 @@ description: ${recipeContext.description ?? "No description"}
                 variant="accent"
                 size="icon"
                 onClick={handleSendMessage}
+                disabled={isTyping}
                 title={t("common.send")}
                 className="ml-auto rounded-full"
               >
