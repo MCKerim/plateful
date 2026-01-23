@@ -33,12 +33,12 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       maxLength,
       ...props
     },
-    ref
+    ref,
   ) => {
     const [currentLength, setCurrentLength] = React.useState(
       (props.value as string)?.length ||
         (props.defaultValue as string)?.length ||
-        0
+        0,
     );
 
     // Update currentLength when value prop changes
@@ -63,7 +63,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputClasses = cn(
       baseInputClasses,
       (onSubmit || onDelete) && "pr-10",
-      className
+      className,
     );
 
     // Common button classes
@@ -129,7 +129,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     // Return plain input if no actions
     return inputElement;
-  }
+  },
 );
 Input.displayName = "Input";
 

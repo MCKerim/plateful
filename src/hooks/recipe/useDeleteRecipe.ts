@@ -11,13 +11,12 @@ export function useDeleteRecipe() {
     mutationFn: async (recipeId: number) => {
       return recipeApi.delete(supabase, recipeId);
     },
-    onSettled: (_data, _error, recipeId) => {
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.all,
-      });
-      queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.detail(recipeId),
-      });
+    onSettled: async (_data, _error, recipeId) => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.detail(recipeId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all }),
+      ]);
     },
   });
 }

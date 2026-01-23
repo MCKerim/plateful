@@ -16,7 +16,8 @@ import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
 import { useTranslation } from "react-i18next";
 import { RecipeRatings } from "@/types/exportedDatabaseTypes.types";
-import { useCreateRating, useUpdateRating } from "@/hooks/ratings";
+import { useCreateRating } from "@/hooks/ratings/useCreateRating";
+import { useUpdateRating } from "@/hooks/ratings/useUpdateRating";
 import { toast } from "sonner";
 
 type Props = {

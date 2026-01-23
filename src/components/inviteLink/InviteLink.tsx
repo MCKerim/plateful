@@ -9,6 +9,7 @@ import { Button } from "../ui/button";
 import { Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Share } from "@capacitor/share";
+import { writeClipboardText } from "@/utils/nativeClipboard";
 
 export default function InviteLink() {
   const { supabase } = useSupabase();
@@ -68,7 +69,7 @@ export default function InviteLink() {
     }
 
     try {
-      await navigator.clipboard.writeText(inviteLink);
+      await writeClipboardText(inviteLink);
       alert(t("inviteLink.copySuccess"));
     } catch (err) {
       console.error("Fehler beim Kopieren des Links:", err);

@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from "react";
-import { RotateCcw, ImagePlus, X } from "lucide-react";
+import { RotateCcw, ImagePlus, X, Send } from "lucide-react";
 import Layout from "../components/layout/Layout";
 import MarkdownRenderer from "../components/general/MarkdownRenderer";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
@@ -37,7 +36,15 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { getCategoryIdByTranslatedEnglishName, getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper";
+import { getCategoryIdByTranslatedEnglishName, getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
+import { Field } from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupTextarea,
+} from "@/components/ui/input-group";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -165,6 +172,7 @@ export default function Chatbot() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
+  const createRecipe = useCreateRecipe();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const messages = useAppSelector(selectMessages);
@@ -196,11 +204,15 @@ export default function Chatbot() {
 
   const handlePickImagesClick = async () => {
     const image = await Camera.getPhoto({
-      quality: 70,
+      quality: 80,
       allowEditing: false,
       resultType: CameraResultType.Base64,
       source: CameraSource.Prompt,
       saveToGallery: false,
+      promptLabelHeader: t("common.cameraPrompt.header"),
+      promptLabelCancel: t("common.cameraPrompt.cancel"),
+      promptLabelPhoto: t("common.cameraPrompt.photo"),
+      promptLabelPicture: t("common.cameraPrompt.picture"),
     });
 
     if (!image.base64String) {
@@ -329,9 +341,8 @@ description: ${recipeContext.description ?? "No description"}
   async function saveSuggestedRecipe(
     title: string,
     description: string,
-    category: string
+    category: string,
   ) {
-    console.log("Saving suggested recipe:", title, category);
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -339,23 +350,21 @@ description: ${recipeContext.description ?? "No description"}
       categoryId = 5;
     }
 
-    // Insert new recipe
-    const { data, error } = await supabase
-      .from("recipes")
-      .insert([
-        {
-          name: title,
-          description,
-          link: null,
-          household_id: householdId,
-          category: categoryId,
-        },
-      ])
-      .select();
+    if (!householdId) {
+      alert(t("chatbot.saveRecipeError"));
+      return;
+    }
 
-    if (!error && data) {
-      navigate(`/recipe/${data[0].id}`);
-    } else {
+    try {
+      const newRecipe = await createRecipe.mutateAsync({
+        name: title,
+        description,
+        link: "",
+        householdId,
+        category: categoryId,
+      });
+      navigate(`/recipe/${newRecipe.id}`);
+    } catch (error) {
       console.error(error);
       alert(t("chatbot.saveRecipeError"));
     }
@@ -424,7 +433,7 @@ description: ${recipeContext.description ?? "No description"}
               size="sm"
               onClick={() =>
                 handleMessageSuggestionButton(
-                  t("chatbot.suggestions.suggestion1.text")
+                  t("chatbot.suggestions.suggestion1.text"),
                 )
               }
             >
@@ -438,7 +447,7 @@ description: ${recipeContext.description ?? "No description"}
                 size="sm"
                 onClick={() =>
                   handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion2.text")
+                    t("chatbot.suggestions.suggestion2.text"),
                   )
                 }
               >
@@ -451,7 +460,7 @@ description: ${recipeContext.description ?? "No description"}
                 size="sm"
                 onClick={() =>
                   handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion3.text")
+                    t("chatbot.suggestions.suggestion3.text"),
                   )
                 }
               >
@@ -511,7 +520,7 @@ description: ${recipeContext.description ?? "No description"}
                                 alt={`upload-${i}`}
                                 className="rounded-md border w-16 h-16 object-cover"
                               />
-                            )
+                            ),
                           )}
                         </div>
                       )}
@@ -595,30 +604,46 @@ description: ${recipeContext.description ?? "No description"}
           </div>
         )}
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-end gap-2">
           {/* tiny image button */}
-          <Button
-            type="button"
-            variant="secondary"
-            size="icon"
-            onClick={handlePickImagesClick}
-            title={t("common.uploadImage")}
-          >
-            <ImagePlus className="w-5 h-5" />
-          </Button>
 
-          <Input
-            type="text"
-            className="flex-1 w-full rounded-full"
-            showSubmitButton
-            placeholder={t("chatbot.inputPlaceholder")}
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onKeyDown={handleKeyDown}
-            disabled={isTyping}
-            onSubmit={handleSendMessage}
-            maxLength={3000}
-          />
+          <Field>
+            <InputGroup>
+              <InputGroupTextarea
+                placeholder={t("chatbot.inputPlaceholder")}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={isTyping}
+                onSubmit={handleSendMessage}
+                maxLength={3000}
+                rows={1}
+              />
+
+              <InputGroupAddon align="block-end">
+                <Button
+                  type="button"
+                  variant="secondary"
+                  size="icon"
+                  onClick={handlePickImagesClick}
+                  title={t("common.uploadImage")}
+                >
+                  <ImagePlus className="w-5 h-5" />
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="accent"
+                  size="icon"
+                  onClick={handleSendMessage}
+                  title={t("common.send")}
+                  className="ml-auto"
+                >
+                  <Send className="w-5 h-5" />
+                </Button>
+              </InputGroupAddon>
+            </InputGroup>
+          </Field>
         </div>
       </div>
     </Layout>

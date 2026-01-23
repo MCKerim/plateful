@@ -14,17 +14,19 @@ import RatingModal, {
 import StarIcon from "@mui/icons-material/Star";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { getMealPlanStatus } from "@/lib/mealPlanHelper";
+import { getMealPlanStatus } from "@/lib/mealPlanHelper/mealPlanHelper";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
-import { formatRating } from "@/lib/formatRatingHelper";
+import { formatRating } from "@/lib/formateRatingHelper/formatRatingHelper";
 import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
 import RatingListItem from "@/components/general/RatingListItem";
-import { useRecipe, useRecipeImages } from "@/hooks/recipe";
-import { useRecipeMealPlanInfo } from "@/hooks/meal-planning";
-import { useRecipeRatings, useDeleteRating } from "@/hooks/ratings";
+import { useRecipe } from "@/hooks/recipe/useRecipe";
+import { useRecipeImages } from "@/hooks/recipe/useRecipeImages";
+import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
+import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
+import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 
 export default function Recipe() {
   const { t } = useTranslation();

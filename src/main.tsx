@@ -16,9 +16,12 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 60 * 5, // 5 minutes
+      staleTime: 1000 * 30, // 30 seconds - responsive to household changes
+      gcTime: 1000 * 60 * 10, // 10 minutes - keep unused cache for navigation
       retry: 1,
-      refetchOnWindowFocus: false,
+      refetchOnWindowFocus: true,
+      refetchOnReconnect: true, // Refetch when network reconnects
+      networkMode: "offlineFirst", // Show cache first, then refetch
     },
   },
 });

@@ -10,7 +10,7 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { categories } from "@/lib/recipeCategoryHelper";
+import { categories } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   resetFilter,

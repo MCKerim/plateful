@@ -9,6 +9,9 @@ import LoadingDots from "@/components/general/LoadingDots";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router";
 import RecipeCard from "@/components/general/RecipeCard";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
+import { readClipboardText } from "@/utils/nativeClipboard";
 
 export default function URLImport() {
   const { t } = useTranslation();
@@ -17,6 +20,7 @@ export default function URLImport() {
   const { supabase } = useSupabase();
   const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<any>(null);
+  const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
 
@@ -28,7 +32,7 @@ export default function URLImport() {
     } else {
       async function autoPasteFromClipboard() {
         try {
-          const text = await navigator.clipboard.readText();
+          const text = await readClipboardText();
           if (text.startsWith("http://") || text.startsWith("https://")) {
             setUrlInput(text);
             toast.success(t("urlImport.linkPastedFromClipboard"), {
@@ -72,6 +76,7 @@ export default function URLImport() {
       } else {
         console.log("recipe-from-url response:", data);
         setData(data[0]);
+        await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
         toast.success(t("urlImport.success"), {
           position: "top-right",
           richColors: true,
