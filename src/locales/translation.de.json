@@ -32,7 +32,8 @@
     "yearsAgo_one": "Vor {{count}} Jahr",
     "yearsAgo_other": "Vor {{count}} Jahren",
     "uploadImage": "Bild hochladen",
-    "reset": "Zurücksetzen"
+    "reset": "Zurücksetzen",
+    "send": "Senden"
   },
   "update": {
     "updateAvailable": "Eine neue Version ist verfügbar! jetzt aktualisieren?"

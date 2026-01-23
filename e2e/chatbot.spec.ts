@@ -9,7 +9,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     const recipe = createRecipe({
       id: 1,
       name: "Spaghetti Carbonara",
-      description: "A classic Italian pasta dish with eggs, cheese, and pancetta.",
+      description:
+        "A classic Italian pasta dish with eggs, cheese, and pancetta.",
       category: 2,
     });
 
@@ -21,7 +22,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
 
     // Verify recipe is loaded
     await expect(
-      page.getByRole("heading", { name: "Spaghetti Carbonara" })
+      page.getByRole("heading", { name: "Spaghetti Carbonara" }),
     ).toBeVisible({ timeout: 10000 });
 
     // Click the Ask AI-Chef button
@@ -75,14 +76,16 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await expect(inputField).toBeVisible();
     await inputField.fill("What can I substitute for pancetta?");
 
-    // Send the message by pressing Enter
-    await inputField.press("Enter");
+    // Click the send button
+    await page.getByRole("button", { name: /send/i }).click();
 
     // Verify the user message appears with recipe context chip
     const userMessage = page.locator('[class*="bg-primary"]').first();
     await expect(userMessage).toBeVisible({ timeout: 10000 });
     await expect(userMessage).toContainText("Chicken Stir Fry");
-    await expect(userMessage).toContainText("What can I substitute for pancetta?");
+    await expect(userMessage).toContainText(
+      "What can I substitute for pancetta?",
+    );
   });
 
   test("should have Ask AI-Chef button visible on recipe page", async ({

@@ -32,7 +32,8 @@
     "yearsAgo_one": "{{count}} year ago",
     "yearsAgo_other": "{{count}} years ago",
     "uploadImage": "Upload image",
-    "reset": "Reset"
+    "reset": "Reset",
+    "send": "Send"
   },
   "update": {
     "updateAvailable": "A new version is available! Update now?"
