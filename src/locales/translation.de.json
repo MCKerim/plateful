@@ -18,6 +18,17 @@
       "photo": "Aus Galerie",
       "picture": "Foto aufnehmen"
     },
+    "imageSourceDrawer": {
+      "camera": {
+        "label": "Foto aufnehmen",
+        "description": "Kamera verwenden",
+        "disabledDescription": "Im Web nicht verfügbar"
+      },
+      "gallery": {
+        "label": "Aus Galerie wählen",
+        "description": "Vorhandenes Foto auswählen"
+      }
+    },
     "uploading": "Hochladen...",
     "planned": "Geplant",
     "today": "Heute",

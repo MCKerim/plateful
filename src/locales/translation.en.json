@@ -18,6 +18,17 @@
       "photo": "From Gallery",
       "picture": "Take Photo"
     },
+    "imageSourceDrawer": {
+      "camera": {
+        "label": "Take Photo",
+        "description": "Use your camera",
+        "disabledDescription": "Not available on web"
+      },
+      "gallery": {
+        "label": "Choose from Gallery",
+        "description": "Select an existing photo"
+      }
+    },
     "uploading": "Uploading...",
     "planned": "Planned",
     "today": "Today",

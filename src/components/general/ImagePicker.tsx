@@ -1,9 +1,8 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
-import { Capacitor } from "@capacitor/core";
 import { useNativeCamera } from "../../hooks/general/useNativeCamera";
 import { AlertCircle } from "lucide-react";
 
@@ -21,59 +20,21 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
   uploading,
 }) => {
   const { t } = useTranslation();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const isNative = Capacitor.isNativePlatform();
-  const { takePhoto, ensurePermissions } = useNativeCamera();
+  const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
   const [error, setError] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setError(null);
-
-    if (file) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB limit
-        setError(t("common.imageTooLarge"));
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        onImageSelected(file, reader.result as string);
-      };
-      reader.onerror = () => {
-        setError(t("common.errorReadingFile"));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
 
   const handleButtonClick = async () => {
     setError(null);
-    
-    if (isNative) {
-      try {
-        const permsOk = await ensurePermissions();
-        if (!permsOk) {
-          setError(t("common.cameraPermissionDenied"));
-          fileInputRef.current?.click();
-          return;
-        }
 
-        const result = await takePhoto();
-        if (result) {
-          onImageSelected(result.file, result.dataUrl);
-        } else {
-          fileInputRef.current?.click();
-        }
-      } catch (err) {
-        console.error("Error taking photo:", err);
-        setError(t("common.errorTakingPhoto"));
-        fileInputRef.current?.click();
+    try {
+      const result = await takePhoto();
+      if (result) {
+        onImageSelected(result.file, result.dataUrl);
       }
-      return;
+    } catch (err) {
+      console.error("Error taking photo:", err);
+      setError(t("common.errorTakingPhoto"));
     }
-
-    fileInputRef.current?.click();
   };
 
   const handleDeleteImage = () => {
@@ -118,14 +79,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         </Button>
       )}
 
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*"
-        capture={isNative ? undefined : "environment"}
-        className="hidden"
-        onChange={handleFileChange}
-      />
+      {ImageSourceDrawerComponent}
 
       {uploading && (
         <div className="text-xs text-muted-foreground">

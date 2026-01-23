@@ -34,7 +34,7 @@ import {
   DialogHeader,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
+import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
 import {
   getCategoryIdByTranslatedEnglishName,
   getEnglishCategoryNameById,
@@ -213,24 +213,18 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  const handlePickImagesClick = async () => {
-    const image = await Camera.getPhoto({
-      quality: 80,
-      allowEditing: false,
-      resultType: CameraResultType.Base64,
-      source: CameraSource.Prompt,
-      saveToGallery: false,
-      promptLabelHeader: t("common.cameraPrompt.header"),
-      promptLabelCancel: t("common.cameraPrompt.cancel"),
-      promptLabelPhoto: t("common.cameraPrompt.photo"),
-      promptLabelPicture: t("common.cameraPrompt.picture"),
-    });
+  const { pickImage, ImageSourceDrawerComponent } = useImageSourcePicker({
+    resultType: "base64",
+  });
 
-    if (!image.base64String) {
+  const handlePickImagesClick = async () => {
+    const result = await pickImage();
+
+    if (!result?.base64String) {
       return;
     }
 
-    setSelectedImagesAsbase64((prev) => [...prev, image.base64String!]);
+    setSelectedImagesAsbase64((prev) => [...prev, result.base64String]);
   };
 
   const handleRemoveImage = (index: number) => {
@@ -659,6 +653,8 @@ description: ${recipeContext.description ?? "No description"}
           </InputGroup>
         </Field>
       </div>
+
+      {ImageSourceDrawerComponent}
     </Layout>
   );
 }
