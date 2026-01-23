@@ -73,7 +73,7 @@ test.describe("Recipe Detail Page", () => {
     });
 
     // Find and click edit button
-    const editButton = page.getByRole("link", { name: /edit/i });
+    const editButton = page.getByRole("button", { name: "Edit Recipe" });
     await expect(editButton).toBeVisible();
     await editButton.click();
 

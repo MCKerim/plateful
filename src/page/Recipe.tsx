@@ -147,6 +147,7 @@ export default function Recipe() {
           size="icon"
           className="absolute top-2 right-2 z-10"
           onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
+          aria-label="Edit Recipe"
         >
           <Pencil size={18} />
         </Button>
