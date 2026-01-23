@@ -12,23 +12,8 @@
     "error": "Ein Fehler ist aufgetreten",
     "commingSoon": "Demnächst verfügbar...",
     "selectImage": "Bild auswählen",
-    "cameraPrompt": {
-      "header": "Foto hinzufügen",
-      "cancel": "Abbrechen",
-      "photo": "Aus Galerie",
-      "picture": "Foto aufnehmen"
-    },
-    "imageSourceDrawer": {
-      "camera": {
-        "label": "Foto aufnehmen",
-        "description": "Kamera verwenden",
-        "disabledDescription": "Im Web nicht verfügbar"
-      },
-      "gallery": {
-        "label": "Aus Galerie wählen",
-        "description": "Vorhandenes Foto auswählen"
-      }
-    },
+    "camera": "Kamera",
+    "gallery": "Fotos",
     "uploading": "Hochladen...",
     "planned": "Geplant",
     "today": "Heute",
