@@ -86,18 +86,7 @@ export default function Settings() {
 
   function handleUpdateLanguage(language: string) {
     if (!user) return;
-
-    updateLanguageMutation.mutate(
-      { userId: user.id, language },
-      {
-        onSuccess: () => {
-          i18n.changeLanguage(language);
-        },
-        onError: (error) => {
-          console.error("Error updating language:", error);
-        },
-      }
-    );
+    updateLanguageMutation.mutate({ userId: user.id, language });
   }
 
   return (
