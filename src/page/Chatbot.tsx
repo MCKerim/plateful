@@ -18,7 +18,6 @@ import {
   selectPreviousResponseId,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
-import { useRecipe, useUpdateRecipe } from "@/hooks/recipe";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
@@ -42,9 +41,10 @@ import { Field } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import { useRecipe } from "@/hooks/recipe/useRecipe";
+import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 
 type VisionPart =
   | { type: "input_text"; text: string }
