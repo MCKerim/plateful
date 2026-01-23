@@ -17,7 +17,7 @@ import {
   setPreviousResponseId,
   selectPreviousResponseId,
 } from "@/redux/slices/chatbotSlice";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
@@ -35,19 +35,136 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { getCategoryIdByTranslatedEnglishName } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { getCategoryIdByTranslatedEnglishName, getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
 import {
   InputGroup,
   InputGroupAddon,
-  InputGroupButton,
   InputGroupTextarea,
 } from "@/components/ui/input-group";
+import { useRecipe } from "@/hooks/recipe/useRecipe";
+import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 
 type VisionPart =
   | { type: "input_text"; text: string }
   | { type: "input_image"; image_url: string };
+
+// Component to handle recipe proposal dialogs with optional field merging
+function RecipeProposalDialog({
+  toolOutput,
+  onSaveNew,
+  onSaveEdit,
+  t,
+}: {
+  toolOutput: any;
+  onSaveNew: (title: string, description: string, category: string) => void;
+  onSaveEdit: (recipeId: number, title: string, description: string, category: string) => void;
+  t: any;
+}) {
+  const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
+  const editRecipeId = isEditProposal ? toolOutput.args.recipeId : null;
+
+  // Fetch original recipe data for edit proposals to merge with partial updates
+  const { data: originalRecipe } = useRecipe(editRecipeId);
+
+  // For edit proposals, merge tool output with original recipe (tool output takes precedence)
+  const getMergedValue = (field: "title" | "description" | "category") => {
+    const toolValue = field === "title"
+      ? toolOutput.args.title
+      : field === "description"
+        ? toolOutput.args.description
+        : toolOutput.args.category;
+
+    if (toolValue !== undefined && toolValue !== null) {
+      return toolValue;
+    }
+
+    // Fall back to original recipe data for edit proposals
+    if (isEditProposal && originalRecipe) {
+      if (field === "title") return originalRecipe.name;
+      if (field === "description") return originalRecipe.description ?? "";
+      if (field === "category") return getEnglishCategoryNameById(originalRecipe.category);
+    }
+
+    return "";
+  };
+
+  const finalTitle = getMergedValue("title");
+  const finalDescription = getMergedValue("description");
+  const finalCategory = getMergedValue("category");
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <div>
+          <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
+            {finalTitle}
+          </p>
+
+          <Button
+            variant="accent"
+            size="sm"
+            className="mt-2 w-full"
+          >
+            <span className="truncate">
+              {isEditProposal
+                ? t("chatbot.previewEditedRecipe")
+                : t("chatbot.previewRecipe")}
+            </span>
+          </Button>
+        </div>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="second-font text-lg font-bold mt-2">
+            {finalTitle}
+          </DialogTitle>
+
+          <DialogDescription className="text-sm font-medium text-muted-foreground">
+            {finalCategory}
+          </DialogDescription>
+        </DialogHeader>
+
+        <ScrollArea className="max-h-[60vh] rounded-md border p-2">
+          <MarkdownRenderer
+            content={finalDescription}
+            className="font-medium"
+          />
+        </ScrollArea>
+
+        <div className="text-sm text-muted-foreground">
+          {isEditProposal
+            ? t("chatbot.updateRecipePrompt")
+            : t("chatbot.saveRecipePrompt")}
+        </div>
+
+        <DialogFooter className="flex-row w-full gap-2">
+          <DialogClose className="w-full">
+            <Button variant="secondary" className="w-full">
+              {t("common.cancel")}
+            </Button>
+          </DialogClose>
+
+          <Button
+            className="w-full"
+            variant="accent"
+            onClick={() => {
+              if (isEditProposal && editRecipeId) {
+                onSaveEdit(editRecipeId, finalTitle, finalDescription, finalCategory);
+              } else {
+                onSaveNew(finalTitle, finalDescription, finalCategory);
+              }
+            }}
+          >
+            {isEditProposal ? t("common.update") : t("common.save")}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -56,11 +173,19 @@ export default function Chatbot() {
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const createRecipe = useCreateRecipe();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const messages = useAppSelector(selectMessages);
   const previousResponseId = useAppSelector(selectPreviousResponseId);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
+
+  // Get recipe context from URL param
+  const recipeIdParam = searchParams.get("recipeId");
+  const recipeId = recipeIdParam ? Number.parseInt(recipeIdParam) : null;
+  const { data: recipeContext } = useRecipe(recipeId);
+
+  const updateRecipeMutation = useUpdateRecipe();
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
@@ -104,23 +229,47 @@ export default function Chatbot() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() && selectedImagesAsbase64.length === 0) return;
 
+    // Check if this is the first message with recipe context
+    const isFirstMessageWithContext = messages.length === 0 && recipeContext;
+
     // Show the user message in the UI right away
-    const userMessage: ChatMessage & { images?: string[] } = {
-      role: "user",
-      content: inputValue || "",
-      images: selectedImagesAsbase64,
-    };
+    const userMessage: ChatMessage & { images?: string[]; recipeName?: string } =
+      {
+        role: "user",
+        content: inputValue || "",
+        images: selectedImagesAsbase64,
+        ...(isFirstMessageWithContext && { recipeName: recipeContext.name }),
+      };
 
     dispatch(addMessage(userMessage));
     setInputValue("");
     setSelectedImagesAsbase64([]);
+    // Clear recipe context from URL after first message (like images)
+    if (isFirstMessageWithContext) {
+      setSearchParams({});
+    }
     dispatch(setIsTyping(true));
 
     try {
+      // Build the text content - prepend context if this is first message and we have context
+      let textContent = inputValue.trim();
+      if (isFirstMessageWithContext) {
+        const categoryName = getEnglishCategoryNameById(recipeContext.category);
+        const contextPrefix = `[Recipe Context]
+recipeId: ${recipeContext.id}
+title: ${recipeContext.name}
+category: ${categoryName}
+description: ${recipeContext.description ?? "No description"}
+[End Recipe Context]
+
+`;
+        textContent = contextPrefix + textContent;
+      }
+
       // Build vision content parts for the server
       const parts: VisionPart[] = [];
-      if (inputValue.trim()) {
-        parts.push({ type: "input_text", text: inputValue.trim() });
+      if (textContent) {
+        parts.push({ type: "input_text", text: textContent });
       }
       for (const url of userMessage.images || []) {
         parts.push({
@@ -218,6 +367,35 @@ export default function Chatbot() {
     } catch (error) {
       console.error(error);
       alert(t("chatbot.saveRecipeError"));
+    }
+  }
+
+  async function saveEditedRecipe(
+    recipeId: number,
+    title: string,
+    description: string,
+    category: string
+  ) {
+    console.log("Updating recipe:", recipeId, title, category);
+    let categoryId = getCategoryIdByTranslatedEnglishName(category);
+
+    if (categoryId === null) {
+      console.error("Invalid category:", category);
+      categoryId = 5;
+    }
+
+    try {
+      await updateRecipeMutation.mutateAsync({
+        recipeId,
+        name: title,
+        description,
+        link: recipeContext?.link ?? "",
+        category: categoryId,
+      });
+      navigate(`/recipe/${recipeId}`);
+    } catch (error) {
+      console.error(error);
+      alert(t("chatbot.updateRecipeError"));
     }
   }
 
@@ -319,6 +497,13 @@ export default function Chatbot() {
               >
                 {message.role === "user" && (
                   <>
+                    {/* Recipe context chip if present */}
+                    {"recipeName" in message && (message as any).recipeName && (
+                      <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
+                        {(message as any).recipeName}
+                      </div>
+                    )}
+
                     <p className="text-sm">{message.content}</p>
 
                     {/* optional images if present */}
@@ -352,73 +537,12 @@ export default function Chatbot() {
                 {message.role === "assistant" &&
                   message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 && (
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <div>
-                          <p className="second-font font-medium mt-2 border-t-[1px] border-dashed border-secondary-foreground pt-2 text-center">
-                            {message.toolOutputsForUI[0].args.title}
-                          </p>
-
-                          <Button
-                            variant="accent"
-                            size="sm"
-                            className="mt-2 w-full"
-                          >
-                            <span className="truncate">
-                              {t("chatbot.previewRecipe")}
-                            </span>
-                          </Button>
-                        </div>
-                      </DialogTrigger>
-
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle className="second-font text-lg font-bold mt-2">
-                            {message.toolOutputsForUI[0].args.title}
-                          </DialogTitle>
-
-                          <DialogDescription className="text-sm font-medium text-muted-foreground">
-                            {message.toolOutputsForUI[0].args.category}
-                          </DialogDescription>
-                        </DialogHeader>
-
-                        <ScrollArea className="max-h-[60vh] rounded-md border p-2">
-                          <MarkdownRenderer
-                            content={
-                              message.toolOutputsForUI[0].args.description || ""
-                            }
-                            className="font-medium"
-                          />
-                        </ScrollArea>
-
-                        <div className="text-sm text-muted-foreground">
-                          {t("chatbot.saveRecipePrompt")}
-                        </div>
-
-                        <DialogFooter className="flex-row w-full gap-2">
-                          <DialogClose className="w-full">
-                            <Button variant="secondary" className="w-full">
-                              {t("common.cancel")}
-                            </Button>
-                          </DialogClose>
-
-                          <Button
-                            className="w-full"
-                            variant="accent"
-                            onClick={() =>
-                              saveSuggestedRecipe(
-                                message.toolOutputsForUI[0].args.title ?? "",
-                                message.toolOutputsForUI[0].args.description ??
-                                  "",
-                                message.toolOutputsForUI[0].args.category,
-                              )
-                            }
-                          >
-                            {t("common.save")}
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                    <RecipeProposalDialog
+                      toolOutput={message.toolOutputsForUI[0]}
+                      onSaveNew={saveSuggestedRecipe}
+                      onSaveEdit={saveEditedRecipe}
+                      t={t}
+                    />
                   )}
               </div>
             </div>
@@ -445,9 +569,17 @@ export default function Chatbot() {
 
       {/* Input Area */}
       <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
-        {/* small strip of selected image previews before sending */}
-        {selectedImagesAsbase64.length > 0 && (
-          <div className="flex gap-2 flex-wrap mb-2">
+        {/* Recipe context and image previews before sending */}
+        {(recipeContext || selectedImagesAsbase64.length > 0) && (
+          <div className="flex gap-2 flex-wrap mb-2 items-center">
+            {/* Recipe context chip */}
+            {recipeContext && (
+              <div className="bg-accent text-accent-foreground second-font font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
+                <span className="truncate">{recipeContext.name}</span>
+              </div>
+            )}
+
+            {/* Image previews */}
             {selectedImagesAsbase64.map((imageAsBase64, i) => (
               <button
                 key={i}

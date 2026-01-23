@@ -8,6 +8,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
+    "update": "Update",
     "error": "An error occurred",
     "commingSoon": "Comming soon...",
     "selectImage": "Select image",
@@ -210,7 +211,8 @@
     "ratings": "Ratings",
     "noRatings": "No Ratings",
     "planningSuccessful": "Recipe planned successfully!",
-    "planningFailed": "Error planning recipe. Please try again later."
+    "planningFailed": "Error planning recipe. Please try again later.",
+    "askChatbot": "Ask AI-Chef"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
@@ -335,6 +337,7 @@
   },
   "chatbot": {
     "greeting": "How can I help you today?",
+    "askingAbout": "Asking about",
     "suggestions": {
       "suggestion1": {
         "label": "Create a healthy recipe",
@@ -354,7 +357,10 @@
     "saveRecipeError": "Error saving recipe. Please try again later.",
     "chatbotMessageError": "Sorry, I'm having trouble connecting right now. Please try again later.",
     "inputPlaceholder": "Ask about recipes or tips...",
-    "saveRecipePrompt": "Save this recipe or ask for changes"
+    "saveRecipePrompt": "Save this recipe or ask for changes",
+    "previewEditedRecipe": "Preview changes",
+    "updateRecipePrompt": "Update this recipe or ask for different edits",
+    "updateRecipeError": "Error updating recipe. Please try again later."
   },
   "bottomNav": {
     "home": "Home",

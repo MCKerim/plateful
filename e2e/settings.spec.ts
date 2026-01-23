@@ -221,6 +221,9 @@ test.describe("Household Settings Page", () => {
     await expect(
       page.getByText(/scan the qr code or share the link/i)
     ).toBeVisible({ timeout: 5000 });
+
+    // Close the dialog to prevent Mobile Safari context cleanup issues
+    await page.keyboard.press("Escape");
   });
 
   test("should show leave and delete household buttons", async ({

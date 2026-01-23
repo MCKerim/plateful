@@ -1,10 +1,12 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { buttonVariants } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
-import { NavLink, useParams } from "react-router";
+import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays } from "lucide-react";
+import { Pencil, Link, CalendarDays, Bot } from "lucide-react";
+import { useAppDispatch } from "@/redux/hooks";
+import { resetChat } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
   RecipeRatingWithUser,
   RatingModalRef,
@@ -29,6 +31,8 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 export default function Recipe() {
   const { t } = useTranslation();
   const params = useParams();
+  const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector(selectUser);
   const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
@@ -76,18 +80,25 @@ export default function Recipe() {
     return (currentUser && rating.owner_id === currentUser.id) || false;
   };
 
+  function handleAskChatbot() {
+    if (!recipe) return;
+    dispatch(resetChat());
+    navigate(`/chatbot?recipeId=${recipe.id}`);
+  }
+
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        <NavLink
-          to={`/recipe/edit/${recipe?.id}`}
-          className={buttonVariants({ variant: "secondary" }) + " w-full"}
+        <Button
+          variant="secondary"
+          className="w-full"
+          onClick={handleAskChatbot}
         >
-          <Pencil />
-          {t("recipe.editRecipe")}
-        </NavLink>
+          <Bot />
+          {t("recipe.askChatbot")}
+        </Button>
 
         {recipe && (
           <WeeklyPlanDialog
@@ -104,31 +115,43 @@ export default function Recipe() {
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
-      {imageUrls.length === 0 ? (
-        <AspectRatio ratio={16 / 9}>
-          <img
-            src={"/no-img.jpg"}
-            alt="Recipe"
-            className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-          />
-        </AspectRatio>
-      ) : (
-        <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
+      <div className="relative">
+        {imageUrls.length === 0 ? (
           <AspectRatio ratio={16 / 9}>
-            {imageUrls.map((item, index) => (
-              <PhotoView key={index} src={item}>
-                {index < 1 ? (
-                  <img
-                    src={item}
-                    alt="Recipe"
-                    className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-                  />
-                ) : undefined}
-              </PhotoView>
-            ))}
+            <img
+              src={"/no-img.jpg"}
+              alt="Recipe"
+              className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+            />
           </AspectRatio>
-        </PhotoProvider>
-      )}
+        ) : (
+          <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
+            <AspectRatio ratio={16 / 9}>
+              {imageUrls.map((item, index) => (
+                <PhotoView key={index} src={item}>
+                  {index < 1 ? (
+                    <img
+                      src={item}
+                      alt="Recipe"
+                      className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+                    />
+                  ) : undefined}
+                </PhotoView>
+              ))}
+            </AspectRatio>
+          </PhotoProvider>
+        )}
+
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute top-2 right-2 z-10"
+          onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
+          aria-label="Edit Recipe"
+        >
+          <Pencil size={18} />
+        </Button>
+      </div>
 
       <div className="flex justify-between">
         <h1 className="first-font text-2xl font-bold break-words w-full">

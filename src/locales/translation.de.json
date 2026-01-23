@@ -8,6 +8,7 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "saving": "Speichern...",
+    "update": "Aktualisieren",
     "error": "Ein Fehler ist aufgetreten",
     "commingSoon": "Demnächst verfügbar...",
     "selectImage": "Bild auswählen",
@@ -210,7 +211,8 @@
     "ratings": "Bewertungen",
     "noRatings": "Keine Bewertungen",
     "planningSuccessful": "Rezept erfolgreich geplant!",
-    "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut."
+    "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
+    "askChatbot": "KI-Koch fragen"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
@@ -342,6 +344,7 @@
   },
   "chatbot": {
     "greeting": "Wie kann ich dir helfen?",
+    "askingAbout": "Frage zu",
     "suggestions": {
       "suggestion1": {
         "label": "Erstelle ein gesundes Rezept",
@@ -361,7 +364,10 @@
     "saveRecipeError": "Fehler beim Speichern des rezepts. Bitte versuche es später erneut.",
     "chatbotMessageError": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut.",
     "inputPlaceholder": "Frage nach Rezepten oder Tipps...",
-    "saveRecipePrompt": "Speichere das Rezept oder frage nach Anpassungen"
+    "saveRecipePrompt": "Speichere das Rezept oder frage nach Anpassungen",
+    "previewEditedRecipe": "Änderungen ansehen",
+    "updateRecipePrompt": "Aktualisiere das Rezept oder frage nach anderen Änderungen",
+    "updateRecipeError": "Fehler beim Aktualisieren des Rezepts. Bitte versuche es später erneut."
   },
   "rating": {
     "rate": "Bewerte dieses Rezept",
