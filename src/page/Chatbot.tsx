@@ -630,6 +630,7 @@ description: ${recipeContext.description ?? "No description"}
                 disabled={isTyping}
                 onSubmit={handleSendMessage}
                 maxLength={3000}
+                maxHeight={200}
                 rows={1}
               />
 
