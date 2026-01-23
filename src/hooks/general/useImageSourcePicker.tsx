@@ -22,6 +22,11 @@ interface UseImageSourcePickerOptions<T extends "dataUrl" | "base64"> {
 
 interface UseImageSourcePickerResult<T extends "dataUrl" | "base64"> {
   pickImage: () => Promise<ImageResult<T> | null>;
+  selectFromCamera: () => Promise<ImageResult<T> | null>;
+  selectFromGallery: () => Promise<ImageResult<T> | null>;
+  isNative: boolean;
+  fileInputRef: React.RefObject<HTMLInputElement>;
+  handleFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   ImageSourceDrawerComponent: React.ReactNode;
 }
 
@@ -152,6 +157,23 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
     }
   }, [isNative, resultType]);
 
+  // Direct selection methods (without drawer)
+  const selectFromCamera = useCallback(async (): Promise<ImageResult<T> | null> => {
+    return takePhotoWithSource(CameraSource.Camera);
+  }, [resultType]);
+
+  const selectFromGallery = useCallback(async (): Promise<ImageResult<T> | null> => {
+    if (isNative) {
+      return takePhotoWithSource(CameraSource.Photos);
+    } else {
+      // On web, use file input - caller must handle the result via handleFileInputChange
+      return new Promise((resolve) => {
+        resolveRef.current = resolve;
+        fileInputRef.current?.click();
+      });
+    }
+  }, [isNative, resultType]);
+
   const handleOpenChange = useCallback((open: boolean) => {
     setIsOpen(open);
     if (!open) {
@@ -187,6 +209,11 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
 
   return {
     pickImage,
+    selectFromCamera,
+    selectFromGallery,
+    isNative,
+    fileInputRef,
+    handleFileInputChange,
     ImageSourceDrawerComponent,
   };
 }

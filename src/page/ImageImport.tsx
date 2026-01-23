@@ -3,8 +3,8 @@ import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
-import { ImagePicker } from "@/components/general/ImagePicker";
-import { Trash2 } from "lucide-react";
+import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
+import { Trash2, Camera, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
@@ -26,31 +26,48 @@ export default function ImageImport() {
   >([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
 
-  const handleImageSelected = async (
-    file: File | undefined,
-    previewUrl: string
-  ) => {
-    if (file && previewUrl) {
-      setIsLoadingImage(true);
-      const compressedFile = await imageCompression(file, {
-        maxWidthOrHeight: 900, // Good for recipe images
-        maxSizeMB: 0.5, // Target max file size (MB)
-        useWebWorker: true,
-        initialQuality: 0.85,
-      });
+  const {
+    selectFromCamera,
+    selectFromGallery,
+    isNative,
+    fileInputRef,
+    handleFileInputChange,
+  } = useImageSourcePicker();
 
-      const reader = new FileReader();
-      reader.onload = () => {
-        if (reader.result) {
-          const base64 = reader.result.toString();
-          setImages((prev) => [
-            ...prev,
-            { file: compressedFile, preview: previewUrl, base64 },
-          ]);
-          setIsLoadingImage(false);
-        }
-      };
-      reader.readAsDataURL(compressedFile);
+  const processImage = async (file: File, dataUrl: string) => {
+    setIsLoadingImage(true);
+    const compressedFile = await imageCompression(file, {
+      maxWidthOrHeight: 900,
+      maxSizeMB: 0.5,
+      useWebWorker: true,
+      initialQuality: 0.85,
+    });
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        const base64 = reader.result.toString();
+        setImages((prev) => [
+          ...prev,
+          { file: compressedFile, preview: dataUrl, base64 },
+        ]);
+        setIsLoadingImage(false);
+      }
+    };
+    reader.readAsDataURL(compressedFile);
+  };
+
+  const handleCameraClick = async () => {
+    const result = await selectFromCamera();
+    if (result) {
+      await processImage(result.file, result.dataUrl);
+    }
+  };
+
+  const handleGalleryClick = async () => {
+    const result = await selectFromGallery();
+    if (result) {
+      await processImage(result.file, result.dataUrl);
     }
   };
 
@@ -76,7 +93,7 @@ export default function ImageImport() {
           body: {
             images: images.map((img) => img.base64),
           },
-        }
+        },
       );
 
       if (error) {
@@ -88,7 +105,9 @@ export default function ImageImport() {
       } else {
         console.log("recipe-from-image response:", data);
         setData(data[0]);
-        await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
+        await queryClient.invalidateQueries({
+          queryKey: queryKeys.recipes.all,
+        });
         toast.success(t("urlImport.success"), {
           position: "top-right",
           richColors: true,
@@ -130,11 +149,19 @@ export default function ImageImport() {
           className="w-full"
           variant="accent"
           onClick={() => handleStartImport()}
-          disabled={isSaving || data !== null}
+          disabled={isSaving || data !== null || images.length === 0}
         >
           {t("imageImport.importButton")}
         </Button>
       </div>
+
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={handleFileInputChange}
+      />
     </>
   );
 
@@ -147,7 +174,7 @@ export default function ImageImport() {
       </div>
 
       {!isSaving && !data && (
-        <>
+        <div className="flex flex-col gap-4 flex-1 justify-between">
           <div className="grid grid-cols-2 gap-4">
             {images.map((image, index) => (
               <div key={index} className="relative">
@@ -180,44 +207,68 @@ export default function ImageImport() {
             )}
           </div>
 
-          <div className="mt-4">
-            <ImagePicker
-              onImageSelected={handleImageSelected}
-              onDeleteImage={() => {}}
-              uploading={false}
-            />
+          <div className="flex gap-4 mt-4">
+            <Button
+              variant="secondary"
+              className="w-full h-26 rounded-2xl pt-4"
+              onClick={handleCameraClick}
+              disabled={!isNative || isLoadingImage}
+            >
+              <div className="flex flex-col gap-1 items-center">
+                <Camera className="!size-8" />
+                <p className="second-font font-medium text-lg">
+                  {t("common.camera")}
+                </p>
+              </div>
+            </Button>
+
+            <Button
+              variant="secondary"
+              className="w-full h-26 rounded-2xl pt-4"
+              onClick={handleGalleryClick}
+              disabled={isLoadingImage}
+            >
+              <div className="flex flex-col gap-1 items-center">
+                <ImageIcon className="!size-8" />
+                <p className="second-font font-medium text-lg">
+                  {t("common.gallery")}
+                </p>
+              </div>
+            </Button>
           </div>
-        </>
+        </div>
       )}
 
-      <div className="flex items-center flex-1">
-        {isSaving && (
-          <div className="flex flex-col items-center justify-center w-full gap-8">
-            <LoadingDots />
+      {(isSaving || data) && (
+        <div className="flex items-center flex-1">
+          {isSaving && (
+            <div className="flex flex-col items-center justify-center w-full gap-8">
+              <LoadingDots />
 
-            <p className="second-font text-center">
-              {t("urlImport.importingMessage")}
-              <br />
-              {t("urlImport.importingDescription")}
-            </p>
-          </div>
-        )}
+              <p className="second-font text-center">
+                {t("urlImport.importingMessage")}
+                <br />
+                {t("urlImport.importingDescription")}
+              </p>
+            </div>
+          )}
 
-        {data && (
-          <div className="flex flex-col w-full gap-4">
-            <h2 className="text-lg font-bold second-font">
-              {t("urlImport.importedRecipe")}
-            </h2>
+          {data && (
+            <div className="flex flex-col w-full gap-4">
+              <h2 className="text-lg font-bold second-font">
+                {t("urlImport.importedRecipe")}
+              </h2>
 
-            <RecipeCard
-              key={data.id}
-              id={data.id}
-              name={data.name}
-              averageRating={null}
-            />
-          </div>
-        )}
-      </div>
+              <RecipeCard
+                key={data.id}
+                id={data.id}
+                name={data.name}
+                averageRating={null}
+              />
+            </div>
+          )}
+        </div>
+      )}
     </Layout>
   );
 }

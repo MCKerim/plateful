@@ -29,7 +29,7 @@ export default function ImageSourceDrawer({
     return (
       <Button
         variant="secondary"
-        className="w-full h-26 rounded-2xl"
+        className="w-full h-26 rounded-2xl pt-4"
         onClick={onClick}
         disabled={disabled}
       >
