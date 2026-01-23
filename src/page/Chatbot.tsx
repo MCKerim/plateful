@@ -328,15 +328,6 @@ description: ${recipeContext.description ?? "No description"}
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      if (!isTyping) {
-        handleSendMessage();
-      }
-    }
-  };
-
   const handleResetChat = () => {
     dispatch(resetChat());
     setInputValue("");
@@ -619,11 +610,11 @@ description: ${recipeContext.description ?? "No description"}
               placeholder={t("chatbot.inputPlaceholder")}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyDown}
               onSubmit={handleSendMessage}
               maxLength={3000}
               maxHeight={200}
               rows={1}
+              enterKeyHint="enter"
             />
 
             <InputGroupAddon align="block-end" className="px-2 pb-2">
