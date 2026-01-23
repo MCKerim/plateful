@@ -35,7 +35,10 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
-import { getCategoryIdByTranslatedEnglishName, getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import {
+  getCategoryIdByTranslatedEnglishName,
+  getEnglishCategoryNameById,
+} from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
 import {
@@ -59,7 +62,12 @@ function RecipeProposalDialog({
 }: {
   toolOutput: any;
   onSaveNew: (title: string, description: string, category: string) => void;
-  onSaveEdit: (recipeId: number, title: string, description: string, category: string) => void;
+  onSaveEdit: (
+    recipeId: number,
+    title: string,
+    description: string,
+    category: string,
+  ) => void;
   t: any;
 }) {
   const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
@@ -70,9 +78,10 @@ function RecipeProposalDialog({
 
   // For edit proposals, merge tool output with original recipe (tool output takes precedence)
   const getMergedValue = (field: "title" | "description" | "category") => {
-    const toolValue = field === "title"
-      ? toolOutput.args.title
-      : field === "description"
+    const toolValue =
+      field === "title"
+        ? toolOutput.args.title
+        : field === "description"
         ? toolOutput.args.description
         : toolOutput.args.category;
 
@@ -84,7 +93,8 @@ function RecipeProposalDialog({
     if (isEditProposal && originalRecipe) {
       if (field === "title") return originalRecipe.name;
       if (field === "description") return originalRecipe.description ?? "";
-      if (field === "category") return getEnglishCategoryNameById(originalRecipe.category);
+      if (field === "category")
+        return getEnglishCategoryNameById(originalRecipe.category);
     }
 
     return "";
@@ -102,11 +112,7 @@ function RecipeProposalDialog({
             {finalTitle}
           </p>
 
-          <Button
-            variant="accent"
-            size="sm"
-            className="mt-2 w-full"
-          >
+          <Button variant="accent" size="sm" className="mt-2 w-full">
             <span className="truncate">
               {isEditProposal
                 ? t("chatbot.previewEditedRecipe")
@@ -152,7 +158,12 @@ function RecipeProposalDialog({
             variant="accent"
             onClick={() => {
               if (isEditProposal && editRecipeId) {
-                onSaveEdit(editRecipeId, finalTitle, finalDescription, finalCategory);
+                onSaveEdit(
+                  editRecipeId,
+                  finalTitle,
+                  finalDescription,
+                  finalCategory,
+                );
               } else {
                 onSaveNew(finalTitle, finalDescription, finalCategory);
               }
@@ -233,13 +244,15 @@ export default function Chatbot() {
     const isFirstMessageWithContext = messages.length === 0 && recipeContext;
 
     // Show the user message in the UI right away
-    const userMessage: ChatMessage & { images?: string[]; recipeName?: string } =
-      {
-        role: "user",
-        content: inputValue || "",
-        images: selectedImagesAsbase64,
-        ...(isFirstMessageWithContext && { recipeName: recipeContext.name }),
-      };
+    const userMessage: ChatMessage & {
+      images?: string[];
+      recipeName?: string;
+    } = {
+      role: "user",
+      content: inputValue || "",
+      images: selectedImagesAsbase64,
+      ...(isFirstMessageWithContext && { recipeName: recipeContext.name }),
+    };
 
     dispatch(addMessage(userMessage));
     setInputValue("");
@@ -374,7 +387,7 @@ description: ${recipeContext.description ?? "No description"}
     recipeId: number,
     title: string,
     description: string,
-    category: string
+    category: string,
   ) {
     console.log("Updating recipe:", recipeId, title, category);
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
@@ -627,6 +640,7 @@ description: ${recipeContext.description ?? "No description"}
                   size="icon"
                   onClick={handlePickImagesClick}
                   title={t("common.uploadImage")}
+                  className="rounded-full"
                 >
                   <ImagePlus className="w-5 h-5" />
                 </Button>
@@ -637,7 +651,7 @@ description: ${recipeContext.description ?? "No description"}
                   size="icon"
                   onClick={handleSendMessage}
                   title={t("common.send")}
-                  className="ml-auto"
+                  className="ml-auto rounded-full"
                 >
                   <Send className="w-5 h-5" />
                 </Button>
