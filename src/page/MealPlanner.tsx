@@ -337,7 +337,7 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div className="flex flex-col gap-1 mb-64">
+        <div className="flex flex-col gap-1 mb-48">
           {isLoading ? (
             <>
               {[new Array(7)].map((_, index) => (
@@ -348,7 +348,7 @@ export default function MealPlanner() {
             getWeekdays(currentWeek).map((day) => (
               <DroppableDay key={day.toISOString()} id={day.toISOString()}>
                 <p
-                  className={`px-2 font-semibold rounded-full w-fit ${
+                  className={`px-1.5 mb-1 text-sm font-semibold rounded-full w-fit ${
                     isToday(day) ? "bg-accent text-accent-foreground" : ""
                   }`}
                 >

@@ -11,7 +11,7 @@ export function DroppableDay({ id, children }: Readonly<Props>) {
   return (
     <div
       ref={setNodeRef}
-      className={`transition-colors rounded-lg p-1 min-h-[50px] ${
+      className={`transition-colors rounded-lg p-1 ${
         isOver ? "bg-accent ring-2 ring-primary" : ""
       }`}
     >
