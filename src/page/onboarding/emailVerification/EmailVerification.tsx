@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
+import { toast } from "sonner";
 
 export default function EmailVerification() {
   const { t } = useTranslation();
@@ -27,7 +28,7 @@ export default function EmailVerification() {
 
   const handleResendEmail = async () => {
     if (!email) {
-      alert(t("Error: No email found to resend verification."));
+      toast.error(t("Error: No email found to resend verification."));
       return;
     }
 
@@ -40,14 +41,14 @@ export default function EmailVerification() {
       });
 
       if (signUpError) {
-        alert("Error resending verification email: " + signUpError.message);
+        toast.error("Error resending verification email: " + signUpError.message);
         return;
       }
 
-      alert(t("emailVerification.resendSent"));
+      toast.success(t("emailVerification.resendSent"));
     } catch (err) {
       console.error("Sign up error:", err);
-      alert(t("emailSignup.errors.signupFailed"));
+      toast.error(t("emailSignup.errors.signupFailed"));
     }
   };
 

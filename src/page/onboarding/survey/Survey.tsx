@@ -6,6 +6,7 @@ import { useSupabase } from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export default function Survey() {
   const { supabase } = useSupabase();
@@ -70,7 +71,7 @@ export default function Survey() {
     }
 
     if (selected.length === 0) {
-      alert("Please select at least one option before proceeding.");
+      toast.error("Please select at least one option before proceeding.");
       return;
     }
 
@@ -118,7 +119,7 @@ export default function Survey() {
 
     if (error) {
       console.error("Error updating user:", error);
-      alert("An error occurred while saving your progress. Please try again.");
+      toast.error("An error occurred while saving your progress. Please try again.");
       return;
     }
 

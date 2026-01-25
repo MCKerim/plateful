@@ -48,6 +48,7 @@ import {
 } from "@/components/ui/input-group";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
+import { toast } from "sonner";
 
 type VisionPart =
   | { type: "input_text"; text: string }
@@ -351,7 +352,7 @@ description: ${recipeContext.description ?? "No description"}
     }
 
     if (!householdId) {
-      alert(t("chatbot.saveRecipeError"));
+      toast.error(t("chatbot.saveRecipeError"));
       return;
     }
 
@@ -366,7 +367,7 @@ description: ${recipeContext.description ?? "No description"}
       navigate(`/recipe/${newRecipe.id}`);
     } catch (error) {
       console.error(error);
-      alert(t("chatbot.saveRecipeError"));
+      toast.error(t("chatbot.saveRecipeError"));
     }
   }
 
@@ -395,7 +396,7 @@ description: ${recipeContext.description ?? "No description"}
       navigate(`/recipe/${recipeId}`);
     } catch (error) {
       console.error(error);
-      alert(t("chatbot.updateRecipeError"));
+      toast.error(t("chatbot.updateRecipeError"));
     }
   }
 

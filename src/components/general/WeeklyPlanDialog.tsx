@@ -260,10 +260,7 @@ export default function WeeklyPlanDialog({
         addWithoutDate: withoutDate,
       });
 
-      toast.success(t("recipe.planningSuccessful"), {
-        position: "top-right",
-        richColors: true,
-      });
+      toast.success(t("recipe.planningSuccessful"));
 
       handleOpenChange(false);
       onSaveComplete?.({ success: true, ...result });
@@ -272,10 +269,7 @@ export default function WeeklyPlanDialog({
         navigate("/planner");
       }
     } catch {
-      toast.error(t("recipe.planningFailed"), {
-        position: "top-right",
-        richColors: true,
-      });
+      toast.error(t("recipe.planningFailed"));
       onSaveComplete?.({ success: false, added: 0, removed: 0 });
     }
   }

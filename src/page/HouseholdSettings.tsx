@@ -31,6 +31,7 @@ import { useState } from "react";
 import { useUpdateHouseholdName } from "@/hooks/household/useUpdateHouseholdName";
 import { useRemoveMember } from "@/hooks/household/useRemoveMember";
 import { useLeaveHousehold } from "@/hooks/household/useLeaveHousehold";
+import { toast } from "sonner";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -56,11 +57,11 @@ export default function HouseholdSettings() {
       { memberId },
       {
         onSuccess: () => {
-          alert(t("householdSettings.success.memberRemoved"));
+          toast.success(t("householdSettings.success.memberRemoved"));
         },
         onError: (error) => {
           console.error("Fehler beim Entfernen des Mitglieds:", error);
-          alert(t("householdSettings.errors.removeMemberFailed"));
+          toast.error(t("householdSettings.errors.removeMemberFailed"));
         },
       }
     );
@@ -83,7 +84,7 @@ export default function HouseholdSettings() {
         },
         onError: (error) => {
           console.error("Fehler beim Verlassen des Haushalts:", error);
-          alert(t("householdSettings.errors.leaveHouseholdFailed"));
+          toast.error(t("householdSettings.errors.leaveHouseholdFailed"));
           setShowLeaveConfirmation(false);
         },
       }
@@ -119,7 +120,7 @@ export default function HouseholdSettings() {
         },
         onError: (error) => {
           console.error("Error updating household name:", error);
-          alert(t("householdSettings.errors.updateNameFailed"));
+          toast.error(t("householdSettings.errors.updateNameFailed"));
         },
       }
     );

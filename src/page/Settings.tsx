@@ -19,6 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
 import { useUpdateLanguage } from "@/hooks/user/useUpdateLanguage";
+import { toast } from "sonner";
 
 export default function Settings() {
   const { supabase } = useSupabase();
@@ -62,12 +63,12 @@ export default function Settings() {
 
   function handleUpdateUsername() {
     if (newUsername.trim() === "" || !user) {
-      alert(t("settings.usernameCannotBeEmpty"));
+      toast.error(t("settings.usernameCannotBeEmpty"));
       return;
     }
 
     if (newUsername.length < 3 || newUsername.length > 20) {
-      alert(t("settings.usernameLengthInvalid"));
+      toast.error(t("settings.usernameLengthInvalid"));
       return;
     }
 

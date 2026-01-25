@@ -77,10 +77,7 @@ export default function ImageImport() {
 
   async function handleStartImport() {
     if (images.length === 0) {
-      toast.error(t("imageImport.errors.noImages"), {
-        position: "top-right",
-        richColors: true,
-      });
+      toast.error(t("imageImport.errors.noImages"));
       return;
     }
 
@@ -98,10 +95,7 @@ export default function ImageImport() {
 
       if (error) {
         console.error("Edge function returned error:", error);
-        toast.error(t("urlImport.errors.importFailed"), {
-          position: "top-right",
-          richColors: true,
-        });
+        toast.error(t("urlImport.errors.importFailed"));
       } else {
         console.log("recipe-from-image response:", data);
         setData(data[0]);
@@ -109,8 +103,6 @@ export default function ImageImport() {
           queryKey: queryKeys.recipes.all,
         });
         toast.success(t("urlImport.success"), {
-          position: "top-right",
-          richColors: true,
           action: {
             label: t("urlImport.viewRecipe"),
             onClick: () => {
@@ -121,10 +113,7 @@ export default function ImageImport() {
       }
     } catch (err: unknown) {
       console.error("Unexpected error calling recipe-from-image:", err);
-      toast.error(t("urlImport.errors.importFailed"), {
-        position: "top-right",
-        richColors: true,
-      });
+      toast.error(t("urlImport.errors.importFailed"));
 
       try {
         const anyErr = err as any;

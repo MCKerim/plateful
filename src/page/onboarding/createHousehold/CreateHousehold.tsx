@@ -9,6 +9,7 @@ import { useSupabase } from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export default function CreateHousehold() {
   const { supabase } = useSupabase();
@@ -25,13 +26,13 @@ export default function CreateHousehold() {
     }
 
     if (isLoading) {
-      alert(t("createHousehold.errors.loading"));
+      toast.error(t("createHousehold.errors.loading"));
       return;
     }
 
     const trimmedName = householdName.trim();
     if (!trimmedName) {
-      alert(t("createHousehold.errors.nameRequired"));
+      toast.error(t("createHousehold.errors.nameRequired"));
       return;
     }
 
@@ -43,7 +44,7 @@ export default function CreateHousehold() {
       .select();
 
     if (error || !data) {
-      alert(t("createHousehold.errors.createFailed") + " " + error?.message);
+      toast.error(t("createHousehold.errors.createFailed") + " " + error?.message);
       setIsLoading(false);
       return;
     }
@@ -56,7 +57,7 @@ export default function CreateHousehold() {
         .eq("id", user.id);
 
       if (updateError) {
-        alert(
+        toast.error(
           t("createHousehold.errors.updateFailed") + " " + updateError.message,
         );
         setIsLoading(false);

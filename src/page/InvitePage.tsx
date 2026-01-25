@@ -6,6 +6,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { House } from "lucide-react";
+import { toast } from "sonner";
 
 export default function InvitePage() {
   const { supabase } = useSupabase();
@@ -39,7 +40,7 @@ export default function InvitePage() {
         .limit(1);
 
       if (error || !invites || invites.length === 0) {
-        alert(t("invitePage.invalidLink"));
+        toast.error(t("invitePage.invalidLink"));
         return;
       }
 

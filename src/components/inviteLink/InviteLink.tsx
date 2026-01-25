@@ -10,6 +10,7 @@ import { Copy, Share2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Share } from "@capacitor/share";
 import { writeClipboardText } from "@/utils/nativeClipboard";
+import { toast } from "sonner";
 
 export default function InviteLink() {
   const { supabase } = useSupabase();
@@ -42,7 +43,7 @@ export default function InviteLink() {
     ]);
 
     if (error) {
-      alert(t("inviteLink.createError") + " " + error.message);
+      toast.error(t("inviteLink.createError") + " " + error.message);
       return;
     }
 
@@ -70,10 +71,10 @@ export default function InviteLink() {
 
     try {
       await writeClipboardText(inviteLink);
-      alert(t("inviteLink.copySuccess"));
+      toast.success(t("inviteLink.copySuccess"));
     } catch (err) {
       console.error("Fehler beim Kopieren des Links:", err);
-      alert(t("inviteLink.copyError"));
+      toast.error(t("inviteLink.copyError"));
     }
   }
 

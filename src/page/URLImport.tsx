@@ -35,10 +35,7 @@ export default function URLImport() {
           const text = await readClipboardText();
           if (text.startsWith("http://") || text.startsWith("https://")) {
             setUrlInput(text);
-            toast.success(t("urlImport.linkPastedFromClipboard"), {
-              position: "top-right",
-              richColors: true,
-            });
+            toast.success(t("urlImport.linkPastedFromClipboard"));
           }
         } catch (err) {
           console.debug(
@@ -69,17 +66,12 @@ export default function URLImport() {
 
       if (error) {
         console.error("Edge function returned error:", error);
-        toast.error(t("urlImport.errors.importFailed"), {
-          position: "top-right",
-          richColors: true,
-        });
+        toast.error(t("urlImport.errors.importFailed"));
       } else {
         console.log("recipe-from-url response:", data);
         setData(data[0]);
         await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
         toast.success(t("urlImport.success"), {
-          position: "top-right",
-          richColors: true,
           action: {
             label: t("urlImport.viewRecipe"),
             onClick: () => {
@@ -90,10 +82,7 @@ export default function URLImport() {
       }
     } catch (err: unknown) {
       console.error("Unexpected error calling recipe-from-url:", err);
-      toast.error(t("urlImport.errors.importFailed"), {
-        position: "top-right",
-        richColors: true,
-      });
+      toast.error(t("urlImport.errors.importFailed"));
 
       try {
         const anyErr = err as any;

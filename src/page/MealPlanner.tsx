@@ -118,11 +118,7 @@ export default function MealPlanner() {
   // Handlers
   function handleDelete(id: number) {
     deleteMutation.mutate(id, {
-      onError: () =>
-        toast.error(t("mealPlanner.deleteError"), {
-          position: "top-right",
-          richColors: true,
-        }),
+      onError: () => toast.error(t("mealPlanner.deleteError")),
     });
   }
 
@@ -130,16 +126,8 @@ export default function MealPlanner() {
     updateDateMutation.mutate(
       { id, newDate, newDays },
       {
-        onSuccess: () =>
-          toast.success(t("recipe.planningSuccessful"), {
-            position: "top-right",
-            richColors: true,
-          }),
-        onError: () =>
-          toast.error(t("recipe.planningFailed"), {
-            position: "top-right",
-            richColors: true,
-          }),
+        onSuccess: () => toast.success(t("recipe.planningSuccessful")),
+        onError: () => toast.error(t("recipe.planningFailed")),
       },
     );
   }
@@ -148,11 +136,7 @@ export default function MealPlanner() {
     setDaysEatenMutation.mutate(
       { id, newDaysEaten },
       {
-        onError: () =>
-          toast.error(t("mealPlanner.updateError"), {
-            position: "top-right",
-            richColors: true,
-          }),
+        onError: () => toast.error(t("mealPlanner.updateError")),
       },
     );
   }

@@ -5,6 +5,7 @@ import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 export default function MealPlanningValue() {
   const { supabase } = useSupabase();
@@ -24,7 +25,7 @@ export default function MealPlanningValue() {
 
     if (error) {
       console.error("Error updating user:", error);
-      alert("An error occurred while saving your progress. Please try again.");
+      toast.error("An error occurred while saving your progress. Please try again.");
       return;
     }
 

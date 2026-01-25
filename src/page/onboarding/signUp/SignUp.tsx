@@ -7,6 +7,7 @@ import CircleTransition from "@/components/general/CircleTransition";
 import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
 import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import { toast } from "sonner";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
@@ -74,13 +75,13 @@ export default function SignUp() {
 
       if (error) {
         console.error("OAuth error:", error);
-        alert("Authentication failed. Please try again.");
+        toast.error("Authentication failed. Please try again.");
       }
 
       await openBrowser(data?.url || "");
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
-      alert("An unexpected error occurred. Please try again.");
+      toast.error("An unexpected error occurred. Please try again.");
     }
   };
 

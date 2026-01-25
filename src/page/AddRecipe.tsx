@@ -10,6 +10,7 @@ import { useSupabase } from "@/utils/supabase";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
+import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
 import {
   Select,
@@ -186,7 +187,7 @@ export default function AddRecipe() {
       .upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
-      alert("Upload failed: " + error.message);
+      toast.error("Upload failed: " + error.message);
       return null;
     }
     return filePath;
@@ -228,12 +229,12 @@ export default function AddRecipe() {
 
   async function saveRecipe() {
     if (title === "") {
-      alert("Please enter a name for the recipe.");
+      toast.error("Please enter a name for the recipe.");
       return;
     }
 
     if (category === null) {
-      alert("Please select a category.");
+      toast.error("Please select a category.");
       return;
     }
 
@@ -262,7 +263,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            alert("An error occurred. Please try again.");
+            toast.error("An error occurred. Please try again.");
           },
         }
       );
@@ -291,7 +292,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            alert("An error occurred. Please try again.");
+            toast.error("An error occurred. Please try again.");
           },
         }
       );
@@ -307,7 +308,7 @@ export default function AddRecipe() {
       },
       onError: (error) => {
         console.error("Error while deleting recipe: ", error);
-        alert("Error while deleting recipe");
+        toast.error("Error while deleting recipe");
       },
     });
   }
