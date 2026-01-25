@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function MealPlannerItemSkeleton() {
   return (
-    <Card className="h-[90px] flex items-center">
+    <Card className="h-[72px] flex items-center">
       <Skeleton className="h-full w-[74px] rounded-l-lg rounded-r-none" />
 
       <div className="flex-1 px-2.5 space-y-2">

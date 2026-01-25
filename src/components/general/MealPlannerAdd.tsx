@@ -11,7 +11,7 @@ export default function MealPlannerAdd({ onClick }: Readonly<Props>) {
   }
 
   return (
-    <Card className="h-[90px]">
+    <Card className="h-[72px]">
       <button
         className="w-full h-full flex items-center justify-center text-muted-foreground"
         onClick={handleClick}

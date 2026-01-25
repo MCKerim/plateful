@@ -70,7 +70,7 @@ export default function MealPlanner() {
 
   const [currentWeek, setCurrentWeek] = useState(new Date());
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
-    null
+    null,
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -100,12 +100,12 @@ export default function MealPlanner() {
         delay: 250,
         tolerance: 5,
       },
-    })
+    }),
   );
 
   // Derived state
   const notPlannedItems = plannedItems.filter(
-    (item) => item.planned_date === null && item.daysEaten < item.days
+    (item) => item.planned_date === null && item.daysEaten < item.days,
   );
   const isDraggingFromDrawer = activeItem?.planned_date === null;
 
@@ -139,7 +139,7 @@ export default function MealPlanner() {
             position: "top-right",
             richColors: true,
           }),
-      }
+      },
     );
   }
 
@@ -152,7 +152,7 @@ export default function MealPlanner() {
             position: "top-right",
             richColors: true,
           }),
-      }
+      },
     );
   }
 
@@ -168,7 +168,7 @@ export default function MealPlanner() {
 
   function getItemsByDate(date: Date) {
     return plannedItems.filter(
-      (item) => item.planned_date && isSameDay(item.planned_date, date)
+      (item) => item.planned_date && isSameDay(item.planned_date, date),
     );
   }
 
@@ -296,7 +296,7 @@ export default function MealPlanner() {
         />
 
         {/* Week Navigation */}
-        <div className="sticky flex items-center justify-between px-2 py-1 border-b bg-background top-11 z-10">
+        <div className="sticky flex items-center justify-between px-2 pb-1 border-b bg-background top-11 z-10">
           <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
             <ChevronLeft size={20} />
           </Button>
@@ -311,7 +311,7 @@ export default function MealPlanner() {
                 ? t("mealPlanner.lastWeek")
                 : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
                     getWeekdays(currentWeek)[6],
-                    "dd.MM"
+                    "dd.MM",
                   )}`}
             </h2>
 
@@ -337,7 +337,7 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div className="flex flex-col gap-2.5 mb-64 p-2">
+        <div className="flex flex-col gap-1 mb-64">
           {isLoading ? (
             <>
               {[new Array(7)].map((_, index) => (
@@ -348,7 +348,7 @@ export default function MealPlanner() {
             getWeekdays(currentWeek).map((day) => (
               <DroppableDay key={day.toISOString()} id={day.toISOString()}>
                 <p
-                  className={`px-2 mb-1 font-semibold rounded-full w-fit ${
+                  className={`px-2 font-semibold rounded-full w-fit ${
                     isToday(day) ? "bg-accent text-accent-foreground" : ""
                   }`}
                 >
@@ -478,7 +478,7 @@ export default function MealPlanner() {
         }}
       >
         {activeItem && (
-          <Card className="h-[90px] flex items-center shadow-2xl opacity-95 border-2 border-primary">
+          <Card className="h-[72px] flex items-center shadow-2xl opacity-95 border-2 border-primary">
             <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
 
             <div className="flex-1 px-2.5">

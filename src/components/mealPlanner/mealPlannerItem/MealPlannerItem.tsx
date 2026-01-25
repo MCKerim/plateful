@@ -155,7 +155,7 @@ export default function MealPlannerItem({
   return (
     <Card
       ref={setNodeRef}
-      className={`h-[90px] flex items-center ${isDragging ? "invisible" : ""}`}
+      className={`h-[72px] flex items-center ${isDragging ? "invisible" : ""}`}
     >
       <div
         ref={dragHandleRef}
@@ -182,7 +182,7 @@ export default function MealPlannerItem({
           }}
           className="text-left flex-1 px-2.5 min-w-0 h-full flex items-center"
         >
-          <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3 w-full">
+          <p className="second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full">
             {recipeName}
           </p>
         </button>
@@ -217,10 +217,7 @@ export default function MealPlannerItem({
         <DrawerContent>
           <DrawerFooter className="gap-2 mb-8 mt-4">
             <DrawerClose asChild>
-              <Button
-                className="w-full"
-                onClick={onEditPlan}
-              >
+              <Button className="w-full" onClick={onEditPlan}>
                 <CalendarDays size={20} />
                 {t("mealPlannerItem.editPlan")}
               </Button>
