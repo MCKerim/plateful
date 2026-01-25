@@ -1,6 +1,7 @@
 import MealPlannerItem from "@/components/mealPlanner/mealPlannerItem/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
+import { useSwipe } from "@/hooks/useSwipe";
 import {
   format,
   isSameDay,
@@ -262,6 +263,16 @@ export default function MealPlanner() {
     setActiveItem(null);
   }
 
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: useCallback(() => {
+      if (!activeItem) goToNextWeek();
+    }, [activeItem]),
+    onSwipeRight: useCallback(() => {
+      if (!activeItem) goToPreviousWeek();
+    }, [activeItem]),
+    threshold: 50,
+  });
+
   return (
     <DndContext
       sensors={sensors}
@@ -337,7 +348,10 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div className="flex flex-col gap-1 mb-48">
+        <div
+          className="flex flex-col gap-1 mb-48"
+          {...swipeHandlers}
+        >
           {isLoading ? (
             <>
               {[new Array(7)].map((_, index) => (
