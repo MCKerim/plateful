@@ -197,7 +197,6 @@
     "willBeRemoved": "Will be removed"
   },
   "cookbook": {
-    "title": "Cookbook",
     "enterRecipeName": "Search recipe...",
     "nothingFound": "No recipes found..."
   },
@@ -363,7 +362,7 @@
     "home": "Home",
     "chatbot": "AI-Chef",
     "explore": "Explore",
-    "cookbook": "Cookbook",
+    "cookbook": "Recipes",
     "planner": "Planner",
     "list": "List"
   },

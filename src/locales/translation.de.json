@@ -197,7 +197,6 @@
     "willBeRemoved": "Wird entfernt"
   },
   "cookbook": {
-    "title": "Kochbuch",
     "enterRecipeName": "Rezept suchen...",
     "nothingFound": "Keine Rezepte gefunden..."
   },
@@ -335,7 +334,7 @@
     "home": "Startseite",
     "chatbot": "KI-Koch",
     "explore": "Erkunden",
-    "cookbook": "Kochbuch",
+    "cookbook": "Rezepte",
     "planner": "Planer",
     "list": "Liste"
   },
