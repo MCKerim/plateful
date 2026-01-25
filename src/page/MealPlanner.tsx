@@ -2,6 +2,12 @@ import MealPlannerItem from "@/components/mealPlanner/mealPlannerItem/MealPlanne
 import Layout from "@/components/layout/Layout";
 import { useEffect, useRef, useState } from "react";
 import { useSwipe } from "@/hooks/useSwipe";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  selectCurrentWeek,
+  setCurrentWeek,
+  resetToCurrentWeek,
+} from "@/redux/slices/mealPlannerSlice";
 import {
   format,
   isSameDay,
@@ -68,8 +74,9 @@ function DayCardSkeleton() {
 export default function MealPlanner() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const currentWeek = useAppSelector(selectCurrentWeek);
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
     null,
   );
@@ -192,15 +199,15 @@ export default function MealPlanner() {
   }
 
   function goToPreviousWeek() {
-    setCurrentWeek((prevWeek) => subWeeks(prevWeek, 1));
+    dispatch(setCurrentWeek(subWeeks(currentWeek, 1).toISOString()));
   }
 
   function goToNextWeek() {
-    setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
+    dispatch(setCurrentWeek(addWeeks(currentWeek, 1).toISOString()));
   }
 
   function goToCurrentWeek() {
-    setCurrentWeek(new Date());
+    dispatch(resetToCurrentWeek());
   }
 
   // DnD handlers
