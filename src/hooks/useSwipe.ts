@@ -10,18 +10,27 @@ interface UseSwipeOptions {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  disabled?: boolean;
 }
 
 export function useSwipe({
   onSwipeLeft,
   onSwipeRight,
   threshold = 50,
+  disabled = false,
 }: UseSwipeOptions): SwipeHandlers {
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
+  const wasDisabledDuringGesture = useRef(false);
+
+  // Track if disabled became true at any point during the gesture
+  if (disabled && touchStartX.current !== null) {
+    wasDisabledDuringGesture.current = true;
+  }
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
+    wasDisabledDuringGesture.current = false;
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
     touchCurrentX.current = e.touches[0].clientX;
@@ -32,7 +41,15 @@ export function useSwipe({
   }, []);
 
   const onTouchEnd = useCallback(() => {
-    if (touchStartX.current === null || touchCurrentX.current === null) {
+    if (
+      wasDisabledDuringGesture.current ||
+      touchStartX.current === null ||
+      touchCurrentX.current === null
+    ) {
+      touchStartX.current = null;
+      touchStartY.current = null;
+      touchCurrentX.current = null;
+      wasDisabledDuringGesture.current = false;
       return;
     }
 
@@ -50,6 +67,7 @@ export function useSwipe({
     touchStartX.current = null;
     touchStartY.current = null;
     touchCurrentX.current = null;
+    wasDisabledDuringGesture.current = false;
   }, [onSwipeLeft, onSwipeRight, threshold]);
 
   return {

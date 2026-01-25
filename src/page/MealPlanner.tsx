@@ -1,6 +1,6 @@
 import MealPlannerItem from "@/components/mealPlanner/mealPlannerItem/MealPlannerItem";
 import Layout from "@/components/layout/Layout";
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSwipe } from "@/hooks/useSwipe";
 import {
   format,
@@ -264,13 +264,10 @@ export default function MealPlanner() {
   }
 
   const swipeHandlers = useSwipe({
-    onSwipeLeft: useCallback(() => {
-      if (!activeItem) goToNextWeek();
-    }, [activeItem]),
-    onSwipeRight: useCallback(() => {
-      if (!activeItem) goToPreviousWeek();
-    }, [activeItem]),
+    onSwipeLeft: goToNextWeek,
+    onSwipeRight: goToPreviousWeek,
     threshold: 50,
+    disabled: activeItem !== null,
   });
 
   return (
@@ -487,8 +484,11 @@ export default function MealPlanner() {
 
       <DragOverlay
         dropAnimation={{
-          duration: 200,
-          easing: "ease",
+          duration: 150,
+          easing: "ease-out",
+          keyframes() {
+            return [{ opacity: 1 }, { opacity: 0 }];
+          },
         }}
       >
         {activeItem && (
