@@ -81,6 +81,9 @@ export default function MealPlanner() {
     null,
   );
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(
+    null,
+  );
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -199,11 +202,15 @@ export default function MealPlanner() {
   }
 
   function goToPreviousWeek() {
+    setSlideDirection("right");
     dispatch(setCurrentWeek(subWeeks(currentWeek, 1).toISOString()));
+    setTimeout(() => setSlideDirection(null), 300);
   }
 
   function goToNextWeek() {
+    setSlideDirection("left");
     dispatch(setCurrentWeek(addWeeks(currentWeek, 1).toISOString()));
+    setTimeout(() => setSlideDirection(null), 300);
   }
 
   function goToCurrentWeek() {
@@ -301,7 +308,7 @@ export default function MealPlanner() {
           </Button>
 
           <div className="flex flex-col items-center">
-            <h2 className="text-lg font-semibold">
+            <h2 className="text-lg font-semibold second-font">
               {isSameWeek(currentWeek, new Date())
                 ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
@@ -336,50 +343,61 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div className="flex flex-col gap-1 mb-48" {...swipeHandlers}>
-          {isLoading ? (
-            <>
-              {[new Array(7)].map((_, index) => (
-                <DayCardSkeleton key={index} />
-              ))}
-            </>
-          ) : (
-            getWeekdays(currentWeek).map((day) => (
-              <DroppableDay key={day.toISOString()} id={day.toISOString()}>
-                <p
-                  className={`px-1.5 mb-1 text-sm font-semibold rounded-full w-fit ${
-                    isToday(day) ? "bg-accent text-accent-foreground" : ""
-                  }`}
-                >
-                  {format(day, "EEE - dd.MM", {
-                    locale:
-                      locales[i18n.language as keyof typeof locales] || enUS,
-                  })}
-                </p>
+        <div className="overflow-x-hidden">
+          <div
+            className={`flex flex-col gap-1 mb-48 ${
+              slideDirection === "left"
+                ? "animate-slide-left"
+                : slideDirection === "right"
+                ? "animate-slide-right"
+                : ""
+            }`}
+            {...swipeHandlers}
+          >
+            {isLoading ? (
+              <>
+                {[new Array(7)].map((_, index) => (
+                  <DayCardSkeleton key={index} />
+                ))}
+              </>
+            ) : (
+              getWeekdays(currentWeek).map((day) => (
+                <DroppableDay key={day.toISOString()} id={day.toISOString()}>
+                  <p
+                    className={`px-1.5 mb-1 text-sm font-semibold rounded-full w-fit ${
+                      isToday(day) ? "bg-accent text-accent-foreground" : ""
+                    }`}
+                  >
+                    {format(day, "EEE - dd.MM", {
+                      locale:
+                        locales[i18n.language as keyof typeof locales] || enUS,
+                    })}
+                  </p>
 
-                {getItemsByDate(day).length > 0 ? (
-                  <ul className="flex flex-col gap-2">
-                    {getItemsByDate(day).map((item) => (
-                      <li key={item.id}>
-                        <MealPlannerItem
-                          {...item}
-                          setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
-                          onRecipeEaten={() => handleRecipeEaten(item)}
-                          onRecipeDelete={() => handleDelete(item.id)}
-                          onEditPlan={() =>
-                            handleEditPlan(item.recipeId, item.recipeName)
-                          }
-                          isDragging={activeItem?.id === item.id}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <MealPlannerAdd onClick={() => navigate("/cookbook")} />
-                )}
-              </DroppableDay>
-            ))
-          )}
+                  {getItemsByDate(day).length > 0 ? (
+                    <ul className="flex flex-col gap-2">
+                      {getItemsByDate(day).map((item) => (
+                        <li key={item.id}>
+                          <MealPlannerItem
+                            {...item}
+                            setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
+                            onRecipeEaten={() => handleRecipeEaten(item)}
+                            onRecipeDelete={() => handleDelete(item.id)}
+                            onEditPlan={() =>
+                              handleEditPlan(item.recipeId, item.recipeName)
+                            }
+                            isDragging={activeItem?.id === item.id}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <MealPlannerAdd onClick={() => navigate("/cookbook")} />
+                  )}
+                </DroppableDay>
+              ))
+            )}
+          </div>
         </div>
 
         {/* Bottom Drawer */}
