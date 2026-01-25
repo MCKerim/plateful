@@ -244,7 +244,7 @@ export default function Chatbot() {
       recipeName?: string;
     } = {
       role: "user",
-      content: inputValue || "",
+      content: inputValue.trim(),
       images: selectedImagesAsbase64,
       ...(isFirstMessageWithContext && { recipeName: recipeContext.name }),
     };
@@ -304,8 +304,6 @@ description: ${recipeContext.description ?? "No description"}
         console.error("Message: ", error.message);
         throw error;
       }
-
-      console.log("Chatbot response:", data);
 
       const newMessage: ChatMessage = {
         role: "assistant",
@@ -505,7 +503,9 @@ description: ${recipeContext.description ?? "No description"}
                       </div>
                     )}
 
-                    <p className="text-sm">{message.content}</p>
+                    <p className="text-sm whitespace-pre-wrap">
+                      {message.content}
+                    </p>
 
                     {/* optional images if present */}
                     {"images" in message &&
