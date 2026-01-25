@@ -57,7 +57,7 @@ export default function CreateHousehold() {
 
       if (updateError) {
         alert(
-          t("createHousehold.errors.updateFailed") + " " + updateError.message
+          t("createHousehold.errors.updateFailed") + " " + updateError.message,
         );
         setIsLoading(false);
         return;
@@ -75,12 +75,14 @@ export default function CreateHousehold() {
       onNext={handleCreateHousehold}
     >
       <div className="text-center">
-        <h1 className="text-4xl font-bold">{t("createHousehold.title")}</h1>
+        <h1 className="text-4xl font-bold first-font">
+          {t("createHousehold.title")}
+        </h1>
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-6">
         <div className="mb-6 text-center">
-          <p className="font-medium eading-relaxed text-primary">
+          <p className="font-medium eading-relaxed text-primary second-font">
             {t("createHousehold.description")}
           </p>
         </div>

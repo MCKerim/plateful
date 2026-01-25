@@ -17,11 +17,13 @@ export default function InviteMembers() {
       onNext={completeScreen}
     >
       <div className="text-center">
-        <h1 className="text-3xl font-bold">{t("inviteMembers.title")}</h1>
+        <h1 className="text-3xl font-bold first-font">
+          {t("inviteMembers.title")}
+        </h1>
       </div>
 
       <div>
-        <p className="max-w-sm mb-12 font-medium text-center text-primary">
+        <p className="max-w-sm mb-12 font-medium text-center text-primary second-font">
           {t("inviteMembers.description")}
           <br />
           {t("inviteMembers.description2")}
