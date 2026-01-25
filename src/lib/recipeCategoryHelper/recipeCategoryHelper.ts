@@ -22,3 +22,9 @@ export function getCategoryIdByTranslatedEnglishName(
   }
   return null;
 }
+
+export function getEnglishCategoryNameById(id: number | null): string {
+  if (id === null) return "Other";
+  const category = categories.find((c) => c.id === id);
+  return category?.engTranslation ?? "Other";
+}
