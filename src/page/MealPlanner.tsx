@@ -257,7 +257,7 @@ export default function MealPlanner() {
   const swipeHandlers = useSwipe({
     onSwipeLeft: goToNextWeek,
     onSwipeRight: goToPreviousWeek,
-    threshold: 50,
+    threshold: 100,
     disabled: activeItem !== null,
   });
 
@@ -336,10 +336,7 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div
-          className="flex flex-col gap-1 mb-48"
-          {...swipeHandlers}
-        >
+        <div className="flex flex-col gap-1 mb-48" {...swipeHandlers}>
           {isLoading ? (
             <>
               {[new Array(7)].map((_, index) => (

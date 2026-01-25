@@ -36,27 +36,36 @@ export function useSwipe({
     touchCurrentX.current = e.touches[0].clientX;
   }, []);
 
+  const touchCurrentY = useRef<number | null>(null);
+
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     touchCurrentX.current = e.touches[0].clientX;
+    touchCurrentY.current = e.touches[0].clientY;
   }, []);
 
   const onTouchEnd = useCallback(() => {
     if (
       wasDisabledDuringGesture.current ||
       touchStartX.current === null ||
-      touchCurrentX.current === null
+      touchCurrentX.current === null ||
+      touchStartY.current === null ||
+      touchCurrentY.current === null
     ) {
       touchStartX.current = null;
       touchStartY.current = null;
       touchCurrentX.current = null;
+      touchCurrentY.current = null;
       wasDisabledDuringGesture.current = false;
       return;
     }
 
     const deltaX = touchCurrentX.current - touchStartX.current;
+    const deltaY = touchCurrentY.current - touchStartY.current;
     const absDeltaX = Math.abs(deltaX);
+    const absDeltaY = Math.abs(deltaY);
 
-    if (absDeltaX > threshold) {
+    // Only trigger swipe if horizontal movement is greater than vertical
+    if (absDeltaX > threshold && absDeltaX > absDeltaY) {
       if (deltaX > 0) {
         onSwipeRight?.();
       } else {
@@ -67,6 +76,7 @@ export function useSwipe({
     touchStartX.current = null;
     touchStartY.current = null;
     touchCurrentX.current = null;
+    touchCurrentY.current = null;
     wasDisabledDuringGesture.current = false;
   }, [onSwipeLeft, onSwipeRight, threshold]);
 
