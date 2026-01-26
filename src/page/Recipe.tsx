@@ -27,6 +27,7 @@ import { useRecipeImages } from "@/hooks/recipe/useRecipeImages";
 import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
 import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
 import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
+import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -40,7 +41,7 @@ export default function Recipe() {
   const ratingModalRef = useRef<RatingModalRef>(null);
 
   // Queries
-  const { data: recipe } = useRecipe(recipeId);
+  const { data: recipe, isLoading } = useRecipe(recipeId);
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
@@ -107,7 +108,7 @@ export default function Recipe() {
     </>
   );
 
-  if (!recipe) return null;
+  if (isLoading || !recipe) return <RecipePageSkeleton />;
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
