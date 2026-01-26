@@ -36,6 +36,7 @@ import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
+import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
 import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
@@ -71,6 +72,8 @@ function App() {
           const platform = Capacitor.getPlatform();
           if (platform === "android" && result.immediateUpdateAllowed) {
             await AppUpdate.performImmediateUpdate();
+            // Fallback: force exit if automatic restart didn't happen
+            await CapacitorApp.exitApp();
           } else if (platform === "ios") {
             // TODO: iOS App Store update flow
             // await AppUpdate.openAppStore({ appId: "..."});
