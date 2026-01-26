@@ -28,6 +28,7 @@ import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanIn
 import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
 import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
+import { useWakeLock } from "@/hooks/general/useWakeLock";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -39,6 +40,9 @@ export default function Recipe() {
   const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
 
   const ratingModalRef = useRef<RatingModalRef>(null);
+
+  // Keep screen awake while viewing recipe (for cooking)
+  useWakeLock();
 
   // Queries
   const { data: recipe, isLoading } = useRecipe(recipeId);
