@@ -319,6 +319,12 @@
         "description": "Bist du sicher, dass du diesen Haushalt löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden und alle Mitglieder werden entfernt.",
         "confirm": "Löschen",
         "cancel": "Abbrechen"
+      },
+      "removeMember": {
+        "title": "Mitglied entfernen",
+        "description": "Bist du sicher, dass du dieses Mitglied aus dem Haushalt entfernen möchtest?",
+        "confirm": "Entfernen",
+        "cancel": "Abbrechen"
       }
     },
     "errors": {

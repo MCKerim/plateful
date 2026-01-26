@@ -14,12 +14,28 @@ import { Trash2 } from "lucide-react";
 type Props = {
   onDelete: () => void;
   customTrigger?: React.ReactNode;
+  title?: string;
+  description?: string;
+  cancelText?: string;
+  confirmText?: string;
 };
 
-export default function DeleteDialog({ onDelete, customTrigger }: Readonly<Props>) {
+export default function DeleteDialog({
+  onDelete,
+  customTrigger,
+  title,
+  description,
+  cancelText,
+  confirmText,
+}: Readonly<Props>) {
   const { t } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const dialogTitle = title ?? t("common.deleteTitle");
+  const dialogDescription = description ?? t("common.deleteConfirmation");
+  const dialogCancelText = cancelText ?? t("common.cancel");
+  const dialogConfirmText = confirmText ?? t("common.delete");
 
   function handleDialogOpenChange(isOpen: boolean) {
     setIsDialogOpen(isOpen);
@@ -37,11 +53,11 @@ export default function DeleteDialog({ onDelete, customTrigger }: Readonly<Props
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{t("common.deleteTitle")}</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">
-          <p>{t("common.deleteConfirmation")}</p>
+          <p>{dialogDescription}</p>
 
           <div className="flex gap-2">
             <Button
@@ -49,7 +65,7 @@ export default function DeleteDialog({ onDelete, customTrigger }: Readonly<Props
               variant="secondary"
               onClick={() => handleDialogOpenChange(false)}
             >
-              {t("common.cancel")}
+              {dialogCancelText}
             </Button>
 
             <Button
@@ -60,7 +76,7 @@ export default function DeleteDialog({ onDelete, customTrigger }: Readonly<Props
                 handleDialogOpenChange(false);
               }}
             >
-              {t("common.delete")}
+              {dialogConfirmText}
             </Button>
           </div>
         </DialogDescription>
