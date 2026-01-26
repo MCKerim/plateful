@@ -68,7 +68,7 @@ export default function CategoryButton({
     <button
       key={id}
       type="button"
-      className="relative h-[132px] w-full max-w-[169px] mx-auto ease-in-out duration-200 hover:scale-105 active:scale-90"
+      className="relative h-[132px] w-full max-w-[169px] mx-auto ease-in-out duration-200 active:scale-95"
       onClick={() => {
         dispatch(setCategoryId(id));
       }}
