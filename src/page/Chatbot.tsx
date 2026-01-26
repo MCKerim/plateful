@@ -611,7 +611,12 @@ description: ${recipeContext.description ?? "No description"}
               placeholder={t("chatbot.inputPlaceholder")}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              onSubmit={handleSendMessage}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && e.shiftKey) {
+                  e.preventDefault();
+                  handleSendMessage();
+                }
+              }}
               maxLength={3000}
               maxHeight={200}
               rows={1}
