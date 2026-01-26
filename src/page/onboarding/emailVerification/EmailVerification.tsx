@@ -55,9 +55,7 @@ export default function EmailVerification() {
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-        <h1 className="font-bold text-4xl first-font">
-          {t("emailVerification.title")}
-        </h1>
+        <h1 className="font-bold text-4xl first-font">{t("emailVerification.title")}</h1>
 
         <p className="text-sm text-muted-foreground second-font">
           {t("emailVerification.subtitle", { email: email })}
@@ -65,10 +63,7 @@ export default function EmailVerification() {
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-3">
-        <OnboardingButton
-          label={t("emailVerification.resendButton")}
-          onClick={handleResendEmail}
-        />
+        <OnboardingButton label={t("emailVerification.resendButton")} onClick={handleResendEmail} />
       </div>
     </div>
   );

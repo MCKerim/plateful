@@ -51,9 +51,7 @@ export default function SurveyLayout({
 
       <motion.div
         key={`answers-${questionNumber}`}
-        className={`flex w-full gap-4 ${
-          twoColumns ? "grid grid-cols-2" : "flex-col"
-        }`}
+        className={`flex w-full gap-4 ${twoColumns ? "grid grid-cols-2" : "flex-col"}`}
         initial={{ opacity: 0, x: -30 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.4, ease: "easeOut" }}
@@ -105,9 +103,9 @@ export default function SurveyLayout({
             <motion.button
               whileHover={{ scale: showNextButton ? 1.02 : 1 }}
               whileTap={{ scale: showNextButton ? 0.98 : 1 }}
-              animate={{ 
+              animate={{
                 opacity: showNextButton ? 1 : 0.5,
-                scale: showNextButton ? 1 : 0.98
+                scale: showNextButton ? 1 : 0.98,
               }}
               transition={{ duration: 0.15 }}
             >

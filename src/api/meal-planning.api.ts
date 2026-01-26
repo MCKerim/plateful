@@ -74,24 +74,14 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  async updateDaysEaten(
-    supabase: SupabaseClient,
-    id: number,
-    daysEaten: number
-  ): Promise<void> {
-    const { error } = await supabase
-      .from("meal_planning")
-      .update({ daysEaten })
-      .eq("id", id);
+  async updateDaysEaten(supabase: SupabaseClient, id: number, daysEaten: number): Promise<void> {
+    const { error } = await supabase.from("meal_planning").update({ daysEaten }).eq("id", id);
 
     if (error) throw error;
   },
 
   async delete(supabase: SupabaseClient, id: number): Promise<void> {
-    const { error } = await supabase
-      .from("meal_planning")
-      .delete()
-      .eq("id", id);
+    const { error } = await supabase.from("meal_planning").delete().eq("id", id);
 
     if (error) throw error;
   },
@@ -114,10 +104,7 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  async getInfoByRecipe(
-    supabase: SupabaseClient,
-    recipeId: number
-  ): Promise<RecipeMealPlanInfo> {
+  async getInfoByRecipe(supabase: SupabaseClient, recipeId: number): Promise<RecipeMealPlanInfo> {
     const today = new Date();
     // Use local date string to avoid timezone issues
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
@@ -137,9 +124,7 @@ export const mealPlanningApi = {
 
     // Separate plans into categories
     const plansWithoutDate = data.filter((p) => p.planned_date === null);
-    const futurePlans = data.filter(
-      (p) => p.planned_date !== null && p.planned_date >= todayStr
-    );
+    const futurePlans = data.filter((p) => p.planned_date !== null && p.planned_date >= todayStr);
 
     // Find active plan: first check for closest future/today date, then check no-date plans
     // futurePlans are already sorted ascending, so first one is closest
@@ -147,8 +132,7 @@ export const mealPlanningApi = {
 
     // If no future plan, check for a no-date plan that's not fully eaten
     if (!activePlan) {
-      activePlan =
-        plansWithoutDate.find((plan) => plan.daysEaten < plan.days) ?? null;
+      activePlan = plansWithoutDate.find((plan) => plan.daysEaten < plan.days) ?? null;
     }
 
     // Find the most recent past planned_date (for "last planned" display)

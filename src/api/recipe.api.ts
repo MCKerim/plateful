@@ -23,27 +23,15 @@ export type RecipeImageInfo = {
 };
 
 export const recipeApi = {
-  async getById(
-    supabase: SupabaseClient,
-    recipeId: number
-  ): Promise<Recipes | null> {
-    const { data, error } = await supabase
-      .from("recipes")
-      .select("*")
-      .eq("id", recipeId)
-      .single();
+  async getById(supabase: SupabaseClient, recipeId: number): Promise<Recipes | null> {
+    const { data, error } = await supabase.from("recipes").select("*").eq("id", recipeId).single();
 
     if (error) throw error;
     return data;
   },
 
-  async getFirstImage(
-    supabase: SupabaseClient,
-    recipeId: number
-  ): Promise<string | null> {
-    const { data, error } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipeId}/`);
+  async getFirstImage(supabase: SupabaseClient, recipeId: number): Promise<string | null> {
+    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (error || !data || data.length === 0) return null;
 
@@ -54,13 +42,8 @@ export const recipeApi = {
     return signedUrlData?.signedUrl ?? null;
   },
 
-  async getImages(
-    supabase: SupabaseClient,
-    recipeId: number
-  ): Promise<string[]> {
-    const { data, error } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipeId}/`);
+  async getImages(supabase: SupabaseClient, recipeId: number): Promise<string[]> {
+    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (error || !data) return [];
 
@@ -80,9 +63,7 @@ export const recipeApi = {
     supabase: SupabaseClient,
     recipeId: number
   ): Promise<RecipeImageInfo | null> {
-    const { data, error } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipeId}/`);
+    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (error || !data || data.length === 0) return null;
 
@@ -91,15 +72,10 @@ export const recipeApi = {
       .from("recipeimages")
       .createSignedUrl(path, 3600);
 
-    return signedUrlData?.signedUrl
-      ? { signedUrl: signedUrlData.signedUrl, path }
-      : null;
+    return signedUrlData?.signedUrl ? { signedUrl: signedUrlData.signedUrl, path } : null;
   },
 
-  async create(
-    supabase: SupabaseClient,
-    params: CreateRecipeParams
-  ): Promise<Recipes> {
+  async create(supabase: SupabaseClient, params: CreateRecipeParams): Promise<Recipes> {
     const { data, error } = await supabase
       .from("recipes")
       .insert([
@@ -118,10 +94,7 @@ export const recipeApi = {
     return data;
   },
 
-  async update(
-    supabase: SupabaseClient,
-    params: UpdateRecipeParams
-  ): Promise<Recipes> {
+  async update(supabase: SupabaseClient, params: UpdateRecipeParams): Promise<Recipes> {
     const { data, error } = await supabase
       .from("recipes")
       .update({
@@ -140,19 +113,14 @@ export const recipeApi = {
 
   async delete(supabase: SupabaseClient, recipeId: number): Promise<void> {
     // Delete all images from storage first
-    const { data: files } = await supabase.storage
-      .from("recipeimages")
-      .list(`recipe_${recipeId}/`);
+    const { data: files } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (files && files.length > 0) {
       const paths = files.map((file) => `recipe_${recipeId}/${file.name}`);
       await supabase.storage.from("recipeimages").remove(paths);
     }
 
-    const { error } = await supabase
-      .from("recipes")
-      .delete()
-      .eq("id", recipeId);
+    const { error } = await supabase.from("recipes").delete().eq("id", recipeId);
 
     if (error) throw error;
   },

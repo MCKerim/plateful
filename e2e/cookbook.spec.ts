@@ -2,10 +2,7 @@ import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
 
 test.describe("Cookbook Page", () => {
-  test("should display recipes when clicking on a category", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display recipes when clicking on a category", async ({ page, setupAuth }) => {
     // Create recipes for different categories
     const recipes = [
       createRecipe({ id: 1, name: "Pancakes", category: 1 }), // Breakfast
@@ -37,10 +34,7 @@ test.describe("Cookbook Page", () => {
     await expect(page.getByText("Chocolate Cake")).not.toBeVisible();
   });
 
-  test("should display all recipes when clicking All Recipes", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display all recipes when clicking All Recipes", async ({ page, setupAuth }) => {
     const recipes = [
       createRecipe({ id: 1, name: "Morning Smoothie", category: 1 }),
       createRecipe({ id: 2, name: "Pasta Carbonara", category: 2 }),
@@ -64,13 +58,8 @@ test.describe("Cookbook Page", () => {
     await expect(page.getByText("Apple Pie")).toBeVisible();
   });
 
-  test("should navigate to recipe detail when clicking a recipe", async ({
-    page,
-    setupAuth,
-  }) => {
-    const recipes = [
-      createRecipe({ id: 42, name: "Special Recipe", category: 2 }),
-    ];
+  test("should navigate to recipe detail when clicking a recipe", async ({ page, setupAuth }) => {
+    const recipes = [createRecipe({ id: 42, name: "Special Recipe", category: 2 })];
 
     await setupAuth({ recipes });
 

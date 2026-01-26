@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import BetaScreen from './BetaScreen';
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import BetaScreen from "./BetaScreen";
 
 const meta = {
   title: "Page/Onboarding/BetaScreen",
   component: BetaScreen,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
 } satisfies Meta<typeof BetaScreen>;
 

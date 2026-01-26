@@ -38,10 +38,7 @@ export default function URLImport() {
             toast.success(t("urlImport.linkPastedFromClipboard"));
           }
         } catch (err) {
-          console.debug(
-            "Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.",
-            err
-          );
+          console.debug("Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.", err);
         }
       }
 
@@ -55,14 +52,11 @@ export default function URLImport() {
     setIsSaving(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "recipe-from-url",
-        {
-          body: {
-            url: url.trim(),
-          },
-        }
-      );
+      const { data, error } = await supabase.functions.invoke("recipe-from-url", {
+        body: {
+          url: url.trim(),
+        },
+      });
 
       if (error) {
         console.error("Edge function returned error:", error);
@@ -118,21 +112,15 @@ export default function URLImport() {
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
-        <h1 className="text-2xl font-bold first-font">
-          {t("urlImport.title")}
-        </h1>
+        <h1 className="text-2xl font-bold first-font">{t("urlImport.title")}</h1>
       </div>
 
       <div className="flex items-center flex-1">
         {!isSaving && !data && (
           <Field>
-            <FieldLabel htmlFor="url">
-              {t("urlImport.urlFieldLabel")}
-            </FieldLabel>
+            <FieldLabel htmlFor="url">{t("urlImport.urlFieldLabel")}</FieldLabel>
 
-            <FieldDescription>
-              {t("urlImport.urlFieldDescription")}
-            </FieldDescription>
+            <FieldDescription>{t("urlImport.urlFieldDescription")}</FieldDescription>
 
             <Input
               id="url"
@@ -165,16 +153,9 @@ export default function URLImport() {
 
         {data && (
           <div className="flex flex-col w-full gap-4">
-            <h2 className="text-lg font-bold second-font">
-              {t("urlImport.importedRecipe")}
-            </h2>
+            <h2 className="text-lg font-bold second-font">{t("urlImport.importedRecipe")}</h2>
 
-            <RecipeCard
-              key={data.id}
-              id={data.id}
-              name={data.name}
-              averageRating={null}
-            />
+            <RecipeCard key={data.id} id={data.id} name={data.name} averageRating={null} />
           </div>
         )}
       </div>

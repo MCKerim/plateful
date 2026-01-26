@@ -22,21 +22,15 @@ export default function BottomNavButton({
   function getIcon() {
     switch (icon) {
       case "home":
-        return (
-          <House size={ICON_SIZE} fill={active ? "currentColor" : "none"} />
-        );
+        return <House size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "chatbot":
         return <Bot size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "explore":
         return <Search size={ICON_SIZE} strokeWidth={active ? 3 : 1.5} />;
       case "cookbook":
-        return (
-          <BookOpen size={ICON_SIZE} fill={active ? "currentColor" : "none"} />
-        );
+        return <BookOpen size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "planner":
-        return (
-          <Calendar size={ICON_SIZE} fill={active ? "currentColor" : "none"} />
-        );
+        return <Calendar size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "lists":
         return <List size={ICON_SIZE} strokeWidth={active ? 3 : 1.5} />;
       default:

@@ -55,7 +55,6 @@ export async function setupAuthRoutes(page: Page, session: MockSession): Promise
 }
 
 export function getSupabaseStorageKey(): string {
-  const supabaseUrl =
-    process.env.VITE_SUPABASE_URL || "https://upupcsgufoejppoietiu.supabase.co";
+  const supabaseUrl = process.env.VITE_SUPABASE_URL || "https://upupcsgufoejppoietiu.supabase.co";
   return `sb-${supabaseUrl.split("//")[1].split(".")[0]}-auth-token`;
 }

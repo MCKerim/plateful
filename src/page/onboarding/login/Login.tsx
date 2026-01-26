@@ -46,7 +46,7 @@ export default function Login() {
 
       // Store email for verification page
       sessionStorage.setItem("signupEmail", email);
-      
+
       // Navigate to verification page
       navigate("/signup/verify");
     } catch (err) {
@@ -60,19 +60,12 @@ export default function Login() {
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
         <h1 className="font-bold text-6xl first-font">{t("login.title")}</h1>
-        <p className="text-sm text-muted-foreground second-font mt-2">
-          {t("login.subtitle")}
-        </p>
+        <p className="text-sm text-muted-foreground second-font mt-2">{t("login.subtitle")}</p>
       </div>
 
-      <form
-        onSubmit={handleLogin}
-        className="flex flex-col w-full max-w-sm gap-4"
-      >
+      <form onSubmit={handleLogin} className="flex flex-col w-full max-w-sm gap-4">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="email">
-            {t("login.emailLabel")}
-          </Label>
+          <Label htmlFor="email">{t("login.emailLabel")}</Label>
 
           <Input
             id="email"
@@ -85,16 +78,10 @@ export default function Login() {
           />
         </div>
 
-        {error && (
-          <p className="text-destructive text-sm">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-destructive text-sm">{error}</p>}
 
         <OnboardingButton
-          label={
-            loading ? t("login.loading") : t("login.loginButton")
-          }
+          label={loading ? t("login.loading") : t("login.loginButton")}
           onClick={() => {
             const form = document.querySelector("form");
             if (form) {

@@ -36,10 +36,7 @@ import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
-import {
-  AppUpdate,
-  AppUpdateAvailability,
-} from "@capawesome/capacitor-app-update";
+import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
 import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
@@ -66,9 +63,7 @@ function App() {
         }
 
         const result = await AppUpdate.getAppUpdateInfo();
-        if (
-          result.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE
-        ) {
+        if (result.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE) {
           const shouldUpdate = globalThis.confirm(t("update.updateAvailable"));
 
           if (!shouldUpdate) return;
@@ -122,10 +117,7 @@ function App() {
     globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
 
     return () => {
-      globalThis.removeEventListener(
-        "sendIntentReceived",
-        handleIntentReceived
-      );
+      globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
     };
   }, [navigate]);
 
@@ -227,15 +219,9 @@ function App() {
       <Route path="/terms" element={<TermsOfService />} />
 
       {/* Onboarding */}
-      <Route
-        path="/"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />}
-      />
+      <Route path="/" element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />} />
 
-      <Route
-        path="/signup"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />}
-      />
+      <Route path="/signup" element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />} />
 
       <Route
         path="/signup/email"
@@ -244,15 +230,10 @@ function App() {
 
       <Route
         path="/signup/verify"
-        element={
-          isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />
-        }
+        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />}
       />
 
-      <Route
-        path="/login"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />}
-      />
+      <Route path="/login" element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />} />
 
       <Route path="/beta" element={<BetaScreen />} />
 
@@ -266,45 +247,29 @@ function App() {
 
       <Route
         path="/createhousehold"
-        element={
-          hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />
-        }
+        element={hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />}
       />
 
       <Route path="/inviteMembers" element={<InviteMembers />} />
 
       <Route
         path="/joinHousehold"
-        element={
-          hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />
-        }
+        element={hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />}
       />
 
       {/* Main Routes */}
       <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
-      <Route
-        path="/householdSettings"
-        element={routeToCorrectPage(<HouseholdSettings />)}
-      />
-      <Route
-        path="/invite/:token"
-        element={isLoggedIn() ? <InvitePage /> : <SignUp />}
-      />
+      <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
+      <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
 
       <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
       <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
       <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
       <Route path="/home" element={routeToCorrectPage(<Home />)} />
 
-      <Route
-        path="/recipe/:recipeId"
-        element={routeToCorrectPage(<Recipe />)}
-      />
+      <Route path="/recipe/:recipeId" element={routeToCorrectPage(<Recipe />)} />
       <Route path="/recipe/add" element={routeToCorrectPage(<AddRecipe />)} />
-      <Route
-        path="/recipe/edit/:recipeId"
-        element={routeToCorrectPage(<AddRecipe />)}
-      />
+      <Route path="/recipe/edit/:recipeId" element={routeToCorrectPage(<AddRecipe />)} />
 
       <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
       <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />

@@ -91,11 +91,7 @@ export default function Recipe() {
       <div className="h-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        <Button
-          variant="secondary"
-          className="w-full"
-          onClick={handleAskChatbot}
-        >
+        <Button variant="secondary" className="w-full" onClick={handleAskChatbot}>
           <Bot />
           {t("recipe.askChatbot")}
         </Button>
@@ -154,17 +150,13 @@ export default function Recipe() {
       </div>
 
       <div className="flex justify-between">
-        <h1 className="first-font text-2xl font-bold break-words w-full">
-          {recipe.name}
-        </h1>
+        <h1 className="first-font text-2xl font-bold break-words w-full">{recipe.name}</h1>
       </div>
 
       <div className="flex justify-between mt-2">
         <div className="flex items-center gap-1">
           <CalendarDays size={16} />
-          <p className="text-sm">
-            {getMealPlanStatus(lastMealPlan ?? null, t)}
-          </p>
+          <p className="text-sm">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
         </div>
 
         <div className="flex items-center gap-0.5">
@@ -182,19 +174,14 @@ export default function Recipe() {
 
       <Separator />
 
-      <MarkdownRenderer
-        content={recipe.description || ""}
-        className="font-medium"
-      />
+      <MarkdownRenderer content={recipe.description || ""} className="font-medium" />
 
       <div>
         <Separator className="mb-2 mt-4" />
 
         <RatingModal ref={ratingModalRef} recipeId={recipe.id} />
 
-        <h2 className="first-font text-xl font-bold mb-1">
-          {t("recipe.ratings")}
-        </h2>
+        <h2 className="first-font text-xl font-bold mb-1">{t("recipe.ratings")}</h2>
 
         {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
 

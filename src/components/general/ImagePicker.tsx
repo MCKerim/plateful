@@ -81,11 +81,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
       {ImageSourceDrawerComponent}
 
-      {uploading && (
-        <div className="text-xs text-muted-foreground">
-          {t("common.uploading")}
-        </div>
-      )}
+      {uploading && <div className="text-xs text-muted-foreground">{t("common.uploading")}</div>}
 
       {error && (
         <div className="flex items-center gap-1 text-xs text-destructive">

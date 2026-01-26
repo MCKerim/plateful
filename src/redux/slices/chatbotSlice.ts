@@ -46,14 +46,13 @@ export const chatbotSlice = createSlice({
   },
 });
 
-export const { addMessage, addMessages, setPreviousResponseId, setIsTyping, resetChat } = chatbotSlice.actions;
+export const { addMessage, addMessages, setPreviousResponseId, setIsTyping, resetChat } =
+  chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
 
 export const selectMessages = (state: RootState) => state.chatbot.messages;
 export const selectIsTyping = (state: RootState) => state.chatbot.isTyping;
-export const selectVisibleMessages = (state: RootState) => 
-  state.chatbot.messages.filter((message: ChatMessage) => 
-    message.role !== "tool"
-  );
+export const selectVisibleMessages = (state: RootState) =>
+  state.chatbot.messages.filter((message: ChatMessage) => message.role !== "tool");
 export const selectPreviousResponseId = (state: RootState) => state.chatbot.previous_response_id;

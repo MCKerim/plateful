@@ -21,11 +21,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
-import {
-  DialogDescription,
-  DialogTitle,
-  DialogTrigger,
-} from "@radix-ui/react-dialog";
+import { DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 import {
   Dialog,
   DialogClose,
@@ -41,18 +37,12 @@ import {
 } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
-import {
-  InputGroup,
-  InputGroupAddon,
-  InputGroupTextarea,
-} from "@/components/ui/input-group";
+import { InputGroup, InputGroupAddon, InputGroupTextarea } from "@/components/ui/input-group";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { toast } from "sonner";
 
-type VisionPart =
-  | { type: "input_text"; text: string }
-  | { type: "input_image"; image_url: string };
+type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
 // Component to handle recipe proposal dialogs with optional field merging
 function RecipeProposalDialog({
@@ -63,12 +53,7 @@ function RecipeProposalDialog({
 }: {
   toolOutput: any;
   onSaveNew: (title: string, description: string, category: string) => void;
-  onSaveEdit: (
-    recipeId: number,
-    title: string,
-    description: string,
-    category: string,
-  ) => void;
+  onSaveEdit: (recipeId: number, title: string, description: string, category: string) => void;
   t: any;
 }) {
   const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
@@ -83,8 +68,8 @@ function RecipeProposalDialog({
       field === "title"
         ? toolOutput.args.title
         : field === "description"
-        ? toolOutput.args.description
-        : toolOutput.args.category;
+          ? toolOutput.args.description
+          : toolOutput.args.category;
 
     if (toolValue !== undefined && toolValue !== null) {
       return toolValue;
@@ -94,8 +79,7 @@ function RecipeProposalDialog({
     if (isEditProposal && originalRecipe) {
       if (field === "title") return originalRecipe.name;
       if (field === "description") return originalRecipe.description ?? "";
-      if (field === "category")
-        return getEnglishCategoryNameById(originalRecipe.category);
+      if (field === "category") return getEnglishCategoryNameById(originalRecipe.category);
     }
 
     return "";
@@ -115,9 +99,7 @@ function RecipeProposalDialog({
 
           <Button variant="accent" size="sm" className="mt-2 w-full">
             <span className="truncate">
-              {isEditProposal
-                ? t("chatbot.previewEditedRecipe")
-                : t("chatbot.previewRecipe")}
+              {isEditProposal ? t("chatbot.previewEditedRecipe") : t("chatbot.previewRecipe")}
             </span>
           </Button>
         </div>
@@ -125,9 +107,7 @@ function RecipeProposalDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="second-font text-lg font-bold mt-2">
-            {finalTitle}
-          </DialogTitle>
+          <DialogTitle className="second-font text-lg font-bold mt-2">{finalTitle}</DialogTitle>
 
           <DialogDescription className="text-sm font-medium text-muted-foreground">
             {finalCategory}
@@ -135,16 +115,11 @@ function RecipeProposalDialog({
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh] rounded-md border p-2">
-          <MarkdownRenderer
-            content={finalDescription}
-            className="font-medium"
-          />
+          <MarkdownRenderer content={finalDescription} className="font-medium" />
         </ScrollArea>
 
         <div className="text-sm text-muted-foreground">
-          {isEditProposal
-            ? t("chatbot.updateRecipePrompt")
-            : t("chatbot.saveRecipePrompt")}
+          {isEditProposal ? t("chatbot.updateRecipePrompt") : t("chatbot.saveRecipePrompt")}
         </div>
 
         <DialogFooter className="flex-row w-full gap-2">
@@ -159,12 +134,7 @@ function RecipeProposalDialog({
             variant="accent"
             onClick={() => {
               if (isEditProposal && editRecipeId) {
-                onSaveEdit(
-                  editRecipeId,
-                  finalTitle,
-                  finalDescription,
-                  finalCategory,
-                );
+                onSaveEdit(editRecipeId, finalTitle, finalDescription, finalCategory);
               } else {
                 onSaveNew(finalTitle, finalDescription, finalCategory);
               }
@@ -200,9 +170,7 @@ export default function Chatbot() {
   const updateRecipeMutation = useUpdateRecipe();
 
   const [inputValue, setInputValue] = useState("");
-  const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<
-    string[]
-  >([]);
+  const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -337,11 +305,7 @@ description: ${recipeContext.description ?? "No description"}
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(
-    title: string,
-    description: string,
-    category: string,
-  ) {
+  async function saveSuggestedRecipe(title: string, description: string, category: string) {
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -373,7 +337,7 @@ description: ${recipeContext.description ?? "No description"}
     recipeId: number,
     title: string,
     description: string,
-    category: string,
+    category: string
   ) {
     console.log("Updating recipe:", recipeId, title, category);
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
@@ -420,9 +384,7 @@ description: ${recipeContext.description ?? "No description"}
           </div>
 
           <div className="flex items-center justify-center w-full gap-2 mb-6">
-            <h2 className="first-font text-xl font-bold">
-              {t("chatbot.greeting")}
-            </h2>
+            <h2 className="first-font text-xl font-bold">{t("chatbot.greeting")}</h2>
           </div>
 
           <div className="flex flex-col items-center gap-2">
@@ -431,9 +393,7 @@ description: ${recipeContext.description ?? "No description"}
               variant="secondary"
               size="sm"
               onClick={() =>
-                handleMessageSuggestionButton(
-                  t("chatbot.suggestions.suggestion1.text"),
-                )
+                handleMessageSuggestionButton(t("chatbot.suggestions.suggestion1.text"))
               }
             >
               {t("chatbot.suggestions.suggestion1.label")}
@@ -445,9 +405,7 @@ description: ${recipeContext.description ?? "No description"}
                 variant="secondary"
                 size="sm"
                 onClick={() =>
-                  handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion2.text"),
-                  )
+                  handleMessageSuggestionButton(t("chatbot.suggestions.suggestion2.text"))
                 }
               >
                 {t("chatbot.suggestions.suggestion2.label")}
@@ -458,9 +416,7 @@ description: ${recipeContext.description ?? "No description"}
                 variant="secondary"
                 size="sm"
                 onClick={() =>
-                  handleMessageSuggestionButton(
-                    t("chatbot.suggestions.suggestion3.text"),
-                  )
+                  handleMessageSuggestionButton(t("chatbot.suggestions.suggestion3.text"))
                 }
               >
                 {t("chatbot.suggestions.suggestion3.label")}
@@ -475,23 +431,17 @@ description: ${recipeContext.description ?? "No description"}
         {visibleMessages.map((message, index) => (
           <div
             key={`${message.role}-${index}`}
-            className={`flex ${
-              message.role === "user" ? "justify-end" : "justify-start"
-            }`}
+            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
           >
             <div
               className={`flex items-start gap-2 ${
-                message.role === "user"
-                  ? "flex-row-reverse max-w-[80%]"
-                  : "flex-row w-full"
+                message.role === "user" ? "flex-row-reverse max-w-[80%]" : "flex-row w-full"
               }`}
             >
               {/* Message Bubble */}
               <div
                 className={`rounded-lg max-w-full px-4 py-2 ${
-                  message.role === "user"
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted"
+                  message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
                 }`}
               >
                 {message.role === "user" && (
@@ -503,36 +453,29 @@ description: ${recipeContext.description ?? "No description"}
                       </div>
                     )}
 
-                    <p className="text-sm whitespace-pre-wrap">
-                      {message.content}
-                    </p>
+                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
                     {/* optional images if present */}
                     {"images" in message &&
                       Array.isArray((message as any).images) &&
                       (message as any).images.length > 0 && (
                         <div className="flex gap-2 mt-2 flex-wrap">
-                          {(message as any).images.map(
-                            (src: string, i: number) => (
-                              <img
-                                key={i}
-                                src={`data:image/jpeg;base64,${src}`}
-                                srcSet={`data:image/jpeg;base64,${src}`}
-                                alt={`upload-${i}`}
-                                className="rounded-md border w-16 h-16 object-cover"
-                              />
-                            ),
-                          )}
+                          {(message as any).images.map((src: string, i: number) => (
+                            <img
+                              key={i}
+                              src={`data:image/jpeg;base64,${src}`}
+                              srcSet={`data:image/jpeg;base64,${src}`}
+                              alt={`upload-${i}`}
+                              className="rounded-md border w-16 h-16 object-cover"
+                            />
+                          ))}
                         </div>
                       )}
                   </>
                 )}
 
                 {message.role === "assistant" && (
-                  <MarkdownRenderer
-                    content={message.content}
-                    className="text-sm"
-                  />
+                  <MarkdownRenderer content={message.content} className="text-sm" />
                 )}
 
                 {message.role === "assistant" &&

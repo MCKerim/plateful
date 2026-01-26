@@ -2,15 +2,7 @@ import i18n from "@/i18n";
 import { formatDate } from "date-fns";
 import { de } from "date-fns/locale";
 
-const weekday = [
-  "Sunday",
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-];
+const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 export function toWeekday(date: Date): string {
   const today = new Date();
@@ -65,9 +57,7 @@ export function getWeekdays(date: Date = new Date()): Date[] {
 export const formatDateByLocale = (date: string | Date) => {
   const dateObj = typeof date === "string" ? new Date(date) : date;
 
-  return formatDate(
-    dateObj,
-    i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy",
-    { locale: i18n.language === "de" ? de : undefined }
-  );
+  return formatDate(dateObj, i18n.language === "de" ? "dd.MM.yyyy" : "MM/dd/yyyy", {
+    locale: i18n.language === "de" ? de : undefined,
+  });
 };

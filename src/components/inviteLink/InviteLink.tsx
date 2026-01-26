@@ -83,11 +83,7 @@ export default function InviteLink() {
       <QRCodeSVG value={inviteLink} size={256} />
 
       <div className="flex w-full gap-2">
-        <Button
-          onClick={copyInviteLink}
-          className="w-full mt-4"
-          variant={"secondary"}
-        >
+        <Button onClick={copyInviteLink} className="w-full mt-4" variant={"secondary"}>
           <Copy size={16} className="mr-2" /> {t("inviteLink.copyButton")}
         </Button>
 

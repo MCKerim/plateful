@@ -5,14 +5,7 @@ type Props = {
   onClick?: () => void;
   icon?: React.ReactNode;
   isStart?: boolean;
-  variant?:
-    | "default"
-    | "accent"
-    | "destructive"
-    | "outline"
-    | "secondary"
-    | "ghost"
-    | "link";
+  variant?: "default" | "accent" | "destructive" | "outline" | "secondary" | "ghost" | "link";
 };
 
 export default function OnboardingButton({

@@ -22,16 +22,11 @@ export default function BetaScreen() {
   };
 
   return (
-    <OnboardingLayout
-      nextButtonLabel={t("beta.nextButton")}
-      onNext={handleNext}
-    >
+    <OnboardingLayout nextButtonLabel={t("beta.nextButton")} onNext={handleNext}>
       <div className="flex flex-col justify-center w-full mb-8 text-center">
         <h1 className="font-bold text-4xl first-font">{t("beta.title")}</h1>
 
-        <p className="text-sm text-muted-foreground second-font">
-          {t("beta.thankYou")}
-        </p>
+        <p className="text-sm text-muted-foreground second-font">{t("beta.thankYou")}</p>
       </div>
 
       <div className="w-64 h-64 mx-auto">
@@ -41,15 +36,11 @@ export default function BetaScreen() {
       <div className="flex flex-col w-full max-w-sm gap-6 mx-auto">
         <div
           className={`text-center space-y-2 transition-all duration-700 ${
-            showAppreciation
-              ? "opacity-100 translate-y-0"
-              : "opacity-70 translate-y-8"
+            showAppreciation ? "opacity-100 translate-y-0" : "opacity-70 translate-y-8"
           }`}
         >
           <div className="flex items-center justify-center">
-            <p className="text-md second-font font-bold">
-              {t("beta.description")}
-            </p>
+            <p className="text-md second-font font-bold">{t("beta.description")}</p>
           </div>
 
           <div className="py-4 px-2 border border-primary rounded-lg">

@@ -9,14 +9,7 @@ export interface InputProps extends React.ComponentProps<"input"> {
   showDeleteButton?: boolean;
   showSubmitButton?: boolean;
   autoComplete?: "on" | "off";
-  enterKeyHint?:
-    | "enter"
-    | "done"
-    | "go"
-    | "next"
-    | "previous"
-    | "search"
-    | "send";
+  enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
   maxLength?: number;
 }
 
@@ -33,12 +26,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       maxLength,
       ...props
     },
-    ref,
+    ref
   ) => {
     const [currentLength, setCurrentLength] = React.useState(
-      (props.value as string)?.length ||
-        (props.defaultValue as string)?.length ||
-        0,
+      (props.value as string)?.length || (props.defaultValue as string)?.length || 0
     );
 
     // Update currentLength when value prop changes
@@ -60,11 +51,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 md:text-sm";
 
     // Add right padding when there's an action button or character count
-    const inputClasses = cn(
-      baseInputClasses,
-      (onSubmit || onDelete) && "pr-10",
-      className,
-    );
+    const inputClasses = cn(baseInputClasses, (onSubmit || onDelete) && "pr-10", className);
 
     // Common button classes
     const buttonClasses =
@@ -112,13 +99,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           {renderActionButton()}
           {maxLength && currentLength + 3 > maxLength && (
             <div className="absolute text-xs bottom-11 right-3 text-muted-foreground">
-              <span
-                className={
-                  currentLength + 1 > maxLength
-                    ? "text-destructive font-bold"
-                    : ""
-                }
-              >
+              <span className={currentLength + 1 > maxLength ? "text-destructive font-bold" : ""}>
                 {currentLength}/{maxLength}
               </span>
             </div>
@@ -129,7 +110,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
     // Return plain input if no actions
     return inputElement;
-  },
+  }
 );
 Input.displayName = "Input";
 

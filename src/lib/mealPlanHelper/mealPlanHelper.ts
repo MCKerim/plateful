@@ -28,10 +28,7 @@ export function getMealPlanStatus(
   return "-";
 }
 
-function formatFutureDate(
-  dateStr: string,
-  t: TFunction<"translation", undefined>
-): string {
+function formatFutureDate(dateStr: string, t: TFunction<"translation", undefined>): string {
   // Parse the date string as local date (YYYY-MM-DD)
   const [year, month, day] = dateStr.split("-").map(Number);
   const plannedDate = new Date(year, month - 1, day);
@@ -48,10 +45,7 @@ function formatFutureDate(
   return t("common.inDays", { count: diffInDays });
 }
 
-function formatPastDate(
-  dateStr: string,
-  t: TFunction<"translation", undefined>
-): string {
+function formatPastDate(dateStr: string, t: TFunction<"translation", undefined>): string {
   // Parse the date string as local date (YYYY-MM-DD)
   const [year, month, day] = dateStr.split("-").map(Number);
   const pastDate = new Date(year, month - 1, day);

@@ -21,18 +21,11 @@ export default function ImageImport() {
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<any>(null);
-  const [images, setImages] = useState<
-    { file: File; preview: string; base64: string }[]
-  >([]);
+  const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
 
-  const {
-    selectFromCamera,
-    selectFromGallery,
-    isNative,
-    fileInputRef,
-    handleFileInputChange,
-  } = useImageSourcePicker();
+  const { selectFromCamera, selectFromGallery, isNative, fileInputRef, handleFileInputChange } =
+    useImageSourcePicker();
 
   const processImage = async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
@@ -47,10 +40,7 @@ export default function ImageImport() {
     reader.onload = () => {
       if (reader.result) {
         const base64 = reader.result.toString();
-        setImages((prev) => [
-          ...prev,
-          { file: compressedFile, preview: dataUrl, base64 },
-        ]);
+        setImages((prev) => [...prev, { file: compressedFile, preview: dataUrl, base64 }]);
         setIsLoadingImage(false);
       }
     };
@@ -84,14 +74,11 @@ export default function ImageImport() {
     setIsSaving(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke(
-        "recipe-from-image",
-        {
-          body: {
-            images: images.map((img) => img.base64),
-          },
+      const { data, error } = await supabase.functions.invoke("recipe-from-image", {
+        body: {
+          images: images.map((img) => img.base64),
         },
-      );
+      });
 
       if (error) {
         console.error("Edge function returned error:", error);
@@ -157,9 +144,7 @@ export default function ImageImport() {
   return (
     <Layout showHeader={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
-        <h1 className="text-2xl font-bold first-font">
-          {t("imageImport.title")}
-        </h1>
+        <h1 className="text-2xl font-bold first-font">{t("imageImport.title")}</h1>
       </div>
 
       {!isSaving && !data && (
@@ -205,9 +190,7 @@ export default function ImageImport() {
             >
               <div className="flex flex-col gap-1 items-center">
                 <Camera className="!size-8" />
-                <p className="second-font font-medium text-lg">
-                  {t("common.camera")}
-                </p>
+                <p className="second-font font-medium text-lg">{t("common.camera")}</p>
               </div>
             </Button>
 
@@ -219,9 +202,7 @@ export default function ImageImport() {
             >
               <div className="flex flex-col gap-1 items-center">
                 <ImageIcon className="!size-8" />
-                <p className="second-font font-medium text-lg">
-                  {t("common.gallery")}
-                </p>
+                <p className="second-font font-medium text-lg">{t("common.gallery")}</p>
               </div>
             </Button>
           </div>
@@ -244,16 +225,9 @@ export default function ImageImport() {
 
           {data && (
             <div className="flex flex-col w-full gap-4">
-              <h2 className="text-lg font-bold second-font">
-                {t("urlImport.importedRecipe")}
-              </h2>
+              <h2 className="text-lg font-bold second-font">{t("urlImport.importedRecipe")}</h2>
 
-              <RecipeCard
-                key={data.id}
-                id={data.id}
-                name={data.name}
-                averageRating={null}
-              />
+              <RecipeCard key={data.id} id={data.id} name={data.name} averageRating={null} />
             </div>
           )}
         </div>

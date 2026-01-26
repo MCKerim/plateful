@@ -14,6 +14,7 @@ npm run storybook    # Start Storybook on port 6006
 ```
 
 ### Mobile Development (Capacitor)
+
 ```bash
 npx cap sync         # Sync web assets to native projects
 npx cap open ios     # Open iOS project in Xcode
@@ -21,6 +22,7 @@ npx cap open android # Open Android project in Android Studio
 ```
 
 ### Code Generation
+
 ```bash
 npm run generate-supabase-types  # Regenerate TypeScript types from Supabase schema
 npm run generate-pwa-assets      # Generate PWA icons from logo
@@ -29,6 +31,7 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 ## Architecture
 
 ### Tech Stack
+
 - **Frontend**: React 18 + TypeScript + Vite + Tailwind CSS
 - **Backend**: Supabase (auth, database, realtime)
 - **State**: Redux Toolkit (user/household/chatbot state) + React Query (server state)
@@ -36,12 +39,15 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 - **UI**: shadcn/ui components (Radix primitives) + Material UI icons + Lucide icons
 
 ### Path Alias
+
 Use `@/` to import from `src/` (configured in vite.config.ts and tsconfig.json).
 
 ### No Barrel Files
+
 Do not create `index.ts` barrel files for re-exporting. Import directly from source files instead (e.g., `@/hooks/recipe/useRecipe` not `@/hooks/recipe`).
 
 ### Key Directory Structure
+
 - `src/page/` - Route page components (MealPlanner, Recipe, Cookbook, Chatbot, etc.)
 - `src/components/ui/` - shadcn/ui base components
 - `src/components/mealPlanner/` - Meal planner feature components (drag-and-drop enabled)
@@ -55,24 +61,30 @@ Do not create `index.ts` barrel files for re-exporting. Import directly from sou
 - `src/locales/` - i18n translation files (en, de)
 
 ### State Management Pattern
+
 - **Redux**: User session, household data, chatbot state, UI filters
 - **React Query**: Server data (recipes, meal plans, ratings) with 5-minute stale time
 - **Supabase Realtime**: Live updates for user/household changes
 
 ### Authentication & Routing
+
 The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/lib/routeToCorrectPagePure.tsx` controls access based on:
+
 1. Login status
 2. Value screens completion
 3. Survey completion
 4. Household membership
 
 ### Supabase Access
+
 Use the `useSupabase()` hook to get the typed Supabase client. Types are generated from the schema in `src/types/database.types.ts`.
 
 ### Internationalization
+
 Supports English and German. Use `useTranslation()` hook and add strings to `src/locales/translation.{lang}.json`.
 
 ### Data Fetching Pattern
+
 The app uses a layered architecture for data fetching:
 
 1. **API Layer** (`src/api/`): Raw Supabase queries returning database types
@@ -80,6 +92,7 @@ The app uses a layered architecture for data fetching:
 3. **Hooks** (`src/hooks/`): React Query hooks that compose API + transformers
 
 Example flow for meal planning:
+
 ```
 useMealPlannerItems (hook)
   → mealPlanningApi.getItemsForWeek (API)
@@ -90,6 +103,7 @@ useMealPlannerItems (hook)
 ## E2E Testing
 
 ### Running E2E Tests
+
 ```bash
 npm run test:e2e                                    # All browsers
 npm run test:e2e -- --project=chromium              # Chromium only
@@ -97,6 +111,7 @@ npm run test:e2e -- --project=chromium e2e/cookbook.spec.ts  # Single file
 ```
 
 ### Test Architecture
+
 E2E tests use Playwright with custom fixtures for authenticated testing:
 
 ```
@@ -115,6 +130,7 @@ e2e/
 ```
 
 ### Writing Authenticated Tests
+
 Import from `./fixtures` instead of `@playwright/test`:
 
 ```typescript
@@ -131,13 +147,16 @@ test("should display recipes", async ({ page, setupAuth }) => {
 ```
 
 ### Factory Functions
+
 - `createUser(overrides?)` - Creates mock user with household
 - `createRecipe(overrides?)` - Creates mock recipe (use `category: 2` for Main dishes)
 - `createMealPlan(overrides?)` - Creates mock meal plan (use `planned_date: null` for unplanned)
 - `createWeeklyMealPlans(recipes, householdId)` - Creates 7 days of meal plans
 
 ### API Mocking
+
 The `setupAuth` fixture automatically mocks:
+
 - `/auth/v1/**` - Supabase auth endpoints
 - `/rest/v1/users` - User data with household join
 - `/rest/v1/recipes` - Recipes list and single recipe fetch

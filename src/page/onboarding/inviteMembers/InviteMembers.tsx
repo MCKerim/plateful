@@ -12,14 +12,9 @@ export default function InviteMembers() {
   }
 
   return (
-    <OnboardingLayout
-      nextButtonLabel={t("inviteMembers.nextButton")}
-      onNext={completeScreen}
-    >
+    <OnboardingLayout nextButtonLabel={t("inviteMembers.nextButton")} onNext={completeScreen}>
       <div className="text-center">
-        <h1 className="text-3xl font-bold first-font">
-          {t("inviteMembers.title")}
-        </h1>
+        <h1 className="text-3xl font-bold first-font">{t("inviteMembers.title")}</h1>
       </div>
 
       <div>

@@ -5,13 +5,7 @@ import { RecipeRatingWithUser } from "./RatingModal";
 import StarIcon from "@mui/icons-material/Star";
 import StarBorderIcon from "@mui/icons-material/StarBorder";
 import DeleteDialog from "./DeleteDialog";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from "../ui/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../ui/drawer";
 import { useTranslation } from "react-i18next";
 
 type Props = {
@@ -35,9 +29,7 @@ export default function RatingListItem({
         <p className="font-semibold second-font">{rating.users.username}</p>
 
         <div className="flex items-center gap-1">
-          <p className="text-sm text-muted-foreground">
-            {formatDateByLocale(rating.created_at)}
-          </p>
+          <p className="text-sm text-muted-foreground">{formatDateByLocale(rating.created_at)}</p>
 
           {canModify && (
             <Drawer>
@@ -50,10 +42,7 @@ export default function RatingListItem({
               <DrawerContent>
                 <DrawerFooter className="gap-2 mb-8 mt-4">
                   <DrawerClose asChild>
-                    <Button
-                      className="w-full"
-                      onClick={() => handleEditRating(rating)}
-                    >
+                    <Button className="w-full" onClick={() => handleEditRating(rating)}>
                       <Edit size={16} />
 
                       {t("common.edit")}

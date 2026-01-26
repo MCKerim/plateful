@@ -18,11 +18,7 @@ export function useMealPlannerItems(currentWeek: Date) {
   return useQuery({
     queryKey: queryKeys.mealPlanning.list(weekStart.toISOString()),
     queryFn: async () => {
-      const data = await mealPlanningApi.getItemsForWeek(
-        supabase,
-        weekStart,
-        weekEnd
-      );
+      const data = await mealPlanningApi.getItemsForWeek(supabase, weekStart, weekEnd);
       return transformMealPlannerItems(data);
     },
     refetchInterval: 1000 * 30, // Poll every 30s for household sync

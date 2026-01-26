@@ -8,11 +8,11 @@ export default function ChatbotValue() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
-  
+
   const h2Texts = [
     t("valueScreens.chatbot.subtitles.mealPlan"),
     t("valueScreens.chatbot.subtitles.recipes"),
-    t("valueScreens.chatbot.subtitles.questions")
+    t("valueScreens.chatbot.subtitles.questions"),
   ];
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function ChatbotValue() {
         <h1 className="text-4xl font-bold first-font">{t("valueScreens.chatbot.title")}</h1>
 
         <h2 className="flex items-center justify-center h-8 text-2xl italic font-semibold second-font">
-          <span 
+          <span
             key={currentTextIndex}
             className="inline-block duration-500 animate-in fade-in-50 slide-in-from-bottom-3"
           >

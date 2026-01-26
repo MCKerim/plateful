@@ -29,10 +29,7 @@ test.describe("Recipe Detail Page", () => {
     await expect(recipeLink).toBeVisible();
   });
 
-  test("should display no ratings message for new recipe", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display no ratings message for new recipe", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 2,
       name: "New Recipe",
@@ -53,10 +50,7 @@ test.describe("Recipe Detail Page", () => {
     await expect(page.getByText(/no ratings/i)).toBeVisible();
   });
 
-  test("should have edit button that navigates to edit page", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should have edit button that navigates to edit page", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 3,
       name: "Editable Recipe",
@@ -103,10 +97,7 @@ test.describe("Recipe Detail Page", () => {
     await expect(planButton).toBeVisible();
   });
 
-  test("should navigate back from recipe detail to cookbook", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should navigate back from recipe detail to cookbook", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 5,
       name: "Navigation Test Recipe",
@@ -130,9 +121,9 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForURL(/\/recipe\/5/);
 
     // Verify we're on the recipe page
-    await expect(
-      page.getByRole("heading", { name: "Navigation Test Recipe" })
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Navigation Test Recipe" })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Go back using browser back
     await page.goBack();

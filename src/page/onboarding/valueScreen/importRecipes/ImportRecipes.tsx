@@ -86,18 +86,16 @@ export default function ImportRecipes() {
             animationDelay: `${icon.delay}ms`,
           }}
         >
-          <img
-            src={icon.iconUrl}
-            alt={icon.appName}
-            className="w-12 h-12 shadow-lg rounded-xl"
-          />
+          <img src={icon.iconUrl} alt={icon.appName} className="w-12 h-12 shadow-lg rounded-xl" />
         </div>
       ))}
 
       <div className="text-center">
         <h1 className="text-4xl font-bold first-font">{t("valueScreens.importRecipes.title")}</h1>
 
-        <h2 className="text-2xl italic font-semibold second-font">{t("valueScreens.importRecipes.subtitle")}</h2>
+        <h2 className="text-2xl italic font-semibold second-font">
+          {t("valueScreens.importRecipes.subtitle")}
+        </h2>
       </div>
 
       <PhoneMockup mediaUrl="/import-recipes-recording.mp4" />

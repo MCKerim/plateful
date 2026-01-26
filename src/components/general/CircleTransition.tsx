@@ -7,10 +7,10 @@ interface CircleTransitionProps {
   duration?: number;
 }
 
-export default function CircleTransition({ 
-  isVisible, 
-  onComplete, 
-  duration = 1.0
+export default function CircleTransition({
+  isVisible,
+  onComplete,
+  duration = 1.0,
 }: Readonly<CircleTransitionProps>) {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -33,18 +33,24 @@ export default function CircleTransition({
     <motion.div
       className="fixed inset-0 z-50 bg-primary"
       style={{
-        maskImage: "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
-        WebkitMaskImage: "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
+        maskImage:
+          "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
+        WebkitMaskImage:
+          "radial-gradient(circle, transparent var(--circle-size), black var(--circle-size))",
       }}
-      initial={{ 
-        "--circle-size": "0px"
-      } as any}
-      animate={{ 
-        "--circle-size": "100vmax"
-      } as any}
+      initial={
+        {
+          "--circle-size": "0px",
+        } as any
+      }
+      animate={
+        {
+          "--circle-size": "100vmax",
+        } as any
+      }
       transition={{
         duration: duration,
-        ease: "easeInOut"
+        ease: "easeInOut",
       }}
       onAnimationComplete={handleAnimationComplete}
     />

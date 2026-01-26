@@ -9,13 +9,7 @@ export function useSetDaysEaten() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({
-      id,
-      newDaysEaten,
-    }: {
-      id: number;
-      newDaysEaten: number;
-    }) => {
+    mutationFn: async ({ id, newDaysEaten }: { id: number; newDaysEaten: number }) => {
       await mealPlanningApi.updateDaysEaten(supabase, id, newDaysEaten);
     },
     onMutate: async ({ id, newDaysEaten }) => {
@@ -29,9 +23,7 @@ export function useSetDaysEaten() {
         { queryKey: queryKeys.mealPlanning.all },
         (old) => {
           if (!old || !Array.isArray(old)) return old;
-          return old.map((item) =>
-            item.id === id ? { ...item, daysEaten: newDaysEaten } : item
-          );
+          return old.map((item) => (item.id === id ? { ...item, daysEaten: newDaysEaten } : item));
         }
       );
 

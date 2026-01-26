@@ -14,10 +14,7 @@ export type UpdateRatingParams = {
 };
 
 export const ratingsApi = {
-  async getByRecipe(
-    supabase: SupabaseClient,
-    recipeId: number
-  ): Promise<RecipeRatingWithUser[]> {
+  async getByRecipe(supabase: SupabaseClient, recipeId: number): Promise<RecipeRatingWithUser[]> {
     const { data, error } = await supabase
       .from("recipe_ratings")
       .select("*, users(created_at, email, username)")
@@ -34,9 +31,7 @@ export const ratingsApi = {
   ): Promise<RecipeRatingWithUser> {
     const { data, error } = await supabase
       .from("recipe_ratings")
-      .insert([
-        { recipe_id: params.recipeId, stars: params.stars, note: params.note },
-      ])
+      .insert([{ recipe_id: params.recipeId, stars: params.stars, note: params.note }])
       .select("*, users(created_at, email, username)")
       .single();
 
@@ -60,10 +55,7 @@ export const ratingsApi = {
   },
 
   async delete(supabase: SupabaseClient, ratingId: number): Promise<void> {
-    const { error } = await supabase
-      .from("recipe_ratings")
-      .delete()
-      .eq("id", ratingId);
+    const { error } = await supabase.from("recipe_ratings").delete().eq("id", ratingId);
 
     if (error) throw error;
   },

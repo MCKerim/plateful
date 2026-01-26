@@ -75,13 +75,7 @@ export default function PlanDialog({
           <div className="flex gap-2">
             <Button
               className="w-full"
-              variant={
-                initialDays === 0
-                  ? "secondary"
-                  : daysToPlan === 1
-                  ? "secondary"
-                  : "outline"
-              }
+              variant={initialDays === 0 ? "secondary" : daysToPlan === 1 ? "secondary" : "outline"}
               onClick={() => saveDate(1)}
             >
               {t("dayWithCount", { count: 1 })}
@@ -89,13 +83,7 @@ export default function PlanDialog({
 
             <Button
               className="w-full"
-              variant={
-                initialDays === 0
-                  ? "secondary"
-                  : daysToPlan === 2
-                  ? "secondary"
-                  : "outline"
-              }
+              variant={initialDays === 0 ? "secondary" : daysToPlan === 2 ? "secondary" : "outline"}
               onClick={() => saveDate(2)}
             >
               {t("dayWithCount", { count: 2 })}
@@ -103,11 +91,7 @@ export default function PlanDialog({
           </div>
 
           {onDeleteDate && (
-            <Button
-              className="w-full"
-              variant="destructive"
-              onClick={deleteDate}
-            >
+            <Button className="w-full" variant="destructive" onClick={deleteDate}>
               {t("common.remove")}
             </Button>
           )}

@@ -1,11 +1,6 @@
-import {
-  MealPlannerItem,
-  MealPlannerItemRaw,
-} from "@/types/meal-planning.types";
+import { MealPlannerItem, MealPlannerItemRaw } from "@/types/meal-planning.types";
 
-export function transformMealPlannerItems(
-  raw: MealPlannerItemRaw[]
-): MealPlannerItem[] {
+export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlannerItem[] {
   return raw.map((item) => ({
     id: item.id,
     recipeId: item.recipes?.id ?? 0,

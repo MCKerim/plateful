@@ -5,7 +5,7 @@ import { Household } from "@/types/exportedDatabaseTypes.types";
 
 interface HouseholdState {
   household: Household | null;
-  members: { id: string, email: string, username: string }[] | null;
+  members: { id: string; email: string; username: string }[] | null;
 }
 const initialState: HouseholdState = {
   household: null,
@@ -20,7 +20,10 @@ export const householdSlice = createSlice({
     setHousehold: (state, action: PayloadAction<Household | null>) => {
       state.household = action.payload;
     },
-    setHouseholdMembers: (state, action: PayloadAction<{ id: string, email: string, username: string }[] | null>) => {
+    setHouseholdMembers: (
+      state,
+      action: PayloadAction<{ id: string; email: string; username: string }[] | null>
+    ) => {
       state.members = action.payload;
     },
   },

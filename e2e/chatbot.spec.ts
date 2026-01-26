@@ -9,8 +9,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     const recipe = createRecipe({
       id: 1,
       name: "Spaghetti Carbonara",
-      description:
-        "A classic Italian pasta dish with eggs, cheese, and pancetta.",
+      description: "A classic Italian pasta dish with eggs, cheese, and pancetta.",
       category: 2,
     });
 
@@ -21,9 +20,9 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify recipe is loaded
-    await expect(
-      page.getByRole("heading", { name: "Spaghetti Carbonara" }),
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Click the Ask AI-Chef button
     const askButton = page.getByRole("button", { name: /ask ai-chef/i });
@@ -40,10 +39,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     });
   });
 
-  test("should show recipe context chip in first user message", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should show recipe context chip in first user message", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 2,
       name: "Chicken Stir Fry",
@@ -83,15 +79,10 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     const userMessage = page.locator('[class*="bg-primary"]').first();
     await expect(userMessage).toBeVisible({ timeout: 10000 });
     await expect(userMessage).toContainText("Chicken Stir Fry");
-    await expect(userMessage).toContainText(
-      "What can I substitute for pancetta?",
-    );
+    await expect(userMessage).toContainText("What can I substitute for pancetta?");
   });
 
-  test("should have Ask AI-Chef button visible on recipe page", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should have Ask AI-Chef button visible on recipe page", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 3,
       name: "Test Recipe",

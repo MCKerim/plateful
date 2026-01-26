@@ -2,10 +2,7 @@ import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hooks";
 import { setUser } from "@/redux/slices/userSlice";
-import {
-  setHousehold,
-  setHouseholdMembers,
-} from "@/redux/slices/householdSlice";
+import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { userApi } from "@/api/user.api";
 import posthog from "posthog-js";
@@ -63,9 +60,7 @@ export function useUserData() {
               userId: userData.id,
               language: languageToSave,
             })
-            .catch((err) =>
-              console.error("Failed to save detected language:", err)
-            );
+            .catch((err) => console.error("Failed to save detected language:", err));
 
           i18n.changeLanguage(languageToSave);
           localStorage.setItem("language", languageToSave);
@@ -80,10 +75,7 @@ export function useUserData() {
           return;
         }
 
-        const membersData = await userApi.getHouseholdMembers(
-          supabase,
-          userData.household_id
-        );
+        const membersData = await userApi.getHouseholdMembers(supabase, userData.household_id);
         dispatch(setHouseholdMembers(membersData));
       } catch (error) {
         console.error("Error fetching user data:", error);

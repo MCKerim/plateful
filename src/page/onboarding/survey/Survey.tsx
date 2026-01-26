@@ -32,9 +32,7 @@ export default function Survey() {
       await handleSingleQuestionComplete(option);
     } else {
       setSelected((prev) =>
-        prev.includes(option)
-          ? prev.filter((item) => item !== option)
-          : [...prev, option]
+        prev.includes(option) ? prev.filter((item) => item !== option) : [...prev, option]
       );
     }
   };
@@ -76,9 +74,7 @@ export default function Survey() {
     }
 
     const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
-    const translatedOptions = selected.map((option) =>
-      t(`questions.${QUESTION_KEY}.${option}`)
-    );
+    const translatedOptions = selected.map((option) => t(`questions.${QUESTION_KEY}.${option}`));
 
     await supabase.from("survey_answears").upsert(
       [

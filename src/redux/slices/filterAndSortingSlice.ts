@@ -31,7 +31,7 @@ export const filterAndSortingSlice = createSlice({
     },
     setSearchTerm: (state, action: PayloadAction<string>) => {
       state.searchTerm = action.payload;
-    }
+    },
   },
 });
 
@@ -40,14 +40,11 @@ export const { resetFilter, setCategoryId, setSorting, setSearchTerm } =
 
 export default filterAndSortingSlice.reducer;
 
-export const selectCategoryId = (state: RootState) =>
-  state.filterAndSorting.categoryId;
+export const selectCategoryId = (state: RootState) => state.filterAndSorting.categoryId;
 
 export const selectActiveFilterCount = (state: RootState) =>
   state.filterAndSorting.categoryId === null ? 0 : 1;
 
-export const selectSorting = (state: RootState) =>
-  state.filterAndSorting.sorting;
+export const selectSorting = (state: RootState) => state.filterAndSorting.sorting;
 
-export const selectSearchTerm = (state: RootState) =>
-  state.filterAndSorting.searchTerm;
+export const selectSearchTerm = (state: RootState) => state.filterAndSorting.searchTerm;

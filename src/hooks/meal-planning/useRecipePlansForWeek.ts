@@ -20,10 +20,7 @@ export function useRecipePlansForWeek(
   weekEnd.setHours(23, 59, 59, 999);
 
   return useQuery({
-    queryKey: queryKeys.mealPlanning.recipePlans(
-      recipeId ?? 0,
-      weekStart.toISOString()
-    ),
+    queryKey: queryKeys.mealPlanning.recipePlans(recipeId ?? 0, weekStart.toISOString()),
     queryFn: async (): Promise<RecipePlanEntry[]> => {
       if (!recipeId) return [];
 

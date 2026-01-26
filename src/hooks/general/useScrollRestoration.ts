@@ -5,10 +5,7 @@ export function useScrollRestoration(scrollKey: string) {
 
   // Restore scroll position on mount
   useEffect(() => {
-    const savedPosition = Number.parseInt(
-      sessionStorage.getItem(scrollKey) || "0",
-      10
-    );
+    const savedPosition = Number.parseInt(sessionStorage.getItem(scrollKey) || "0", 10);
 
     if (savedPosition > 0) {
       let attempts = 0;

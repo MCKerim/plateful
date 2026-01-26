@@ -85,21 +85,13 @@ export default function InvitePage() {
           <div className="flex items-center justify-center">
             <House className="w-8 h-8" />
           </div>
-          <p className="font-medium text-primary">
-            {t("invitePage.invitedTo")}
-          </p>
+          <p className="font-medium text-primary">{t("invitePage.invitedTo")}</p>
 
-          <h1 className="text-2xl font-bold text-primary">
-            "{household?.name}"
-          </h1>
+          <h1 className="text-2xl font-bold text-primary">"{household?.name}"</h1>
         </div>
 
         <div className="flex flex-col w-full gap-3">
-          <Button
-            onClick={updateHousehold}
-            disabled={isJoining}
-            className="w-full"
-          >
+          <Button onClick={updateHousehold} disabled={isJoining} className="w-full">
             {isJoining ? "Joining..." : t("invitePage.joinButton")}
           </Button>
 

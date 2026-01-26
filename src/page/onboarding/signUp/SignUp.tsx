@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import CircleTransition from "@/components/general/CircleTransition";
 import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
-import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
 
 export default function SignUp() {
@@ -51,8 +51,7 @@ export default function SignUp() {
       if (
         globalThis.location.hostname === "localhost" ||
         globalThis.location.hostname === "127.0.0.1" ||
-        globalThis.location.hostname ===
-          "plateful-git-staging-mckerims-projects.vercel.app"
+        globalThis.location.hostname === "plateful-git-staging-mckerims-projects.vercel.app"
       ) {
         // Development environment
         redirectUri = currentUrl;
@@ -97,9 +96,7 @@ export default function SignUp() {
         <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
           <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
 
-          <p className="text-sm text-muted-foreground second-font">
-            {t("signup.subtitle")}
-          </p>
+          <p className="text-sm text-muted-foreground second-font">{t("signup.subtitle")}</p>
         </div>
 
         <RiveComponent onClick={replayAnimation} />

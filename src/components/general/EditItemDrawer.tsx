@@ -20,7 +20,12 @@ type Props = {
   onItemEdited: () => void;
 };
 
-export default function EditItemDrawer({ currentId, currentName, currentAmount, onItemEdited }: Readonly<Props>) {
+export default function EditItemDrawer({
+  currentId,
+  currentName,
+  currentAmount,
+  onItemEdited,
+}: Readonly<Props>) {
   const { supabase } = useSupabase();
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
@@ -38,13 +43,13 @@ export default function EditItemDrawer({ currentId, currentName, currentAmount, 
     const { data: itemData } = await supabase
       .from("item")
       .update({ name: newItemName })
-      .eq('id', currentId)
+      .eq("id", currentId)
       .select();
 
     const { data: amountData } = await supabase
       .from("shopping_list_items")
       .update({ amount: newItemAmount })
-      .eq('item_id', currentId)
+      .eq("item_id", currentId)
       .select();
 
     if (itemData && amountData) {
@@ -85,7 +90,7 @@ export default function EditItemDrawer({ currentId, currentName, currentAmount, 
                 onChange={(e) => setNewItemAmount(e.target.value)}
               />
             </div>
-            
+
             <DrawerClose>
               <Button className="w-full" onClick={editItem}>
                 Edit Item

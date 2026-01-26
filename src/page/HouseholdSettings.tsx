@@ -3,18 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import {
-  selectHousehold,
-  selectHouseholdMembers,
-} from "@/redux/slices/householdSlice";
-import {
-  CircleMinus,
-  Pencil,
-  Trash2,
-  House,
-  UserRoundPlus,
-  LogOut,
-} from "lucide-react";
+import { selectHousehold, selectHouseholdMembers } from "@/redux/slices/householdSlice";
+import { CircleMinus, Pencil, Trash2, House, UserRoundPlus, LogOut } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -163,9 +153,7 @@ export default function HouseholdSettings() {
           >
             {member.username} - {member.email}
             {member.id === user?.id ? (
-              <span className="text-sm text-muted-foreground">
-                {t("householdSettings.you")}
-              </span>
+              <span className="text-sm text-muted-foreground">{t("householdSettings.you")}</span>
             ) : (
               <CircleMinus />
             )}
@@ -182,9 +170,7 @@ export default function HouseholdSettings() {
 
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>
-              {t("householdSettings.scanQrOrShareLink")}
-            </DialogTitle>
+            <DialogTitle>{t("householdSettings.scanQrOrShareLink")}</DialogTitle>
           </DialogHeader>
 
           <DialogDescription>
@@ -196,19 +182,11 @@ export default function HouseholdSettings() {
       <Separator className="my-2" />
 
       <div className="w-full gap-2 flex">
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={leaveHousehold}
-        >
+        <Button variant="destructive" className="w-full" onClick={leaveHousehold}>
           <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
         </Button>
 
-        <Button
-          variant="destructive"
-          className="w-full"
-          onClick={deleteHousehold}
-        >
+        <Button variant="destructive" className="w-full" onClick={deleteHousehold}>
           <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
         </Button>
       </div>
@@ -244,21 +222,14 @@ export default function HouseholdSettings() {
       </Dialog>
 
       {/* Leave Household Confirmation Dialog */}
-      <Dialog
-        open={showLeaveConfirmation}
-        onOpenChange={setShowLeaveConfirmation}
-      >
+      <Dialog open={showLeaveConfirmation} onOpenChange={setShowLeaveConfirmation}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>
-              {t("householdSettings.confirmations.leaveHousehold.title")}
-            </DialogTitle>
+            <DialogTitle>{t("householdSettings.confirmations.leaveHousehold.title")}</DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col gap-4 py-4">
-            <p>
-              {t("householdSettings.confirmations.leaveHousehold.description")}
-            </p>
+            <p>{t("householdSettings.confirmations.leaveHousehold.description")}</p>
 
             <div className="flex gap-2">
               <Button
@@ -269,11 +240,7 @@ export default function HouseholdSettings() {
                 {t("householdSettings.confirmations.leaveHousehold.cancel")}
               </Button>
 
-              <Button
-                className="w-full"
-                variant="destructive"
-                onClick={confirmLeaveHousehold}
-              >
+              <Button className="w-full" variant="destructive" onClick={confirmLeaveHousehold}>
                 {t("householdSettings.confirmations.leaveHousehold.confirm")}
               </Button>
             </div>
@@ -282,21 +249,14 @@ export default function HouseholdSettings() {
       </Dialog>
 
       {/* Delete Household Confirmation Dialog */}
-      <Dialog
-        open={showDeleteConfirmation}
-        onOpenChange={setShowDeleteConfirmation}
-      >
+      <Dialog open={showDeleteConfirmation} onOpenChange={setShowDeleteConfirmation}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>
-              {t("householdSettings.confirmations.deleteHousehold.title")}
-            </DialogTitle>
+            <DialogTitle>{t("householdSettings.confirmations.deleteHousehold.title")}</DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col gap-4 py-4">
-            <p>
-              {t("householdSettings.confirmations.deleteHousehold.description")}
-            </p>
+            <p>{t("householdSettings.confirmations.deleteHousehold.description")}</p>
 
             <div className="flex gap-2">
               <Button
@@ -307,11 +267,7 @@ export default function HouseholdSettings() {
                 {t("householdSettings.confirmations.deleteHousehold.cancel")}
               </Button>
 
-              <Button
-                className="w-full"
-                variant="destructive"
-                onClick={confirmDeleteHousehold}
-              >
+              <Button className="w-full" variant="destructive" onClick={confirmDeleteHousehold}>
                 {t("householdSettings.confirmations.deleteHousehold.confirm")}
               </Button>
             </div>

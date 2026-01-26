@@ -29,5 +29,4 @@ export const { setCurrentWeek, resetToCurrentWeek } = mealPlannerSlice.actions;
 
 export default mealPlannerSlice.reducer;
 
-export const selectCurrentWeek = (state: RootState) =>
-  new Date(state.mealPlanner.currentWeek);
+export const selectCurrentWeek = (state: RootState) => new Date(state.mealPlanner.currentWeek);

@@ -52,14 +52,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
   },
   {
     questionKey: "question9",
-    optionKeys: [
-      "option1",
-      "option2",
-      "option3",
-      "option4",
-      "option5",
-      "option6",
-    ],
+    optionKeys: ["option1", "option2", "option3", "option4", "option5", "option6"],
     type: "multiple",
   },
   {
@@ -81,15 +74,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
   },
   {
     questionKey: "question11",
-    optionKeys: [
-      "option1",
-      "option2",
-      "option3",
-      "option4",
-      "option5",
-      "option6",
-      "option7",
-    ],
+    optionKeys: ["option1", "option2", "option3", "option4", "option5", "option6", "option7"],
     type: "multiple",
     twoColumns: true,
   },

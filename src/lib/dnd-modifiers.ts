@@ -13,10 +13,7 @@ export const restrictToVerticalAxisAndWindow: Modifier = ({
     ...transform,
     x: 0,
     y: Math.max(
-      Math.min(
-        transform.y,
-        windowRect.height - draggingNodeRect.top - draggingNodeRect.height
-      ),
+      Math.min(transform.y, windowRect.height - draggingNodeRect.top - draggingNodeRect.height),
       -draggingNodeRect.top
     ),
   };

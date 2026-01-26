@@ -48,19 +48,14 @@ function getFrontColorCode(color: string, darkmode: boolean): string {
 }
 
 // Apple folder like design button
-export default function CategoryButton({
-  id,
-  name,
-  color = "",
-}: Readonly<Props>) {
+export default function CategoryButton({ id, name, color = "" }: Readonly<Props>) {
   const dispatch = useAppDispatch();
   const { theme } = useTheme();
 
   // Determine if darkmode is active
   const isDarkMode =
     theme === "dark" ||
-    (theme === "system" &&
-      globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
+    (theme === "system" && globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches);
 
   const frontColor = getFrontColorCode(color, isDarkMode);
 

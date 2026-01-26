@@ -1,10 +1,10 @@
 type Props = {
   mediaUrl: string;
-  mediaType?: 'image' | 'video';
+  mediaType?: "image" | "video";
 };
 
-export default function PhoneMockup({ mediaUrl, mediaType = 'image' }: Readonly<Props>) {
-  const isVideo = mediaType === 'video' || mediaUrl.match(/\.(mp4|webm|ogg|mov)$/i);
+export default function PhoneMockup({ mediaUrl, mediaType = "image" }: Readonly<Props>) {
+  const isVideo = mediaType === "video" || mediaUrl.match(/\.(mp4|webm|ogg|mov)$/i);
 
   return (
     <div className="bg-black rounded-[2.2rem] p-2 shadow-[5px_15px_30px_rgba(0,0,0,0.4)]">

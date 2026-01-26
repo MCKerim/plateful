@@ -29,26 +29,15 @@ export default function Home() {
       </p>
 
       <div className="flex flex-col gap-2 p-2 border-t">
-        <NavLink
-          data-canny-link
-          to="https://plateful.canny.io/support/create"
-          target="blank"
-        >
-          <Button
-            variant="secondary"
-            className="w-full font-bold bg-accent text-accent-foreground"
-          >
+        <NavLink data-canny-link to="https://plateful.canny.io/support/create" target="blank">
+          <Button variant="secondary" className="w-full font-bold bg-accent text-accent-foreground">
             <Donut />
 
             {t("settings.suggestFeatureOrReportBug")}
           </Button>
         </NavLink>
 
-        <NavLink
-          data-canny-link
-          to="https://plateful.canny.io/changelog"
-          target="blank"
-        >
+        <NavLink data-canny-link to="https://plateful.canny.io/changelog" target="blank">
           <Button variant="secondary" className="w-full">
             <Newspaper />
 

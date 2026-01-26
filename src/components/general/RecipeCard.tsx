@@ -15,11 +15,7 @@ type Props = {
   averageRating: number | null;
 };
 
-export default function RecipeCard({
-  id,
-  name,
-  averageRating,
-}: Readonly<Props>) {
+export default function RecipeCard({ id, name, averageRating }: Readonly<Props>) {
   const { t } = useTranslation();
   const { data: imageUrl } = useRecipeFirstImage(id);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(id);
@@ -27,9 +23,7 @@ export default function RecipeCard({
   const TAGS: string[] = [];
 
   function renderTagPills() {
-    return TAGS.map((tag, index) => (
-      <TagPill key={index} name={tag} color="green" />
-    ));
+    return TAGS.map((tag, index) => <TagPill key={index} name={tag} color="green" />);
   }
 
   return (
@@ -48,9 +42,7 @@ export default function RecipeCard({
             </h1>
           </div>
 
-          {TAGS.length > 0 && (
-            <div className="flex gap-1">{renderTagPills()}</div>
-          )}
+          {TAGS.length > 0 && <div className="flex gap-1">{renderTagPills()}</div>}
 
           <div className="flex justify-between">
             <div className="flex items-center gap-1">

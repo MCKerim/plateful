@@ -1,9 +1,7 @@
 import { test, expect } from "./fixtures";
 
 test.describe("Authenticated User Flows", () => {
-  test("should access cookbook page when authenticated", async ({
-    authenticatedPage,
-  }) => {
+  test("should access cookbook page when authenticated", async ({ authenticatedPage }) => {
     await authenticatedPage.goto("/cookbook");
     await authenticatedPage.waitForLoadState("networkidle");
 
@@ -19,9 +17,7 @@ test.describe("Authenticated User Flows", () => {
     expect(count).toBeGreaterThan(0);
   });
 
-  test("should access meal planner page when authenticated", async ({
-    authenticatedPage,
-  }) => {
+  test("should access meal planner page when authenticated", async ({ authenticatedPage }) => {
     await authenticatedPage.goto("/planner");
     await authenticatedPage.waitForLoadState("networkidle");
 
@@ -36,9 +32,7 @@ test.describe("Authenticated User Flows", () => {
     await expect(body).not.toBeEmpty();
   });
 
-  test("should navigate between cookbook and planner", async ({
-    authenticatedPage,
-  }) => {
+  test("should navigate between cookbook and planner", async ({ authenticatedPage }) => {
     // Start at cookbook
     await authenticatedPage.goto("/cookbook");
     await authenticatedPage.waitForLoadState("networkidle");
@@ -63,9 +57,7 @@ test.describe("Authenticated User Flows", () => {
     }
   });
 
-  test("should show empty state in cookbook for new user", async ({
-    authenticatedPage,
-  }) => {
+  test("should show empty state in cookbook for new user", async ({ authenticatedPage }) => {
     await authenticatedPage.goto("/cookbook");
     await authenticatedPage.waitForLoadState("networkidle");
 
@@ -84,9 +76,7 @@ test.describe("Authenticated User Flows", () => {
       await authenticatedPage.waitForLoadState("networkidle");
 
       // Should show empty state or "nothing found" message
-      const emptyState = authenticatedPage.locator(
-        "text=/nothing|no recipes|empty/i"
-      );
+      const emptyState = authenticatedPage.locator("text=/nothing|no recipes|empty/i");
       await expect(emptyState).toBeVisible({ timeout: 10000 });
     }
   });

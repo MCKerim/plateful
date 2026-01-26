@@ -57,9 +57,7 @@ export default function Cookbook() {
     }
 
     if (categoryId !== null && categoryId !== 0) {
-      searchedRecipes = searchedRecipes.filter(
-        (recipe) => recipe.category === categoryId
-      );
+      searchedRecipes = searchedRecipes.filter((recipe) => recipe.category === categoryId);
     }
 
     searchedRecipes.sort((a, b) => {
@@ -189,9 +187,7 @@ export default function Cookbook() {
               <Rive src="/plateful-character.riv" artboard="Sad" />
             </div>
 
-            <p className="flex justify-center italic font-bold">
-              {t("cookbook.nothingFound")}
-            </p>
+            <p className="flex justify-center italic font-bold">{t("cookbook.nothingFound")}</p>
           </div>
         )}
     </Layout>

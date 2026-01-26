@@ -42,14 +42,12 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
     const [rating, setRating] = useState(1);
     const [note, setNote] = useState("");
-    const [editingRating, setEditingRating] =
-      useState<RecipeRatingWithUser | null>(null);
+    const [editingRating, setEditingRating] = useState<RecipeRatingWithUser | null>(null);
 
     const createRatingMutation = useCreateRating();
     const updateRatingMutation = useUpdateRating();
 
-    const isSubmitting =
-      createRatingMutation.isPending || updateRatingMutation.isPending;
+    const isSubmitting = createRatingMutation.isPending || updateRatingMutation.isPending;
 
     useImperativeHandle(ref, () => ({
       open: (ratingToEdit?: RecipeRatingWithUser) => {
@@ -134,9 +132,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
 
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {isEditMode ? t("rating.editTitle") : t("rating.title")}
-            </DialogTitle>
+            <DialogTitle>{isEditMode ? t("rating.editTitle") : t("rating.title")}</DialogTitle>
           </DialogHeader>
 
           <DialogDescription className="flex flex-col gap-4 py-4">
@@ -145,11 +141,7 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
                 const starValue = index + 1;
 
                 return (
-                  <button
-                    key={index}
-                    onClick={() => setRating(starValue)}
-                    type="button"
-                  >
+                  <button key={index} onClick={() => setRating(starValue)} type="button">
                     {rating >= starValue ? (
                       <StarIcon fontSize="large" />
                     ) : (

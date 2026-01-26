@@ -1,10 +1,7 @@
 import { test, expect } from "./fixtures";
 
 test.describe("Settings Page", () => {
-  test("should display settings page with all sections", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display settings page with all sections", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
 
     await page.goto("/settings");
@@ -25,24 +22,17 @@ test.describe("Settings Page", () => {
 
     // Should see Household section
     await expect(page.getByRole("heading", { name: "Household" })).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /manage your household/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /manage your household/i })).toBeVisible();
 
     // Should see Support & Feedback section
     await expect(page.getByText("Support & Feedback")).toBeVisible();
 
     // Should see Account section
     await expect(page.getByText("Account")).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /sign out/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
   });
 
-  test("should display user information in account section", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display user information in account section", async ({ page, setupAuth }) => {
     await setupAuth({
       user: { username: "TestUser", email: "test@example.com" },
       recipes: [],
@@ -73,9 +63,9 @@ test.describe("Settings Page", () => {
     await editButton.click();
 
     // Should see edit username dialog
-    await expect(
-      page.getByRole("heading", { name: /edit username/i })
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: /edit username/i })).toBeVisible({
+      timeout: 5000,
+    });
 
     // Should see input field
     await expect(page.getByPlaceholder(/enter new username/i)).toBeVisible();
@@ -103,10 +93,7 @@ test.describe("Settings Page", () => {
     expect(page.url()).toContain("/householdSettings");
   });
 
-  test("should display info section with version and legal links", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display info section with version and legal links", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
 
     await page.goto("/settings");
@@ -119,18 +106,11 @@ test.describe("Settings Page", () => {
     await expect(page.getByText(/v0\.0\.\d+/)).toBeVisible();
 
     // Should see Privacy Policy and Terms of Service buttons
-    await expect(
-      page.getByRole("button", { name: /privacy policy/i })
-    ).toBeVisible();
-    await expect(
-      page.getByRole("button", { name: /terms of service/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /privacy policy/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /terms of service/i })).toBeVisible();
   });
 
-  test("should navigate to privacy policy page", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should navigate to privacy policy page", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
 
     await page.goto("/settings");
@@ -146,10 +126,7 @@ test.describe("Settings Page", () => {
 });
 
 test.describe("Household Settings Page", () => {
-  test("should display household settings with household name", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display household settings with household name", async ({ page, setupAuth }) => {
     await setupAuth({
       household: { name: "Test Household" },
       recipes: [],
@@ -168,10 +145,7 @@ test.describe("Household Settings Page", () => {
     await expect(page.getByText(/1 Member/i)).toBeVisible();
   });
 
-  test("should display current user in members list", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display current user in members list", async ({ page, setupAuth }) => {
     await setupAuth({
       user: { username: "HouseholdMember", email: "member@example.com" },
       household: { name: "My Household" },
@@ -218,18 +192,15 @@ test.describe("Household Settings Page", () => {
     await page.getByText("Invite Member").click();
 
     // Should see invite dialog
-    await expect(
-      page.getByText(/scan the qr code or share the link/i)
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/scan the qr code or share the link/i)).toBeVisible({
+      timeout: 5000,
+    });
 
     // Close the dialog to prevent Mobile Safari context cleanup issues
     await page.keyboard.press("Escape");
   });
 
-  test("should show leave and delete household buttons", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should show leave and delete household buttons", async ({ page, setupAuth }) => {
     await setupAuth({
       household: { name: "Leavable Household" },
       recipes: [],
@@ -240,20 +211,15 @@ test.describe("Household Settings Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should see leave household button
-    await expect(
-      page.getByRole("button", { name: /leave household/i })
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("button", { name: /leave household/i })).toBeVisible({
+      timeout: 10000,
+    });
 
     // Should see delete household button
-    await expect(
-      page.getByRole("button", { name: /delete household/i })
-    ).toBeVisible();
+    await expect(page.getByRole("button", { name: /delete household/i })).toBeVisible();
   });
 
-  test("should show confirmation dialog when leaving household", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should show confirmation dialog when leaving household", async ({ page, setupAuth }) => {
     await setupAuth({
       household: { name: "Leaving Household" },
       recipes: [],
@@ -267,9 +233,7 @@ test.describe("Household Settings Page", () => {
     await page.getByRole("button", { name: /leave household/i }).click();
 
     // Should see confirmation dialog
-    await expect(
-      page.getByText(/are you sure you want to leave/i)
-    ).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/are you sure you want to leave/i)).toBeVisible({ timeout: 5000 });
 
     // Should have cancel and confirm buttons
     await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();

@@ -21,9 +21,7 @@ export function useSaveRecipePlans() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (
-      params: SaveRecipePlansParams
-    ): Promise<SaveRecipePlansResult> => {
+    mutationFn: async (params: SaveRecipePlansParams): Promise<SaveRecipePlansResult> => {
       const operations: Promise<void>[] = [];
 
       // Delete removed plans
@@ -47,13 +45,7 @@ export function useSaveRecipePlans() {
       // Add without date if requested
       if (params.addWithoutDate) {
         operations.push(
-          mealPlanningApi.create(
-            supabase,
-            params.recipeId,
-            params.householdId,
-            null,
-            1
-          )
+          mealPlanningApi.create(supabase, params.recipeId, params.householdId, null, 1)
         );
       }
 

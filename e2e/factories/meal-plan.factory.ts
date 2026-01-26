@@ -22,7 +22,7 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
     // Use 'in' check to distinguish between explicit null and undefined
     planned_date:
       overrides && "planned_date" in overrides
-        ? overrides.planned_date ?? null
+        ? (overrides.planned_date ?? null)
         : formatDate(new Date()),
     days: overrides?.days ?? 1,
     daysEaten: overrides?.daysEaten ?? 0,
@@ -47,10 +47,7 @@ export function createWeeklyMealPlans(
   );
 }
 
-export function createBacklogMealPlans(
-  recipes: MockRecipe[],
-  householdId: number
-): MockMealPlan[] {
+export function createBacklogMealPlans(recipes: MockRecipe[], householdId: number): MockMealPlan[] {
   return recipes.map((recipe) =>
     createMealPlan({
       recipe_id: recipe.id,

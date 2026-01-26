@@ -38,10 +38,7 @@ export default function CreateHousehold() {
 
     setIsLoading(true);
 
-    const { data, error } = await supabase
-      .from("household")
-      .insert({ name: trimmedName })
-      .select();
+    const { data, error } = await supabase.from("household").insert({ name: trimmedName }).select();
 
     if (error || !data) {
       toast.error(t("createHousehold.errors.createFailed") + " " + error?.message);
@@ -57,9 +54,7 @@ export default function CreateHousehold() {
         .eq("id", user.id);
 
       if (updateError) {
-        toast.error(
-          t("createHousehold.errors.updateFailed") + " " + updateError.message,
-        );
+        toast.error(t("createHousehold.errors.updateFailed") + " " + updateError.message);
         setIsLoading(false);
         return;
       }
@@ -76,9 +71,7 @@ export default function CreateHousehold() {
       onNext={handleCreateHousehold}
     >
       <div className="text-center">
-        <h1 className="text-4xl font-bold first-font">
-          {t("createHousehold.title")}
-        </h1>
+        <h1 className="text-4xl font-bold first-font">{t("createHousehold.title")}</h1>
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-6">

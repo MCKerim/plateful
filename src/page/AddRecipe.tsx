@@ -42,9 +42,7 @@ export default function AddRecipe() {
   const [link, setLink] = useState("");
 
   const filterCategoryId = useAppSelector(selectCategoryId);
-  const [category, setCategory] = useState(
-    filterCategoryId === 0 ? null : filterCategoryId
-  );
+  const [category, setCategory] = useState(filterCategoryId === 0 ? null : filterCategoryId);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -97,9 +95,7 @@ export default function AddRecipe() {
 
       // --- Chefkoch cleanup ---
       if (finalTitle.toLowerCase().includes(" - gefunden auf chefkoch.de")) {
-        finalTitle = finalTitle
-          .replace(/ - gefunden auf chefkoch\.de$/i, "")
-          .trim();
+        finalTitle = finalTitle.replace(/ - gefunden auf chefkoch\.de$/i, "").trim();
       }
 
       // --- Generate fallback title ---
@@ -121,10 +117,8 @@ export default function AddRecipe() {
 
             const parts = hostname.split(".");
             // Take last 1-2 parts to avoid subdomains like "s."
-            const mainName =
-              parts.length > 2 ? parts[parts.length - 2] : parts[0];
-            const capitalized =
-              mainName.charAt(0).toUpperCase() + mainName.slice(1);
+            const mainName = parts.length > 2 ? parts[parts.length - 2] : parts[0];
+            const capitalized = mainName.charAt(0).toUpperCase() + mainName.slice(1);
             finalTitle = capitalized;
           } catch {
             finalTitle = finalUrl;
@@ -193,10 +187,7 @@ export default function AddRecipe() {
     return filePath;
   }
 
-  async function handleImageSelected(
-    file: File | undefined,
-    previewUrl: string
-  ) {
+  async function handleImageSelected(file: File | undefined, previewUrl: string) {
     if (!file) {
       setImageFile(null);
       setImagePreview("");
@@ -252,12 +243,8 @@ export default function AddRecipe() {
           onSuccess: async () => {
             // If a new image was uploaded, move it to the correct folder if needed
             if (imageFile && imageSupabaseUrl?.includes("temp")) {
-              const newPath = `recipe_${recipeId}/${imageSupabaseUrl
-                .split("/")
-                .pop()}`;
-              await supabase.storage
-                .from("recipeimages")
-                .move(imageSupabaseUrl, newPath);
+              const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split("/").pop()}`;
+              await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
             navigate(`/recipe/${recipeId}`, { replace: true });
           },
@@ -281,12 +268,8 @@ export default function AddRecipe() {
           onSuccess: async (data) => {
             // If an image was uploaded, move it to the correct folder with the new recipe id
             if (imageFile && imageSupabaseUrl) {
-              const newPath = `recipe_${data.id}/${imageSupabaseUrl
-                .split("/")
-                .pop()}`;
-              await supabase.storage
-                .from("recipeimages")
-                .move(imageSupabaseUrl, newPath);
+              const newPath = `recipe_${data.id}/${imageSupabaseUrl.split("/").pop()}`;
+              await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
             navigate(`/recipe/${data.id}`, { replace: true });
           },
@@ -318,11 +301,7 @@ export default function AddRecipe() {
       <div className="h-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        <Button
-          className="w-full"
-          variant="secondary"
-          onClick={() => navigate(-1)}
-        >
+        <Button className="w-full" variant="secondary" onClick={() => navigate(-1)}>
           {t("common.cancel")}
         </Button>
 
@@ -337,9 +316,7 @@ export default function AddRecipe() {
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold first-font">
-          {params.recipeId
-            ? t("addRecipe.editRecipe")
-            : t("addRecipe.addRecipe")}
+          {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
         </h1>
 
         {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
@@ -371,9 +348,7 @@ export default function AddRecipe() {
 
           <Select
             value={category?.toString() ?? ""}
-            onValueChange={(value) =>
-              setCategory(value ? parseInt(value) : null)
-            }
+            onValueChange={(value) => setCategory(value ? parseInt(value) : null)}
           >
             <SelectTrigger>
               <SelectValue placeholder={t("categorys.chooseACategory")} />

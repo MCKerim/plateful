@@ -27,10 +27,7 @@ test.describe("Recipe Edit Page", () => {
     await expect(linkInput).toHaveValue("https://example.com/original");
   });
 
-  test("should have cancel button that navigates back", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should have cancel button that navigates back", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 2,
       name: "Test Recipe",
@@ -77,7 +74,10 @@ test.describe("Recipe Edit Page", () => {
 
     // Should have delete button (trash icon button in header)
     // The delete button is a ghost button with a Trash2 icon
-    const deleteButton = page.locator("button").filter({ has: page.locator("svg") }).first();
+    const deleteButton = page
+      .locator("button")
+      .filter({ has: page.locator("svg") })
+      .first();
     await expect(deleteButton).toBeVisible();
 
     // Click it to open delete confirmation dialog

@@ -11,9 +11,7 @@ test.describe("Onboarding Flow", () => {
     await expect(page.locator("body")).not.toBeEmpty();
   });
 
-  test("should show signup/login for unauthenticated users", async ({
-    page,
-  }) => {
+  test("should show signup/login for unauthenticated users", async ({ page }) => {
     await page.goto("/");
 
     // Wait for the app to load
@@ -22,17 +20,13 @@ test.describe("Onboarding Flow", () => {
     // Look for common auth-related elements
     // Adjust these selectors based on your actual SignUp component
     const hasAuthContent = await page
-      .locator(
-        'text=/sign up|sign in|log in|register|welcome|get started/i'
-      )
+      .locator("text=/sign up|sign in|log in|register|welcome|get started/i")
       .count();
 
     expect(hasAuthContent).toBeGreaterThan(0);
   });
 
-  test("should redirect to signup when accessing protected route", async ({
-    page,
-  }) => {
+  test("should redirect to signup when accessing protected route", async ({ page }) => {
     // Try to access a protected route
     await page.goto("/planner");
 
@@ -43,7 +37,7 @@ test.describe("Onboarding Flow", () => {
     // The SignUp component is rendered inline (URL stays /planner)
     // Check that the planner content is NOT shown (user is blocked from accessing it)
     const hasPlannerContent = await page.locator('[data-testid="planner"]').count();
-    const hasMealPlanContent = await page.locator('text=/meal plan|weekly plan/i').count();
+    const hasMealPlanContent = await page.locator("text=/meal plan|weekly plan/i").count();
 
     // If no planner content is visible, the route is protected
     const isProtected = hasPlannerContent === 0 && hasMealPlanContent === 0;

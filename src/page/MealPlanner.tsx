@@ -8,25 +8,13 @@ import {
   setCurrentWeek,
   resetToCurrentWeek,
 } from "@/redux/slices/mealPlannerSlice";
-import {
-  format,
-  isSameDay,
-  isToday,
-  addWeeks,
-  subWeeks,
-  isSameWeek,
-} from "date-fns";
+import { format, isSameDay, isToday, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { Button } from "@/components/ui/button";
-import {
-  CalendarOff,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { CalendarOff, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router";
 import {
   DndContext,
@@ -77,13 +65,9 @@ export default function MealPlanner() {
   const dispatch = useAppDispatch();
 
   const currentWeek = useAppSelector(selectCurrentWeek);
-  const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(
-    null,
-  );
+  const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(
-    null,
-  );
+  const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<number>();
@@ -93,8 +77,7 @@ export default function MealPlanner() {
   } | null>(null);
 
   // React Query hooks - clean and simple!
-  const { data: plannedItems = [], isLoading } =
-    useMealPlannerItems(currentWeek);
+  const { data: plannedItems = [], isLoading } = useMealPlannerItems(currentWeek);
   const deleteMutation = useDeletePlannedItem();
   const updateDateMutation = useUpdatePlannedItemDate();
   const setDaysEatenMutation = useSetDaysEaten();
@@ -111,12 +94,12 @@ export default function MealPlanner() {
         delay: 250,
         tolerance: 5,
       },
-    }),
+    })
   );
 
   // Derived state
   const notPlannedItems = plannedItems.filter(
-    (item) => item.planned_date === null && item.daysEaten < item.days,
+    (item) => item.planned_date === null && item.daysEaten < item.days
   );
   const isDraggingFromDrawer = activeItem?.planned_date === null;
 
@@ -138,7 +121,7 @@ export default function MealPlanner() {
       {
         onSuccess: () => toast.success(t("recipe.planningSuccessful")),
         onError: () => toast.error(t("recipe.planningFailed")),
-      },
+      }
     );
   }
 
@@ -147,7 +130,7 @@ export default function MealPlanner() {
       { id, newDaysEaten },
       {
         onError: () => toast.error(t("mealPlanner.updateError")),
-      },
+      }
     );
   }
 
@@ -162,9 +145,7 @@ export default function MealPlanner() {
   }
 
   function getItemsByDate(date: Date) {
-    return plannedItems.filter(
-      (item) => item.planned_date && isSameDay(item.planned_date, date),
-    );
+    return plannedItems.filter((item) => item.planned_date && isSameDay(item.planned_date, date));
   }
 
   useEffect(() => {
@@ -242,10 +223,7 @@ export default function MealPlanner() {
       }
     } else {
       const targetDate = new Date(targetId);
-      if (
-        !activeItem.planned_date ||
-        !isSameDay(activeItem.planned_date, targetDate)
-      ) {
+      if (!activeItem.planned_date || !isSameDay(activeItem.planned_date, targetDate)) {
         // Close drawer if it will be empty
         if (isDraggingFromDrawer && notPlannedItems.length === 1) {
           setIsDrawerOpen(false);
@@ -285,11 +263,7 @@ export default function MealPlanner() {
       }}
     >
       <Layout>
-        <RatingModal
-          ref={ratingModalRef}
-          recipeId={recipeToRate}
-          showTriggerButton={false}
-        />
+        <RatingModal ref={ratingModalRef} recipeId={recipeToRate} showTriggerButton={false} />
 
         {/* Weekly Plan Dialog for editing */}
         <WeeklyPlanDialog
@@ -312,13 +286,13 @@ export default function MealPlanner() {
               {isSameWeek(currentWeek, new Date())
                 ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
-                ? t("mealPlanner.nextWeek")
-                : isSameWeek(currentWeek, subWeeks(new Date(), 1))
-                ? t("mealPlanner.lastWeek")
-                : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
-                    getWeekdays(currentWeek)[6],
-                    "dd.MM",
-                  )}`}
+                  ? t("mealPlanner.nextWeek")
+                  : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                    ? t("mealPlanner.lastWeek")
+                    : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
+                        getWeekdays(currentWeek)[6],
+                        "dd.MM"
+                      )}`}
             </h2>
 
             {!isSameWeek(currentWeek, new Date()) && (
@@ -332,9 +306,7 @@ export default function MealPlanner() {
               </Button>
             )}
 
-            {isSameWeek(currentWeek, new Date()) && (
-              <div className="h-[16px]"></div>
-            )}
+            {isSameWeek(currentWeek, new Date()) && <div className="h-[16px]"></div>}
           </div>
 
           <Button variant="ghost" size="sm" onClick={goToNextWeek}>
@@ -349,8 +321,8 @@ export default function MealPlanner() {
               slideDirection === "left"
                 ? "animate-slide-left"
                 : slideDirection === "right"
-                ? "animate-slide-right"
-                : ""
+                  ? "animate-slide-right"
+                  : ""
             }`}
             {...swipeHandlers}
           >
@@ -369,8 +341,7 @@ export default function MealPlanner() {
                     }`}
                   >
                     {format(day, "EEE - dd.MM", {
-                      locale:
-                        locales[i18n.language as keyof typeof locales] || enUS,
+                      locale: locales[i18n.language as keyof typeof locales] || enUS,
                     })}
                   </p>
 
@@ -383,9 +354,7 @@ export default function MealPlanner() {
                             setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
                             onRecipeEaten={() => handleRecipeEaten(item)}
                             onRecipeDelete={() => handleDelete(item.id)}
-                            onEditPlan={() =>
-                              handleEditPlan(item.recipeId, item.recipeName)
-                            }
+                            onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
                             isDragging={activeItem?.id === item.id}
                           />
                         </li>
@@ -460,17 +429,13 @@ export default function MealPlanner() {
                             recipeName={item.recipeName}
                             days={item.days}
                             daysEaten={item.daysEaten}
-                            setDaysEaten={(days) =>
-                              handleSetDaysEaten(item.id, days)
-                            }
+                            setDaysEaten={(days) => handleSetDaysEaten(item.id, days)}
                             onRecipeEaten={() => {
                               handleRecipeEaten(item);
                               showRateRecipeModal(item.recipeId);
                             }}
                             onRecipeDelete={() => handleDelete(item.id)}
-                            onEditPlan={() =>
-                              handleEditPlan(item.recipeId, item.recipeName)
-                            }
+                            onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
                             isDragging={activeItem?.id === item.id}
                           />
                         </div>

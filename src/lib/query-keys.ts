@@ -2,8 +2,7 @@ export const queryKeys = {
   mealPlanning: {
     all: ["meal-planning"] as const,
     list: (weekStart: string) => ["meal-planning", "list", weekStart] as const,
-    summary: (weekStart: string) =>
-      ["meal-planning", "summary", weekStart] as const,
+    summary: (weekStart: string) => ["meal-planning", "summary", weekStart] as const,
     info: (recipeId: number) => ["meal-planning", "info", recipeId] as const,
     recipePlans: (recipeId: number, weekStart: string) =>
       ["meal-planning", "recipe-plans", recipeId, weekStart] as const,

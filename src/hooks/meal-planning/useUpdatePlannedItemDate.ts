@@ -2,10 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
-import {
-  MealPlannerItem,
-  UpdatePlannedItemParams,
-} from "@/types/meal-planning.types";
+import { MealPlannerItem, UpdatePlannedItemParams } from "@/types/meal-planning.types";
 
 export function useUpdatePlannedItemDate() {
   const { supabase } = useSupabase();
@@ -28,9 +25,7 @@ export function useUpdatePlannedItemDate() {
         (old) => {
           if (!old || !Array.isArray(old)) return old;
           return old.map((item) =>
-            item.id === id
-              ? { ...item, planned_date: newDate, days: newDays }
-              : item
+            item.id === id ? { ...item, planned_date: newDate, days: newDays } : item
           );
         }
       );

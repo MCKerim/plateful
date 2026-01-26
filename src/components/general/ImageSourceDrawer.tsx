@@ -24,7 +24,7 @@ export default function ImageSourceDrawer({
     icon: React.ReactNode,
     label: string,
     onClick: () => void,
-    disabled?: boolean,
+    disabled?: boolean
   ) {
     return (
       <Button
@@ -51,14 +51,10 @@ export default function ImageSourceDrawer({
               <Camera className="!size-8" />,
               t("common.camera"),
               onCameraSelect,
-              !isNative,
+              !isNative
             )}
 
-            {renderButton(
-              <ImageIcon className="!size-8" />,
-              t("common.gallery"),
-              onGallerySelect,
-            )}
+            {renderButton(<ImageIcon className="!size-8" />, t("common.gallery"), onGallerySelect)}
           </div>
         </DrawerFooter>
       </DrawerContent>

@@ -6,9 +6,7 @@ test.describe("Sign Up Page", () => {
     await page.waitForLoadState("networkidle");
   });
 
-  test("should display the signup page with title and buttons", async ({
-    page,
-  }) => {
+  test("should display the signup page with title and buttons", async ({ page }) => {
     // Click on Get Started button to go to signup page
     const getStartedButton = page.getByRole("button", {
       name: /get started/i,
@@ -27,9 +25,7 @@ test.describe("Sign Up Page", () => {
     await expect(emailButton).toBeVisible();
   });
 
-  test("should navigate to email signup when clicking email button", async ({
-    page,
-  }) => {
+  test("should navigate to email signup when clicking email button", async ({ page }) => {
     // Click on Get Started button to go to signup page
     const getStartedButton = page.getByRole("button", {
       name: /get started/i,
@@ -50,7 +46,7 @@ test.describe("Sign Up Page", () => {
       name: /get started/i,
     });
     await getStartedButton.click();
-    
+
     // Check for terms and conditions text
     const termsText = page.locator("text=/terms|conditions|privacy/i");
     await expect(termsText).toBeVisible();

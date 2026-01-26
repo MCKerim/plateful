@@ -24,10 +24,7 @@ export const useNativeCamera = (): UseNativeCameraResult => {
       const req = await Camera.requestPermissions({
         permissions: ["camera", "photos"],
       });
-      return (
-        req.camera === "granted" &&
-        (req.photos === "granted" || req.photos === "limited")
-      );
+      return req.camera === "granted" && (req.photos === "granted" || req.photos === "limited");
     } catch {
       return false;
     }

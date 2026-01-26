@@ -4,13 +4,7 @@ import { Button } from "../../ui/button";
 import NoMealsIcon from "@mui/icons-material/NoMeals";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useEffect, useRef, useState } from "react";
-import {
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from "../../ui/drawer";
+import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../../ui/drawer";
 import { CalendarDays, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";

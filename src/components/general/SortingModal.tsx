@@ -1,18 +1,9 @@
 import { useState } from "react";
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import SwapVertRoundedIcon from "@mui/icons-material/SwapVertRounded";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
-import {
-  selectSorting,
-  setSorting,
-} from "@/redux/slices/filterAndSortingSlice";
+import { selectSorting, setSorting } from "@/redux/slices/filterAndSortingSlice";
 import { useTranslation } from "react-i18next";
 
 const sortOptions = [

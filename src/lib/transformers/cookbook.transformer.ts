@@ -1,8 +1,6 @@
 import { CookbookRecipeRaw, CookbookRecipe } from "@/types/cookbook.types";
 
-export function transformCookbookRecipes(
-  raw: CookbookRecipeRaw[]
-): CookbookRecipe[] {
+export function transformCookbookRecipes(raw: CookbookRecipeRaw[]): CookbookRecipe[] {
   return raw.map((recipe) => ({
     id: recipe.id,
     recipeName: recipe.name,

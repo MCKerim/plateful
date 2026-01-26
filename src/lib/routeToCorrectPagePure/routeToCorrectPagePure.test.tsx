@@ -51,10 +51,7 @@ describe("routeToCorrectPagePure", () => {
     );
 
     renderWithRouter(result);
-    expect(screen.getByTestId("navigate")).toHaveAttribute(
-      "data-to",
-      "/values/1"
-    );
+    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/values/1");
   });
 
   it("should redirect to /survey when logged in, seen values, but not completed survey", () => {
@@ -80,10 +77,7 @@ describe("routeToCorrectPagePure", () => {
     );
 
     renderWithRouter(result);
-    expect(screen.getByTestId("navigate")).toHaveAttribute(
-      "data-to",
-      "/createhousehold"
-    );
+    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/createhousehold");
   });
 
   it("should render the page when all conditions are met", () => {

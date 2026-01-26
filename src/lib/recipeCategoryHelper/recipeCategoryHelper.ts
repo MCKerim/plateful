@@ -7,14 +7,10 @@ export const categories = [
 ];
 
 export function getTranslatedCategory(t: any, id: number): string {
-  return t(
-    `categorys.${categories.find((category) => category.id === id)?.name}`
-  );
+  return t(`categorys.${categories.find((category) => category.id === id)?.name}`);
 }
 
-export function getCategoryIdByTranslatedEnglishName(
-  name: string
-): number | null {
+export function getCategoryIdByTranslatedEnglishName(name: string): number | null {
   for (const category of categories) {
     if (category.engTranslation === name) {
       return category.id;

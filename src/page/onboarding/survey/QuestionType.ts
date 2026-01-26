@@ -3,4 +3,4 @@ export type SurveyQuestionType = {
   optionKeys: string[];
   type: "single" | "multiple";
   twoColumns?: boolean;
-}
+};

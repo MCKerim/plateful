@@ -30,7 +30,7 @@ export function createRecipes(count: number, householdId: number): MockRecipe[] 
     createRecipe({
       name: `Recipe ${i + 1}`,
       household_id: householdId,
-      category: (((i % 5) + 1) as RecipeCategory),
+      category: ((i % 5) + 1) as RecipeCategory,
     })
   );
 }

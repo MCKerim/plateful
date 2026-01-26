@@ -37,9 +37,7 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
   const [isOpen, setIsOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const resolveRef = useRef<((result: ImageResult<T> | null) => void) | null>(
-    null
-  );
+  const resolveRef = useRef<((result: ImageResult<T> | null) => void) | null>(null);
 
   const isNative = Capacitor.isNativePlatform();
 
@@ -55,10 +53,7 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
       const req = await Camera.requestPermissions({
         permissions: ["camera", "photos"],
       });
-      return (
-        req.camera === "granted" &&
-        (req.photos === "granted" || req.photos === "limited")
-      );
+      return req.camera === "granted" && (req.photos === "granted" || req.photos === "limited");
     } catch {
       return false;
     }
@@ -76,18 +71,14 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
     return new File([bytes], filename, { type: mime });
   };
 
-  const takePhotoWithSource = async (
-    source: CameraSource
-  ): Promise<ImageResult<T> | null> => {
+  const takePhotoWithSource = async (source: CameraSource): Promise<ImageResult<T> | null> => {
     try {
       if (isNative) {
         await ensurePermissions();
       }
 
       const cameraResultType =
-        resultType === "base64"
-          ? CameraResultType.Base64
-          : CameraResultType.DataUrl;
+        resultType === "base64" ? CameraResultType.Base64 : CameraResultType.DataUrl;
 
       const photo = await Camera.getPhoto({
         quality: 80,

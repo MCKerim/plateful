@@ -4,14 +4,12 @@ import type { RecipeMealPlanInfo } from "@/types/meal-planning.types";
 
 describe("mealPlanHelper", () => {
   // Create a mock translation function that returns the key with count if provided
-  const mockT = vi.fn(
-    (key: string, options?: { count?: number }): string => {
-      if (options?.count !== undefined) {
-        return `${key}_${options.count}`;
-      }
-      return key;
+  const mockT = vi.fn((key: string, options?: { count?: number }): string => {
+    if (options?.count !== undefined) {
+      return `${key}_${options.count}`;
     }
-  ) as unknown as Parameters<typeof getMealPlanStatus>[1];
+    return key;
+  }) as unknown as Parameters<typeof getMealPlanStatus>[1];
 
   beforeEach(() => {
     vi.useFakeTimers();

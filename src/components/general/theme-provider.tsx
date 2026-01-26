@@ -51,9 +51,7 @@ export function ThemeProvider({
       }
 
       root.classList.add(effectiveTheme);
-      setEdgeToEdgeBackgroundColor(
-        effectiveTheme === "dark" ? DARK_BG_COLOR : LIGHT_BG_COLOR
-      );
+      setEdgeToEdgeBackgroundColor(effectiveTheme === "dark" ? DARK_BG_COLOR : LIGHT_BG_COLOR);
     };
 
     updateTheme(); // Initial update
@@ -94,8 +92,7 @@ export function ThemeProvider({
 export const useTheme = () => {
   const context = useContext(ThemeProviderContext);
 
-  if (context === undefined)
-    throw new Error("useTheme must be used within a ThemeProvider");
+  if (context === undefined) throw new Error("useTheme must be used within a ThemeProvider");
 
   return context;
 };

@@ -13,9 +13,7 @@ export default function SurveyStart() {
         <Progress value={0} />
       </div>
 
-      <h1 className="mb-4 text-3xl font-bold text-center first-font">
-        {t("surveyStart.title")}
-      </h1>
+      <h1 className="mb-4 text-3xl font-bold text-center first-font">{t("surveyStart.title")}</h1>
 
       <Button
         className="second-font w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"

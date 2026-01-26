@@ -3,14 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface TextareaProps extends React.ComponentProps<"textarea"> {
-  enterKeyHint?:
-    | "enter"
-    | "done"
-    | "go"
-    | "next"
-    | "previous"
-    | "search"
-    | "send";
+  enterKeyHint?: "enter" | "done" | "go" | "next" | "previous" | "search" | "send";
   rows?: number;
   maxHeight?: number;
 }
@@ -23,8 +16,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       const textarea = textareaRef.current;
       if (textarea) {
         // Store current scroll position
-        const scrollTop =
-          globalThis.pageYOffset || document.documentElement.scrollTop;
+        const scrollTop = globalThis.pageYOffset || document.documentElement.scrollTop;
 
         textarea.style.height = "auto";
         const newHeight = textarea.scrollHeight;
@@ -64,11 +56,11 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         enterKeyHint={enterKeyHint}
         className={cn(
           "flex w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50 md:text-sm resize-none",
-          className,
+          className
         )}
       />
     );
-  },
+  }
 );
 Textarea.displayName = "Textarea";
 

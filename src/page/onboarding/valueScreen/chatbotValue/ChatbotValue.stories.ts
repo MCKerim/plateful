@@ -1,11 +1,11 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import ChatbotValue from './ChatbotValue';
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import ChatbotValue from "./ChatbotValue";
 
 const meta = {
   title: "Page/Onboarding/Value Screens/ChatbotValue",
   component: ChatbotValue,
   parameters: {
-    layout: 'fullscreen',
+    layout: "fullscreen",
   },
 } satisfies Meta<typeof ChatbotValue>;
 

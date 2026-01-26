@@ -83,9 +83,7 @@ export default function FilterModal() {
                   variant="secondary"
                   key={category.id}
                   className={`${
-                    selectedCategory === category.id
-                      ? "bg-accent text-accent-foreground"
-                      : ""
+                    selectedCategory === category.id ? "bg-accent text-accent-foreground" : ""
                   }`}
                   onClick={() => toggleCategory(category.id)}
                   size="sm"
@@ -100,11 +98,7 @@ export default function FilterModal() {
         <DialogFooter>
           <div className="flex w-full gap-2">
             {selectedCategory !== 0 && (
-              <Button
-                onClick={handleReset}
-                className="w-full"
-                variant="secondary"
-              >
+              <Button onClick={handleReset} className="w-full" variant="secondary">
                 Zurücksetzen
               </Button>
             )}

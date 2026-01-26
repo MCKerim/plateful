@@ -8,10 +8,7 @@ export function DroppableNoDateZone({ children }: Readonly<Props>) {
   const { isOver, setNodeRef } = useDroppable({ id: "no-date-zone" });
 
   return (
-    <div
-      ref={setNodeRef}
-      className={`transition-colors ${isOver ? "bg-accent" : "bg-background"}`}
-    >
+    <div ref={setNodeRef} className={`transition-colors ${isOver ? "bg-accent" : "bg-background"}`}>
       {children}
     </div>
   );

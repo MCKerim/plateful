@@ -12,10 +12,7 @@ export default function BottomNav() {
 
   const getActiveIndex = () => {
     if (location.pathname.startsWith("/chatbot")) return 0;
-    if (
-      location.pathname.startsWith("/cookbook") ||
-      location.pathname.startsWith("/recipe")
-    )
+    if (location.pathname.startsWith("/cookbook") || location.pathname.startsWith("/recipe"))
       return 1;
     if (location.pathname.startsWith("/planner")) return 2;
     return 0;

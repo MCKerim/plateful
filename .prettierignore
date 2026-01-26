@@ -1,0 +1,10 @@
+dist
+dev-dist
+android
+ios
+coverage
+playwright-report
+test-results
+storybook-static
+node_modules
+src/types/database.types.ts

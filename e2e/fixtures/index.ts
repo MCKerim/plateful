@@ -1,9 +1,5 @@
 import { test as base, Page, BrowserContext } from "@playwright/test";
-import {
-  CustomFixtures,
-  TestScenario,
-  AuthenticatedFixtureOptions,
-} from "./types";
+import { CustomFixtures, TestScenario, AuthenticatedFixtureOptions } from "./types";
 import { createMockSession, setupAuthRoutes, getSupabaseStorageKey } from "./auth.fixture";
 import { setupApiMocks } from "./api-mocks.fixture";
 import { createUser, createHousehold } from "../factories";
@@ -43,10 +39,7 @@ function createDefaultScenario(): TestScenario {
 }
 
 function createScenarioFromOptions(options?: AuthenticatedFixtureOptions): TestScenario {
-  const household =
-    options?.household === null
-      ? null
-      : createHousehold(options?.household);
+  const household = options?.household === null ? null : createHousehold(options?.household);
 
   const user = createUser({
     household_id: household?.id ?? null,

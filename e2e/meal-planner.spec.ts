@@ -22,10 +22,7 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByText(/mon -/i)).toBeVisible();
   });
 
-  test("should display planned meals for current week", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should display planned meals for current week", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 1,
       name: "Planned Dinner",
@@ -83,10 +80,7 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByText("Unplanned Meal").first()).toBeVisible({ timeout: 5000 });
   });
 
-  test("should show empty state when no meals planned", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should show empty state when no meals planned", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
 
     await page.goto("/planner");
@@ -100,10 +94,7 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByText(/no date - 0/i)).toBeVisible();
   });
 
-  test("should click on planned item to view recipe", async ({
-    page,
-    setupAuth,
-  }) => {
+  test("should click on planned item to view recipe", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
       id: 10,
       name: "Clickable Recipe",

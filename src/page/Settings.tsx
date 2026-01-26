@@ -81,7 +81,7 @@ export default function Settings() {
         onError: (error) => {
           console.error("Error updating username:", error);
         },
-      },
+      }
     );
   }
 
@@ -138,17 +138,11 @@ export default function Settings() {
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
-          <h2 className="font-medium border-b">
-            {t("settings.supportFeedback")}
-          </h2>
+          <h2 className="font-medium border-b">{t("settings.supportFeedback")}</h2>
 
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
-          <NavLink
-            data-canny-link
-            to="https://plateful.canny.io/support/create"
-            target="blank"
-          >
+          <NavLink data-canny-link to="https://plateful.canny.io/support/create" target="blank">
             <Button variant="secondary" className="w-full">
               <Donut />
 
@@ -167,9 +161,7 @@ export default function Settings() {
               className="w-20 h-20 mb-2 border-2 border-dashed rounded-full border-accent"
             />
 
-            <p className="text-sm whitespace-pre-line">
-              {t("settings.aboutDescription")}
-            </p>
+            <p className="text-sm whitespace-pre-line">{t("settings.aboutDescription")}</p>
           </div>
 
           <div className="flex py-2 justify-evenly">
@@ -215,11 +207,7 @@ export default function Settings() {
           <div className="flex justify-between items-center border-b">
             <h2 className="font-medium">{t("settings.account")}</h2>
 
-            <Button
-              variant="ghost"
-              size="iconSm"
-              onClick={() => setIsUsernameDialogOpen(true)}
-            >
+            <Button variant="ghost" size="iconSm" onClick={() => setIsUsernameDialogOpen(true)}>
               <Pencil />
             </Button>
           </div>
@@ -234,10 +222,7 @@ export default function Settings() {
         </div>
       </div>
 
-      <Dialog
-        open={isUsernameDialogOpen}
-        onOpenChange={setIsUsernameDialogOpen}
-      >
+      <Dialog open={isUsernameDialogOpen} onOpenChange={setIsUsernameDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("settings.editUsername")}</DialogTitle>

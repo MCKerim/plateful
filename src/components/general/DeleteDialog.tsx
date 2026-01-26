@@ -16,10 +16,7 @@ type Props = {
   customTrigger?: React.ReactNode;
 };
 
-export default function DeleteDialog({
-  onDelete,
-  customTrigger,
-}: Readonly<Props>) {
+export default function DeleteDialog({ onDelete, customTrigger }: Readonly<Props>) {
   const { t } = useTranslation();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);

@@ -1,11 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerFooter,
-  DrawerTrigger,
-} from "../ui/drawer";
+import { Drawer, DrawerContent, DrawerFooter, DrawerTrigger } from "../ui/drawer";
 import { Camera, Link, Plus } from "lucide-react";
 
 type Props = {
@@ -29,21 +24,14 @@ export default function AddNewRecipeDrawer({
     disabled?: boolean
   ) {
     return (
-      <Button
-        variant="secondary"
-        size="lg"
-        onClick={onClick}
-        disabled={disabled}
-      >
+      <Button variant="secondary" size="lg" onClick={onClick} disabled={disabled}>
         <div className="flex justify-start gap-4 w-full h-full items-center text-start">
           {icon}
 
           <div className="flex flex-col justify-start">
             <p className="second-font font-semibold">{label}</p>
 
-            <p className="text-xs font-normal text-muted-foreground">
-              {description}
-            </p>
+            <p className="text-xs font-normal text-muted-foreground">{description}</p>
           </div>
         </div>
       </Button>
@@ -72,11 +60,7 @@ export default function AddNewRecipeDrawer({
             t("addRecipeDrawer.importFromImage.description")
           )}
 
-          {renderButton(
-            <Plus />,
-            t("addRecipeDrawer.createNewRecipe.label"),
-            newRecipeClicked
-          )}
+          {renderButton(<Plus />, t("addRecipeDrawer.createNewRecipe.label"), newRecipeClicked)}
         </DrawerFooter>
       </DrawerContent>
     </Drawer>
