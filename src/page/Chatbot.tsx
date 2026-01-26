@@ -606,7 +606,7 @@ description: ${recipeContext.description ?? "No description"}
         )}
 
         <Field>
-          <InputGroup className="rounded-2xl bg-background">
+          <InputGroup className="rounded-2xl bg-background dark:bg-background">
             <InputGroupTextarea
               placeholder={t("chatbot.inputPlaceholder")}
               value={inputValue}
