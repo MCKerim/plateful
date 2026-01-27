@@ -1,5 +1,6 @@
 import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
+import type { Request } from "@playwright/test";
 
 test.describe("Chatbot - Ask AI-Chef Feature", () => {
   test("should load recipe context when navigating from recipe page", async ({
@@ -97,5 +98,117 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     // Verify the Ask AI-Chef button is present and visible
     const askButton = page.getByRole("button", { name: /ask ai-chef/i });
     await expect(askButton).toBeVisible({ timeout: 10000 });
+  });
+
+  test("should preserve recipe link when saving chatbot-edited recipe", async ({
+    page,
+    setupAuth,
+  }) => {
+    const recipeLink = "https://example.com/original-recipe-link";
+    const recipe = createRecipe({
+      id: 4,
+      name: "Recipe With Link",
+      description: "Original description",
+      category: 2,
+      link: recipeLink,
+    });
+
+    await setupAuth({ recipes: [recipe] });
+
+    // Track PATCH request to verify link is preserved
+    let capturedUpdateRequest: Request | null = null;
+
+    // Mock the recipe update PATCH request
+    await page.route("**/rest/v1/recipes?id=eq.4", async (route) => {
+      const request = route.request();
+      if (request.method() === "PATCH") {
+        capturedUpdateRequest = request;
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            id: 4,
+            name: "Updated Recipe Name",
+            description: "Updated description",
+            category: 2,
+            link: recipeLink,
+            household_id: 1,
+            created_at: new Date().toISOString(),
+          }),
+        });
+      } else {
+        // For GET requests, return the recipe
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            id: recipe.id,
+            name: recipe.name,
+            description: recipe.description,
+            category: recipe.category,
+            link: recipe.link,
+            household_id: recipe.household_id,
+            created_at: recipe.created_at,
+          }),
+        });
+      }
+    });
+
+    // Mock the Supabase edge function for chatbot to return a propose_recipe_edit tool output
+    await page.route("**/functions/v1/chatbot", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "response-123",
+          output_text: "I've updated the recipe for you!",
+          tool_outputs_for_ui: JSON.stringify([
+            {
+              toolName: "propose_recipe_edit",
+              args: {
+                recipeId: 4,
+                title: "Updated Recipe Name",
+                description: "Updated description by AI",
+                category: "Main",
+              },
+            },
+          ]),
+        }),
+      });
+    });
+
+    // Navigate to chatbot with recipe context
+    await page.goto("/chatbot?recipeId=4");
+    await page.waitForLoadState("networkidle");
+
+    // Verify recipe context chip is visible
+    await expect(page.getByText("Recipe With Link")).toBeVisible({ timeout: 10000 });
+
+    // Type and send a message to trigger the chatbot response
+    const inputField = page.getByPlaceholder(/ask about recipes or tips/i);
+    await expect(inputField).toBeVisible();
+    await inputField.fill("Please update this recipe");
+    await page.getByRole("button", { name: /send/i }).click();
+
+    // Wait for the assistant response with the recipe proposal
+    await expect(page.getByText("Updated Recipe Name")).toBeVisible({ timeout: 10000 });
+
+    // Click the preview button to open the dialog
+    const previewButton = page.getByRole("button", { name: /preview edited recipe/i });
+    await expect(previewButton).toBeVisible({ timeout: 5000 });
+    await previewButton.click();
+
+    // Click the update/save button in the dialog
+    const updateButton = page.getByRole("button", { name: /update/i });
+    await expect(updateButton).toBeVisible({ timeout: 5000 });
+    await updateButton.click();
+
+    // Wait for the PATCH request to be made
+    await page.waitForURL(/\/recipe\/4/, { timeout: 10000 });
+
+    // Verify the link was preserved in the update request
+    expect(capturedUpdateRequest).not.toBeNull();
+    const requestBody = capturedUpdateRequest!.postDataJSON();
+    expect(requestBody.link).toBe(recipeLink);
   });
 });
