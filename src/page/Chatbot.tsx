@@ -228,7 +228,6 @@ description: ${recipeContext.description ?? "No description"}
     category: string,
     link: string
   ) {
-    console.log("Updating recipe:", recipeId, title, category);
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
