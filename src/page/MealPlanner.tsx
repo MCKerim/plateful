@@ -314,7 +314,7 @@ export default function MealPlanner() {
         </div>
 
         {/* Calendar Days */}
-        <div className="overflow-x-hidden">
+        <div className="overflow-x-hidden" {...swipeHandlers}>
           <div
             className={`flex flex-col gap-1 mb-48 ${
               slideDirection === "left"
@@ -323,7 +323,6 @@ export default function MealPlanner() {
                   ? "animate-slide-right"
                   : ""
             }`}
-            {...swipeHandlers}
           >
             {isLoading ? (
               <>
@@ -462,8 +461,8 @@ export default function MealPlanner() {
         }}
       >
         {activeItem && (
-          <Card className="h-[72px] flex items-center shadow-2xl opacity-95 border-2 border-primary">
-            <div className="h-full w-[74px] bg-muted border-r-4 border-background" />
+          <Card className="h-[72px] flex items-center shadow-2xl opacity-95">
+            <div className="h-full w-[74px] bg-muted border-r-4 border-background"></div>
 
             <div className="flex-1 px-2.5">
               <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
