@@ -246,7 +246,7 @@
     "urlFieldPlaceholder": "https://",
     "importButton": "Import Recipe",
     "importingMessage": "This can take a few seconds...",
-    "importingDescription": "You can close this page and find the recipe in your cookbook later",
+    "importingDescription": "You can close this page and find the recipe in your recipes later",
     "errors": {
       "invalidUrl": "Invalid URL. Please check the link.",
       "importFailed": "Failed to import recipe."

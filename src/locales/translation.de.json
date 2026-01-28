@@ -242,7 +242,7 @@
     "urlFieldPlaceholder": "https://",
     "importButton": "Rezept importieren",
     "importingMessage": "Dies kann einige Sekunden dauern...",
-    "importingDescription": "Du kannst die Seite schließen und später das Rezept in deinem Kochbuch finden",
+    "importingDescription": "Du kannst die Seite schließen und später das Rezept in deinen Rezepten finden",
     "errors": {
       "invalidUrl": "Ungültige URL. Bitte überprüfe den Link.",
       "importFailed": "Fehler beim Importieren des Rezepts."
