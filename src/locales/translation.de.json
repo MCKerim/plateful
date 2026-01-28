@@ -9,6 +9,7 @@
     "save": "Speichern",
     "saving": "Speichern...",
     "update": "Aktualisieren",
+    "open": "Öffnen",
     "error": "Ein Fehler ist aufgetreten",
     "commingSoon": "Demnächst verfügbar...",
     "selectImage": "Bild auswählen",
@@ -369,7 +370,9 @@
     "saveRecipePrompt": "Speichere das Rezept oder frage nach Anpassungen",
     "previewEditedRecipe": "Änderungen ansehen",
     "updateRecipePrompt": "Aktualisiere das Rezept oder frage nach anderen Änderungen",
-    "updateRecipeError": "Fehler beim Aktualisieren des Rezepts. Bitte versuche es später erneut."
+    "updateRecipeError": "Fehler beim Aktualisieren des Rezepts. Bitte versuche es später erneut.",
+    "recipeSaved": "Rezept gespeichert!",
+    "recipeUpdated": "Rezept aktualisiert!"
   },
   "rating": {
     "rate": "Bewerte dieses Rezept",

@@ -61,10 +61,11 @@ export const TOOLS = [
     },
   },
 ];
-export function proposeRecipe(title, description, category) {
+export function proposeRecipe(proposalId: string, title, description, category) {
   const toolOutputForUI = {
-    status: "success",
-    tool: "propose_recipe",
+    status: `Proposal ${proposalId} shown to user. Status: pending acceptance.`,
+    proposalId,
+    toolName: "propose_recipe",
     args: {
       title: title,
       description: description,
@@ -74,9 +75,10 @@ export function proposeRecipe(title, description, category) {
   return toolOutputForUI;
 }
 
-export function proposeRecipeEdit(recipeId, title, description, category) {
+export function proposeRecipeEdit(proposalId: string, recipeId, title, description, category) {
   const toolOutputForUI = {
-    status: "success",
+    status: `Proposal ${proposalId} shown to user. Status: pending acceptance.`,
+    proposalId,
     toolName: "propose_recipe_edit",
     args: {
       recipeId: recipeId,

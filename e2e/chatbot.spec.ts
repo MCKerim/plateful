@@ -2,6 +2,27 @@ import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
 import type { Request } from "@playwright/test";
 
+/** Helper to build an SSE response body from chatbot edge function */
+function buildSSEResponse(
+  text: string,
+  responseId: string,
+  toolOutputsForUI: any[] = []
+): string {
+  // Stream text in chunks
+  const chunkSize = 12;
+  let body = "";
+  for (let i = 0; i < text.length; i += chunkSize) {
+    const chunk = text.slice(i, i + chunkSize);
+    body += `data: ${JSON.stringify({ delta: chunk })}\n\n`;
+  }
+  body += `data: ${JSON.stringify({
+    done: true,
+    id: responseId,
+    tool_outputs_for_ui: JSON.stringify(toolOutputsForUI),
+  })}\n\n`;
+  return body;
+}
+
 test.describe("Chatbot - Ask AI-Chef Feature", () => {
   test("should load recipe context when navigating from recipe page", async ({
     page,
@@ -59,12 +80,12 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
       timeout: 10000,
     });
 
-    // Mock the chat API response to prevent actual API calls
-    await page.route("**/chat/completions**", async (route) => {
+    // Mock the chatbot edge function with SSE streaming
+    await page.route("**/functions/v1/chatbot", async (route) => {
       await route.fulfill({
         status: 200,
         contentType: "text/event-stream",
-        body: 'data: {"choices":[{"delta":{"content":"I can help with that recipe!"}}]}\n\ndata: [DONE]\n',
+        body: buildSSEResponse("I can help with that recipe!", "resp-1"),
       });
     });
 
@@ -119,12 +140,10 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     let capturedUpdateRequest: Request | null = null;
 
     // Register route AFTER setupAuth so it takes precedence (later routes win in Playwright)
-    // Use a broad pattern and check method inside
     await page.route("**/rest/v1/recipes**", async (route) => {
       const request = route.request();
       const url = request.url();
 
-      // Only intercept PATCH requests for recipe id=4
       if (request.method() === "PATCH" && url.includes("id=eq.4")) {
         capturedUpdateRequest = request;
         await route.fulfill({
@@ -141,31 +160,32 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
           }),
         });
       } else {
-        // Let setupAuth's routes handle non-PATCH requests
         await route.fallback();
       }
     });
 
-    // Mock the Supabase edge function for chatbot to return a propose_recipe_edit tool output
+    // Mock the chatbot edge function with SSE streaming + tool output
     await page.route("**/functions/v1/chatbot", async (route) => {
+      const toolOutputs = [
+        {
+          proposalId: "p_1",
+          toolName: "propose_recipe_edit",
+          args: {
+            recipeId: 4,
+            title: "Updated Recipe Name",
+            description: "Updated description by AI",
+            category: "Main Course",
+          },
+        },
+      ];
       await route.fulfill({
         status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({
-          id: "response-123",
-          output_text: "I've updated the recipe for you!",
-          tool_outputs_for_ui: JSON.stringify([
-            {
-              toolName: "propose_recipe_edit",
-              args: {
-                recipeId: 4,
-                title: "Updated Recipe Name",
-                description: "Updated description by AI",
-                category: "Main",
-              },
-            },
-          ]),
-        }),
+        contentType: "text/event-stream",
+        body: buildSSEResponse(
+          "I've updated the recipe for you!",
+          "response-123",
+          toolOutputs
+        ),
       });
     });
 
@@ -195,12 +215,219 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await expect(updateButton).toBeVisible({ timeout: 5000 });
     await updateButton.click();
 
-    // Wait for the PATCH request to be made
-    await page.waitForURL(/\/recipe\/4/, { timeout: 10000 });
+    // User stays on chatbot page (no navigation)
+    await page.waitForTimeout(1000);
+    expect(page.url()).toContain("/chatbot");
 
     // Verify the link was preserved in the update request
     expect(capturedUpdateRequest).not.toBeNull();
     const requestBody = capturedUpdateRequest!.postDataJSON();
     expect(requestBody.link).toBe(recipeLink);
+  });
+
+  test("should show toast and stay in chat when saving a proposed recipe", async ({
+    page,
+    setupAuth,
+  }) => {
+    await setupAuth({});
+
+    // Mock POST for creating recipe
+    await page.route("**/rest/v1/recipes**", async (route) => {
+      const request = route.request();
+      if (request.method() === "POST") {
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify([
+            {
+              id: 99,
+              name: "Banana Pancakes",
+              description: "Fluffy pancakes",
+              category: 1,
+              link: "",
+              household_id: 1,
+              created_at: new Date().toISOString(),
+            },
+          ]),
+        });
+      } else {
+        await route.fallback();
+      }
+    });
+
+    // Mock chatbot with a propose_recipe tool output
+    await page.route("**/functions/v1/chatbot", async (route) => {
+      const toolOutputs = [
+        {
+          proposalId: "p_1",
+          toolName: "propose_recipe",
+          args: {
+            title: "Banana Pancakes",
+            description: "## Ingredients\n- 2 bananas\n- 2 eggs",
+            category: "Breakfast",
+          },
+        },
+      ];
+      await route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        body: buildSSEResponse("Here's a recipe for you!", "resp-1", toolOutputs),
+      });
+    });
+
+    await page.goto("/chatbot");
+    await page.waitForLoadState("networkidle");
+
+    // Send a message
+    const inputField = page.getByPlaceholder(/ask about recipes or tips/i);
+    await inputField.fill("Make me pancakes");
+    await page.getByRole("button", { name: /send/i }).click();
+
+    // Wait for proposal button
+    await expect(page.getByText("Banana Pancakes")).toBeVisible({ timeout: 10000 });
+
+    // Open preview dialog
+    const previewButton = page.getByRole("button", { name: /preview recipe/i });
+    await expect(previewButton).toBeVisible({ timeout: 5000 });
+    await previewButton.click();
+
+    // Save the recipe
+    const saveButton = page.getByRole("button", { name: /save/i });
+    await expect(saveButton).toBeVisible({ timeout: 5000 });
+    await saveButton.click();
+
+    // Verify user stays on chatbot (no navigation)
+    await page.waitForTimeout(1000);
+    expect(page.url()).toContain("/chatbot");
+
+    // Verify toast appears
+    await expect(page.getByText(/recipe saved/i)).toBeVisible({ timeout: 5000 });
+  });
+
+  test("should include proposal feedback in next message", async ({ page, setupAuth }) => {
+    await setupAuth({});
+
+    // Mock POST for creating recipe
+    await page.route("**/rest/v1/recipes**", async (route) => {
+      const request = route.request();
+      if (request.method() === "POST") {
+        await route.fulfill({
+          status: 201,
+          contentType: "application/json",
+          body: JSON.stringify([
+            {
+              id: 42,
+              name: "Test Recipe",
+              description: "Test",
+              category: 1,
+              link: "",
+              household_id: 1,
+              created_at: new Date().toISOString(),
+            },
+          ]),
+        });
+      } else {
+        await route.fallback();
+      }
+    });
+
+    // Track chatbot requests
+    let chatbotRequestCount = 0;
+    let secondRequestBody: any = null;
+
+    await page.route("**/functions/v1/chatbot", async (route) => {
+      chatbotRequestCount++;
+
+      if (chatbotRequestCount === 2) {
+        secondRequestBody = JSON.parse(route.request().postData() ?? "{}");
+      }
+
+      const toolOutputs =
+        chatbotRequestCount === 1
+          ? [
+              {
+                proposalId: "p_1",
+                toolName: "propose_recipe",
+                args: {
+                  title: "Test Recipe",
+                  description: "Test description",
+                  category: "Other",
+                },
+              },
+            ]
+          : [];
+
+      await route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        body: buildSSEResponse(
+          chatbotRequestCount === 1 ? "Here you go!" : "Sure thing!",
+          `resp-${chatbotRequestCount}`,
+          toolOutputs
+        ),
+      });
+    });
+
+    await page.goto("/chatbot");
+    await page.waitForLoadState("networkidle");
+
+    // Send first message
+    const inputField = page.getByPlaceholder(/ask about recipes or tips/i);
+    await inputField.fill("Give me a recipe");
+    await page.getByRole("button", { name: /send/i }).click();
+
+    // Wait for proposal
+    await expect(page.getByText("Test Recipe")).toBeVisible({ timeout: 10000 });
+
+    // Save the proposed recipe
+    const previewButton = page.getByRole("button", { name: /preview recipe/i });
+    await previewButton.click();
+    const saveButton = page.getByRole("button", { name: /save/i });
+    await expect(saveButton).toBeVisible({ timeout: 5000 });
+    await saveButton.click();
+
+    // Wait for toast
+    await expect(page.getByText(/recipe saved/i)).toBeVisible({ timeout: 5000 });
+
+    // Send follow-up message
+    await inputField.fill("Can you edit that?");
+    await page.getByRole("button", { name: /send/i }).click();
+
+    // Wait for second response
+    await expect(page.getByText("Sure thing!")).toBeVisible({ timeout: 10000 });
+
+    // Verify the second request included proposal feedback
+    expect(secondRequestBody).not.toBeNull();
+    const messageContent = secondRequestBody.messages[0].content;
+    const textPart = messageContent.find((p: any) => p.type === "input_text");
+    expect(textPart.text).toContain("[Proposal Outcomes]");
+    expect(textPart.text).toContain("p_1");
+    expect(textPart.text).toContain("42");
+  });
+
+  test("should stream response text incrementally", async ({ page, setupAuth }) => {
+    await setupAuth({});
+
+    // Mock chatbot with delayed SSE chunks
+    await page.route("**/functions/v1/chatbot", async (route) => {
+      const text = "This is a streamed response from the AI chef.";
+      await route.fulfill({
+        status: 200,
+        contentType: "text/event-stream",
+        body: buildSSEResponse(text, "resp-stream"),
+      });
+    });
+
+    await page.goto("/chatbot");
+    await page.waitForLoadState("networkidle");
+
+    const inputField = page.getByPlaceholder(/ask about recipes or tips/i);
+    await inputField.fill("Hello");
+    await page.getByRole("button", { name: /send/i }).click();
+
+    // Verify the full streamed text appears
+    await expect(
+      page.getByText("This is a streamed response from the AI chef.")
+    ).toBeVisible({ timeout: 10000 });
   });
 });

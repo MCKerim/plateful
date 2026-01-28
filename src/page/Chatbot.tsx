@@ -10,12 +10,13 @@ import {
   selectIsTyping,
   selectVisibleMessages,
   addMessage,
-  addMessages,
   setIsTyping,
   resetChat,
   ChatMessage,
   setPreviousResponseId,
   selectPreviousResponseId,
+  appendToLastMessage,
+  finalizeLastMessage,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -59,6 +60,7 @@ export default function Chatbot() {
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
+  const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -130,6 +132,13 @@ description: ${recipeContext.description ?? "No description"}
         textContent = contextPrefix + textContent;
       }
 
+      // Prepend pending feedback if any
+      if (pendingFeedback.length > 0) {
+        const feedbackBlock = `[Proposal Outcomes]\n${pendingFeedback.join("\n")}\n[End Proposal Outcomes]\n\n`;
+        textContent = feedbackBlock + textContent;
+        setPendingFeedback([]);
+      }
+
       // Build vision content parts for the server
       const parts: VisionPart[] = [];
       if (textContent) {
@@ -142,42 +151,81 @@ description: ${recipeContext.description ?? "No description"}
         });
       }
 
-      // Call the Supabase edge function
-      const { data, error } = await supabase.functions.invoke("chatbot", {
-        body: {
+      // Call the edge function with streaming
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
+      const session = (await supabase.auth.getSession()).data.session;
+
+      const response = await fetch(`${supabaseUrl}/functions/v1/chatbot`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.access_token ?? supabaseKey}`,
+          apikey: supabaseKey,
+        },
+        body: JSON.stringify({
           previous_response_id: previousResponseId,
-          // Responses API accepts an array of messages with mixed content parts
           messages: [
             {
               role: "user",
               content: parts,
             },
           ],
-        },
+        }),
       });
 
-      if (error) {
-        console.error("Message: ", error.message);
-        throw error;
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
 
-      const newMessage: ChatMessage = {
-        role: "assistant",
-        content: data.output_text,
-        toolOutputsForUI: JSON.parse(data.tool_outputs_for_ui),
-      };
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No response body");
 
-      dispatch(setPreviousResponseId(data.id));
-      dispatch(addMessages([newMessage]));
+      const decoder = new TextDecoder();
+      let buffer = "";
+      let assistantMessageAdded = false;
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        // Process complete SSE lines
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const jsonStr = line.slice(6);
+          if (!jsonStr.trim()) continue;
+
+          try {
+            const event = JSON.parse(jsonStr);
+            if (event.done) {
+              if (!assistantMessageAdded) {
+                dispatch(addMessage({ role: "assistant", content: "" }));
+              }
+              dispatch(setPreviousResponseId(event.id));
+              dispatch(finalizeLastMessage(JSON.parse(event.tool_outputs_for_ui)));
+            } else if (event.delta) {
+              if (!assistantMessageAdded) {
+                dispatch(setIsTyping(false));
+                dispatch(addMessage({ role: "assistant", content: event.delta }));
+                assistantMessageAdded = true;
+              } else {
+                dispatch(appendToLastMessage(event.delta));
+              }
+            }
+          } catch {
+            // skip malformed lines
+          }
+        }
+      }
     } catch (error) {
       console.error("Error calling chatbot function:", error);
 
-      const errorMessage: ChatMessage = {
-        content: t("chatbot.errorMessage"),
-        role: "assistant",
-      };
-
-      dispatch(addMessage(errorMessage));
+      dispatch(addMessage({ role: "assistant", content: t("chatbot.errorMessage") }));
     } finally {
       dispatch(setIsTyping(false));
     }
@@ -187,13 +235,19 @@ description: ${recipeContext.description ?? "No description"}
     dispatch(resetChat());
     setInputValue("");
     setSelectedImagesAsbase64([]);
+    setPendingFeedback([]);
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(title: string, description: string, category: string) {
+  async function saveSuggestedRecipe(
+    proposalId: string,
+    title: string,
+    description: string,
+    category: string
+  ) {
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -214,7 +268,16 @@ description: ${recipeContext.description ?? "No description"}
         householdId,
         category: categoryId,
       });
-      navigate(`/recipe/${newRecipe.id}`);
+      setPendingFeedback((prev) => [
+        ...prev,
+        `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`,
+      ]);
+      toast.success(t("chatbot.recipeSaved"), {
+        action: {
+          label: t("common.open"),
+          onClick: () => navigate(`/recipe/${newRecipe.id}`),
+        },
+      });
     } catch (error) {
       console.error(error);
       toast.error(t("chatbot.saveRecipeError"));
@@ -222,6 +285,7 @@ description: ${recipeContext.description ?? "No description"}
   }
 
   async function saveEditedRecipe(
+    proposalId: string,
     recipeId: number,
     title: string,
     description: string,
@@ -243,7 +307,16 @@ description: ${recipeContext.description ?? "No description"}
         link,
         category: categoryId,
       });
-      navigate(`/recipe/${recipeId}`);
+      setPendingFeedback((prev) => [
+        ...prev,
+        `Proposal ${proposalId} accepted. Recipe ${recipeId} ("${title}") updated.`,
+      ]);
+      toast.success(t("chatbot.recipeUpdated"), {
+        action: {
+          label: t("common.open"),
+          onClick: () => navigate(`/recipe/${recipeId}`),
+        },
+      });
     } catch (error) {
       console.error(error);
       toast.error(t("chatbot.updateRecipeError"));

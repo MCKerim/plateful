@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 import {
   Dialog,
@@ -14,6 +15,7 @@ import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCat
 
 interface RecipeProposalDialogProps {
   toolOutput: {
+    proposalId: string;
     toolName: string;
     args: {
       recipeId?: number;
@@ -22,8 +24,9 @@ interface RecipeProposalDialogProps {
       category?: string;
     };
   };
-  onSaveNew: (title: string, description: string, category: string) => void;
+  onSaveNew: (proposalId: string, title: string, description: string, category: string) => void;
   onSaveEdit: (
+    proposalId: string,
     recipeId: number,
     title: string,
     description: string,
@@ -39,6 +42,7 @@ export function RecipeProposalDialog({
   onSaveEdit,
   t,
 }: RecipeProposalDialogProps) {
+  const [open, setOpen] = useState(false);
   const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
   const editRecipeId = isEditProposal ? toolOutput.args.recipeId : null;
 
@@ -73,7 +77,7 @@ export function RecipeProposalDialog({
   const finalCategory = getMergedValue("category");
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div>
           <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
@@ -118,6 +122,7 @@ export function RecipeProposalDialog({
             onClick={() => {
               if (isEditProposal && editRecipeId) {
                 onSaveEdit(
+                  toolOutput.proposalId,
                   editRecipeId,
                   finalTitle,
                   finalDescription,
@@ -125,8 +130,9 @@ export function RecipeProposalDialog({
                   originalRecipe?.link ?? ""
                 );
               } else {
-                onSaveNew(finalTitle, finalDescription, finalCategory);
+                onSaveNew(toolOutput.proposalId, finalTitle, finalDescription, finalCategory);
               }
+              setOpen(false);
             }}
           >
             {isEditProposal ? t("common.update") : t("common.save")}

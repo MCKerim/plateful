@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import OpenAI from "npm:openai";
 import { TOOLS, proposeRecipe, proposeRecipeEdit } from "./tools.ts";
-import { CORS, ANSWEAR_HEADER } from "./headers.ts";
+import { CORS, ANSWEAR_HEADER, STREAM_HEADER } from "./headers.ts";
 import { DEFAULT_PROMPT } from "./prompts.ts";
 
 serve(async (req) => {
@@ -54,6 +54,8 @@ serve(async (req) => {
   const client = new OpenAI({
     apiKey,
   });
+
+  let proposalCounter = 0;
   let answear = await client.responses.create({
     model: "gpt-4.1-mini",
     tools: TOOLS,
@@ -68,10 +70,12 @@ serve(async (req) => {
     toolOutputs = [];
     for (const item of answear.output ?? []) {
       if (item.type === "function_call") {
+        proposalCounter++;
+        const proposalId = `p_${proposalCounter}`;
         switch (item.name) {
           case "propose_recipe": {
             const { title, description, category } = JSON.parse(item.arguments);
-            const toolOutputForUI = proposeRecipe(title, description, category);
+            const toolOutputForUI = proposeRecipe(proposalId, title, description, category);
             toolOutputs.push({
               type: "function_call_output",
               call_id: item.call_id,
@@ -88,6 +92,7 @@ serve(async (req) => {
               category: editCategory,
             } = JSON.parse(item.arguments);
             const editToolOutputForUI = proposeRecipeEdit(
+              proposalId,
               editRecipeId,
               editTitle,
               editDescription,
@@ -118,14 +123,41 @@ serve(async (req) => {
     }
     loopCount++;
   } while (toolOutputs.length !== 0 && loopCount <= 5);
-  return new Response(
-    JSON.stringify({
-      id: answear.id,
-      output_text: answear.output_text,
-      tool_outputs_for_ui: JSON.stringify(toolOutputsForUI),
-    }),
-    {
-      headers: ANSWEAR_HEADER,
-    }
-  );
+
+  // Stream the final text response via SSE
+  const finalText = answear.output_text ?? "";
+  const responseId = answear.id;
+  const encoder = new TextEncoder();
+  const chunkSize = 12;
+  const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+  const stream = new ReadableStream({
+    async start(controller) {
+      // Stream text in chunks with small delays so the client receives them incrementally
+      for (let i = 0; i < finalText.length; i += chunkSize) {
+        const chunk = finalText.slice(i, i + chunkSize);
+        controller.enqueue(
+          encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`)
+        );
+        await delay(30);
+      }
+
+      // Send done event with metadata
+      controller.enqueue(
+        encoder.encode(
+          `data: ${JSON.stringify({
+            done: true,
+            id: responseId,
+            tool_outputs_for_ui: JSON.stringify(toolOutputsForUI),
+          })}\n\n`
+        )
+      );
+
+      controller.close();
+    },
+  });
+
+  return new Response(stream, {
+    headers: STREAM_HEADER,
+  });
 });

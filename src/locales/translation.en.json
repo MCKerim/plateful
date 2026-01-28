@@ -9,6 +9,7 @@
     "save": "Save",
     "saving": "Saving...",
     "update": "Update",
+    "open": "Open",
     "error": "An error occurred",
     "commingSoon": "Comming soon...",
     "selectImage": "Select image",
@@ -362,7 +363,9 @@
     "saveRecipePrompt": "Save this recipe or ask for changes",
     "previewEditedRecipe": "Preview changes",
     "updateRecipePrompt": "Update this recipe or ask for different edits",
-    "updateRecipeError": "Error updating recipe. Please try again later."
+    "updateRecipeError": "Error updating recipe. Please try again later.",
+    "recipeSaved": "Recipe saved!",
+    "recipeUpdated": "Recipe updated!"
   },
   "bottomNav": {
     "home": "Home",

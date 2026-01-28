@@ -43,11 +43,30 @@ export const chatbotSlice = createSlice({
       state.previous_response_id = null;
       state.isTyping = false;
     },
+    appendToLastMessage: (state, action: PayloadAction<string>) => {
+      const last = state.messages[state.messages.length - 1];
+      if (last) {
+        last.content += action.payload;
+      }
+    },
+    finalizeLastMessage: (state, action: PayloadAction<any[]>) => {
+      const last = state.messages[state.messages.length - 1];
+      if (last && action.payload.length > 0) {
+        last.toolOutputsForUI = action.payload;
+      }
+    },
   },
 });
 
-export const { addMessage, addMessages, setPreviousResponseId, setIsTyping, resetChat } =
-  chatbotSlice.actions;
+export const {
+  addMessage,
+  addMessages,
+  setPreviousResponseId,
+  setIsTyping,
+  resetChat,
+  appendToLastMessage,
+  finalizeLastMessage,
+} = chatbotSlice.actions;
 
 export default chatbotSlice.reducer;
 

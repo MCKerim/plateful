@@ -8,3 +8,10 @@ export const ANSWEAR_HEADER = {
   ...CORS,
   "Content-Type": "application/json",
 };
+
+export const STREAM_HEADER = {
+  ...CORS,
+  "Content-Type": "text/event-stream",
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
+};
