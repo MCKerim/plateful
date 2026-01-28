@@ -299,7 +299,7 @@ export default function MealPlanner() {
                 variant="link"
                 size="sm"
                 onClick={goToCurrentWeek}
-                className="h-auto p-0 text-xs text-muted-foreground"
+                className="h-auto p-0 text-xs text-muted-foreground italic"
               >
                 {t("mealPlanner.goToCurrentWeek")}
               </Button>
