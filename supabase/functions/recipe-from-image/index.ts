@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  let { images } = body ?? {};
+  const { images } = body ?? {};
 
   if (!Array.isArray(images)) {
     return new Response(JSON.stringify({ error: "Missing 'images' in body" }), {

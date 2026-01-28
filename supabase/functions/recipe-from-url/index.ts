@@ -40,7 +40,7 @@ Deno.serve(async (req: Request) => {
     );
   }
 
-  let { url } = body ?? {};
+  const { url } = body ?? {};
 
   if (!url) {
     return new Response(JSON.stringify({ error: "Missing 'url' in body" }), {

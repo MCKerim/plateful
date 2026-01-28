@@ -39,7 +39,7 @@ serve(async (req) => {
       }
     );
   }
-  let { messages, previous_response_id } = body ?? {};
+  const { messages, previous_response_id } = body ?? {};
   if (!Array.isArray(messages)) {
     return new Response(
       JSON.stringify({
@@ -63,7 +63,7 @@ serve(async (req) => {
   });
   let loopCount = 0;
   let toolOutputs = [];
-  let toolOutputsForUI = [];
+  const toolOutputsForUI = [];
   do {
     toolOutputs = [];
     for (const item of answear.output ?? []) {
