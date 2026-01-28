@@ -61,6 +61,9 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
   const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
+  const [knownRecipeIds, setKnownRecipeIds] = useState<number[]>(
+    () => (recipeId ? [recipeId] : [])
+  );
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -165,6 +168,7 @@ description: ${recipeContext.description ?? "No description"}
         },
         body: JSON.stringify({
           previous_response_id: previousResponseId,
+          known_recipe_ids: knownRecipeIds,
           messages: [
             {
               role: "user",
@@ -236,6 +240,7 @@ description: ${recipeContext.description ?? "No description"}
     setInputValue("");
     setSelectedImagesAsbase64([]);
     setPendingFeedback([]);
+    setKnownRecipeIds(recipeId ? [recipeId] : []);
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
@@ -268,6 +273,7 @@ description: ${recipeContext.description ?? "No description"}
         householdId,
         category: categoryId,
       });
+      setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
       setPendingFeedback((prev) => [
         ...prev,
         `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`,
@@ -441,14 +447,16 @@ description: ${recipeContext.description ?? "No description"}
 
                 {message.role === "assistant" &&
                   message.toolOutputsForUI &&
-                  message.toolOutputsForUI.length > 0 && (
+                  message.toolOutputsForUI.length > 0 &&
+                  message.toolOutputsForUI.map((toolOutput: any, i: number) => (
                     <RecipeProposalDialog
-                      toolOutput={message.toolOutputsForUI[0]}
+                      key={toolOutput.proposalId ?? i}
+                      toolOutput={toolOutput}
                       onSaveNew={saveSuggestedRecipe}
                       onSaveEdit={saveEditedRecipe}
                       t={t}
                     />
-                  )}
+                  ))}
               </div>
             </div>
           </div>

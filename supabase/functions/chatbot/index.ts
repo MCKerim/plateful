@@ -39,7 +39,8 @@ serve(async (req) => {
       }
     );
   }
-  const { messages, previous_response_id } = body ?? {};
+  const { messages, previous_response_id, known_recipe_ids } = body ?? {};
+  const validRecipeIds = new Set(Array.isArray(known_recipe_ids) ? known_recipe_ids : []);
   if (!Array.isArray(messages)) {
     return new Response(
       JSON.stringify({
@@ -91,6 +92,30 @@ serve(async (req) => {
               description: editDescription,
               category: editCategory,
             } = JSON.parse(item.arguments);
+
+            // Guard: if recipeId is not in the known set, downgrade to propose_recipe
+            if (!validRecipeIds.has(editRecipeId)) {
+              console.warn(
+                `propose_recipe_edit called with unknown recipeId ${editRecipeId}, converting to propose_recipe`
+              );
+              const fallbackTitle = editTitle ?? "Recipe";
+              const fallbackDescription = editDescription ?? "";
+              const fallbackCategory = editCategory ?? "Other";
+              const fallbackOutput = proposeRecipe(
+                proposalId,
+                fallbackTitle,
+                fallbackDescription,
+                fallbackCategory
+              );
+              toolOutputs.push({
+                type: "function_call_output",
+                call_id: item.call_id,
+                output: `Error: recipeId ${editRecipeId} does not exist in the database. The proposal was converted to a new recipe proposal (${proposalId}). In the future, only use propose_recipe_edit for confirmed saved recipes.`,
+              });
+              toolOutputsForUI.push(fallbackOutput);
+              break;
+            }
+
             const editToolOutputForUI = proposeRecipeEdit(
               proposalId,
               editRecipeId,
