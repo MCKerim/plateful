@@ -118,10 +118,14 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     // Track PATCH request to verify link is preserved
     let capturedUpdateRequest: Request | null = null;
 
-    // Mock the recipe update PATCH request
-    await page.route("**/rest/v1/recipes?id=eq.4", async (route) => {
+    // Register route AFTER setupAuth so it takes precedence (later routes win in Playwright)
+    // Use a broad pattern and check method inside
+    await page.route("**/rest/v1/recipes**", async (route) => {
       const request = route.request();
-      if (request.method() === "PATCH") {
+      const url = request.url();
+
+      // Only intercept PATCH requests for recipe id=4
+      if (request.method() === "PATCH" && url.includes("id=eq.4")) {
         capturedUpdateRequest = request;
         await route.fulfill({
           status: 200,
@@ -137,20 +141,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
           }),
         });
       } else {
-        // For GET requests, return the recipe
-        await route.fulfill({
-          status: 200,
-          contentType: "application/json",
-          body: JSON.stringify({
-            id: recipe.id,
-            name: recipe.name,
-            description: recipe.description,
-            category: recipe.category,
-            link: recipe.link,
-            household_id: recipe.household_id,
-            created_at: recipe.created_at,
-          }),
-        });
+        // Let setupAuth's routes handle non-PATCH requests
+        await route.fallback();
       }
     });
 
@@ -194,7 +186,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await expect(page.getByText("Updated Recipe Name")).toBeVisible({ timeout: 10000 });
 
     // Click the preview button to open the dialog
-    const previewButton = page.getByRole("button", { name: /preview edited recipe/i });
+    const previewButton = page.getByRole("button", { name: /preview changes/i });
     await expect(previewButton).toBeVisible({ timeout: 5000 });
     await previewButton.click();
 
