@@ -69,7 +69,7 @@ serve(async (req) => {
     for (const item of answear.output ?? []) {
       if (item.type === "function_call") {
         switch (item.name) {
-          case "propose_recipe":
+          case "propose_recipe": {
             const { title, description, category } = JSON.parse(item.arguments);
             const toolOutputForUI = proposeRecipe(title, description, category);
             toolOutputs.push({
@@ -79,7 +79,8 @@ serve(async (req) => {
             });
             toolOutputsForUI.push(toolOutputForUI);
             break;
-          case "propose_recipe_edit":
+          }
+          case "propose_recipe_edit": {
             const {
               recipeId: editRecipeId,
               title: editTitle,
@@ -99,6 +100,7 @@ serve(async (req) => {
             });
             toolOutputsForUI.push(editToolOutputForUI);
             break;
+          }
           default:
             console.error("Function not implemented: " + item.name);
             break;
