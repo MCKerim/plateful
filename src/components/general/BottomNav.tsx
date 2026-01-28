@@ -24,7 +24,7 @@ export default function BottomNav() {
     <>
       <div style={{ height: "100px" }}></div>
 
-      <div className="fixed bottom-0 z-20 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
+      <div className="fixed bottom-0 z-40 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
         <div className="flex justify-between w-full gap-1 px-2 relative">
           {/* Sliding indicator */}
           <motion.div
