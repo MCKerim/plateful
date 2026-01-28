@@ -242,7 +242,6 @@ export default function MealPlanner() {
   const swipeHandlers = useSwipe({
     onSwipeLeft: goToNextWeek,
     onSwipeRight: goToPreviousWeek,
-    threshold: 100,
     disabled: activeItem !== null,
   });
 

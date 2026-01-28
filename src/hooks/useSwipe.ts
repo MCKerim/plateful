@@ -16,7 +16,7 @@ interface UseSwipeOptions {
 export function useSwipe({
   onSwipeLeft,
   onSwipeRight,
-  threshold = 50,
+  threshold = 75,
   disabled = false,
 }: UseSwipeOptions): SwipeHandlers {
   const touchStartX = useRef<number | null>(null);
