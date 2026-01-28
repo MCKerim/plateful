@@ -49,7 +49,7 @@ export default function BottomNavButton({
       <motion.div
         className="flex flex-col items-center justify-center w-full"
         whileTap={{ scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
         {getIcon()}
 
