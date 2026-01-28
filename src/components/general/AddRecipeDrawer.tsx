@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerFooter, DrawerTrigger } from "../ui/drawer";
 import { Camera, Link, Plus } from "lucide-react";
+import { motion } from "motion/react";
 
 type Props = {
   urlImportClicked: () => void;
@@ -40,8 +41,15 @@ export default function AddNewRecipeDrawer({
 
   return (
     <Drawer>
-      <DrawerTrigger className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:bg-accent/90 active:scale-95">
-        <Plus size={34} />
+      <DrawerTrigger asChild>
+        <motion.button
+          className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg hover:bg-accent/90"
+          whileTap={{ scale: 0.95 }}
+          whileHover={{ scale: 1.1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        >
+          <Plus size={34} />
+        </motion.button>
       </DrawerTrigger>
 
       <DrawerContent>

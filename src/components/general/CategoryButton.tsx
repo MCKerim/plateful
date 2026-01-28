@@ -1,6 +1,7 @@
 import { useAppDispatch } from "@/redux/hooks";
 import { setCategoryId } from "@/redux/slices/filterAndSortingSlice";
 import { useTheme } from "@/components/general/theme-provider";
+import { motion } from "motion/react";
 
 type Props = {
   id: number;
@@ -60,10 +61,12 @@ export default function CategoryButton({ id, name, color = "" }: Readonly<Props>
   const frontColor = getFrontColorCode(color, isDarkMode);
 
   return (
-    <button
+    <motion.button
       key={id}
       type="button"
-      className="relative h-[132px] w-full max-w-[169px] mx-auto ease-in-out duration-200 active:scale-95"
+      className="relative h-[132px] w-full max-w-[169px] mx-auto"
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 300, damping: 20 }}
       onClick={() => {
         dispatch(setCategoryId(id));
       }}
@@ -92,6 +95,6 @@ export default function CategoryButton({ id, name, color = "" }: Readonly<Props>
           {name}
         </p>
       </div>
-    </button>
+    </motion.button>
   );
 }
