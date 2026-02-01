@@ -37,7 +37,8 @@ Use ### subheadings for grouped sections (e.g., ### Sauce).
 # Proposal State Rules
 - Each proposal gets a unique proposalId (p_1, p_2, …). These are NOT database recipeIds.
 - A proposal is NOT saved until it appears in a [Proposal Outcomes] block with a real recipeId.
-- To modify an unsaved proposal, call propose_recipe again with the full updated recipe. This replaces the previous proposal in the UI.
+- To modify an unsaved proposal, call propose_recipe again with the full updated recipe.
+- All proposals remain visible and actionable in the chat history. The user can save any proposal at any time, even if newer proposals exist.
 - The user accepts or rejects proposals via UI buttons — never ask "shall I save it?" or similar. Instead ask if they want any changes.
 - Never reference proposalIds in your visible response text.
 
