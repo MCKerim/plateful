@@ -65,6 +65,7 @@ export default function Chatbot() {
     () => (recipeId ? [recipeId] : [])
   );
 
+  const proposalCounterRef = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -169,6 +170,7 @@ description: ${recipeContext.description ?? "No description"}
         body: JSON.stringify({
           previous_response_id: previousResponseId,
           known_recipe_ids: knownRecipeIds,
+          proposal_counter: proposalCounterRef.current,
           messages: [
             {
               role: "user",
@@ -211,7 +213,9 @@ description: ${recipeContext.description ?? "No description"}
                 dispatch(addMessage({ role: "assistant", content: "" }));
               }
               dispatch(setPreviousResponseId(event.id));
-              dispatch(finalizeLastMessage(JSON.parse(event.tool_outputs_for_ui)));
+              const toolOutputs = JSON.parse(event.tool_outputs_for_ui);
+              proposalCounterRef.current += toolOutputs.length;
+              dispatch(finalizeLastMessage(toolOutputs));
             } else if (event.delta) {
               if (!assistantMessageAdded) {
                 dispatch(setIsTyping(false));

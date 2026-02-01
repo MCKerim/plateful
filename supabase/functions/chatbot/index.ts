@@ -39,7 +39,7 @@ serve(async (req) => {
       }
     );
   }
-  const { messages, previous_response_id, known_recipe_ids } = body ?? {};
+  const { messages, previous_response_id, known_recipe_ids, proposal_counter } = body ?? {};
   const validRecipeIds = new Set(Array.isArray(known_recipe_ids) ? known_recipe_ids : []);
   if (!Array.isArray(messages)) {
     return new Response(
@@ -56,7 +56,7 @@ serve(async (req) => {
     apiKey,
   });
 
-  let proposalCounter = 0;
+  let proposalCounter = typeof proposal_counter === "number" ? proposal_counter : 0;
   let answear = await client.responses.create({
     model: "gpt-4.1-mini",
     tools: TOOLS,
