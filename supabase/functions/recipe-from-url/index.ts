@@ -120,8 +120,8 @@ Deno.serve(async (req: Request) => {
           name: node_data.data.recipe.title,
           link: url,
           description: node_data.data.recipe.description,
+          category: node_data.data.recipe.category,
           household_id: householdId,
-          category: 1,
         },
       ])
       .select();
