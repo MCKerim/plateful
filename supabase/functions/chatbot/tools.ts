@@ -10,11 +10,12 @@ export const TOOLS = [
       properties: {
         title: {
           type: "string",
-          description: "Recipe title",
+          description: "Short concise dish name, max ~50 characters",
         },
         description: {
           type: "string",
-          description: "Recipe ingredients, serving size and instructions formatted with markdown",
+          description:
+            "Multi-line markdown string with real line breaks (not escaped \\n). Start with a short one-sentence summary, then a blank line, then serving size, then a blank line, then ## Ingredients with a bullet list (- item), then a blank line, then ## Instructions with numbered steps (1. step). Use ### subheadings to group (e.g. ### Sauce) if needed.",
         },
         category: {
           type: "string",
