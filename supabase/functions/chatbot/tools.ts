@@ -64,7 +64,7 @@ export const TOOLS = [
 ];
 export function proposeRecipe(proposalId: string, title, description, category) {
   const toolOutputForUI = {
-    status: `Proposal ${proposalId} shown to user. Status: pending acceptance.`,
+    status: `Proposal ${proposalId} shown to user. The user can review and save it anytime.`,
     proposalId,
     toolName: "propose_recipe",
     args: {
@@ -78,7 +78,7 @@ export function proposeRecipe(proposalId: string, title, description, category) 
 
 export function proposeRecipeEdit(proposalId: string, recipeId, title, description, category) {
   const toolOutputForUI = {
-    status: `Proposal ${proposalId} shown to user. Status: pending acceptance.`,
+    status: `Proposal ${proposalId} shown to user. The user can review and save it anytime.`,
     proposalId,
     toolName: "propose_recipe_edit",
     args: {

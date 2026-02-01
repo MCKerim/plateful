@@ -93,26 +93,14 @@ serve(async (req) => {
               category: editCategory,
             } = JSON.parse(item.arguments);
 
-            // Guard: if recipeId is not in the known set, downgrade to propose_recipe
             if (!validRecipeIds.has(editRecipeId)) {
-              console.warn(
-                `propose_recipe_edit called with unknown recipeId ${editRecipeId}, converting to propose_recipe`
-              );
-              const fallbackTitle = editTitle ?? "Recipe";
-              const fallbackDescription = editDescription ?? "";
-              const fallbackCategory = editCategory ?? "Other";
-              const fallbackOutput = proposeRecipe(
-                proposalId,
-                fallbackTitle,
-                fallbackDescription,
-                fallbackCategory
-              );
+              console.warn(`propose_recipe_edit called with unknown recipeId ${editRecipeId}`);
+              proposalCounter--;
               toolOutputs.push({
                 type: "function_call_output",
                 call_id: item.call_id,
-                output: `Error: recipeId ${editRecipeId} does not exist in the database. The proposal was converted to a new recipe proposal (${proposalId}). In the future, only use propose_recipe_edit for confirmed saved recipes.`,
+                output: `Error: recipeId ${editRecipeId} is not a saved recipe. Valid recipeIds only come from [Recipe Context] or [Proposal Outcomes] blocks. Use propose_recipe instead for unsaved proposals.`,
               });
-              toolOutputsForUI.push(fallbackOutput);
               break;
             }
 
@@ -161,9 +149,7 @@ serve(async (req) => {
       // Stream text in chunks with small delays so the client receives them incrementally
       for (let i = 0; i < finalText.length; i += chunkSize) {
         const chunk = finalText.slice(i, i + chunkSize);
-        controller.enqueue(
-          encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`)
-        );
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify({ delta: chunk })}\n\n`));
         await delay(30);
       }
 
