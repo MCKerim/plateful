@@ -58,7 +58,7 @@ serve(async (req) => {
 
   let proposalCounter = typeof proposal_counter === "number" ? proposal_counter : 0;
   let answear = await client.responses.create({
-    model: "gpt-5-mini",
+    model: "gpt-4.1-mini",
     tools: TOOLS,
     instructions: DEFAULT_PROMPT,
     previous_response_id: previous_response_id ?? null,
@@ -127,7 +127,7 @@ serve(async (req) => {
     }
     if (toolOutputs.length !== 0) {
       answear = await client.responses.create({
-        model: "gpt-5-mini",
+        model: "gpt-4.1-mini",
         tools: TOOLS,
         instructions: DEFAULT_PROMPT,
         previous_response_id: answear.id,
