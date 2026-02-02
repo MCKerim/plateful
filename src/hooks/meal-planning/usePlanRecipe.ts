@@ -7,7 +7,6 @@ export type PlanRecipeParams = {
   recipeId: number;
   householdId: number;
   plannedDate: Date | null;
-  days: number;
 };
 
 export function usePlanRecipe() {
@@ -21,8 +20,7 @@ export function usePlanRecipe() {
         supabase,
         params.recipeId,
         params.householdId,
-        dateString,
-        params.days
+        dateString
       );
     },
     onSettled: async () => {

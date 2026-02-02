@@ -3,14 +3,12 @@ export type MealPlannerItem = {
   recipeId: number;
   recipeName: string;
   planned_date: Date | null;
-  days: number;
-  daysEaten: number;
+  eaten: boolean;
 };
 
 export type MealPlannerItemRaw = {
   id: number;
   planned_date: string | null;
-  days: number;
   daysEaten: number;
   recipes: { id: number; name: string } | null;
 };
@@ -28,26 +26,22 @@ export type PlannedItemSummary = {
 export type UpdatePlannedItemParams = {
   id: number;
   newDate: Date | null;
-  newDays: number;
 };
 
 export type CreateMealPlanParams = {
   recipeId: number;
   householdId: number;
   date: Date | null;
-  days: number;
 };
 
 export type RecipePlanEntry = {
   id: number;
   planned_date: Date | null;
-  days: number;
 };
 
 export type RecipePlanEntryRaw = {
   id: number;
   planned_date: string | null;
-  days: number;
 };
 
 export type SaveRecipePlansResult = {
@@ -60,8 +54,7 @@ export type RecipeMealPlanInfo = {
   activePlan: {
     id: number;
     planned_date: string | null;
-    days: number;
-    daysEaten: number;
+    eaten: boolean;
   } | null;
   lastPlannedDate: string | null;
 };

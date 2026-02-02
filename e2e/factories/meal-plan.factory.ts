@@ -53,7 +53,7 @@ export function createBacklogMealPlans(recipes: MockRecipe[], householdId: numbe
       recipe_id: recipe.id,
       household_id: householdId,
       planned_date: null,
-      days: 2,
+      days: 1,
       recipes: { id: recipe.id, name: recipe.name },
     })
   );

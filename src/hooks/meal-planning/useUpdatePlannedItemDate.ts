@@ -9,11 +9,11 @@ export function useUpdatePlannedItemDate() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, newDate, newDays }: UpdatePlannedItemParams) => {
+    mutationFn: async ({ id, newDate }: UpdatePlannedItemParams) => {
       const plannedDate = newDate ? newDate.toISOString() : null;
-      await mealPlanningApi.updateDate(supabase, id, plannedDate, newDays);
+      await mealPlanningApi.updateDate(supabase, id, plannedDate);
     },
-    onMutate: async ({ id, newDate, newDays }) => {
+    onMutate: async ({ id, newDate }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.mealPlanning.all });
 
       const previousData = queryClient.getQueriesData<MealPlannerItem[]>({
@@ -25,7 +25,7 @@ export function useUpdatePlannedItemDate() {
         (old) => {
           if (!old || !Array.isArray(old)) return old;
           return old.map((item) =>
-            item.id === id ? { ...item, planned_date: newDate, days: newDays } : item
+            item.id === id ? { ...item, planned_date: newDate } : item
           );
         }
       );

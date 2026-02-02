@@ -36,8 +36,7 @@ export function useSaveRecipePlans() {
             supabase,
             params.recipeId,
             params.householdId,
-            date.toISOString(),
-            1
+            date.toISOString()
           )
         );
       }
@@ -45,7 +44,7 @@ export function useSaveRecipePlans() {
       // Add without date entries
       for (let i = 0; i < params.withoutDateCount; i++) {
         operations.push(
-          mealPlanningApi.create(supabase, params.recipeId, params.householdId, null, 1)
+          mealPlanningApi.create(supabase, params.recipeId, params.householdId, null)
         );
       }
 

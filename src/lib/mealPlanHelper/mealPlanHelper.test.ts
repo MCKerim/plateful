@@ -39,8 +39,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: null,
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -52,8 +51,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: "2024-06-15",
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -65,8 +63,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: "2024-06-16",
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -78,8 +75,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: "2024-06-18", // 3 days from now
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -92,8 +88,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: "2024-06-20", // 5 days from now
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -177,8 +172,7 @@ describe("mealPlanHelper", () => {
         activePlan: {
           id: 1,
           planned_date: "2024-06-16",
-          days: 1,
-          daysEaten: 0,
+          eaten: false,
         },
         lastPlannedDate: "2024-06-10", // This should be ignored
       };

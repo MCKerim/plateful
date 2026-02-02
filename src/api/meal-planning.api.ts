@@ -19,7 +19,6 @@ export const mealPlanningApi = {
         `
         id,
         planned_date,
-        days,
         daysEaten,
         recipes (id, name)
       `
@@ -28,7 +27,7 @@ export const mealPlanningApi = {
         `planned_date.is.null,and(planned_date.gte.${weekStart.toISOString()},planned_date.lte.${weekEnd.toISOString()})`
       )
       .order("created_at", { ascending: true })
-      .returns<MealPlannerItemRaw[]>(); // Use .returns<T>() for proper typing
+      .returns<MealPlannerItemRaw[]>();
 
     if (error) throw error;
     return data ?? [];
@@ -45,7 +44,7 @@ export const mealPlanningApi = {
       .gte("planned_date", weekStart.toISOString())
       .lte("planned_date", weekEnd.toISOString())
       .order("planned_date", { ascending: true })
-      .returns<PlannedItemSummaryRaw[]>(); // Use .returns<T>() for proper typing
+      .returns<PlannedItemSummaryRaw[]>();
 
     if (error) throw error;
 
@@ -63,19 +62,21 @@ export const mealPlanningApi = {
   async updateDate(
     supabase: SupabaseClient,
     id: number,
-    plannedDate: string | null,
-    days: number
+    plannedDate: string | null
   ): Promise<void> {
     const { error } = await supabase
       .from("meal_planning")
-      .update({ planned_date: plannedDate, days })
+      .update({ planned_date: plannedDate })
       .eq("id", id);
 
     if (error) throw error;
   },
 
-  async updateDaysEaten(supabase: SupabaseClient, id: number, daysEaten: number): Promise<void> {
-    const { error } = await supabase.from("meal_planning").update({ daysEaten }).eq("id", id);
+  async setEaten(supabase: SupabaseClient, id: number, eaten: boolean): Promise<void> {
+    const { error } = await supabase
+      .from("meal_planning")
+      .update({ daysEaten: eaten ? 1 : 0 })
+      .eq("id", id);
 
     if (error) throw error;
   },
@@ -90,14 +91,13 @@ export const mealPlanningApi = {
     supabase: SupabaseClient,
     recipeId: number,
     householdId: number,
-    plannedDate: string | null,
-    days: number
+    plannedDate: string | null
   ): Promise<void> {
     const { error } = await supabase.from("meal_planning").insert({
       recipe_id: recipeId,
       household_id: householdId,
       planned_date: plannedDate,
-      days,
+      days: 1,
       daysEaten: 0,
     });
 
@@ -106,10 +106,8 @@ export const mealPlanningApi = {
 
   async getInfoByRecipe(supabase: SupabaseClient, recipeId: number): Promise<RecipeMealPlanInfo> {
     const today = new Date();
-    // Use local date string to avoid timezone issues
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
-    // Get all meal plans for this recipe, ascending so closest date comes first
     const { data, error } = await supabase
       .from("meal_planning")
       .select("*")
@@ -122,31 +120,31 @@ export const mealPlanningApi = {
       return { activePlan: null, lastPlannedDate: null };
     }
 
-    // Separate plans into categories
     const plansWithoutDate = data.filter((p) => p.planned_date === null);
     const futurePlans = data.filter((p) => p.planned_date !== null && p.planned_date >= todayStr);
 
-    // Find active plan: first check for closest future/today date, then check no-date plans
-    // futurePlans are already sorted ascending, so first one is closest
     let activePlan = futurePlans.length > 0 ? futurePlans[0] : null;
 
-    // If no future plan, check for a no-date plan that's not fully eaten
     if (!activePlan) {
-      activePlan = plansWithoutDate.find((plan) => plan.daysEaten < plan.days) ?? null;
+      activePlan = plansWithoutDate.find((plan) => plan.daysEaten < 1) ?? null;
     }
 
-    // Find the most recent past planned_date (for "last planned" display)
     const pastPlansWithDates = data.filter(
       (p) => p.planned_date !== null && p.planned_date < todayStr
     );
-    // Get the most recent past date (last item since ascending order)
     const lastPlannedDate =
       pastPlansWithDates.length > 0
         ? pastPlansWithDates[pastPlansWithDates.length - 1].planned_date
         : null;
 
     return {
-      activePlan: activePlan ?? null,
+      activePlan: activePlan
+        ? {
+            id: activePlan.id,
+            planned_date: activePlan.planned_date,
+            eaten: activePlan.daysEaten >= 1,
+          }
+        : null,
       lastPlannedDate,
     };
   },
@@ -159,7 +157,7 @@ export const mealPlanningApi = {
   ): Promise<RecipePlanEntryRaw[]> {
     const { data, error } = await supabase
       .from("meal_planning")
-      .select("id, planned_date, days")
+      .select("id, planned_date")
       .eq("recipe_id", recipeId)
       .gte("planned_date", weekStart.toISOString())
       .lte("planned_date", weekEnd.toISOString())

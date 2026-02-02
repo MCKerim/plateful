@@ -4,15 +4,15 @@ import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 import { MealPlannerItem } from "@/types/meal-planning.types";
 
-export function useSetDaysEaten() {
+export function useSetEaten() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, newDaysEaten }: { id: number; newDaysEaten: number }) => {
-      await mealPlanningApi.updateDaysEaten(supabase, id, newDaysEaten);
+    mutationFn: async ({ id, eaten }: { id: number; eaten: boolean }) => {
+      await mealPlanningApi.setEaten(supabase, id, eaten);
     },
-    onMutate: async ({ id, newDaysEaten }) => {
+    onMutate: async ({ id, eaten }) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.mealPlanning.all });
 
       const previousData = queryClient.getQueriesData<MealPlannerItem[]>({
@@ -23,7 +23,7 @@ export function useSetDaysEaten() {
         { queryKey: queryKeys.mealPlanning.all },
         (old) => {
           if (!old || !Array.isArray(old)) return old;
-          return old.map((item) => (item.id === id ? { ...item, daysEaten: newDaysEaten } : item));
+          return old.map((item) => (item.id === id ? { ...item, eaten } : item));
         }
       );
 

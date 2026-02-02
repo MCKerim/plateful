@@ -34,7 +34,6 @@ export function useRecipePlansForWeek(
       return raw.map((item) => ({
         id: item.id,
         planned_date: item.planned_date ? new Date(item.planned_date) : null,
-        days: item.days,
       }));
     },
     enabled: enabled && recipeId !== null,

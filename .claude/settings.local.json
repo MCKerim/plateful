@@ -6,5 +6,9 @@
       "Bash(npm run format:check:*)",
       "Bash(npm run build:*)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }

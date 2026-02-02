@@ -37,7 +37,7 @@ import { DroppableNoDateZone } from "@/components/mealPlanner/droppableNoDateZon
 import { DroppableDay } from "@/components/mealPlanner/droppableDay/DroppableDay";
 import { useDeletePlannedItem } from "@/hooks/meal-planning/useDeletePlannedItem";
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
-import { useSetDaysEaten } from "@/hooks/meal-planning/useSetDaysEaten";
+import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
 import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlannedItemDate";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
@@ -80,7 +80,7 @@ export default function MealPlanner() {
   const { data: plannedItems = [], isLoading } = useMealPlannerItems(currentWeek);
   const deleteMutation = useDeletePlannedItem();
   const updateDateMutation = useUpdatePlannedItemDate();
-  const setDaysEatenMutation = useSetDaysEaten();
+  const setEatenMutation = useSetEaten();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -99,7 +99,7 @@ export default function MealPlanner() {
 
   // Derived state
   const notPlannedItems = plannedItems.filter(
-    (item) => item.planned_date === null && item.daysEaten < item.days
+    (item) => item.planned_date === null && !item.eaten
   );
   const isDraggingFromDrawer = activeItem?.planned_date === null;
 
@@ -115,9 +115,9 @@ export default function MealPlanner() {
     });
   }
 
-  function handleUpdateDate(id: number, newDate: Date | null, newDays: number) {
+  function handleUpdateDate(id: number, newDate: Date | null) {
     updateDateMutation.mutate(
-      { id, newDate, newDays },
+      { id, newDate },
       {
         onSuccess: () => toast.success(t("recipe.planningSuccessful")),
         onError: () => toast.error(t("recipe.planningFailed")),
@@ -125,9 +125,9 @@ export default function MealPlanner() {
     );
   }
 
-  function handleSetDaysEaten(id: number, newDaysEaten: number) {
-    setDaysEatenMutation.mutate(
-      { id, newDaysEaten },
+  function handleSetEaten(id: number, eaten: boolean) {
+    setEatenMutation.mutate(
+      { id, eaten },
       {
         onError: () => toast.error(t("mealPlanner.updateError")),
       }
@@ -135,7 +135,7 @@ export default function MealPlanner() {
   }
 
   function handleRecipeEaten(item: MealPlannerItemType) {
-    handleSetDaysEaten(item.id, item.daysEaten + 1);
+    handleSetEaten(item.id, true);
     setRecipeToRate(item.recipeId);
     ratingModalRef.current?.open();
   }
@@ -177,11 +177,6 @@ export default function MealPlanner() {
     };
   }, [activeItem]);
 
-  function showRateRecipeModal(recipeId: number) {
-    setRecipeToRate(recipeId);
-    ratingModalRef.current?.open();
-  }
-
   function goToPreviousWeek() {
     setSlideDirection("right");
     dispatch(setCurrentWeek(subWeeks(currentWeek, 1).toISOString()));
@@ -219,7 +214,7 @@ export default function MealPlanner() {
 
     if (targetId === "no-date-zone") {
       if (activeItem.planned_date !== null) {
-        handleUpdateDate(activeItem.id, null, 1);
+        handleUpdateDate(activeItem.id, null);
       }
     } else {
       const targetDate = new Date(targetId);
@@ -228,7 +223,7 @@ export default function MealPlanner() {
         if (isDraggingFromDrawer && notPlannedItems.length === 1) {
           setIsDrawerOpen(false);
         }
-        handleUpdateDate(activeItem.id, targetDate, activeItem.days);
+        handleUpdateDate(activeItem.id, targetDate);
       }
     }
 
@@ -349,8 +344,13 @@ export default function MealPlanner() {
                         <li key={item.id}>
                           <MealPlannerItem
                             {...item}
-                            setDaysEaten={(d) => handleSetDaysEaten(item.id, d)}
-                            onRecipeEaten={() => handleRecipeEaten(item)}
+                            onToggleEaten={() => {
+                              if (item.eaten) {
+                                handleSetEaten(item.id, false);
+                              } else {
+                                handleRecipeEaten(item);
+                              }
+                            }}
                             onRecipeDelete={() => handleDelete(item.id)}
                             onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
                             isDragging={activeItem?.id === item.id}
@@ -422,15 +422,13 @@ export default function MealPlanner() {
                         <div key={item.id} className="flex-shrink-0 w-[280px]">
                           <MealPlannerItem
                             key={item.id}
-                            id={item.id}
-                            recipeId={item.recipeId}
-                            recipeName={item.recipeName}
-                            days={item.days}
-                            daysEaten={item.daysEaten}
-                            setDaysEaten={(days) => handleSetDaysEaten(item.id, days)}
-                            onRecipeEaten={() => {
-                              handleRecipeEaten(item);
-                              showRateRecipeModal(item.recipeId);
+                            {...item}
+                            onToggleEaten={() => {
+                              if (item.eaten) {
+                                handleSetEaten(item.id, false);
+                              } else {
+                                handleRecipeEaten(item);
+                              }
                             }}
                             onRecipeDelete={() => handleDelete(item.id)}
                             onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}

@@ -1,11 +1,9 @@
 import { useNavigate } from "react-router";
 import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
-import NoMealsIcon from "@mui/icons-material/NoMeals";
-import RestaurantIcon from "@mui/icons-material/Restaurant";
 import { useEffect, useRef, useState } from "react";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../../ui/drawer";
-import { CalendarDays, MoreVertical, Trash2 } from "lucide-react";
+import { CalendarDays, Check, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
@@ -15,10 +13,8 @@ type Props = {
   id: number;
   recipeId: number;
   recipeName: string;
-  days: number;
-  daysEaten: number;
-  setDaysEaten: (days: number) => void;
-  onRecipeEaten: (id: number) => void;
+  eaten: boolean;
+  onToggleEaten: () => void;
   onRecipeDelete: (id: number) => void;
   onEditPlan: () => void;
   isDragging?: boolean;
@@ -28,10 +24,8 @@ export default function MealPlannerItem({
   id,
   recipeId,
   recipeName,
-  days,
-  daysEaten,
-  setDaysEaten,
-  onRecipeEaten,
+  eaten,
+  onToggleEaten,
   onRecipeDelete,
   onEditPlan,
   isDragging = false,
@@ -133,19 +127,6 @@ export default function MealPlannerItem({
     };
   }, []);
 
-  function eat() {
-    if (daysEaten + 1 > days) {
-      setDaysEaten(0);
-    } else {
-      const updatedDaysEaten = daysEaten + 1;
-      setDaysEaten(updatedDaysEaten);
-
-      if (updatedDaysEaten >= days) {
-        onRecipeEaten(recipeId);
-      }
-    }
-  }
-
   return (
     <Card
       ref={setNodeRef}
@@ -183,22 +164,15 @@ export default function MealPlannerItem({
       </div>
 
       <Button
-        className="flex gap-2 items-center me-1"
+        className={`me-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
         variant="outline"
+        size="icon"
         onClick={(e) => {
           e.stopPropagation();
-          eat();
+          onToggleEaten();
         }}
       >
-        {Array.from({ length: 1 }, (_, index) => (
-          <span key={index}>
-            {index < daysEaten ? (
-              <NoMealsIcon style={{ fontSize: 24 }} />
-            ) : (
-              <RestaurantIcon style={{ fontSize: 24 }} />
-            )}
-          </span>
-        ))}
+        <Check size={18} className={eaten ? "text-primary" : "text-muted-foreground"} />
       </Button>
 
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>

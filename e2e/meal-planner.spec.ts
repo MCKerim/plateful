@@ -59,7 +59,7 @@ test.describe("Meal Planner Page", () => {
       id: 2,
       recipe_id: recipe.id,
       planned_date: null, // No date = unplanned
-      days: 2,
+      days: 1,
       daysEaten: 0,
       recipes: { id: recipe.id, name: recipe.name },
     });
