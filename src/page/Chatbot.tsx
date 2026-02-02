@@ -116,7 +116,7 @@ export default function Chatbot() {
     setSelectedImagesAsbase64([]);
     // Clear recipe context from URL after first message (like images)
     if (isFirstMessageWithContext) {
-      setSearchParams({});
+      setSearchParams({}, { replace: true });
     }
     dispatch(setIsTyping(true));
 
