@@ -314,17 +314,15 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
         await route.fulfill({
           status: 201,
           contentType: "application/json",
-          body: JSON.stringify([
-            {
-              id: 42,
-              name: "Test Recipe",
-              description: "Test",
-              category: 1,
-              link: "",
-              household_id: 1,
-              created_at: new Date().toISOString(),
-            },
-          ]),
+          body: JSON.stringify({
+            id: 42,
+            name: "Test Recipe",
+            description: "Test",
+            category: 1,
+            link: "",
+            household_id: 1,
+            created_at: new Date().toISOString(),
+          }),
         });
       } else {
         await route.fallback();
