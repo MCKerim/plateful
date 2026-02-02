@@ -243,8 +243,6 @@ description: ${recipeContext.description ?? "No description"}
 
   const handleResetChat = () => {
     dispatch(resetChat());
-    setInputValue("");
-    setSelectedImagesAsbase64([]);
     setPendingFeedback([]);
     setKnownRecipeIds(recipeId ? [recipeId] : []);
   };
