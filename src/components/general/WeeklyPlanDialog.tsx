@@ -168,24 +168,15 @@ export default function WeeklyPlanDialog({
   }
 
   function toggleWeekDate(date: Date) {
-    const updatedDates = selectedDates.some((d) => isSameDay(d, date))
-      ? selectedDates.filter((d) => !isSameDay(d, date))
-      : [...selectedDates, date];
-
-    if (updatedDates.length > 0) {
-      setWithoutDate(false);
-    }
-
-    setSelectedDates(updatedDates);
+    setSelectedDates((prev) =>
+      prev.some((d) => isSameDay(d, date))
+        ? prev.filter((d) => !isSameDay(d, date))
+        : [...prev, date]
+    );
   }
 
   function toggleWithoutDate() {
-    const updatedWithoutDate = !withoutDate;
-    if (updatedWithoutDate) {
-      setSelectedDates([]);
-    }
-
-    setWithoutDate(updatedWithoutDate);
+    setWithoutDate((prev) => !prev);
     setWithoutDateCount(1);
   }
 
