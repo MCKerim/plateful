@@ -37,7 +37,8 @@
     "send": "Send"
   },
   "update": {
-    "updateAvailable": "A new version is available! Update now?"
+    "title": "Update Available",
+    "updateAvailable": "A new version is available! Would you like to update now?"
   },
   "welcome": {
     "title": "Congratulations,",

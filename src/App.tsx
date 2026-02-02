@@ -38,18 +38,18 @@ import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
-import { useTranslation } from "react-i18next";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import { useUserData } from "./hooks/user/useUserData";
+import UpdateDialog from "./components/general/UpdateDialog";
 
 function App() {
-  const { t } = useTranslation();
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const [loading, setLoading] = useState(true);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
   const { fetchUserData } = useUserData();
 
@@ -65,21 +65,7 @@ function App() {
 
         const result = await AppUpdate.getAppUpdateInfo();
         if (result.updateAvailability === AppUpdateAvailability.UPDATE_AVAILABLE) {
-          const shouldUpdate = globalThis.confirm(t("update.updateAvailable"));
-
-          if (!shouldUpdate) return;
-
-          const platform = Capacitor.getPlatform();
-          if (platform === "android" && result.immediateUpdateAllowed) {
-            await AppUpdate.performImmediateUpdate();
-            // Fallback: force exit if automatic restart didn't happen
-            await CapacitorApp.exitApp();
-          } else if (platform === "ios") {
-            // TODO: iOS App Store update flow
-            // await AppUpdate.openAppStore({ appId: "..."});
-          } else {
-            await AppUpdate.openAppStore();
-          }
+          setShowUpdateDialog(true);
         }
       } catch (error) {
         console.error("Error checking for app updates:", error);
@@ -88,6 +74,30 @@ function App() {
 
     checkForUpdates();
   }, []);
+
+  const handleUpdate = async () => {
+    setShowUpdateDialog(false);
+    try {
+      const platform = Capacitor.getPlatform();
+      if (platform === "android") {
+        const result = await AppUpdate.getAppUpdateInfo();
+        if (result.immediateUpdateAllowed) {
+          await AppUpdate.performImmediateUpdate();
+          // Fallback: force exit if automatic restart didn't happen
+          await CapacitorApp.exitApp();
+        } else {
+          await AppUpdate.openAppStore();
+        }
+      } else if (platform === "ios") {
+        // TODO: iOS App Store update flow
+        // await AppUpdate.openAppStore({ appId: "..."});
+      } else {
+        await AppUpdate.openAppStore();
+      }
+    } catch (error) {
+      console.error("Error performing app update:", error);
+    }
+  };
 
   useEffect(() => {
     const handleIntentReceived = (result: any) => {
@@ -214,72 +224,79 @@ function App() {
   }
 
   return (
-    <Routes>
-      {/* Privacy Policy */}
-      <Route path="/privacy" element={<Privacy />} />
-
-      {/* Terms of Service */}
-      <Route path="/terms" element={<TermsOfService />} />
-
-      {/* Onboarding */}
-      <Route path="/" element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />} />
-
-      <Route path="/signup" element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />} />
-
-      <Route
-        path="/signup/email"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailSignUp />}
+    <>
+      <UpdateDialog
+        open={showUpdateDialog}
+        onConfirm={handleUpdate}
+        onCancel={() => setShowUpdateDialog(false)}
       />
+      <Routes>
+        {/* Privacy Policy */}
+        <Route path="/privacy" element={<Privacy />} />
 
-      <Route
-        path="/signup/verify"
-        element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />}
-      />
+        {/* Terms of Service */}
+        <Route path="/terms" element={<TermsOfService />} />
 
-      <Route path="/login" element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />} />
+        {/* Onboarding */}
+        <Route path="/" element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />} />
 
-      <Route path="/beta" element={<BetaScreen />} />
+        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />} />
 
-      <Route path="/values" element={<ImportRecipes />} />
-      <Route path="/values/1" element={<ImportRecipes />} />
-      <Route path="/values/2" element={<ChatbotValue />} />
-      <Route path="/values/3" element={<MealPlanningValue />} />
+        <Route
+          path="/signup/email"
+          element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailSignUp />}
+        />
 
-      <Route path="/survey" element={<SurveyStart />} />
-      <Route path="/survey/:questionId" element={<Survey />} />
+        <Route
+          path="/signup/verify"
+          element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />}
+        />
 
-      <Route
-        path="/createhousehold"
-        element={hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />}
-      />
+        <Route path="/login" element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />} />
 
-      <Route path="/inviteMembers" element={<InviteMembers />} />
+        <Route path="/beta" element={<BetaScreen />} />
 
-      <Route
-        path="/joinHousehold"
-        element={hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />}
-      />
+        <Route path="/values" element={<ImportRecipes />} />
+        <Route path="/values/1" element={<ImportRecipes />} />
+        <Route path="/values/2" element={<ChatbotValue />} />
+        <Route path="/values/3" element={<MealPlanningValue />} />
 
-      {/* Main Routes */}
-      <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
-      <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
-      <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
+        <Route path="/survey" element={<SurveyStart />} />
+        <Route path="/survey/:questionId" element={<Survey />} />
 
-      <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
-      <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
-      <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
-      <Route path="/home" element={routeToCorrectPage(<Home />)} />
+        <Route
+          path="/createhousehold"
+          element={hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />}
+        />
 
-      <Route path="/recipe/:recipeId" element={routeToCorrectPage(<Recipe />)} />
-      <Route path="/recipe/add" element={routeToCorrectPage(<AddRecipe />)} />
-      <Route path="/recipe/edit/:recipeId" element={routeToCorrectPage(<AddRecipe />)} />
+        <Route path="/inviteMembers" element={<InviteMembers />} />
 
-      <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
-      <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+        <Route
+          path="/joinHousehold"
+          element={hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />}
+        />
 
-      {/* 404 Not Found Route */}
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+        {/* Main Routes */}
+        <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
+        <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
+        <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
+
+        <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
+        <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
+        <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
+        <Route path="/home" element={routeToCorrectPage(<Home />)} />
+
+        <Route path="/recipe/:recipeId" element={routeToCorrectPage(<Recipe />)} />
+        <Route path="/recipe/add" element={routeToCorrectPage(<AddRecipe />)} />
+        <Route path="/recipe/edit/:recipeId" element={routeToCorrectPage(<AddRecipe />)} />
+
+        <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
+        <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+
+        {/* 404 Not Found Route */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </>
   );
 }
 
