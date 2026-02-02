@@ -35,8 +35,7 @@ export type MockMealPlan = {
   recipe_id: number;
   household_id: number;
   planned_date: string | null;
-  days: number;
-  daysEaten: number;
+  eaten: boolean;
   created_at: string;
   recipes: { id: number; name: string } | null;
 };

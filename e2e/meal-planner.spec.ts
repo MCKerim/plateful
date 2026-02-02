@@ -34,8 +34,6 @@ test.describe("Meal Planner Page", () => {
       id: 1,
       recipe_id: recipe.id,
       planned_date: formatDate(today),
-      days: 1,
-      daysEaten: 0,
       recipes: { id: recipe.id, name: recipe.name },
     });
 
@@ -59,8 +57,6 @@ test.describe("Meal Planner Page", () => {
       id: 2,
       recipe_id: recipe.id,
       planned_date: null, // No date = unplanned
-      days: 1,
-      daysEaten: 0,
       recipes: { id: recipe.id, name: recipe.name },
     });
 
@@ -106,7 +102,6 @@ test.describe("Meal Planner Page", () => {
       id: 1,
       recipe_id: recipe.id,
       planned_date: formatDate(today),
-      days: 1,
       recipes: { id: recipe.id, name: recipe.name },
     });
 

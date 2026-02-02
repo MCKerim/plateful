@@ -24,8 +24,7 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
       overrides && "planned_date" in overrides
         ? (overrides.planned_date ?? null)
         : formatDate(new Date()),
-    days: overrides?.days ?? 1,
-    daysEaten: overrides?.daysEaten ?? 0,
+    eaten: overrides?.eaten ?? false,
     created_at: overrides?.created_at ?? new Date().toISOString(),
     recipes: overrides?.recipes ?? { id: 1, name: "Test Recipe" },
   };
@@ -41,7 +40,6 @@ export function createWeeklyMealPlans(
       recipe_id: recipe.id,
       household_id: householdId,
       planned_date: formatDate(addDays(startDate, index)),
-      days: 1,
       recipes: { id: recipe.id, name: recipe.name },
     })
   );
@@ -53,7 +51,6 @@ export function createBacklogMealPlans(recipes: MockRecipe[], householdId: numbe
       recipe_id: recipe.id,
       household_id: householdId,
       planned_date: null,
-      days: 1,
       recipes: { id: recipe.id, name: recipe.name },
     })
   );

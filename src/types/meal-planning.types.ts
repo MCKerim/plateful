@@ -9,7 +9,7 @@ export type MealPlannerItem = {
 export type MealPlannerItemRaw = {
   id: number;
   planned_date: string | null;
-  daysEaten: number;
+  eaten: boolean;
   recipes: { id: number; name: string } | null;
 };
 

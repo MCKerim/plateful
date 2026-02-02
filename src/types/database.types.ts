@@ -146,8 +146,7 @@ export type Database = {
       meal_planning: {
         Row: {
           created_at: string
-          days: number
-          daysEaten: number
+          eaten: boolean
           household_id: number
           id: number
           owner_id: string
@@ -156,8 +155,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          days?: number
-          daysEaten?: number
+          eaten?: boolean
           household_id: number
           id?: number
           owner_id?: string
@@ -166,8 +164,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          days?: number
-          daysEaten?: number
+          eaten?: boolean
           household_id?: number
           id?: number
           owner_id?: string
@@ -439,7 +436,7 @@ export type Database = {
           has_seen_value_screens?: boolean
           household_id?: number | null
           id?: string
-          language?: string
+          language: string
           username?: string
         }
         Update: {

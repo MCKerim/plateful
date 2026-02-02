@@ -6,6 +6,6 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
     recipeId: item.recipes?.id ?? 0,
     recipeName: item.recipes?.name ?? "-",
     planned_date: item.planned_date ? new Date(item.planned_date) : null,
-    eaten: item.daysEaten >= 1,
+    eaten: item.eaten,
   }));
 }

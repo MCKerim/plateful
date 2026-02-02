@@ -19,7 +19,7 @@ export const mealPlanningApi = {
         `
         id,
         planned_date,
-        daysEaten,
+        eaten,
         recipes (id, name)
       `
       )
@@ -75,7 +75,7 @@ export const mealPlanningApi = {
   async setEaten(supabase: SupabaseClient, id: number, eaten: boolean): Promise<void> {
     const { error } = await supabase
       .from("meal_planning")
-      .update({ daysEaten: eaten ? 1 : 0 })
+      .update({ eaten })
       .eq("id", id);
 
     if (error) throw error;
@@ -97,8 +97,7 @@ export const mealPlanningApi = {
       recipe_id: recipeId,
       household_id: householdId,
       planned_date: plannedDate,
-      days: 1,
-      daysEaten: 0,
+      eaten: false,
     });
 
     if (error) throw error;
@@ -126,7 +125,7 @@ export const mealPlanningApi = {
     let activePlan = futurePlans.length > 0 ? futurePlans[0] : null;
 
     if (!activePlan) {
-      activePlan = plansWithoutDate.find((plan) => plan.daysEaten < 1) ?? null;
+      activePlan = plansWithoutDate.find((plan) => !plan.eaten) ?? null;
     }
 
     const pastPlansWithDates = data.filter(
@@ -142,7 +141,7 @@ export const mealPlanningApi = {
         ? {
             id: activePlan.id,
             planned_date: activePlan.planned_date,
-            eaten: activePlan.daysEaten >= 1,
+            eaten: activePlan.eaten,
           }
         : null,
       lastPlannedDate,
