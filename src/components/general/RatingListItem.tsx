@@ -78,7 +78,7 @@ export default function RatingListItem({
         </div>
       </div>
 
-      <p className="text-wrap break-words">{rating.note}</p>
+      <p className="break-words whitespace-pre-wrap">{rating.note}</p>
     </div>
   );
 }
