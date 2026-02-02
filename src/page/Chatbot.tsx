@@ -13,6 +13,7 @@ import {
   setIsTyping,
   resetChat,
   ChatMessage,
+  ToolOutputForUI,
   setPreviousResponseId,
   selectPreviousResponseId,
   appendToLastMessage,
@@ -418,9 +419,10 @@ description: ${recipeContext.description ?? "No description"}
                 {message.role === "user" && (
                   <>
                     {/* Recipe context chip if present */}
-                    {"recipeName" in message && (message as any).recipeName && (
+                    {"recipeName" in message &&
+                      (message as ChatMessage & { recipeName?: string }).recipeName && (
                       <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
-                        {(message as any).recipeName}
+                        {(message as ChatMessage & { recipeName?: string }).recipeName}
                       </div>
                     )}
 
@@ -428,10 +430,10 @@ description: ${recipeContext.description ?? "No description"}
 
                     {/* optional images if present */}
                     {"images" in message &&
-                      Array.isArray((message as any).images) &&
-                      (message as any).images.length > 0 && (
+                      Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
+                      ((message as ChatMessage & { images?: string[] }).images ?? []).length > 0 && (
                         <div className="flex gap-2 mt-2 flex-wrap">
-                          {(message as any).images.map((src: string, i: number) => (
+                          {((message as ChatMessage & { images?: string[] }).images ?? []).map((src: string, i: number) => (
                             <img
                               key={i}
                               src={`data:image/jpeg;base64,${src}`}
@@ -452,7 +454,7 @@ description: ${recipeContext.description ?? "No description"}
                 {message.role === "assistant" &&
                   message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 &&
-                  message.toolOutputsForUI.map((toolOutput: any, i: number) => (
+                  message.toolOutputsForUI.map((toolOutput: ToolOutputForUI, i: number) => (
                     <RecipeProposalDialog
                       key={toolOutput.proposalId ?? i}
                       toolOutput={toolOutput}

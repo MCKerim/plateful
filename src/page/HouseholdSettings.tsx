@@ -49,7 +49,7 @@ export default function HouseholdSettings() {
           toast.success(t("householdSettings.success.memberRemoved"));
         },
         onError: (error) => {
-          console.error("Fehler beim Entfernen des Mitglieds:", error);
+          console.error("Error removing member:", error);
           toast.error(t("householdSettings.errors.removeMemberFailed"));
         },
       }
@@ -65,7 +65,7 @@ export default function HouseholdSettings() {
       { userId: user.id },
       {
         onError: (error) => {
-          console.error("Fehler beim Verlassen des Haushalts:", error);
+          console.error("Error leaving household:", error);
           toast.error(t("householdSettings.errors.leaveHouseholdFailed"));
         },
       }
@@ -202,7 +202,7 @@ export default function HouseholdSettings() {
           cancelText={t("householdSettings.confirmations.deleteHousehold.cancel")}
           confirmText={t("householdSettings.confirmations.deleteHousehold.confirm")}
           customTrigger={
-            <Button variant="destructive" className="w-full">
+            <Button variant="destructive" className="w-full" disabled>
               <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
             </Button>
           }

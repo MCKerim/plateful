@@ -106,10 +106,10 @@ function App() {
   };
 
   useEffect(() => {
-    const handleIntentReceived = (result: any) => {
-      if (!result) return;
+    const handleIntentReceived = (result: unknown) => {
+      if (!result || typeof result !== "object") return;
 
-      const { url, title, text } = result;
+      const { url, title, text } = result as { url?: string; title?: string; text?: string };
       if (url || title || text) {
         const params = new URLSearchParams();
         if (url) params.set("url", url);

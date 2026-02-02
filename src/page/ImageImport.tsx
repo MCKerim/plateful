@@ -20,7 +20,7 @@ export default function ImageImport() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{ id: number; name: string } | null>(null);
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
 
@@ -103,9 +103,9 @@ export default function ImageImport() {
       toast.error(t("urlImport.errors.importFailed"));
 
       try {
-        const anyErr = err as any;
-        if (anyErr?.response && typeof anyErr.response.text === "function") {
-          const text = await anyErr.response.text();
+        const errWithResponse = err as { response?: { text?: () => Promise<string> } };
+        if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
+          const text = await errWithResponse.response.text();
           console.error("Edge function returned (raw text):", text);
         }
       } catch (error_) {

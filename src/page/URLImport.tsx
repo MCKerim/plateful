@@ -19,7 +19,7 @@ export default function URLImport() {
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{ id: number; name: string } | null>(null);
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
@@ -79,9 +79,9 @@ export default function URLImport() {
       toast.error(t("urlImport.errors.importFailed"));
 
       try {
-        const anyErr = err as any;
-        if (anyErr?.response && typeof anyErr.response.text === "function") {
-          const text = await anyErr.response.text();
+        const errWithResponse = err as { response?: { text?: () => Promise<string> } };
+        if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
+          const text = await errWithResponse.response.text();
           console.error("Edge function returned (raw text):", text);
         }
       } catch (error_) {
