@@ -38,7 +38,7 @@ export default function URLImport() {
             toast.success(t("urlImport.linkPastedFromClipboard"));
           }
         } catch (err) {
-          console.debug("Kein Zugriff auf die Zwischenablage oder ungültiger Inhalt.", err);
+          console.debug("Could not access clipboard or invalid content.", err);
         }
       }
 
@@ -62,7 +62,6 @@ export default function URLImport() {
         console.error("Edge function returned error:", error);
         toast.error(t("urlImport.errors.importFailed"));
       } else {
-        console.log("recipe-from-url response:", data);
         setData(data[0]);
         await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
         window.history.replaceState(null, "", "/cookbook");

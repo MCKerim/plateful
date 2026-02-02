@@ -109,9 +109,6 @@ function App() {
     const handleIntentReceived = (result: any) => {
       if (!result) return;
 
-      console.log("SendIntent received");
-      console.log(JSON.stringify(result));
-
       const { url, title, text } = result;
       if (url || title || text) {
         const params = new URLSearchParams();

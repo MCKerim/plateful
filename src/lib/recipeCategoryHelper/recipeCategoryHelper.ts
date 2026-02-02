@@ -6,7 +6,7 @@ export const categories = [
   { id: 5, name: "category5", color: "purple", engTranslation: "Other" },
 ];
 
-export function getTranslatedCategory(t: any, id: number): string {
+export function getTranslatedCategory(t: (key: string) => string, id: number): string {
   return t(`categorys.${categories.find((category) => category.id === id)?.name}`);
 }
 

@@ -84,7 +84,6 @@ export default function ImageImport() {
         console.error("Edge function returned error:", error);
         toast.error(t("urlImport.errors.importFailed"));
       } else {
-        console.log("recipe-from-image response:", data);
         setData(data[0]);
         await queryClient.invalidateQueries({
           queryKey: queryKeys.recipes.all,

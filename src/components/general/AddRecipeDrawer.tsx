@@ -18,7 +18,7 @@ export default function AddNewRecipeDrawer({
   const { t } = useTranslation();
 
   function renderButton(
-    icon: any,
+    icon: React.ReactNode,
     label: string,
     onClick: () => void,
     description?: string,
