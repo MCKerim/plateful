@@ -8,6 +8,7 @@
     "cancel": "Abbrechen",
     "save": "Speichern",
     "saving": "Speichern...",
+    "deleting": "Löschen...",
     "update": "Aktualisieren",
     "open": "Öffnen",
     "error": "Ein Fehler ist aufgetreten",
@@ -235,7 +236,9 @@
     "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de",
-    "importRecipeData": "Rezeptdaten importieren (TikTok)"
+    "importRecipeData": "Rezeptdaten importieren (TikTok)",
+    "recipeSaved": "Rezept gespeichert!",
+    "recipeDeleted": "Rezept gelöscht!"
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link aus der Zwischenablage eingefügt",

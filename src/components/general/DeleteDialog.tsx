@@ -18,6 +18,7 @@ type Props = {
   description?: string;
   cancelText?: string;
   confirmText?: string;
+  loading?: boolean;
 };
 
 export default function DeleteDialog({
@@ -27,6 +28,7 @@ export default function DeleteDialog({
   description,
   cancelText,
   confirmText,
+  loading,
 }: Readonly<Props>) {
   const { t } = useTranslation();
 
@@ -63,6 +65,7 @@ export default function DeleteDialog({
             <Button
               className="w-full"
               variant="secondary"
+              disabled={loading}
               onClick={() => handleDialogOpenChange(false)}
             >
               {dialogCancelText}
@@ -71,12 +74,10 @@ export default function DeleteDialog({
             <Button
               className="w-full"
               variant="destructive"
-              onClick={() => {
-                onDelete();
-                handleDialogOpenChange(false);
-              }}
+              disabled={loading}
+              onClick={onDelete}
             >
-              {dialogConfirmText}
+              {loading ? t("common.deleting") : dialogConfirmText}
             </Button>
           </div>
         </DialogDescription>

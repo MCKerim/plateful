@@ -246,6 +246,7 @@ export default function AddRecipe() {
               const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
+            toast.success(t("addRecipe.recipeSaved"));
             navigate(`/recipe/${recipeId}`, { replace: true });
           },
           onError: (error) => {
@@ -271,6 +272,7 @@ export default function AddRecipe() {
               const newPath = `recipe_${data.id}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
+            toast.success(t("addRecipe.recipeSaved"));
             navigate(`/recipe/${data.id}`, { replace: true });
           },
           onError: (error) => {
@@ -287,6 +289,7 @@ export default function AddRecipe() {
 
     deleteRecipeMutation.mutate(recipeId, {
       onSuccess: () => {
+        toast.success(t("addRecipe.recipeDeleted"));
         navigate("/cookbook");
       },
       onError: (error) => {
@@ -305,8 +308,15 @@ export default function AddRecipe() {
           {t("common.cancel")}
         </Button>
 
-        <Button className="w-full" variant="accent" onClick={saveRecipe}>
-          {t("common.save")}
+        <Button
+          className="w-full"
+          variant="accent"
+          onClick={saveRecipe}
+          disabled={createRecipeMutation.isPending || updateRecipeMutation.isPending}
+        >
+          {createRecipeMutation.isPending || updateRecipeMutation.isPending
+            ? t("common.saving")
+            : t("common.save")}
         </Button>
       </div>
     </>
@@ -319,7 +329,9 @@ export default function AddRecipe() {
           {params.recipeId ? t("addRecipe.editRecipe") : t("addRecipe.addRecipe")}
         </h1>
 
-        {params.recipeId && <DeleteDialog onDelete={deleteRecipe} />}
+        {params.recipeId && (
+          <DeleteDialog onDelete={deleteRecipe} loading={deleteRecipeMutation.isPending} />
+        )}
       </div>
 
       <div className="grid items-center w-full gap-5">

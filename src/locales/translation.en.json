@@ -8,6 +8,7 @@
     "cancel": "Cancel",
     "save": "Save",
     "saving": "Saving...",
+    "deleting": "Deleting...",
     "update": "Update",
     "open": "Open",
     "error": "An error occurred",
@@ -239,7 +240,9 @@
     "descriptionPlaceholder": "A delicious dish with tomatoes.",
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com",
-    "importRecipeData": "Import recipe data (TikTok)"
+    "importRecipeData": "Import recipe data (TikTok)",
+    "recipeSaved": "Recipe saved!",
+    "recipeDeleted": "Recipe deleted!"
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link pasted from clipboard",
