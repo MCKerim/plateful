@@ -37,7 +37,7 @@ export default function InviteLink() {
         token: token,
         household_id: user.household_id,
         invited_by: user.id,
-        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // 24h gültig
+        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Valid for 24 hours
         used: false,
       },
     ]);
@@ -59,7 +59,7 @@ export default function InviteLink() {
         dialogTitle: t("inviteLink.shareDialogTitle"),
       });
     } catch (err) {
-      console.error("Fehler beim Teilen des Links:", err);
+      console.error("Error sharing link:", err);
       await copyInviteLink();
     }
   }
@@ -73,7 +73,7 @@ export default function InviteLink() {
       await writeClipboardText(inviteLink);
       toast.success(t("inviteLink.copySuccess"));
     } catch (err) {
-      console.error("Fehler beim Kopieren des Links:", err);
+      console.error("Error copying link:", err);
       toast.error(t("inviteLink.copyError"));
     }
   }

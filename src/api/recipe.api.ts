@@ -22,6 +22,8 @@ export type RecipeImageInfo = {
   path: string;
 };
 
+const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
+
 export const recipeApi = {
   async getById(supabase: SupabaseClient, recipeId: number): Promise<Recipes | null> {
     const { data, error } = await supabase.from("recipes").select("*").eq("id", recipeId).single();
@@ -37,7 +39,7 @@ export const recipeApi = {
 
     const { data: signedUrlData } = await supabase.storage
       .from("recipeimages")
-      .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, 3600);
+      .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, SIGNED_URL_EXPIRY_SECONDS);
 
     return signedUrlData?.signedUrl ?? null;
   },
@@ -51,7 +53,7 @@ export const recipeApi = {
       data.map(async (file) => {
         const { data: signedUrlData } = await supabase.storage
           .from("recipeimages")
-          .createSignedUrl(`recipe_${recipeId}/${file.name}`, 3600);
+          .createSignedUrl(`recipe_${recipeId}/${file.name}`, SIGNED_URL_EXPIRY_SECONDS);
         return signedUrlData?.signedUrl ?? null;
       })
     );
@@ -70,7 +72,7 @@ export const recipeApi = {
     const path = `recipe_${recipeId}/${data[0].name}`;
     const { data: signedUrlData } = await supabase.storage
       .from("recipeimages")
-      .createSignedUrl(path, 3600);
+      .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
 
     return signedUrlData?.signedUrl ? { signedUrl: signedUrlData.signedUrl, path } : null;
   },

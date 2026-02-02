@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -29,12 +30,7 @@ export default function ImageImport() {
 
   const processImage = async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
-    const compressedFile = await imageCompression(file, {
-      maxWidthOrHeight: 900,
-      maxSizeMB: 0.5,
-      useWebWorker: true,
-      initialQuality: 0.85,
-    });
+    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
 
     const reader = new FileReader();
     reader.onload = () => {

@@ -3,6 +3,8 @@ import { Camera, CameraResultType, CameraSource } from "@capacitor/camera";
 import { Capacitor } from "@capacitor/core";
 import ImageSourceDrawer from "@/components/general/ImageSourceDrawer";
 
+const CAMERA_QUALITY = 80;
+
 export interface ImageResultDataUrl {
   file: File;
   dataUrl: string;
@@ -81,7 +83,7 @@ export function useImageSourcePicker<T extends "dataUrl" | "base64" = "dataUrl">
         resultType === "base64" ? CameraResultType.Base64 : CameraResultType.DataUrl;
 
       const photo = await Camera.getPhoto({
-        quality: 80,
+        quality: CAMERA_QUALITY,
         allowEditing: false,
         source,
         resultType: cameraResultType,

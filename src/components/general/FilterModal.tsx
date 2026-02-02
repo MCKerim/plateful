@@ -11,6 +11,7 @@ import {
 import { Label } from "../ui/label";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
 import { categories } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
   resetFilter,
@@ -20,6 +21,7 @@ import {
 } from "@/redux/slices/filterAndSortingSlice";
 
 export default function FilterModal() {
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const activeFilterCount = useAppSelector(selectActiveFilterCount);
   const categoryId = useAppSelector(selectCategoryId);
@@ -70,12 +72,12 @@ export default function FilterModal() {
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Filtern nach</DialogTitle>
+          <DialogTitle>{t("filterModal.title")}</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col py-4">
           <div>
-            <Label className="block mb-2">Kategorie</Label>
+            <Label className="block mb-2">{t("categorys.category")}</Label>
 
             <div className="flex flex-wrap gap-2 pl-2">
               {categories.map((category) => (
@@ -99,12 +101,12 @@ export default function FilterModal() {
           <div className="flex w-full gap-2">
             {selectedCategory !== 0 && (
               <Button onClick={handleReset} className="w-full" variant="secondary">
-                Zurücksetzen
+                {t("common.reset")}
               </Button>
             )}
 
             <Button onClick={handleApply} className="w-full">
-              Anwenden
+              {t("common.apply")}
             </Button>
           </div>
         </DialogFooter>

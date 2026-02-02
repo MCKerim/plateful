@@ -35,7 +35,9 @@
     "yearsAgo_other": "Vor {{count}} Jahren",
     "uploadImage": "Bild hochladen",
     "reset": "Zurücksetzen",
-    "send": "Senden"
+    "send": "Senden",
+    "next": "Weiter",
+    "apply": "Anwenden"
   },
   "update": {
     "title": "Neues Update verfügbar!",
@@ -403,6 +405,17 @@
     "oldest": "Älteste",
     "rating": "Am besten bewertet",
     "aToZ": "A bis Z"
+  },
+  "filterModal": {
+    "title": "Filtern nach"
+  },
+  "editItem": {
+    "title": "Artikel bearbeiten",
+    "itemName": "Artikelname",
+    "itemNamePlaceholder": "Apfel",
+    "amount": "Menge",
+    "amountPlaceholder": "5",
+    "editButton": "Artikel bearbeiten"
   },
 
   "ingredients": "Zutaten",

@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
@@ -196,12 +197,7 @@ export default function AddRecipe() {
     }
 
     // Compress and resize the image before upload
-    const compressedFile = await imageCompression(file, {
-      maxWidthOrHeight: 900, // Good for recipe images
-      maxSizeMB: 0.5, // Target max file size (MB)
-      useWebWorker: true,
-      initialQuality: 0.85,
-    });
+    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
     setImageFile(compressedFile);
     setImagePreview(previewUrl);
 

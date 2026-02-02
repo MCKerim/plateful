@@ -12,6 +12,7 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { useSupabase } from "@/utils/supabase";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   currentId: number;
@@ -27,6 +28,7 @@ export default function EditItemDrawer({
   onItemEdited,
 }: Readonly<Props>) {
   const { supabase } = useSupabase();
+  const { t } = useTranslation();
   const [newItemName, setNewItemName] = useState("");
   const [newItemAmount, setNewItemAmount] = useState("");
 
@@ -64,16 +66,16 @@ export default function EditItemDrawer({
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
-          <DrawerTitle>Edit Item</DrawerTitle>
+          <DrawerTitle>{t("editItem.title")}</DrawerTitle>
         </DrawerHeader>
         <DrawerFooter>
           <div className="flex flex-col mt-4 space-y-2">
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="itemInput">Item name</Label>
+              <Label htmlFor="itemInput">{t("editItem.itemName")}</Label>
               <Input
                 type="text"
                 id="itemInput"
-                placeholder="Appel"
+                placeholder={t("editItem.itemNamePlaceholder")}
                 value={newItemName}
                 autoFocus
                 onChange={(e) => setNewItemName(e.target.value)}
@@ -81,11 +83,11 @@ export default function EditItemDrawer({
             </div>
 
             <div className="grid w-full items-center gap-1.5">
-              <Label htmlFor="amountInput">Amount</Label>
+              <Label htmlFor="amountInput">{t("editItem.amount")}</Label>
               <Input
                 type="text"
                 id="amountInput"
-                placeholder="5"
+                placeholder={t("editItem.amountPlaceholder")}
                 value={newItemAmount}
                 onChange={(e) => setNewItemAmount(e.target.value)}
               />
@@ -93,13 +95,13 @@ export default function EditItemDrawer({
 
             <DrawerClose>
               <Button className="w-full" onClick={editItem}>
-                Edit Item
+                {t("editItem.editButton")}
               </Button>
             </DrawerClose>
           </div>
           <DrawerClose>
             <Button variant="outline" className="w-full">
-              Cancel
+              {t("common.cancel")}
             </Button>
           </DrawerClose>
         </DrawerFooter>
