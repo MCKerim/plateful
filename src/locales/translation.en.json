@@ -37,8 +37,9 @@
     "send": "Send"
   },
   "update": {
-    "title": "Update Available",
-    "updateAvailable": "A new version is available! Would you like to update now?"
+    "title": "New Update Available!",
+    "updateAvailable": "A tastier version of Plateful is ready for you!",
+    "updateNow": "Update now"
   },
   "welcome": {
     "title": "Congratulations,",

@@ -37,8 +37,9 @@
     "send": "Senden"
   },
   "update": {
-    "title": "Update verfügbar",
-    "updateAvailable": "Eine neue Version ist verfügbar! Möchtest du jetzt aktualisieren?"
+    "title": "Neues Update verfügbar!",
+    "updateAvailable": "Eine noch leckerere Version von Plateful wartet auf dich!",
+    "updateNow": "Jetzt aktualisieren"
   },
   "signup": {
     "title": "Plateful",
