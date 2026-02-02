@@ -83,8 +83,6 @@ function App() {
         const result = await AppUpdate.getAppUpdateInfo();
         if (result.immediateUpdateAllowed) {
           await AppUpdate.performImmediateUpdate();
-          // Fallback: force exit if automatic restart didn't happen
-          await CapacitorApp.exitApp();
         } else {
           await AppUpdate.openAppStore();
         }
@@ -94,6 +92,14 @@ function App() {
       } else {
         await AppUpdate.openAppStore();
       }
+
+      // Reload the webview when the user returns from the store
+      const listener = await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+        if (isActive) {
+          listener.remove();
+          window.location.reload();
+        }
+      });
     } catch (error) {
       console.error("Error performing app update:", error);
     }
