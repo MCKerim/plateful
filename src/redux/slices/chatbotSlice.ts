@@ -13,12 +13,14 @@ interface ChatbotState {
   messages: ChatMessage[];
   previous_response_id: string | null;
   isTyping: boolean;
+  recipeId: number | null;
 }
 
 const initialState: ChatbotState = {
   messages: [],
   previous_response_id: null,
   isTyping: false,
+  recipeId: null,
 };
 
 export const chatbotSlice = createSlice({
@@ -38,10 +40,14 @@ export const chatbotSlice = createSlice({
     setIsTyping: (state, action: PayloadAction<boolean>) => {
       state.isTyping = action.payload;
     },
+    setRecipeId: (state, action: PayloadAction<number | null>) => {
+      state.recipeId = action.payload;
+    },
     resetChat: (state) => {
       state.messages = [];
       state.previous_response_id = null;
       state.isTyping = false;
+      state.recipeId = null;
     },
     appendToLastMessage: (state, action: PayloadAction<string>) => {
       const last = state.messages[state.messages.length - 1];
@@ -63,6 +69,7 @@ export const {
   addMessages,
   setPreviousResponseId,
   setIsTyping,
+  setRecipeId,
   resetChat,
   appendToLastMessage,
   finalizeLastMessage,
@@ -75,3 +82,4 @@ export const selectIsTyping = (state: RootState) => state.chatbot.isTyping;
 export const selectVisibleMessages = (state: RootState) =>
   state.chatbot.messages.filter((message: ChatMessage) => message.role !== "tool");
 export const selectPreviousResponseId = (state: RootState) => state.chatbot.previous_response_id;
+export const selectRecipeId = (state: RootState) => state.chatbot.recipeId;

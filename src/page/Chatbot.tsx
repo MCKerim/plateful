@@ -17,6 +17,7 @@ import {
   selectPreviousResponseId,
   appendToLastMessage,
   finalizeLastMessage,
+  setRecipeId,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -117,6 +118,7 @@ export default function Chatbot() {
     // Clear recipe context from URL after first message (like images)
     if (isFirstMessageWithContext) {
       setSearchParams({}, { replace: true });
+      dispatch(setRecipeId(recipeId));
     }
     dispatch(setIsTyping(true));
 
