@@ -157,14 +157,16 @@ export default function MealPlannerItem({
           }}
           className="text-left flex-1 px-2.5 min-w-0 h-full flex items-center"
         >
-          <p className="second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full">
+          <p
+            className={`second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full ${eaten ? "line-through" : ""}`}
+          >
             {recipeName}
           </p>
         </button>
       </div>
 
       <Button
-        className={`me-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
+        className={`rounded-full me-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
         variant="outline"
         size="icon"
         onClick={(e) => {
@@ -172,12 +174,12 @@ export default function MealPlannerItem({
           onToggleEaten();
         }}
       >
-        <Check size={18} className={eaten ? "text-primary" : "text-muted-foreground"} />
+        <Check className="!size-5" />
       </Button>
 
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
-          <Button className="me-2.5" variant="outline">
+          <Button className="p-3" variant="ghost">
             <MoreVertical size={16} />
           </Button>
         </DrawerTrigger>
