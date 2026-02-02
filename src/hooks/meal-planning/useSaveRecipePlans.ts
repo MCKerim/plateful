@@ -8,7 +8,7 @@ export type SaveRecipePlansParams = {
   householdId: number;
   datesToAdd: Date[];
   planIdsToRemove: number[];
-  addWithoutDate: boolean;
+  withoutDateCount: number;
 };
 
 export type SaveRecipePlansResult = {
@@ -42,8 +42,8 @@ export function useSaveRecipePlans() {
         );
       }
 
-      // Add without date if requested
-      if (params.addWithoutDate) {
+      // Add without date entries
+      for (let i = 0; i < params.withoutDateCount; i++) {
         operations.push(
           mealPlanningApi.create(supabase, params.recipeId, params.householdId, null, 1)
         );
@@ -52,7 +52,7 @@ export function useSaveRecipePlans() {
       await Promise.all(operations);
 
       return {
-        added: params.datesToAdd.length + (params.addWithoutDate ? 1 : 0),
+        added: params.datesToAdd.length + params.withoutDateCount,
         removed: params.planIdsToRemove.length,
       };
     },

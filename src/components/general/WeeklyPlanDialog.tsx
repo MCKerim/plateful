@@ -2,7 +2,7 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { CalendarDays, ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
@@ -60,6 +60,7 @@ export default function WeeklyPlanDialog({
 
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
+  const [withoutDateCount, setWithoutDateCount] = useState(1);
   const [currentWeek, setCurrentWeek] = useState(new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
@@ -93,6 +94,7 @@ export default function WeeklyPlanDialog({
     if (!isDialogOpen) {
       setSelectedDates([]);
       setWithoutDate(false);
+      setWithoutDateCount(1);
       setCurrentWeek(new Date());
       setInitializedWeeks(new Set());
     }
@@ -184,6 +186,7 @@ export default function WeeklyPlanDialog({
     }
 
     setWithoutDate(updatedWithoutDate);
+    setWithoutDateCount(1);
   }
 
   async function handleSave() {
@@ -232,7 +235,7 @@ export default function WeeklyPlanDialog({
         householdId,
         datesToAdd,
         planIdsToRemove,
-        addWithoutDate: withoutDate,
+        withoutDateCount: withoutDate ? withoutDateCount : 0,
       });
 
       toast.success(t("recipe.planningSuccessful"));
@@ -351,6 +354,33 @@ export default function WeeklyPlanDialog({
         >
           {t("mealPlanner.noDate")}
         </Button>
+
+        {/* Day count selector */}
+        {withoutDate && (
+          <div className="flex items-center justify-center gap-3">
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={withoutDateCount <= 1}
+              onClick={() => setWithoutDateCount((c) => Math.max(1, c - 1))}
+            >
+              <Minus size={16} />
+            </Button>
+            <span className="text-lg font-semibold text-center">
+              {withoutDateCount} {withoutDateCount === 1 ? t("common.day") : t("common.days")}
+            </span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="h-8 w-8"
+              disabled={withoutDateCount >= 10}
+              onClick={() => setWithoutDateCount((c) => Math.min(10, c + 1))}
+            >
+              <Plus size={16} />
+            </Button>
+          </div>
+        )}
 
         {/* Save Button */}
         <Button className="mt-4" onClick={handleSave} disabled={saveMutation.isPending}>
