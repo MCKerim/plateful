@@ -130,7 +130,7 @@ export default function MealPlannerItem({
   return (
     <Card
       ref={setNodeRef}
-      className={`h-[72px] flex items-center ${isDragging ? "invisible" : ""}`}
+      className={`h-[72px] flex items-center ${isDragging ? "invisible" : ""} ${eaten ? "opacity-60" : ""}`}
     >
       <div
         ref={dragHandleRef}
@@ -158,7 +158,7 @@ export default function MealPlannerItem({
           className="text-left flex-1 px-2.5 min-w-0 h-full flex items-center"
         >
           <p
-            className={`second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full ${eaten ? "line-through" : ""}`}
+            className={`second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full`}
           >
             {recipeName}
           </p>
