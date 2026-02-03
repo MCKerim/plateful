@@ -108,6 +108,11 @@ export default function MealPlanner() {
     setIsDrawerOpen(notPlannedItems.length > 0);
   }, [notPlannedItems.length]);
 
+  // Reset scroll position when page opens or week changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [currentWeek]);
+
   // Handlers
   function handleDelete(id: number) {
     deleteMutation.mutate(id, {
