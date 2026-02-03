@@ -235,26 +235,28 @@ export default function Settings() {
             {user?.username} - {user?.email}
           </p>
 
-          <DeleteDialog
-            onDelete={signOut}
-            title={t("settings.confirmations.signOut.title")}
-            description={t("settings.confirmations.signOut.description")}
-            cancelText={t("settings.confirmations.signOut.cancel")}
-            confirmText={t("settings.confirmations.signOut.confirm")}
-            customTrigger={
-              <Button variant="destructive" className="w-full">
-                <LogOut size={16} /> {t("settings.signOut")}
-              </Button>
-            }
-          />
+          <div className="flex gap-2">
+            <DeleteDialog
+              onDelete={signOut}
+              title={t("settings.confirmations.signOut.title")}
+              description={t("settings.confirmations.signOut.description")}
+              cancelText={t("settings.confirmations.signOut.cancel")}
+              confirmText={t("settings.confirmations.signOut.confirm")}
+              customTrigger={
+                <Button variant="destructive" className="w-full">
+                  <LogOut size={16} /> {t("settings.signOut")}
+                </Button>
+              }
+            />
 
-          <Button
-            variant="destructive"
-            className="w-full"
-            onClick={() => setIsDeleteAccountDialogOpen(true)}
-          >
-            <Trash2 size={16} /> {t("settings.deleteAccount")}
-          </Button>
+            <Button
+              variant="destructive"
+              className="w-full"
+              onClick={() => setIsDeleteAccountDialogOpen(true)}
+            >
+              <Trash2 size={16} /> {t("settings.deleteAccount")}
+            </Button>
+          </div>
         </div>
       </div>
 
