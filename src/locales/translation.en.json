@@ -244,7 +244,13 @@
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)",
     "recipeSaved": "Recipe saved!",
-    "recipeDeleted": "Recipe deleted!"
+    "recipeDeleted": "Recipe deleted!",
+    "errors": {
+      "uploadFailed": "Upload failed",
+      "nameRequired": "Please enter a name for the recipe.",
+      "categoryRequired": "Please select a category.",
+      "deleteFailed": "Error while deleting recipe"
+    }
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link pasted from clipboard",

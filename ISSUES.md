@@ -35,10 +35,10 @@ All magic numbers have been extracted to `src/lib/constants.ts`:
 - `src/App.tsx:90-91` — iOS App Store update flow not implemented
 - `src/page/HouseholdSettings.tsx:75-78` — delete household handler is empty (button is now disabled)
 
-## Internationalization Gaps
+## ~~Internationalization Gaps~~ (RESOLVED)
 
-- `src/page/AddRecipe.tsx` — several hardcoded English toast messages (upload failed, name required, category required, generic error)
-- `src/utils/nativeClipboard.ts` — hardcoded German strings instead of using i18n
+- ~~`src/page/AddRecipe.tsx` — hardcoded English toast messages~~ → Added `addRecipe.errors.*` keys
+- ~~`src/utils/nativeClipboard.ts` — hardcoded German strings~~ → Was actually in URLImport.tsx, already fixed
 
 ## Other Issues
 

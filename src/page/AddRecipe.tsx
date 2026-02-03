@@ -182,7 +182,7 @@ export default function AddRecipe() {
       .upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
-      toast.error("Upload failed: " + error.message);
+      toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
       return null;
     }
     return filePath;
@@ -216,12 +216,12 @@ export default function AddRecipe() {
 
   async function saveRecipe() {
     if (title === "") {
-      toast.error("Please enter a name for the recipe.");
+      toast.error(t("addRecipe.errors.nameRequired"));
       return;
     }
 
     if (category === null) {
-      toast.error("Please select a category.");
+      toast.error(t("addRecipe.errors.categoryRequired"));
       return;
     }
 
@@ -247,7 +247,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            toast.error("An error occurred. Please try again.");
+            toast.error(t("common.error"));
           },
         }
       );
@@ -273,7 +273,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            toast.error("An error occurred. Please try again.");
+            toast.error(t("common.error"));
           },
         }
       );
@@ -290,7 +290,7 @@ export default function AddRecipe() {
       },
       onError: (error) => {
         console.error("Error while deleting recipe: ", error);
-        toast.error("Error while deleting recipe");
+        toast.error(t("addRecipe.errors.deleteFailed"));
       },
     });
   }

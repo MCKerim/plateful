@@ -240,7 +240,13 @@
     "linkPlaceholder": "https://www.tomaten-suppe.de",
     "importRecipeData": "Rezeptdaten importieren (TikTok)",
     "recipeSaved": "Rezept gespeichert!",
-    "recipeDeleted": "Rezept gelöscht!"
+    "recipeDeleted": "Rezept gelöscht!",
+    "errors": {
+      "uploadFailed": "Hochladen fehlgeschlagen",
+      "nameRequired": "Bitte gib einen Namen für das Rezept ein.",
+      "categoryRequired": "Bitte wähle eine Kategorie.",
+      "deleteFailed": "Fehler beim Löschen des Rezepts"
+    }
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link aus der Zwischenablage eingefügt",
