@@ -136,14 +136,20 @@ export default function ImageImport() {
       <div className="h-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        <Button
-          className="w-full"
-          variant="accent"
-          onClick={() => handleStartImport()}
-          disabled={isSaving || data !== null || images.length === 0}
-        >
-          {t("imageImport.importButton")}
-        </Button>
+        {isSaving || data !== null ? (
+          <Button className="w-full" variant="secondary" onClick={() => navigate("/cookbook")}>
+            {t("urlImport.backToCookbook")}
+          </Button>
+        ) : (
+          <Button
+            className="w-full"
+            variant="accent"
+            onClick={() => handleStartImport()}
+            disabled={images.length === 0}
+          >
+            {t("imageImport.importButton")}
+          </Button>
+        )}
       </div>
 
       <input

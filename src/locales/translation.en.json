@@ -267,7 +267,8 @@
     },
     "success": "Recipe imported successfully!",
     "importedRecipe": "Recipe imported successfully:",
-    "viewRecipe": "View"
+    "viewRecipe": "View",
+    "backToCookbook": "Back to Cookbook"
   },
   "imageImport": {
     "title": "Import Recipe",

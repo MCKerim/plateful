@@ -263,7 +263,8 @@
     },
     "success": "Rezept erfolgreich importiert!",
     "importedRecipe": "Rezept erfolgreich importiert",
-    "viewRecipe": "Ansehen"
+    "viewRecipe": "Ansehen",
+    "backToCookbook": "Zurück zum Kochbuch"
   },
   "imageImport": {
     "title": "Rezept Importieren",
