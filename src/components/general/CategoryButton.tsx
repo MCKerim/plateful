@@ -66,7 +66,7 @@ export default function CategoryButton({ id, name, color = "" }: Readonly<Props>
       type="button"
       className="relative h-[132px] w-full max-w-[169px] mx-auto"
       whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+      transition={{ type: "spring", stiffness: 400, damping: 17 }}
       onClick={() => {
         dispatch(setCategoryId(id));
       }}

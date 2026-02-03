@@ -43,10 +43,9 @@ export default function AddNewRecipeDrawer({
     <Drawer>
       <DrawerTrigger asChild>
         <motion.button
-          className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg hover:bg-accent/90"
-          whileTap={{ scale: 0.95 }}
-          whileHover={{ scale: 1.1 }}
-          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg"
+          whileTap={{ scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 400, damping: 17 }}
         >
           <Plus size={34} />
         </motion.button>
