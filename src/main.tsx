@@ -12,7 +12,10 @@ import { PostHogProvider } from "posthog-js/react";
 import { Toaster } from "./components/ui/sonner.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { QUERY_STALE_TIME, QUERY_GC_TIME } from "./lib/constants.ts";
+
+// React Query configuration
+const QUERY_STALE_TIME = 1000 * 30; // 30 seconds - responsive to household changes
+const QUERY_GC_TIME = 1000 * 60 * 10; // 10 minutes - keep unused cache for navigation
 
 const queryClient = new QueryClient({
   defaultOptions: {

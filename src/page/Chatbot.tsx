@@ -36,9 +36,10 @@ import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
-import { DEFAULT_CATEGORY_ID } from "@/lib/constants";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
+
+const DEFAULT_CATEGORY_ID = 5;
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -64,8 +65,8 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
   const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
-  const [knownRecipeIds, setKnownRecipeIds] = useState<number[]>(
-    () => (recipeId ? [recipeId] : [])
+  const [knownRecipeIds, setKnownRecipeIds] = useState<number[]>(() =>
+    recipeId ? [recipeId] : []
   );
 
   const proposalCounterRef = useRef(0);
@@ -422,27 +423,30 @@ description: ${recipeContext.description ?? "No description"}
                     {/* Recipe context chip if present */}
                     {"recipeName" in message &&
                       (message as ChatMessage & { recipeName?: string }).recipeName && (
-                      <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
-                        {(message as ChatMessage & { recipeName?: string }).recipeName}
-                      </div>
-                    )}
+                        <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
+                          {(message as ChatMessage & { recipeName?: string }).recipeName}
+                        </div>
+                      )}
 
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
                     {/* optional images if present */}
                     {"images" in message &&
                       Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
-                      ((message as ChatMessage & { images?: string[] }).images ?? []).length > 0 && (
+                      ((message as ChatMessage & { images?: string[] }).images ?? []).length >
+                        0 && (
                         <div className="flex gap-2 mt-2 flex-wrap">
-                          {((message as ChatMessage & { images?: string[] }).images ?? []).map((src: string, i: number) => (
-                            <img
-                              key={i}
-                              src={`data:image/jpeg;base64,${src}`}
-                              srcSet={`data:image/jpeg;base64,${src}`}
-                              alt={`upload-${i}`}
-                              className="rounded-md border w-16 h-16 object-cover"
-                            />
-                          ))}
+                          {((message as ChatMessage & { images?: string[] }).images ?? []).map(
+                            (src: string, i: number) => (
+                              <img
+                                key={i}
+                                src={`data:image/jpeg;base64,${src}`}
+                                srcSet={`data:image/jpeg;base64,${src}`}
+                                alt={`upload-${i}`}
+                                className="rounded-md border w-16 h-16 object-cover"
+                              />
+                            )
+                          )}
                         </div>
                       )}
                   </>

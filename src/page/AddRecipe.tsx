@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { IMAGE_COMPRESSION_OPTIONS, COMMON_TLD_REGEX } from "@/lib/constants";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
@@ -28,6 +28,9 @@ import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
+
+// Regex to remove common TLDs when generating recipe title from URL
+const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();
