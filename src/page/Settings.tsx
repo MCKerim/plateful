@@ -169,7 +169,7 @@ export default function Settings() {
 
           <p className="text-sm">{t("settings.supportFeedbackDescription")}</p>
 
-          <NavLink data-canny-link to="https://plateful.canny.io/support/create" target="blank">
+          <NavLink data-canny-link to="https://plateful.canny.io/support" target="blank">
             <Button variant="secondary" className="w-full">
               <Donut />
 
