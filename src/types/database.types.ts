@@ -280,6 +280,7 @@ export type Database = {
           link: string | null
           name: string
           owner_id: string
+          status: string
           visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
@@ -292,6 +293,7 @@ export type Database = {
           link?: string | null
           name: string
           owner_id?: string
+          status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
@@ -304,6 +306,7 @@ export type Database = {
           link?: string | null
           name?: string
           owner_id?: string
+          status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Relationships: [

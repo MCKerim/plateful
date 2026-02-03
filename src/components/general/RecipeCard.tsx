@@ -8,14 +8,25 @@ import { useTranslation } from "react-i18next";
 import { formatRating } from "@/lib/formateRatingHelper/formatRatingHelper";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
+import { RecipeStatus } from "@/types/cookbook.types";
+import ImportingRecipeCard from "./ImportingRecipeCard";
 
 type Props = {
   id: number;
   name: string;
   averageRating: number | null;
+  status?: RecipeStatus;
 };
 
-export default function RecipeCard({ id, name, averageRating }: Readonly<Props>) {
+export default function RecipeCard({
+  id,
+  name,
+  averageRating,
+  status = "ready",
+}: Readonly<Props>) {
+  if (status === "importing") {
+    return <ImportingRecipeCard />;
+  }
   const { t } = useTranslation();
   const { data: imageUrl } = useRecipeFirstImage(id);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(id);

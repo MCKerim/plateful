@@ -85,57 +85,80 @@ Deno.serve(async (req: Request) => {
     const householdId = userProfile.household_id;
     const language = userProfile.language;
 
-    const NODE_SERVICE_URL = "http://91.99.166.5:3000/api/extract-recipe";
-
-    const nodeResponse = await fetch(NODE_SERVICE_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ url: url, language: language }),
-    });
-
-    if (!nodeResponse.ok) {
-      const errorText = await nodeResponse.text();
-      console.error(`Node Service Error (${nodeResponse.status}):`, errorText);
-
-      return new Response(
-        JSON.stringify({
-          error: "Recipe extraction failed",
-          details: errorText,
-        }),
-        {
-          status: nodeResponse.status,
-          headers: ANSWEAR_HEADER,
-        }
-      );
-    }
-
-    const node_data = await nodeResponse.json();
-
-    const { data, error } = await supabase
+    // Step 1: Create placeholder recipe with 'importing' status
+    const { data: placeholderData, error: placeholderError } = await supabase
       .from("recipes")
       .insert([
         {
-          name: node_data.data.recipe.title,
+          name: "Importing...",
           link: url,
-          description: node_data.data.recipe.description,
-          category: node_data.data.recipe.category,
+          description: "",
+          category: null,
           household_id: householdId,
+          status: "importing",
         },
       ])
       .select();
 
+    if (placeholderError || !placeholderData?.[0]) {
+      console.error("Failed to create placeholder recipe:", placeholderError);
+      throw placeholderError || new Error("Failed to create placeholder");
+    }
+
+    const recipeId = placeholderData[0].id;
+    console.log("Created placeholder recipe with id:", recipeId);
+
+    // Step 2: Call Node service for extraction
+    const NODE_SERVICE_URL = "http://91.99.166.5:3000/api/extract-recipe";
+
+    let node_data = null;
+    try {
+      const nodeResponse = await fetch(NODE_SERVICE_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ url: url, language: language }),
+      });
+
+      if (nodeResponse.ok) {
+        node_data = await nodeResponse.json();
+      } else {
+        const errorText = await nodeResponse.text();
+        console.error(`Node Service Error (${nodeResponse.status}):`, errorText);
+      }
+    } catch (fetchError) {
+      console.error("Node service fetch error:", fetchError);
+    }
+
+    // Step 3: Update recipe with extracted data (or partial data on failure)
+    const updateData = {
+      name: node_data?.data?.recipe?.title || url,
+      description: node_data?.data?.recipe?.description || "",
+      category: node_data?.data?.recipe?.category || null,
+      status: "ready",
+    };
+
+    const { data, error } = await supabase
+      .from("recipes")
+      .update(updateData)
+      .eq("id", recipeId)
+      .select();
+
     if (error) {
+      console.error("Failed to update recipe:", error);
+      // Still try to mark as ready even if update fails
+      await supabase.from("recipes").update({ status: "ready" }).eq("id", recipeId);
       throw error;
     }
 
-    const image = node_data.data.recipe.imageAsBase64;
+    // Step 4: Upload image if available
+    const image = node_data?.data?.recipe?.imageAsBase64;
 
     console.log("Image check:", {
       hasImage: !!image,
       imageLength: image?.length,
-      recipeId: data[0]?.id,
+      recipeId: recipeId,
       dataLength: data?.length,
     });
 
@@ -153,9 +176,9 @@ Deno.serve(async (req: Request) => {
           firstBytes: Array.from(bytes.slice(0, 10)),
         });
 
-        const imageFormat = node_data.data.recipe.imageFormat || "webp";
+        const imageFormat = node_data?.data?.recipe?.imageFormat || "webp";
         const imageFileName = `${Date.now()}.${imageFormat}`;
-        const imageFilePath = `recipe_${data[0].id}/${imageFileName}`;
+        const imageFilePath = `recipe_${recipeId}/${imageFileName}`;
 
         console.log("Uploading to:", imageFilePath);
 
