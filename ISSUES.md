@@ -24,11 +24,12 @@ All magic numbers have been extracted to `src/lib/constants.ts`:
 - ~~Camera quality `80` in `src/hooks/general/useImageSourcePicker.tsx`~~ → `CAMERA_QUALITY`
 - ~~TLD regex in `AddRecipe.tsx`~~ → `COMMON_TLD_REGEX`
 
-## Race Conditions & Missing Cleanup
+## ~~Race Conditions & Missing Cleanup~~ (RESOLVED)
 
-- `src/page/URLImport.tsx:27-47` — useEffect depends on `[searchParams]` but calls `handleSave` which may read stale state
-- `src/page/Recipe.tsx:58-67` and `src/page/Cookbook.tsx:160-167` — `popstate` listeners can duplicate on remount
-- `src/page/URLImport.tsx` and `src/page/ImageImport.tsx` — long-running API calls lack AbortController cancellation on unmount
+- ~~`src/page/URLImport.tsx:27-47` — useEffect depends on `[searchParams]` but calls `handleSave` which may read stale state~~ → Wrapped `handleSave` in `useCallback` with proper dependencies, added `hasProcessedUrlParam` ref to prevent duplicate processing
+- ~~`src/page/Recipe.tsx:58-67` and `src/page/Cookbook.tsx:160-167` — `popstate` listeners can duplicate on remount~~ → Already has proper cleanup (listeners are removed on unmount)
+- ~~`src/page/URLImport.tsx` and `src/page/ImageImport.tsx` — long-running API calls lack AbortController cancellation on unmount~~ → Added AbortController with cleanup, async operations now check `signal.aborted` before updating state
+- ~~`src/page/Settings.tsx:34-55` — useEffect missing `supabase` dependency and no cleanup~~ → Added `supabase` to deps and mounted check for async callback
 
 ## Incomplete Features (TODOs)
 
@@ -42,6 +43,6 @@ All magic numbers have been extracted to `src/lib/constants.ts`:
 
 ## Other Issues
 
-- `src/page/Settings.tsx:34-55` — useEffect calls `supabase.auth.getUser()` but could use `useAppSelector(selectUser)` instead
-- `src/page/Settings.tsx:42-53` — Canny widget assumes `window.Canny` exists without checking script load
+- `src/page/Settings.tsx:42-53` — Canny widget assumes `window.Canny` exists without checking script load (low priority - guarded by `if (window.Canny)`)
 - `src/hooks/user/useUserData.ts:51,66` — language saved to both localStorage and Supabase with no conflict resolution
+- `src/App.tsx` — Several useEffects missing dependencies (`supabase`, `fetchUserData`) but require careful restructuring to avoid infinite loops

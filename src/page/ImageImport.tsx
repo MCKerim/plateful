@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -24,6 +24,14 @@ export default function ImageImport() {
   const [data, setData] = useState<{ id: number; name: string } | null>(null);
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup on unmount - abort any pending API calls
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const { selectFromCamera, selectFromGallery, isNative, fileInputRef, handleFileInputChange } =
     useImageSourcePicker();
@@ -67,6 +75,11 @@ export default function ImageImport() {
       return;
     }
 
+    // Abort any previous request and create new controller
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     setIsSaving(true);
 
     try {
@@ -75,6 +88,9 @@ export default function ImageImport() {
           images: images.map((img) => img.base64),
         },
       });
+
+      // Check if component unmounted during the async operation
+      if (signal.aborted) return;
 
       if (error) {
         console.error("Edge function returned error:", error);
@@ -95,6 +111,7 @@ export default function ImageImport() {
         });
       }
     } catch (err: unknown) {
+      if (signal.aborted) return;
       console.error("Unexpected error calling recipe-from-image:", err);
       toast.error(t("urlImport.errors.importFailed"));
 
@@ -108,7 +125,9 @@ export default function ImageImport() {
         console.debug("Could not retrieve raw response from error.", error_);
       }
     } finally {
-      setIsSaving(false);
+      if (!signal.aborted) {
+        setIsSaving(false);
+      }
     }
   }
 

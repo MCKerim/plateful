@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/general/LoadingDots";
@@ -23,16 +23,76 @@ export default function URLImport() {
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
+  const hasProcessedUrlParam = useRef(false);
+
+  const handleSave = useCallback(
+    async (url: string, signal?: AbortSignal) => {
+      if (!url?.trim()) return;
+
+      setIsSaving(true);
+
+      try {
+        const { data, error } = await supabase.functions.invoke("recipe-from-url", {
+          body: {
+            url: url.trim(),
+          },
+        });
+
+        // Check if component unmounted during the async operation
+        if (signal?.aborted) return;
+
+        if (error) {
+          console.error("Edge function returned error:", error);
+          toast.error(t("urlImport.errors.importFailed"));
+        } else {
+          setData(data[0]);
+          await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
+          window.history.replaceState(null, "", "/cookbook");
+          toast.success(t("urlImport.success"), {
+            action: {
+              label: t("urlImport.viewRecipe"),
+              onClick: () => {
+                navigate(`/recipe/${data[0].id}`);
+              },
+            },
+          });
+        }
+      } catch (err: unknown) {
+        if (signal?.aborted) return;
+        console.error("Unexpected error calling recipe-from-url:", err);
+        toast.error(t("urlImport.errors.importFailed"));
+
+        try {
+          const errWithResponse = err as { response?: { text?: () => Promise<string> } };
+          if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
+            const text = await errWithResponse.response.text();
+            console.error("Edge function returned (raw text):", text);
+          }
+        } catch (error_) {
+          console.debug("Could not retrieve raw response from error.", error_);
+        }
+      } finally {
+        if (!signal?.aborted) {
+          setIsSaving(false);
+        }
+      }
+    },
+    [supabase, t, queryClient, navigate]
+  );
 
   useEffect(() => {
+    const abortController = new AbortController();
+
     const urlFromParams = searchParams.get("url");
-    if (urlFromParams) {
+    if (urlFromParams && !hasProcessedUrlParam.current) {
+      hasProcessedUrlParam.current = true;
       setUrlInput(urlFromParams);
-      handleSave(urlFromParams);
-    } else {
+      handleSave(urlFromParams, abortController.signal);
+    } else if (!urlFromParams) {
       async function autoPasteFromClipboard() {
         try {
           const text = await readClipboardText();
+          if (abortController.signal.aborted) return;
           if (text.startsWith("http://") || text.startsWith("https://")) {
             setUrlInput(text);
             toast.success(t("urlImport.linkPastedFromClipboard"));
@@ -44,53 +104,11 @@ export default function URLImport() {
 
       autoPasteFromClipboard();
     }
-  }, [searchParams]);
 
-  async function handleSave(url = urlInput) {
-    if (!url?.trim()) return;
-
-    setIsSaving(true);
-
-    try {
-      const { data, error } = await supabase.functions.invoke("recipe-from-url", {
-        body: {
-          url: url.trim(),
-        },
-      });
-
-      if (error) {
-        console.error("Edge function returned error:", error);
-        toast.error(t("urlImport.errors.importFailed"));
-      } else {
-        setData(data[0]);
-        await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-        window.history.replaceState(null, "", "/cookbook");
-        toast.success(t("urlImport.success"), {
-          action: {
-            label: t("urlImport.viewRecipe"),
-            onClick: () => {
-              navigate(`/recipe/${data[0].id}`);
-            },
-          },
-        });
-      }
-    } catch (err: unknown) {
-      console.error("Unexpected error calling recipe-from-url:", err);
-      toast.error(t("urlImport.errors.importFailed"));
-
-      try {
-        const errWithResponse = err as { response?: { text?: () => Promise<string> } };
-        if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
-          const text = await errWithResponse.response.text();
-          console.error("Edge function returned (raw text):", text);
-        }
-      } catch (error_) {
-        console.debug("Could not retrieve raw response from error.", error_);
-      }
-    } finally {
-      setIsSaving(false);
-    }
-  }
+    return () => {
+      abortController.abort();
+    };
+  }, [searchParams, handleSave, t]);
 
   const saveFooter = (
     <>
@@ -100,7 +118,7 @@ export default function URLImport() {
         <Button
           className="w-full"
           variant="accent"
-          onClick={() => handleSave()}
+          onClick={() => handleSave(urlInput)}
           disabled={isSaving || data !== null}
         >
           {t("urlImport.importButton")}
@@ -132,7 +150,7 @@ export default function URLImport() {
               disabled={isSaving}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  handleSave();
+                  handleSave(urlInput);
                 }
               }}
             />

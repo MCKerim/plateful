@@ -32,8 +32,12 @@ export default function Settings() {
   const updateLanguageMutation = useUpdateLanguage();
 
   useEffect(() => {
-    // Benutzeridentifikation mit Canny
+    let isMounted = true;
+
+    // User identification with Canny
     supabase.auth.getUser().then(({ data, error }) => {
+      if (!isMounted) return;
+
       if (error || !data) {
         console.error("Error fetching user: ", error);
         return;
@@ -52,7 +56,11 @@ export default function Settings() {
         });
       }
     });
-  }, []);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [supabase]);
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
