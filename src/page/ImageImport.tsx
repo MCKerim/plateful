@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -20,21 +21,24 @@ export default function ImageImport() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<{ id: number; name: string } | null>(null);
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+
+  // Cleanup on unmount - abort any pending API calls
+  useEffect(() => {
+    return () => {
+      abortControllerRef.current?.abort();
+    };
+  }, []);
 
   const { selectFromCamera, selectFromGallery, isNative, fileInputRef, handleFileInputChange } =
     useImageSourcePicker();
 
   const processImage = async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
-    const compressedFile = await imageCompression(file, {
-      maxWidthOrHeight: 900,
-      maxSizeMB: 0.5,
-      useWebWorker: true,
-      initialQuality: 0.85,
-    });
+    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
 
     const reader = new FileReader();
     reader.onload = () => {
@@ -71,6 +75,11 @@ export default function ImageImport() {
       return;
     }
 
+    // Abort any previous request and create new controller
+    abortControllerRef.current?.abort();
+    abortControllerRef.current = new AbortController();
+    const signal = abortControllerRef.current.signal;
+
     setIsSaving(true);
 
     try {
@@ -80,11 +89,13 @@ export default function ImageImport() {
         },
       });
 
+      // Check if component unmounted during the async operation
+      if (signal.aborted) return;
+
       if (error) {
         console.error("Edge function returned error:", error);
         toast.error(t("urlImport.errors.importFailed"));
       } else {
-        console.log("recipe-from-image response:", data);
         setData(data[0]);
         await queryClient.invalidateQueries({
           queryKey: queryKeys.recipes.all,
@@ -100,20 +111,23 @@ export default function ImageImport() {
         });
       }
     } catch (err: unknown) {
+      if (signal.aborted) return;
       console.error("Unexpected error calling recipe-from-image:", err);
       toast.error(t("urlImport.errors.importFailed"));
 
       try {
-        const anyErr = err as any;
-        if (anyErr?.response && typeof anyErr.response.text === "function") {
-          const text = await anyErr.response.text();
+        const errWithResponse = err as { response?: { text?: () => Promise<string> } };
+        if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
+          const text = await errWithResponse.response.text();
           console.error("Edge function returned (raw text):", text);
         }
       } catch (error_) {
         console.debug("Could not retrieve raw response from error.", error_);
       }
     } finally {
-      setIsSaving(false);
+      if (!signal.aborted) {
+        setIsSaving(false);
+      }
     }
   }
 

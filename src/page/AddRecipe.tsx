@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
@@ -27,6 +28,9 @@ import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
+
+// Regex to remove common TLDs when generating recipe title from URL
+const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();
@@ -113,7 +117,7 @@ export default function AddRecipe() {
           try {
             const hostname = new URL(finalUrl).hostname
               .replace(/^www\./, "")
-              .replace(/\.com$|\.de$|\.net$|\.org$/i, ""); // remove common TLDs
+              .replace(COMMON_TLD_REGEX, "");
 
             const parts = hostname.split(".");
             // Take last 1-2 parts to avoid subdomains like "s."
@@ -181,7 +185,7 @@ export default function AddRecipe() {
       .upload(filePath, file, { upsert: true });
     setImageUploading(false);
     if (error) {
-      toast.error("Upload failed: " + error.message);
+      toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
       return null;
     }
     return filePath;
@@ -196,12 +200,7 @@ export default function AddRecipe() {
     }
 
     // Compress and resize the image before upload
-    const compressedFile = await imageCompression(file, {
-      maxWidthOrHeight: 900, // Good for recipe images
-      maxSizeMB: 0.5, // Target max file size (MB)
-      useWebWorker: true,
-      initialQuality: 0.85,
-    });
+    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
     setImageFile(compressedFile);
     setImagePreview(previewUrl);
 
@@ -220,12 +219,12 @@ export default function AddRecipe() {
 
   async function saveRecipe() {
     if (title === "") {
-      toast.error("Please enter a name for the recipe.");
+      toast.error(t("addRecipe.errors.nameRequired"));
       return;
     }
 
     if (category === null) {
-      toast.error("Please select a category.");
+      toast.error(t("addRecipe.errors.categoryRequired"));
       return;
     }
 
@@ -251,7 +250,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            toast.error("An error occurred. Please try again.");
+            toast.error(t("common.error"));
           },
         }
       );
@@ -277,7 +276,7 @@ export default function AddRecipe() {
           },
           onError: (error) => {
             console.error(error);
-            toast.error("An error occurred. Please try again.");
+            toast.error(t("common.error"));
           },
         }
       );
@@ -294,7 +293,7 @@ export default function AddRecipe() {
       },
       onError: (error) => {
         console.error("Error while deleting recipe: ", error);
-        toast.error("Error while deleting recipe");
+        toast.error(t("addRecipe.errors.deleteFailed"));
       },
     });
   }

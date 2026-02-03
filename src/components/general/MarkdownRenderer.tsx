@@ -6,69 +6,74 @@ interface MarkdownRendererProps {
   className?: string;
 }
 
-// Custom components for markdown rendering with proper types
-const CustomParagraph = (props: any) => (
-  <p className="mb-2 leading-relaxed last:mb-0 text-primary">{props.children}</p>
+type MarkdownComponentProps = {
+  children?: React.ReactNode;
+  className?: string;
+  href?: string;
+};
+
+const CustomParagraph = ({ children }: MarkdownComponentProps) => (
+  <p className="mb-2 leading-relaxed last:mb-0 text-primary">{children}</p>
 );
 
-const CustomH1 = (props: any) => (
-  <h1 className="mb-2 text-lg font-semibold text-primary">{props.children}</h1>
+const CustomH1 = ({ children }: MarkdownComponentProps) => (
+  <h1 className="mb-2 text-lg font-semibold text-primary">{children}</h1>
 );
 
-const CustomH2 = (props: any) => (
-  <h2 className="mb-2 text-base font-semibold text-primary">{props.children}</h2>
+const CustomH2 = ({ children }: MarkdownComponentProps) => (
+  <h2 className="mb-2 text-base font-semibold text-primary">{children}</h2>
 );
 
-const CustomH3 = (props: any) => (
-  <h3 className="mb-1 text-sm font-semibold text-primary">{props.children}</h3>
+const CustomH3 = ({ children }: MarkdownComponentProps) => (
+  <h3 className="mb-1 text-sm font-semibold text-primary">{children}</h3>
 );
 
-const CustomUL = (props: any) => (
-  <ul className="pl-4 mb-2 space-y-1 list-disc text-primary">{props.children}</ul>
+const CustomUL = ({ children }: MarkdownComponentProps) => (
+  <ul className="pl-4 mb-2 space-y-1 list-disc text-primary">{children}</ul>
 );
 
-const CustomOL = (props: any) => (
-  <ol className="pl-4 mb-2 space-y-1 list-decimal text-primary">{props.children}</ol>
+const CustomOL = ({ children }: MarkdownComponentProps) => (
+  <ol className="pl-4 mb-2 space-y-1 list-decimal text-primary">{children}</ol>
 );
 
-const CustomLI = (props: any) => (
-  <li className="text-sm leading-relaxed text-primary">{props.children}</li>
+const CustomLI = ({ children }: MarkdownComponentProps) => (
+  <li className="text-sm leading-relaxed text-primary">{children}</li>
 );
 
-const CustomCode = (props: any) => {
-  const isInline = !props.className;
+const CustomCode = ({ children, className }: MarkdownComponentProps) => {
+  const isInline = !className;
   if (isInline) {
     return (
-      <code className="bg-muted/50 px-1 py-0.5 rounded text-xs font-mono">{props.children}</code>
+      <code className="bg-muted/50 px-1 py-0.5 rounded text-xs font-mono">{children}</code>
     );
   }
   return (
     <code className="block p-2 overflow-x-auto font-mono text-xs rounded bg-muted/50">
-      {props.children}
+      {children}
     </code>
   );
 };
 
-const CustomBlockquote = (props: any) => (
+const CustomBlockquote = ({ children }: MarkdownComponentProps) => (
   <blockquote className="pl-4 my-2 italic border-l-4 border-muted text-primary">
-    {props.children}
+    {children}
   </blockquote>
 );
 
-const CustomStrong = (props: any) => (
-  <strong className="font-semibold text-primary">{props.children}</strong>
+const CustomStrong = ({ children }: MarkdownComponentProps) => (
+  <strong className="font-semibold text-primary">{children}</strong>
 );
 
-const CustomEm = (props: any) => <em className="italic text-primary">{props.children}</em>;
+const CustomEm = ({ children }: MarkdownComponentProps) => <em className="italic text-primary">{children}</em>;
 
-const CustomA = (props: any) => (
+const CustomA = ({ href, children }: MarkdownComponentProps) => (
   <a
-    href={props.href}
+    href={href}
     className="underline text-primary hover:no-underline"
     target="_blank"
     rel="noopener noreferrer"
   >
-    {props.children}
+    {children}
   </a>
 );
 

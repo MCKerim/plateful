@@ -2,10 +2,21 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
+export interface ToolOutputForUI {
+  proposalId: string;
+  toolName: string;
+  args: {
+    recipeId?: number;
+    title?: string;
+    description?: string;
+    category?: string;
+  };
+}
+
 export interface ChatMessage {
   role: "user" | "assistant" | "tool";
   content: string;
-  toolOutputsForUI?: any;
+  toolOutputsForUI?: ToolOutputForUI[];
   previous_response_id?: string;
 }
 
@@ -55,7 +66,7 @@ export const chatbotSlice = createSlice({
         last.content += action.payload;
       }
     },
-    finalizeLastMessage: (state, action: PayloadAction<any[]>) => {
+    finalizeLastMessage: (state, action: PayloadAction<ToolOutputForUI[]>) => {
       const last = state.messages[state.messages.length - 1];
       if (last && action.payload.length > 0) {
         last.toolOutputsForUI = action.payload;

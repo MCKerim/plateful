@@ -13,11 +13,15 @@ import { Toaster } from "./components/ui/sonner.tsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
+// React Query configuration
+const QUERY_STALE_TIME = 1000 * 30; // 30 seconds - responsive to household changes
+const QUERY_GC_TIME = 1000 * 60 * 10; // 10 minutes - keep unused cache for navigation
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 1000 * 30, // 30 seconds - responsive to household changes
-      gcTime: 1000 * 60 * 10, // 10 minutes - keep unused cache for navigation
+      staleTime: QUERY_STALE_TIME,
+      gcTime: QUERY_GC_TIME,
       retry: 1,
       refetchOnWindowFocus: true,
       refetchOnReconnect: true, // Refetch when network reconnects

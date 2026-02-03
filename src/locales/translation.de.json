@@ -35,7 +35,9 @@
     "yearsAgo_other": "Vor {{count}} Jahren",
     "uploadImage": "Bild hochladen",
     "reset": "Zurücksetzen",
-    "send": "Senden"
+    "send": "Senden",
+    "next": "Weiter",
+    "apply": "Anwenden"
   },
   "update": {
     "title": "Neues Update verfügbar!",
@@ -238,7 +240,13 @@
     "linkPlaceholder": "https://www.tomaten-suppe.de",
     "importRecipeData": "Rezeptdaten importieren (TikTok)",
     "recipeSaved": "Rezept gespeichert!",
-    "recipeDeleted": "Rezept gelöscht!"
+    "recipeDeleted": "Rezept gelöscht!",
+    "errors": {
+      "uploadFailed": "Hochladen fehlgeschlagen",
+      "nameRequired": "Bitte gib einen Namen für das Rezept ein.",
+      "categoryRequired": "Bitte wähle eine Kategorie.",
+      "deleteFailed": "Fehler beim Löschen des Rezepts"
+    }
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link aus der Zwischenablage eingefügt",
@@ -403,6 +411,17 @@
     "oldest": "Älteste",
     "rating": "Am besten bewertet",
     "aToZ": "A bis Z"
+  },
+  "filterModal": {
+    "title": "Filtern nach"
+  },
+  "editItem": {
+    "title": "Artikel bearbeiten",
+    "itemName": "Artikelname",
+    "itemNamePlaceholder": "Apfel",
+    "amount": "Menge",
+    "amountPlaceholder": "5",
+    "editButton": "Artikel bearbeiten"
   },
 
   "ingredients": "Zutaten",

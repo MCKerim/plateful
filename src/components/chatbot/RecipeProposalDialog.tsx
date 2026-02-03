@@ -12,18 +12,10 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
-  toolOutput: {
-    proposalId: string;
-    toolName: string;
-    args: {
-      recipeId?: number;
-      title?: string;
-      description?: string;
-      category?: string;
-    };
-  };
+  toolOutput: ToolOutputForUI;
   onSaveNew: (proposalId: string, title: string, description: string, category: string) => void;
   onSaveEdit: (
     proposalId: string,

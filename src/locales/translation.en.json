@@ -35,7 +35,9 @@
     "yearsAgo_other": "{{count}} years ago",
     "uploadImage": "Upload image",
     "reset": "Reset",
-    "send": "Send"
+    "send": "Send",
+    "next": "Next",
+    "apply": "Apply"
   },
   "update": {
     "title": "New Update Available!",
@@ -192,7 +194,7 @@
     "goToCurrentWeek": "go to current week",
     "thisWeek": "This Week",
     "nextWeek": "Next Week",
-    "lastWeek": "Letzte Woche",
+    "lastWeek": "Last Week",
     "deleteError": "Error deleting item",
     "updateError": "Error updating item",
     "planned": "planned",
@@ -242,7 +244,13 @@
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)",
     "recipeSaved": "Recipe saved!",
-    "recipeDeleted": "Recipe deleted!"
+    "recipeDeleted": "Recipe deleted!",
+    "errors": {
+      "uploadFailed": "Upload failed",
+      "nameRequired": "Please enter a name for the recipe.",
+      "categoryRequired": "Please select a category.",
+      "deleteFailed": "Error while deleting recipe"
+    }
   },
   "urlImport": {
     "linkPastedFromClipboard": "Link pasted from clipboard",
@@ -404,6 +412,17 @@
     "oldest": "Oldest",
     "rating": "Top rated",
     "aToZ": "A to Z"
+  },
+  "filterModal": {
+    "title": "Filter by"
+  },
+  "editItem": {
+    "title": "Edit Item",
+    "itemName": "Item name",
+    "itemNamePlaceholder": "Apple",
+    "amount": "Amount",
+    "amountPlaceholder": "5",
+    "editButton": "Edit Item"
   },
 
   "ingredients": "Ingredients",

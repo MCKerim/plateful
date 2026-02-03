@@ -17,7 +17,6 @@ export function useScrollRestoration(scrollKey: string) {
 
         setTimeout(() => {
           if (Math.abs(window.scrollY - savedPosition) < 50 || attempts >= maxAttempts) {
-            console.log("Scroll restored after", attempts, "attempts");
             setScrollRestored(true);
           } else {
             tryRestore();
