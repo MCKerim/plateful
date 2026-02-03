@@ -7,7 +7,8 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, LogOut, Pencil } from "lucide-react";
+import { Donut, House, LogOut, Pencil, Trash2 } from "lucide-react";
+import DeleteDialog from "@/components/general/DeleteDialog";
 import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
 import {
   Dialog,
@@ -27,6 +28,8 @@ export default function Settings() {
   const user = useAppSelector(selectUser);
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [newUsername, setNewUsername] = useState(user?.username || "");
+  const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
 
   const updateUsernameMutation = useUpdateUsername();
   const updateLanguageMutation = useUpdateLanguage();
@@ -59,6 +62,22 @@ export default function Settings() {
     if (error) {
       console.error("Error while sign out: ", error);
     }
+  };
+
+  // TODO: Implement actual account deletion logic
+  // This should delete user data from Supabase and sign out the user
+  const handleDeleteAccount = async () => {
+    console.log("Delete account requested");
+    setIsDeleteAccountDialogOpen(false);
+    setDeleteConfirmationText("");
+  };
+
+  const getDeleteConfirmationWord = () => {
+    return i18n.language === "de" ? "löschen" : "delete";
+  };
+
+  const isDeleteConfirmationValid = () => {
+    return deleteConfirmationText.toLowerCase() === getDeleteConfirmationWord();
   };
 
   function handleUpdateUsername() {
@@ -216,8 +235,25 @@ export default function Settings() {
             {user?.username} - {user?.email}
           </p>
 
-          <Button variant="destructive" onClick={signOut}>
-            <LogOut size={16} /> {t("settings.signOut")}
+          <DeleteDialog
+            onDelete={signOut}
+            title={t("settings.confirmations.signOut.title")}
+            description={t("settings.confirmations.signOut.description")}
+            cancelText={t("settings.confirmations.signOut.cancel")}
+            confirmText={t("settings.confirmations.signOut.confirm")}
+            customTrigger={
+              <Button variant="destructive" className="w-full">
+                <LogOut size={16} /> {t("settings.signOut")}
+              </Button>
+            }
+          />
+
+          <Button
+            variant="destructive"
+            className="w-full"
+            onClick={() => setIsDeleteAccountDialogOpen(true)}
+          >
+            <Trash2 size={16} /> {t("settings.deleteAccount")}
           </Button>
         </div>
       </div>
@@ -249,6 +285,59 @@ export default function Settings() {
               </Button>
             </div>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isDeleteAccountDialogOpen}
+        onOpenChange={(open) => {
+          setIsDeleteAccountDialogOpen(open);
+          if (!open) setDeleteConfirmationText("");
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t("settings.confirmations.deleteAccount.title")}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              {t("settings.confirmations.deleteAccount.description")}
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">
+                {t("settings.confirmations.deleteAccount.confirmationText")}
+              </label>
+              <Input
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                placeholder={t("settings.confirmations.deleteAccount.confirmationPlaceholder")}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => {
+                  setIsDeleteAccountDialogOpen(false);
+                  setDeleteConfirmationText("");
+                }}
+              >
+                {t("settings.confirmations.deleteAccount.cancel")}
+              </Button>
+
+              <Button
+                className="w-full"
+                variant="destructive"
+                disabled={!isDeleteConfirmationValid()}
+                onClick={handleDeleteAccount}
+              >
+                {t("settings.confirmations.deleteAccount.confirm")}
+              </Button>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     </Layout>
