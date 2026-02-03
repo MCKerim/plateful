@@ -301,6 +301,23 @@
 
     "account": "Konto",
     "signOut": "Abmelden",
+    "deleteAccount": "Konto löschen",
+    "confirmations": {
+      "signOut": {
+        "title": "Abmelden",
+        "description": "Bist du sicher, dass du dich abmelden möchtest?",
+        "confirm": "Abmelden",
+        "cancel": "Abbrechen"
+      },
+      "deleteAccount": {
+        "title": "Konto löschen",
+        "description": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Alle deine Daten werden gelöscht.",
+        "confirmationText": "Tippe \"löschen\" zur Bestätigung",
+        "confirmationPlaceholder": "löschen",
+        "confirm": "Konto löschen",
+        "cancel": "Abbrechen"
+      }
+    },
     "modeToggle": {
       "light": "Hell",
       "dark": "Dunkel",

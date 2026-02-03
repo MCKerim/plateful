@@ -30,6 +30,7 @@ test.describe("Settings Page", () => {
     // Should see Account section
     await expect(page.getByText("Account")).toBeVisible();
     await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /delete account/i })).toBeVisible();
   });
 
   test("should display user information in account section", async ({ page, setupAuth }) => {
@@ -73,6 +74,158 @@ test.describe("Settings Page", () => {
     // Should see cancel and save buttons
     await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /save/i })).toBeVisible();
+  });
+
+  test("should show sign out confirmation dialog", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Click sign out button
+    await page.getByRole("button", { name: /sign out/i }).click();
+
+    // Should see confirmation dialog
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/are you sure you want to sign out/i)).toBeVisible();
+
+    // Should have cancel and confirm buttons
+    await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();
+    await expect(
+      page.getByRole("dialog").getByRole("button", { name: /sign out/i })
+    ).toBeVisible();
+  });
+
+  test("should close sign out dialog when cancel is clicked", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Click sign out button
+    await page.getByRole("button", { name: /sign out/i }).click();
+
+    // Dialog should be visible
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+
+    // Click cancel
+    await page.getByRole("button", { name: /cancel/i }).click();
+
+    // Dialog should be closed
+    await expect(page.getByRole("dialog")).not.toBeVisible();
+
+    // Should still be on settings page
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+  });
+
+  test("should show delete account confirmation dialog", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Click delete account button
+    await page.getByRole("button", { name: /delete account/i }).click();
+
+    // Should see confirmation dialog
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await expect(page.getByRole("heading", { name: /delete account/i })).toBeVisible();
+    await expect(
+      page.getByText(/this action is permanent and cannot be undone/i)
+    ).toBeVisible();
+
+    // Should have text input for confirmation
+    await expect(page.getByPlaceholder(/delete/i)).toBeVisible();
+
+    // Should have cancel and confirm buttons
+    await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();
+    await expect(
+      page.getByRole("dialog").getByRole("button", { name: /delete account/i })
+    ).toBeVisible();
+  });
+
+  test("should have delete account confirm button disabled until correct text is entered", async ({
+    page,
+    setupAuth,
+  }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Click delete account button
+    await page.getByRole("button", { name: /delete account/i }).click();
+
+    // Dialog should be visible
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+
+    // Confirm button should be disabled initially
+    const confirmButton = page
+      .getByRole("dialog")
+      .getByRole("button", { name: /delete account/i });
+    await expect(confirmButton).toBeDisabled();
+
+    // Type wrong text
+    await page.getByPlaceholder(/delete/i).fill("wrong");
+    await expect(confirmButton).toBeDisabled();
+
+    // Type correct text (lowercase)
+    await page.getByPlaceholder(/delete/i).fill("delete");
+    await expect(confirmButton).toBeEnabled();
+  });
+
+  test("should close delete account dialog when cancel is clicked", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Click delete account button
+    await page.getByRole("button", { name: /delete account/i }).click();
+
+    // Dialog should be visible
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+
+    // Click cancel
+    await page.getByRole("button", { name: /cancel/i }).click();
+
+    // Dialog should be closed
+    await expect(page.getByRole("dialog")).not.toBeVisible();
+
+    // Should still be on settings page
+    await expect(page.getByRole("heading", { name: "Settings" })).toBeVisible();
+  });
+
+  test("should clear confirmation text when delete account dialog is reopened", async ({
+    page,
+    setupAuth,
+  }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/settings");
+    await page.waitForLoadState("networkidle");
+
+    // Open dialog and type something
+    await page.getByRole("button", { name: /delete account/i }).click();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+    await page.getByPlaceholder(/delete/i).fill("delete");
+
+    // Close dialog
+    await page.getByRole("button", { name: /cancel/i }).click();
+    await expect(page.getByRole("dialog")).not.toBeVisible();
+
+    // Reopen dialog
+    await page.getByRole("button", { name: /delete account/i }).click();
+    await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
+
+    // Input should be empty
+    await expect(page.getByPlaceholder(/delete/i)).toHaveValue("");
+
+    // Confirm button should be disabled
+    const confirmButton = page
+      .getByRole("dialog")
+      .getByRole("button", { name: /delete account/i });
+    await expect(confirmButton).toBeDisabled();
   });
 
   test("should navigate to household settings", async ({ page, setupAuth }) => {
