@@ -6,8 +6,8 @@
 
 ## Code Duplication to Extract
 
-1. **Recipe import logic** — `URLImport.tsx` and `ImageImport.tsx` share near-identical error handling, history replacement, and toast patterns. Extract a `useRecipeImport()` hook.
-2. **Recipe save logic** — `Chatbot.tsx:254-334` and `AddRecipe.tsx:221-284` duplicate category validation and recipe creation. Extract a `useRecipeSaver()` hook.
+1. **Recipe import logic** — `URLImport.tsx` and `ImageImport.tsx` share near-identical error handling, history replacement, and toast patterns. Consider extracting a `useRecipeImport()` hook (medium-risk refactor).
+2. **Recipe save logic** — `Chatbot.tsx:254-334` and `AddRecipe.tsx:221-284` duplicate category validation and recipe creation. Consider extracting a `useRecipeSaver()` hook (medium-risk refactor).
 3. ~~**Image compression config**~~ (RESOLVED — extracted to `src/lib/constants.ts`)
 
 ## God Components to Break Up
@@ -15,13 +15,14 @@
 - **`Chatbot.tsx` (573 lines)** — handles streaming, image selection, recipe saving, category lookups, and rendering. Split into ChatMessageList, ChatInput, RecipeProposal sub-components.
 - **`AddRecipe.tsx` (408 lines)** — handles form state, image upload, CRUD, validation. Extract ImageUploadForm and RecipeForm.
 
-## Hardcoded Magic Numbers
+## ~~Hardcoded Magic Numbers~~ (RESOLVED)
 
-- ~~Signed URL expiry `3600` in `src/api/recipe.api.ts`~~ (RESOLVED — `SIGNED_URL_EXPIRY_SECONDS`)
-- React Query timing in `src/main.tsx:19-20` — extract to config
-- Default category ID `5` in `src/page/Chatbot.tsx:263,308` — make configurable
-- ~~Camera quality `80` in `src/hooks/general/useImageSourcePicker.tsx`~~ (RESOLVED — `CAMERA_QUALITY`)
-- TLD regex `/\.com$|\.de$|\.net$|\.org$/i` in `AddRecipe.tsx:116`
+All magic numbers have been extracted to `src/lib/constants.ts`:
+- ~~Signed URL expiry `3600` in `src/api/recipe.api.ts`~~ → `SIGNED_URL_EXPIRY_SECONDS`
+- ~~React Query timing in `src/main.tsx`~~ → `QUERY_STALE_TIME`, `QUERY_GC_TIME`
+- ~~Default category ID `5` in `src/page/Chatbot.tsx`~~ → `DEFAULT_CATEGORY_ID`
+- ~~Camera quality `80` in `src/hooks/general/useImageSourcePicker.tsx`~~ → `CAMERA_QUALITY`
+- ~~TLD regex in `AddRecipe.tsx`~~ → `COMMON_TLD_REGEX`
 
 ## Race Conditions & Missing Cleanup
 

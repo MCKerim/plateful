@@ -36,6 +36,7 @@ import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
+import { DEFAULT_CATEGORY_ID } from "@/lib/constants";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -262,7 +263,7 @@ description: ${recipeContext.description ?? "No description"}
 
     if (categoryId === null) {
       console.error("Invalid category:", category);
-      categoryId = 5;
+      categoryId = DEFAULT_CATEGORY_ID;
     }
 
     if (!householdId) {
@@ -307,7 +308,7 @@ description: ${recipeContext.description ?? "No description"}
 
     if (categoryId === null) {
       console.error("Invalid category:", category);
-      categoryId = 5;
+      categoryId = DEFAULT_CATEGORY_ID;
     }
 
     try {

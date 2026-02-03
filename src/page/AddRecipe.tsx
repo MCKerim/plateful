@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
+import { IMAGE_COMPRESSION_OPTIONS, COMMON_TLD_REGEX } from "@/lib/constants";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
@@ -114,7 +114,7 @@ export default function AddRecipe() {
           try {
             const hostname = new URL(finalUrl).hostname
               .replace(/^www\./, "")
-              .replace(/\.com$|\.de$|\.net$|\.org$/i, ""); // remove common TLDs
+              .replace(COMMON_TLD_REGEX, "");
 
             const parts = hostname.split(".");
             // Take last 1-2 parts to avoid subdomains like "s."
