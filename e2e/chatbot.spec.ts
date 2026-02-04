@@ -1,12 +1,13 @@
 import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
 import type { Request } from "@playwright/test";
+import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
 
 /** Helper to build an SSE response body from chatbot edge function */
 function buildSSEResponse(
   text: string,
   responseId: string,
-  toolOutputsForUI: any[] = []
+  toolOutputsForUI: ToolOutputForUI[] = []
 ): string {
   // Stream text in chunks
   const chunkSize = 12;
@@ -187,11 +188,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
       await route.fulfill({
         status: 200,
         contentType: "text/event-stream",
-        body: buildSSEResponse(
-          "I've updated the recipe for you!",
-          "response-123",
-          toolOutputs
-        ),
+        body: buildSSEResponse("I've updated the recipe for you!", "response-123", toolOutputs),
       });
     });
 
@@ -433,8 +430,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await page.getByRole("button", { name: /send/i }).click();
 
     // Verify the full streamed text appears
-    await expect(
-      page.getByText("This is a streamed response from the AI chef.")
-    ).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText("This is a streamed response from the AI chef.")).toBeVisible({
+      timeout: 10000,
+    });
   });
 });

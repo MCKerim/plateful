@@ -110,7 +110,7 @@ export default function InvitePage() {
 
           <p className="second-font font-medium text-primary">{t("invitePage.invitedTo")}</p>
 
-          <h1 className="first-font text-4xl mt-12 break-all">Family Ismail</h1>
+          <h1 className="first-font text-4xl mt-12 break-all">{household?.name}</h1>
         </div>
 
         <div className="flex flex-col w-full gap-3">
