@@ -30,6 +30,7 @@ export default function JoinHousehold() {
         </NavLink>
       </div>
 
+      {/* this div is for flex spacing and should not be removed */}
       <div></div>
     </div>
   );

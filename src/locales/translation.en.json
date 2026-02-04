@@ -134,7 +134,12 @@
     "invitedTo": "You have been invited to the following household:",
     "joinButton": "Join Household",
     "declineButton": "Don't Join",
-    "invalidLink": "Invalid or expired link"
+    "invalidLink": "Invalid link",
+    "expiredLink": "This link has expired",
+    "invalidOrExpiredLink": "Invalid or expired link",
+    "joinSuccess": "You have successfully joined the household",
+    "joinError": "Error joining household",
+    "joinLoading": "Joining..."
   },
   "signup": {
     "title": "Plateful",

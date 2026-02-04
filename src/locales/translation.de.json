@@ -178,7 +178,12 @@
     "invitedTo": "Du wurdest zu folgendem Haushalt eingeladen:",
     "joinButton": "Dem Haushalt beitreten",
     "declineButton": "Nicht beitreten",
-    "invalidLink": "Ungültiger oder abgelaufener Link"
+    "invalidLink": "Ungültiger Link",
+    "expiredLink": "Dieser Link ist abgelaufen",
+    "invalidOrExpiredLink": "Ungültiger oder abgelaufener Link",
+    "joinSuccess": "Du wurdest erfolgreich zum Haushalt beigetragen",
+    "joinError": "Fehler beim Beitreten des Haushalts",
+    "joinLoading": "Beitreten..."
   },
   "list": {
     "title": "Einkaufsliste"

@@ -48,7 +48,7 @@ export default function InvitePage() {
 
       // Check if invite has expired
       if (new Date(invite.expires_at) < new Date()) {
-        toast.error(t("invitePage.invalidLink"));
+        toast.error(t("invitePage.expiredLink"));
         return;
       }
 
@@ -62,6 +62,13 @@ export default function InvitePage() {
 
   async function updateHousehold() {
     if (!invite) {
+      toast.error(t("invitePage.invalidOrExpiredLink"));
+      return;
+    }
+
+    // Check if invite has expired before joining
+    if (new Date(invite.expires_at) < new Date()) {
+      toast.error(t("invitePage.expiredLink"));
       return;
     }
 
@@ -82,8 +89,12 @@ export default function InvitePage() {
         })
         .eq("id", invite.id);
 
-      navigate("/householdSettings");
+      toast.success(t("invitePage.joinSuccess"));
+      setIsJoining(false);
+
+      navigate("/");
     } catch (error) {
+      toast.error(t("invitePage.joinError"));
       console.error("Error joining household:", error);
       setIsJoining(false);
     }
@@ -92,18 +103,19 @@ export default function InvitePage() {
   return (
     <Layout>
       <div className="flex flex-col items-center justify-center flex-1 h-full max-w-md mx-auto space-y-6 text-center">
-        <div className="mb-16 space-y-2">
+        <div className="mb-16 gap-2">
           <div className="flex items-center justify-center">
-            <House className="w-8 h-8" />
+            <House className="w-12 h-12" />
           </div>
-          <p className="font-medium text-primary">{t("invitePage.invitedTo")}</p>
 
-          <h1 className="text-2xl font-bold text-primary">"{household?.name}"</h1>
+          <p className="second-font font-medium text-primary">{t("invitePage.invitedTo")}</p>
+
+          <h1 className="first-font text-4xl mt-12 break-all">Family Ismail</h1>
         </div>
 
         <div className="flex flex-col w-full gap-3">
           <Button onClick={updateHousehold} disabled={isJoining} className="w-full">
-            {isJoining ? "Joining..." : t("invitePage.joinButton")}
+            {isJoining ? t("invitePage.joinLoading") : t("invitePage.joinButton")}
           </Button>
 
           <NavLink to="/" className="w-full">
