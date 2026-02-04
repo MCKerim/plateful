@@ -18,18 +18,14 @@ type Props = {
   status?: RecipeStatus;
 };
 
-export default function RecipeCard({
-  id,
-  name,
-  averageRating,
-  status = "ready",
-}: Readonly<Props>) {
-  if (status === "importing") {
-    return <ImportingRecipeCard />;
-  }
+export default function RecipeCard({ id, name, averageRating, status = "ready" }: Readonly<Props>) {
   const { t } = useTranslation();
   const { data: imageUrl } = useRecipeFirstImage(id);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(id);
+
+  if (status === "importing") {
+    return <ImportingRecipeCard />;
+  }
 
   const TAGS: string[] = [];
 
