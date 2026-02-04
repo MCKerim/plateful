@@ -1,7 +1,5 @@
 import { MockMealPlan, MockRecipe } from "../fixtures/types";
 
-let mealPlanIdCounter = 1;
-
 function formatDate(date: Date): string {
   return date.toISOString().split("T")[0];
 }
@@ -13,12 +11,13 @@ function addDays(date: Date, days: number): Date {
 }
 
 export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan {
-  const id = overrides?.id ?? mealPlanIdCounter++;
+  const id = overrides?.id ?? crypto.randomUUID();
+  const defaultRecipeId = crypto.randomUUID();
 
   return {
     id,
-    recipe_id: overrides?.recipe_id ?? 1,
-    household_id: overrides?.household_id ?? 1,
+    recipe_id: overrides?.recipe_id ?? defaultRecipeId,
+    household_id: overrides?.household_id ?? crypto.randomUUID(),
     // Use 'in' check to distinguish between explicit null and undefined
     planned_date:
       overrides && "planned_date" in overrides
@@ -26,13 +25,13 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
         : formatDate(new Date()),
     eaten: overrides?.eaten ?? false,
     created_at: overrides?.created_at ?? new Date().toISOString(),
-    recipes: overrides?.recipes ?? { id: 1, name: "Test Recipe" },
+    recipes: overrides?.recipes ?? { id: defaultRecipeId, name: "Test Recipe" },
   };
 }
 
 export function createWeeklyMealPlans(
   recipes: MockRecipe[],
-  householdId: number,
+  householdId: string,
   startDate: Date = new Date()
 ): MockMealPlan[] {
   return recipes.slice(0, 7).map((recipe, index) =>
@@ -45,7 +44,7 @@ export function createWeeklyMealPlans(
   );
 }
 
-export function createBacklogMealPlans(recipes: MockRecipe[], householdId: number): MockMealPlan[] {
+export function createBacklogMealPlans(recipes: MockRecipe[], householdId: string): MockMealPlan[] {
   return recipes.map((recipe) =>
     createMealPlan({
       recipe_id: recipe.id,

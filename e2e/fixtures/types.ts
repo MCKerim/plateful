@@ -7,23 +7,23 @@ export type MockUser = {
   username: string;
   has_seen_value_screens: boolean;
   has_completed_survey: boolean;
-  household_id: number | null;
+  household_id: string | null;
   language: string;
   created_at: string;
 };
 
 export type MockHousehold = {
-  id: number;
+  id: string;
   name: string;
   created_at: string;
 };
 
 export type MockRecipe = {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   category: number | null;
-  household_id: number | null;
+  household_id: string | null;
   link: string | null;
   owner_id: string;
   created_at: string;
@@ -31,13 +31,13 @@ export type MockRecipe = {
 };
 
 export type MockMealPlan = {
-  id: number;
-  recipe_id: number;
-  household_id: number;
+  id: string;
+  recipe_id: string;
+  household_id: string;
   planned_date: string | null;
   eaten: boolean;
   created_at: string;
-  recipes: { id: number; name: string } | null;
+  recipes: { id: string; name: string } | null;
 };
 
 export type MockSession = {

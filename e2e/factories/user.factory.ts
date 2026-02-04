@@ -1,13 +1,11 @@
 import { MockUser } from "../fixtures/types";
 
-let userIdCounter = 1;
-
 export function createUser(overrides?: Partial<MockUser>): MockUser {
-  const id = overrides?.id ?? `test-user-${userIdCounter++}`;
+  const id = overrides?.id ?? crypto.randomUUID();
 
   return {
     id,
-    email: overrides?.email ?? `testuser${userIdCounter}@example.com`,
+    email: overrides?.email ?? `testuser-${id.slice(0, 8)}@example.com`,
     username: overrides?.username ?? "TestUser",
     has_seen_value_screens: overrides?.has_seen_value_screens ?? true,
     has_completed_survey: overrides?.has_completed_survey ?? true,
@@ -25,7 +23,7 @@ export function createNewUser(): MockUser {
   });
 }
 
-export function createOnboardedUser(householdId: number): MockUser {
+export function createOnboardedUser(householdId: string): MockUser {
   return createUser({
     has_seen_value_screens: true,
     has_completed_survey: true,

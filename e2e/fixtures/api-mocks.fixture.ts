@@ -46,12 +46,12 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
   await page.route("**/rest/v1/recipes?*", async (route) => {
     const url = route.request().url();
 
-    // Check if this is a single recipe fetch (contains id=eq.X)
-    const singleRecipeMatch = url.match(/id=eq\.(\d+)/);
+    // Check if this is a single recipe fetch (contains id=eq.UUID or id=eq.number)
+    const singleRecipeMatch = url.match(/id=eq\.([a-f0-9-]+)/i);
 
     if (singleRecipeMatch) {
       // Single recipe fetch - return single object
-      const recipeId = Number.parseInt(singleRecipeMatch[1]);
+      const recipeId = singleRecipeMatch[1];
       const recipe = scenario.recipes.find((r) => r.id === recipeId);
 
       if (recipe) {

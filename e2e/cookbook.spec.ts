@@ -5,11 +5,11 @@ test.describe("Cookbook Page", () => {
   test("should display recipes when clicking on a category", async ({ page, setupAuth }) => {
     // Create recipes for different categories
     const recipes = [
-      createRecipe({ id: 1, name: "Pancakes", category: 1 }), // Breakfast
-      createRecipe({ id: 2, name: "Omelette", category: 1 }), // Breakfast
-      createRecipe({ id: 3, name: "Spaghetti", category: 2 }), // Main
-      createRecipe({ id: 4, name: "Chicken Curry", category: 2 }), // Main
-      createRecipe({ id: 5, name: "Chocolate Cake", category: 3 }), // Dessert
+      createRecipe({ name: "Pancakes", category: 1 }), // Breakfast
+      createRecipe({ name: "Omelette", category: 1 }), // Breakfast
+      createRecipe({ name: "Spaghetti", category: 2 }), // Main
+      createRecipe({ name: "Chicken Curry", category: 2 }), // Main
+      createRecipe({ name: "Chocolate Cake", category: 3 }), // Dessert
     ];
 
     await setupAuth({ recipes });
@@ -36,9 +36,9 @@ test.describe("Cookbook Page", () => {
 
   test("should display all recipes when clicking All Recipes", async ({ page, setupAuth }) => {
     const recipes = [
-      createRecipe({ id: 1, name: "Morning Smoothie", category: 1 }),
-      createRecipe({ id: 2, name: "Pasta Carbonara", category: 2 }),
-      createRecipe({ id: 3, name: "Apple Pie", category: 3 }),
+      createRecipe({ name: "Morning Smoothie", category: 1 }),
+      createRecipe({ name: "Pasta Carbonara", category: 2 }),
+      createRecipe({ name: "Apple Pie", category: 3 }),
     ];
 
     await setupAuth({ recipes });
@@ -59,7 +59,8 @@ test.describe("Cookbook Page", () => {
   });
 
   test("should navigate to recipe detail when clicking a recipe", async ({ page, setupAuth }) => {
-    const recipes = [createRecipe({ id: 42, name: "Special Recipe", category: 2 })];
+    const recipeId = "00000000-0000-0000-0000-000000000042";
+    const recipes = [createRecipe({ id: recipeId, name: "Special Recipe", category: 2 })];
 
     await setupAuth({ recipes });
 
@@ -78,15 +79,15 @@ test.describe("Cookbook Page", () => {
     await recipeCard.click();
 
     // Should navigate to recipe detail page
-    await page.waitForURL(/\/recipe\/42/);
-    expect(page.url()).toContain("/recipe/42");
+    await page.waitForURL(new RegExp(`/recipe/${recipeId}`));
+    expect(page.url()).toContain(`/recipe/${recipeId}`);
   });
 
   test("should search for recipes", async ({ page, setupAuth }) => {
     const recipes = [
-      createRecipe({ id: 1, name: "Banana Bread", category: 1 }),
-      createRecipe({ id: 2, name: "Banana Smoothie", category: 4 }),
-      createRecipe({ id: 3, name: "Chocolate Mousse", category: 3 }),
+      createRecipe({ name: "Banana Bread", category: 1 }),
+      createRecipe({ name: "Banana Smoothie", category: 4 }),
+      createRecipe({ name: "Chocolate Mousse", category: 3 }),
     ];
 
     await setupAuth({ recipes });

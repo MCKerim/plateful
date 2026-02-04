@@ -3,8 +3,9 @@ import { createRecipe } from "./factories";
 
 test.describe("Recipe Edit Page", () => {
   test("should load recipe data into edit form", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000001";
     const recipe = createRecipe({
-      id: 1,
+      id: recipeId,
       name: "Original Recipe Name",
       description: "Original description text",
       category: 2, // Main
@@ -13,7 +14,7 @@ test.describe("Recipe Edit Page", () => {
 
     await setupAuth({ recipes: [recipe] });
 
-    await page.goto("/recipe/edit/1");
+    await page.goto(`/recipe/edit/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify form is populated with recipe data
@@ -28,15 +29,16 @@ test.describe("Recipe Edit Page", () => {
   });
 
   test("should have cancel button that navigates back", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000002";
     const recipe = createRecipe({
-      id: 2,
+      id: recipeId,
       name: "Test Recipe",
     });
 
     await setupAuth({ recipes: [recipe] });
 
     // Navigate from recipe detail to edit
-    await page.goto("/recipe/2");
+    await page.goto(`/recipe/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     await expect(page.getByRole("heading", { name: "Test Recipe" })).toBeVisible({
@@ -45,7 +47,7 @@ test.describe("Recipe Edit Page", () => {
 
     // Click edit button
     await page.getByRole("button", { name: "Edit Recipe" }).click();
-    await page.waitForURL(/\/recipe\/edit\/2/);
+    await page.waitForURL(new RegExp(`/recipe/edit/${recipeId}`));
 
     // Click cancel button
     const cancelButton = page.getByRole("button", { name: /cancel/i });
@@ -53,19 +55,20 @@ test.describe("Recipe Edit Page", () => {
     await cancelButton.click();
 
     // Should navigate back to recipe detail
-    await page.waitForURL(/\/recipe\/2$/);
-    expect(page.url()).toMatch(/\/recipe\/2$/);
+    await page.waitForURL(new RegExp(`/recipe/${recipeId}$`));
+    expect(page.url()).toMatch(new RegExp(`/recipe/${recipeId}$`));
   });
 
   test("should have delete button in edit mode", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000003";
     const recipe = createRecipe({
-      id: 3,
+      id: recipeId,
       name: "Deletable Recipe",
     });
 
     await setupAuth({ recipes: [recipe] });
 
-    await page.goto("/recipe/edit/3");
+    await page.goto(`/recipe/edit/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify we're on the edit page with form loaded
@@ -89,14 +92,15 @@ test.describe("Recipe Edit Page", () => {
   });
 
   test("should have save button", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000004";
     const recipe = createRecipe({
-      id: 4,
+      id: recipeId,
       name: "Saveable Recipe",
     });
 
     await setupAuth({ recipes: [recipe] });
 
-    await page.goto("/recipe/edit/4");
+    await page.goto(`/recipe/edit/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify we're on the edit page
@@ -109,14 +113,15 @@ test.describe("Recipe Edit Page", () => {
   });
 
   test("should be able to edit recipe name", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000005";
     const recipe = createRecipe({
-      id: 5,
+      id: recipeId,
       name: "Old Name",
     });
 
     await setupAuth({ recipes: [recipe] });
 
-    await page.goto("/recipe/edit/5");
+    await page.goto(`/recipe/edit/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify original name is loaded

@@ -1,9 +1,7 @@
 import { MockHousehold } from "../fixtures/types";
 
-let householdIdCounter = 1;
-
 export function createHousehold(overrides?: Partial<MockHousehold>): MockHousehold {
-  const id = overrides?.id ?? householdIdCounter++;
+  const id = overrides?.id ?? crypto.randomUUID();
 
   return {
     id,

@@ -28,8 +28,9 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     page,
     setupAuth,
   }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000001";
     const recipe = createRecipe({
-      id: 1,
+      id: recipeId,
       name: "Spaghetti Carbonara",
       description: "A classic Italian pasta dish with eggs, cheese, and pancetta.",
       category: 2,
@@ -38,7 +39,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await setupAuth({ recipes: [recipe] });
 
     // Navigate to recipe detail page
-    await page.goto("/recipe/1");
+    await page.goto(`/recipe/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify recipe is loaded
@@ -52,8 +53,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await askButton.click();
 
     // Verify navigation to chatbot with recipeId param
-    await page.waitForURL(/\/chatbot\?recipeId=1/);
-    expect(page.url()).toContain("/chatbot?recipeId=1");
+    await page.waitForURL(new RegExp(`/chatbot\\?recipeId=${recipeId}`));
+    expect(page.url()).toContain(`/chatbot?recipeId=${recipeId}`);
 
     // Verify recipe context chip is visible in the chat input area
     await expect(page.getByText("Spaghetti Carbonara")).toBeVisible({
@@ -62,8 +63,9 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
   });
 
   test("should show recipe context chip in first user message", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000002";
     const recipe = createRecipe({
-      id: 2,
+      id: recipeId,
       name: "Chicken Stir Fry",
       description: "A quick and easy weeknight dinner.",
       category: 2,
@@ -72,7 +74,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await setupAuth({ recipes: [recipe] });
 
     // Navigate directly to chatbot with recipe context
-    await page.goto("/chatbot?recipeId=2");
+    await page.goto(`/chatbot?recipeId=${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify recipe context chip is visible before sending message
@@ -105,15 +107,16 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
   });
 
   test("should have Ask AI-Chef button visible on recipe page", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000003";
     const recipe = createRecipe({
-      id: 3,
+      id: recipeId,
       name: "Test Recipe",
       category: 2,
     });
 
     await setupAuth({ recipes: [recipe] });
 
-    await page.goto("/recipe/3");
+    await page.goto(`/recipe/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify the Ask AI-Chef button is present and visible
@@ -125,13 +128,16 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     page,
     setupAuth,
   }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000004";
+    const householdId = "00000000-0000-0000-0000-000000000100";
     const recipeLink = "https://example.com/original-recipe-link";
     const recipe = createRecipe({
-      id: 4,
+      id: recipeId,
       name: "Recipe With Link",
       description: "Original description",
       category: 2,
       link: recipeLink,
+      household_id: householdId,
     });
 
     await setupAuth({ recipes: [recipe] });
@@ -144,18 +150,18 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
       const request = route.request();
       const url = request.url();
 
-      if (request.method() === "PATCH" && url.includes("id=eq.4")) {
+      if (request.method() === "PATCH" && url.includes(`id=eq.${recipeId}`)) {
         capturedUpdateRequest = request;
         await route.fulfill({
           status: 200,
           contentType: "application/json",
           body: JSON.stringify({
-            id: 4,
+            id: recipeId,
             name: "Updated Recipe Name",
             description: "Updated description",
             category: 2,
             link: recipeLink,
-            household_id: 1,
+            household_id: householdId,
             created_at: new Date().toISOString(),
           }),
         });
@@ -171,7 +177,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
           proposalId: "p_1",
           toolName: "propose_recipe_edit",
           args: {
-            recipeId: 4,
+            recipeId: recipeId,
             title: "Updated Recipe Name",
             description: "Updated description by AI",
             category: "Main Course",
@@ -190,7 +196,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     });
 
     // Navigate to chatbot with recipe context
-    await page.goto("/chatbot?recipeId=4");
+    await page.goto(`/chatbot?recipeId=${recipeId}`);
     await page.waitForLoadState("networkidle");
 
     // Verify recipe context chip is visible
@@ -229,6 +235,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     page,
     setupAuth,
   }) => {
+    const householdId = "00000000-0000-0000-0000-000000000100";
     await setupAuth({});
 
     // Mock POST for creating recipe
@@ -240,12 +247,12 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
           contentType: "application/json",
           body: JSON.stringify([
             {
-              id: 99,
+              id: "00000000-0000-0000-0000-000000000099",
               name: "Banana Pancakes",
               description: "Fluffy pancakes",
               category: 1,
               link: "",
-              household_id: 1,
+              household_id: householdId,
               created_at: new Date().toISOString(),
             },
           ]),
@@ -305,6 +312,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
   });
 
   test("should include proposal feedback in next message", async ({ page, setupAuth }) => {
+    const householdId = "00000000-0000-0000-0000-000000000100";
+    const createdRecipeId = "00000000-0000-0000-0000-000000000042";
     await setupAuth({});
 
     // Mock POST for creating recipe
@@ -315,12 +324,12 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
           status: 201,
           contentType: "application/json",
           body: JSON.stringify({
-            id: 42,
+            id: createdRecipeId,
             name: "Test Recipe",
             description: "Test",
             category: 1,
             link: "",
-            household_id: 1,
+            household_id: householdId,
             created_at: new Date().toISOString(),
           }),
         });
@@ -400,7 +409,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     const textPart = messageContent.find((p: any) => p.type === "input_text");
     expect(textPart.text).toContain("[Proposal Outcomes]");
     expect(textPart.text).toContain("p_1");
-    expect(textPart.text).toContain("42");
+    expect(textPart.text).toContain(createdRecipeId);
   });
 
   test("should stream response text incrementally", async ({ page, setupAuth }) => {

@@ -24,14 +24,12 @@ test.describe("Meal Planner Page", () => {
 
   test("should display planned meals for current week", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
-      id: 1,
       name: "Planned Dinner",
       category: 2,
     });
 
     const today = new Date();
     const mealPlan = createMealPlan({
-      id: 1,
       recipe_id: recipe.id,
       planned_date: formatDate(today),
       recipes: { id: recipe.id, name: recipe.name },
@@ -48,13 +46,11 @@ test.describe("Meal Planner Page", () => {
 
   test("should display unplanned items section", async ({ page, setupAuth }) => {
     const recipe = createRecipe({
-      id: 2,
       name: "Unplanned Meal",
       category: 2,
     });
 
     const mealPlan = createMealPlan({
-      id: 2,
       recipe_id: recipe.id,
       planned_date: null, // No date = unplanned
       recipes: { id: recipe.id, name: recipe.name },
@@ -91,15 +87,15 @@ test.describe("Meal Planner Page", () => {
   });
 
   test("should click on planned item to view recipe", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000010";
     const recipe = createRecipe({
-      id: 10,
+      id: recipeId,
       name: "Clickable Recipe",
       category: 2,
     });
 
     const today = new Date();
     const mealPlan = createMealPlan({
-      id: 1,
       recipe_id: recipe.id,
       planned_date: formatDate(today),
       recipes: { id: recipe.id, name: recipe.name },
@@ -116,8 +112,8 @@ test.describe("Meal Planner Page", () => {
     await recipeLink.click();
 
     // Should navigate to recipe detail page
-    await page.waitForURL(/\/recipe\/10/);
-    expect(page.url()).toContain("/recipe/10");
+    await page.waitForURL(new RegExp(`/recipe/${recipeId}`));
+    expect(page.url()).toContain(`/recipe/${recipeId}`);
   });
 
   test("should display days of the week", async ({ page, setupAuth }) => {
