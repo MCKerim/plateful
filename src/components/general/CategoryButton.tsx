@@ -91,7 +91,7 @@ export default function CategoryButton({ id, name, color = "" }: Readonly<Props>
         className="absolute bottom-0 left-0 right-0 h-[106px] flex items-center justify-center rounded-lg"
         style={{ backgroundColor: frontColor }}
       >
-        <p className="first-font text-background z-40 break-words text-center text-xl px-2">
+        <p className="first-font text-background z-20 break-words text-center text-xl px-2">
           {name}
         </p>
       </div>

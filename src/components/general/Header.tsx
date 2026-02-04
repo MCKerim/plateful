@@ -12,7 +12,7 @@ export default function Header({ buttons }: Readonly<Props>) {
     <>
       <div style={{ height: "38px" }}></div>
 
-      <div className="fixed top-0 z-20 w-full max-w-lg pt-1 bg-background">
+      <div className="fixed top-0 z-40 w-full max-w-lg pt-1 bg-background">
         <div className="flex items-center justify-between w-full px-2">
           <div className="flex items-center gap-1">
             <h1 className="text-xl font-bold first-font">Plateful</h1>
