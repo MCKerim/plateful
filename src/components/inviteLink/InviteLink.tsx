@@ -38,7 +38,6 @@ export default function InviteLink() {
         household_id: user.household_id,
         invited_by: user.id,
         expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Valid for 24 hours
-        used: false,
       },
     ]);
 

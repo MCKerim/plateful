@@ -44,9 +44,17 @@ export default function InvitePage() {
         return;
       }
 
-      setInvite(invites[0]);
+      const invite = invites[0];
+
+      // Check if invite has expired
+      if (new Date(invite.expires_at) < new Date()) {
+        toast.error(t("invitePage.invalidLink"));
+        return;
+      }
+
+      setInvite(invite);
       setCurrentUserId(user.id);
-      setHousehold(invites[0].household);
+      setHousehold(invite.household);
     };
 
     handleInvite();
@@ -65,10 +73,13 @@ export default function InvitePage() {
         .update({ household_id: invite.household_id })
         .eq("id", currentUserId);
 
-      // Markiere Invite als genutzt
+      // Track invite usage
       await supabase
         .from("invites")
-        .update({ used: true, used_by: currentUserId })
+        .update({
+          used_by: currentUserId,
+          use_count: invite.use_count + 1,
+        })
         .eq("id", invite.id);
 
       navigate("/householdSettings");

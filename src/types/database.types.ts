@@ -78,7 +78,7 @@ export type Database = {
           id: string
           invited_by: string | null
           token: string
-          used: boolean
+          use_count: number
           used_by: string | null
         }
         Insert: {
@@ -88,7 +88,7 @@ export type Database = {
           id?: string
           invited_by?: string | null
           token: string
-          used?: boolean
+          use_count?: number
           used_by?: string | null
         }
         Update: {
@@ -98,7 +98,7 @@ export type Database = {
           id?: string
           invited_by?: string | null
           token?: string
-          used?: boolean
+          use_count?: number
           used_by?: string | null
         }
         Relationships: [
