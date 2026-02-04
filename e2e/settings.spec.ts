@@ -28,7 +28,7 @@ test.describe("Settings Page", () => {
     await expect(page.getByText("Support & Feedback")).toBeVisible();
 
     // Should see Account section
-    await expect(page.getByText("Account")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Account" })).toBeVisible();
     await expect(page.getByRole("button", { name: /sign out/i })).toBeVisible();
     await expect(page.getByRole("button", { name: /delete account/i })).toBeVisible();
   });
@@ -91,9 +91,7 @@ test.describe("Settings Page", () => {
 
     // Should have cancel and confirm buttons
     await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();
-    await expect(
-      page.getByRole("dialog").getByRole("button", { name: /sign out/i })
-    ).toBeVisible();
+    await expect(page.getByRole("dialog").getByRole("button", { name: /sign out/i })).toBeVisible();
   });
 
   test("should close sign out dialog when cancel is clicked", async ({ page, setupAuth }) => {
@@ -130,9 +128,7 @@ test.describe("Settings Page", () => {
     // Should see confirmation dialog
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole("heading", { name: /delete account/i })).toBeVisible();
-    await expect(
-      page.getByText(/this action is permanent and cannot be undone/i)
-    ).toBeVisible();
+    await expect(page.getByText(/this action is permanent and cannot be undone/i)).toBeVisible();
 
     // Should have text input for confirmation
     await expect(page.getByPlaceholder(/delete/i)).toBeVisible();
@@ -160,9 +156,7 @@ test.describe("Settings Page", () => {
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
 
     // Confirm button should be disabled initially
-    const confirmButton = page
-      .getByRole("dialog")
-      .getByRole("button", { name: /delete account/i });
+    const confirmButton = page.getByRole("dialog").getByRole("button", { name: /delete account/i });
     await expect(confirmButton).toBeDisabled();
 
     // Type wrong text
@@ -222,9 +216,7 @@ test.describe("Settings Page", () => {
     await expect(page.getByPlaceholder(/delete/i)).toHaveValue("");
 
     // Confirm button should be disabled
-    const confirmButton = page
-      .getByRole("dialog")
-      .getByRole("button", { name: /delete account/i });
+    const confirmButton = page.getByRole("dialog").getByRole("button", { name: /delete account/i });
     await expect(confirmButton).toBeDisabled();
   });
 

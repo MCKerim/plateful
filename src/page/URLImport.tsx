@@ -31,6 +31,9 @@ export default function URLImport() {
 
       setIsSaving(true);
 
+      // Invalidate cache immediately so Cookbook shows the importing card
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
+
       try {
         const { data, error } = await supabase.functions.invoke("recipe-from-url", {
           body: {

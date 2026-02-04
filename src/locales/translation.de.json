@@ -204,7 +204,9 @@
   },
   "cookbook": {
     "enterRecipeName": "Rezept suchen...",
-    "nothingFound": "Keine Rezepte gefunden..."
+    "nothingFound": "Keine Rezepte gefunden...",
+    "importing": "Importiere...",
+    "recentlyAdded": "Zuletzt hinzugefügt"
   },
   "recipe": {
     "editRecipe": "Rezept bearbeiten",
