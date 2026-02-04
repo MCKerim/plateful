@@ -33,8 +33,13 @@ export default function ImageImport() {
     };
   }, []);
 
-  const { selectFromCamera, selectFromGallery, isNative, fileInputRef, handleFileInputChange } =
-    useImageSourcePicker();
+  const {
+    selectFromCamera,
+    selectMultipleFromGallery,
+    isNative,
+    multipleFileInputRef,
+    handleMultipleFileInputChange,
+  } = useImageSourcePicker();
 
   const processImage = async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
@@ -59,9 +64,11 @@ export default function ImageImport() {
   };
 
   const handleGalleryClick = async () => {
-    const result = await selectFromGallery();
-    if (result) {
-      await processImage(result.file, result.dataUrl);
+    const results = await selectMultipleFromGallery();
+    if (results) {
+      for (const result of results) {
+        await processImage(result.file, result.dataUrl);
+      }
     }
   };
 
@@ -156,11 +163,12 @@ export default function ImageImport() {
       </div>
 
       <input
-        ref={fileInputRef}
+        ref={multipleFileInputRef}
         type="file"
         accept="image/*"
+        multiple
         className="hidden"
-        onChange={handleFileInputChange}
+        onChange={handleMultipleFileInputChange}
       />
     </>
   );

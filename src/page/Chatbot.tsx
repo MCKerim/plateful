@@ -80,18 +80,18 @@ export default function Chatbot() {
     scrollToBottom();
   }, [messages]);
 
-  const { pickImage, ImageSourceDrawerComponent } = useImageSourcePicker({
+  const { pickMultipleImages, ImageSourceDrawerComponent } = useImageSourcePicker({
     resultType: "base64",
   });
 
   const handlePickImagesClick = async () => {
-    const result = await pickImage();
+    const results = await pickMultipleImages();
 
-    if (!result?.base64String) {
+    if (!results || results.length === 0) {
       return;
     }
 
-    setSelectedImagesAsbase64((prev) => [...prev, result.base64String]);
+    setSelectedImagesAsbase64((prev) => [...prev, ...results.map((r) => r.base64String)]);
   };
 
   const handleRemoveImage = (index: number) => {
