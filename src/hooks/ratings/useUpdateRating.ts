@@ -4,7 +4,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { ratingsApi, UpdateRatingParams } from "@/api/ratings.api";
 import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
-type UpdateRatingWithRecipeId = UpdateRatingParams & { recipeId: number };
+type UpdateRatingWithRecipeId = UpdateRatingParams & { recipeId: string };
 
 export function useUpdateRating() {
   const { supabase } = useSupabase();

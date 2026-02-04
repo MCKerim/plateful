@@ -12,7 +12,7 @@ type Props = {
   rating: RecipeRatingWithUser;
   canModify: boolean;
   handleEditRating: (rating: RecipeRatingWithUser) => void;
-  handleDeleteRating: (ratingId: number) => void;
+  handleDeleteRating: (ratingId: string) => void;
 };
 
 export default function RatingListItem({

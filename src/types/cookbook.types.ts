@@ -1,7 +1,7 @@
 export type RecipeStatus = "importing" | "ready";
 
 export type CookbookRecipeRaw = {
-  id: number;
+  id: string;
   name: string;
   description: string | null;
   category: number | null;
@@ -11,7 +11,7 @@ export type CookbookRecipeRaw = {
 };
 
 export type CookbookRecipe = {
-  id: number;
+  id: string;
   recipeName: string;
   description: string;
   category: number | null;

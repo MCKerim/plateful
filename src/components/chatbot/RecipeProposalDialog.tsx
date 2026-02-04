@@ -19,7 +19,7 @@ interface RecipeProposalDialogProps {
   onSaveNew: (proposalId: string, title: string, description: string, category: string) => void;
   onSaveEdit: (
     proposalId: string,
-    recipeId: number,
+    recipeId: string,
     title: string,
     description: string,
     category: string,

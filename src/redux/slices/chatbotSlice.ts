@@ -6,7 +6,7 @@ export interface ToolOutputForUI {
   proposalId: string;
   toolName: string;
   args: {
-    recipeId?: number;
+    recipeId?: string;
     title?: string;
     description?: string;
     category?: string;
@@ -24,7 +24,7 @@ interface ChatbotState {
   messages: ChatMessage[];
   previous_response_id: string | null;
   isTyping: boolean;
-  recipeId: number | null;
+  recipeId: string | null;
 }
 
 const initialState: ChatbotState = {
@@ -51,7 +51,7 @@ export const chatbotSlice = createSlice({
     setIsTyping: (state, action: PayloadAction<boolean>) => {
       state.isTyping = action.payload;
     },
-    setRecipeId: (state, action: PayloadAction<number | null>) => {
+    setRecipeId: (state, action: PayloadAction<string | null>) => {
       state.recipeId = action.payload;
     },
     resetChat: (state) => {

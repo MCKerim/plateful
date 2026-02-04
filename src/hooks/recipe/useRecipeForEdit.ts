@@ -3,11 +3,11 @@ import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
 import { recipeApi } from "@/api/recipe.api";
 
-export function useRecipeForEdit(recipeId: number | null) {
+export function useRecipeForEdit(recipeId: string | null) {
   const { supabase } = useSupabase();
 
   const recipeQuery = useQuery({
-    queryKey: queryKeys.recipes.detail(recipeId ?? 0),
+    queryKey: queryKeys.recipes.detail(recipeId ?? ""),
     queryFn: async () => {
       if (!recipeId) return null;
       return recipeApi.getById(supabase, recipeId);
@@ -16,7 +16,7 @@ export function useRecipeForEdit(recipeId: number | null) {
   });
 
   const imageQuery = useQuery({
-    queryKey: [...queryKeys.recipes.images(recipeId ?? 0), "edit"],
+    queryKey: [...queryKeys.recipes.images(recipeId ?? ""), "edit"],
     queryFn: async () => {
       if (!recipeId) return null;
       return recipeApi.getImageWithPath(supabase, recipeId);

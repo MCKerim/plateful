@@ -5,8 +5,8 @@ import { ratingsApi } from "@/api/ratings.api";
 import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
 type DeleteRatingParams = {
-  ratingId: number;
-  recipeId: number;
+  ratingId: string;
+  recipeId: string;
 };
 
 export function useDeleteRating() {

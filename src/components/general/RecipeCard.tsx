@@ -12,7 +12,7 @@ import { RecipeStatus } from "@/types/cookbook.types";
 import ImportingRecipeCard from "./ImportingRecipeCard";
 
 type Props = {
-  id: number;
+  id: string;
   name: string;
   averageRating: number | null;
   status?: RecipeStatus;

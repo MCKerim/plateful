@@ -4,10 +4,10 @@ import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 
 export type SaveRecipePlansParams = {
-  recipeId: number;
-  householdId: number;
+  recipeId: string;
+  householdId: string;
   datesToAdd: Date[];
-  planIdsToRemove: number[];
+  planIdsToRemove: string[];
   withoutDateCount: number;
 };
 

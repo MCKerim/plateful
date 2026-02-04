@@ -55,7 +55,7 @@ export default function AddRecipe() {
 
   const navigate = useNavigate();
 
-  const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
+  const recipeId = params.recipeId ?? null;
 
   // React Query hooks
   const { recipe, imageInfo } = useRecipeForEdit(recipeId);

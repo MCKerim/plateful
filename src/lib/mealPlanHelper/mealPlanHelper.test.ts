@@ -37,7 +37,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.planned" for active plan without date', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: null,
           eaten: false,
         },
@@ -49,7 +49,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.today" for plan scheduled today', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: "2024-06-15",
           eaten: false,
         },
@@ -61,7 +61,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.tomorrow" for plan scheduled tomorrow', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: "2024-06-16",
           eaten: false,
         },
@@ -73,7 +73,7 @@ describe("mealPlanHelper", () => {
     it("should return days count for future plans (3 days)", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: "2024-06-18", // 3 days from now
           eaten: false,
         },
@@ -86,7 +86,7 @@ describe("mealPlanHelper", () => {
     it("should return days count for future plans (5 days)", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: "2024-06-20", // 5 days from now
           eaten: false,
         },
@@ -170,7 +170,7 @@ describe("mealPlanHelper", () => {
     it("should prioritize active plan over last planned date", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: 1,
+          id: "1",
           planned_date: "2024-06-16",
           eaten: false,
         },

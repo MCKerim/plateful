@@ -2,7 +2,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@/types/database.types";
 
 export type UpdateHouseholdNameParams = {
-  householdId: number;
+  householdId: string;
   name: string;
 };
 

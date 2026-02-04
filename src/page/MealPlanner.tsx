@@ -70,9 +70,9 @@ export default function MealPlanner() {
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
 
   const ratingModalRef = useRef<RatingModalRef>(null);
-  const [recipeToRate, setRecipeToRate] = useState<number>();
+  const [recipeToRate, setRecipeToRate] = useState<string>();
   const [editingRecipe, setEditingRecipe] = useState<{
-    id: number;
+    id: string;
     name: string;
   } | null>(null);
 
@@ -114,13 +114,13 @@ export default function MealPlanner() {
   }, [currentWeek]);
 
   // Handlers
-  function handleDelete(id: number) {
+  function handleDelete(id: string) {
     deleteMutation.mutate(id, {
       onError: () => toast.error(t("mealPlanner.deleteError")),
     });
   }
 
-  function handleUpdateDate(id: number, newDate: Date | null) {
+  function handleUpdateDate(id: string, newDate: Date | null) {
     updateDateMutation.mutate(
       { id, newDate },
       {
@@ -130,7 +130,7 @@ export default function MealPlanner() {
     );
   }
 
-  function handleSetEaten(id: number, eaten: boolean) {
+  function handleSetEaten(id: string, eaten: boolean) {
     setEatenMutation.mutate(
       { id, eaten },
       {
@@ -145,7 +145,7 @@ export default function MealPlanner() {
     ratingModalRef.current?.open();
   }
 
-  function handleEditPlan(recipeId: number, recipeName: string) {
+  function handleEditPlan(recipeId: string, recipeName: string) {
     setEditingRecipe({ id: recipeId, name: recipeName });
   }
 
@@ -266,7 +266,7 @@ export default function MealPlanner() {
 
         {/* Weekly Plan Dialog for editing */}
         <WeeklyPlanDialog
-          recipeId={editingRecipe?.id ?? 0}
+          recipeId={editingRecipe?.id ?? ""}
           recipeName={editingRecipe?.name ?? ""}
           open={editingRecipe !== null}
           onOpenChange={(open) => !open && setEditingRecipe(null)}

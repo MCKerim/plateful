@@ -31,7 +31,7 @@ export const userApi = {
 
   async getHouseholdMembers(
     supabase: SupabaseClient<Database>,
-    householdId: number
+    householdId: string
   ): Promise<HouseholdMember[]> {
     const { data, error } = await supabase
       .from("users")

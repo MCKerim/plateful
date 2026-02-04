@@ -3,11 +3,11 @@ import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 
-export function useRecipeMealPlanInfo(recipeId: number | null) {
+export function useRecipeMealPlanInfo(recipeId: string | null) {
   const { supabase } = useSupabase();
 
   return useQuery({
-    queryKey: queryKeys.mealPlanning.info(recipeId ?? 0),
+    queryKey: queryKeys.mealPlanning.info(recipeId ?? ""),
     queryFn: async () => {
       if (!recipeId) return null;
       return mealPlanningApi.getInfoByRecipe(supabase, recipeId);

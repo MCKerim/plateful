@@ -22,7 +22,7 @@ import { toast } from "sonner";
 
 type Props = {
   showTriggerButton?: boolean;
-  recipeId?: number;
+  recipeId?: string;
 };
 
 export type RatingModalRef = {

@@ -17,22 +17,22 @@ export type Database = {
       cookbooks: {
         Row: {
           created_at: string
-          household_id: number
-          id: number
+          household_id: string | null
+          id: string
           name: string
           owner_id: string
         }
         Insert: {
           created_at?: string
-          household_id: number
-          id?: number
+          household_id?: string | null
+          id?: string
           name?: string
           owner_id?: string
         }
         Update: {
           created_at?: string
-          household_id?: number
-          id?: number
+          household_id?: string | null
+          id?: string
           name?: string
           owner_id?: string
         }
@@ -49,20 +49,23 @@ export type Database = {
       household: {
         Row: {
           created_at: string
-          id: number
+          id: string
           name: string
+          old_id: number
           owner_id: string
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           name: string
+          old_id?: number
           owner_id?: string
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           name?: string
+          old_id?: number
           owner_id?: string
         }
         Relationships: []
@@ -71,8 +74,8 @@ export type Database = {
         Row: {
           created_at: string
           expires_at: string
-          household_id: number
-          id: number
+          household_id: string | null
+          id: string
           invited_by: string | null
           token: string
           used: boolean
@@ -81,8 +84,8 @@ export type Database = {
         Insert: {
           created_at?: string
           expires_at: string
-          household_id: number
-          id?: number
+          household_id?: string | null
+          id?: string
           invited_by?: string | null
           token: string
           used?: boolean
@@ -91,8 +94,8 @@ export type Database = {
         Update: {
           created_at?: string
           expires_at?: string
-          household_id?: number
-          id?: number
+          household_id?: string | null
+          id?: string
           invited_by?: string | null
           token?: string
           used?: boolean
@@ -126,19 +129,19 @@ export type Database = {
         Row: {
           created_at: string
           description: string | null
-          id: number
+          id: string
           name: string
         }
         Insert: {
           created_at?: string
           description?: string | null
-          id?: number
+          id?: string
           name: string
         }
         Update: {
           created_at?: string
           description?: string | null
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
@@ -147,29 +150,29 @@ export type Database = {
         Row: {
           created_at: string
           eaten: boolean
-          household_id: number
-          id: number
+          household_id: string | null
+          id: string
           owner_id: string
           planned_date: string | null
-          recipe_id: number | null
+          recipe_id: string | null
         }
         Insert: {
           created_at?: string
           eaten?: boolean
-          household_id: number
-          id?: number
+          household_id?: string | null
+          id?: string
           owner_id?: string
           planned_date?: string | null
-          recipe_id?: number | null
+          recipe_id?: string | null
         }
         Update: {
           created_at?: string
           eaten?: boolean
-          household_id?: number
-          id?: number
+          household_id?: string | null
+          id?: string
           owner_id?: string
           planned_date?: string | null
-          recipe_id?: number | null
+          recipe_id?: string | null
         }
         Relationships: [
           {
@@ -192,23 +195,23 @@ export type Database = {
         Row: {
           amount: string
           created_at: string
-          id: number
-          item_id: number
-          recipe_id: number
+          id: string
+          item_id: string | null
+          recipe_id: string | null
         }
         Insert: {
           amount?: string
           created_at?: string
-          id?: number
-          item_id: number
-          recipe_id: number
+          id?: string
+          item_id?: string | null
+          recipe_id?: string | null
         }
         Update: {
           amount?: string
           created_at?: string
-          id?: number
-          item_id?: number
-          recipe_id?: number
+          id?: string
+          item_id?: string | null
+          recipe_id?: string | null
         }
         Relationships: [
           {
@@ -230,26 +233,26 @@ export type Database = {
       recipe_ratings: {
         Row: {
           created_at: string
-          id: number
+          id: string
           note: string
           owner_id: string
-          recipe_id: number
+          recipe_id: string | null
           stars: number
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           note?: string
           owner_id?: string
-          recipe_id: number
+          recipe_id?: string | null
           stars?: number
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           note?: string
           owner_id?: string
-          recipe_id?: number
+          recipe_id?: string | null
           stars?: number
         }
         Relationships: [
@@ -272,39 +275,42 @@ export type Database = {
       recipes: {
         Row: {
           category: number | null
-          cookbook_id: number | null
+          cookbook_id: string | null
           created_at: string
           description: string | null
-          household_id: number | null
-          id: number
+          household_id: string | null
+          id: string
           link: string | null
           name: string
+          old_id: number
           owner_id: string
           status: string
           visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
           category?: number | null
-          cookbook_id?: number | null
+          cookbook_id?: string | null
           created_at?: string
           description?: string | null
-          household_id?: number | null
-          id?: number
+          household_id?: string | null
+          id?: string
           link?: string | null
           name: string
+          old_id?: number
           owner_id?: string
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
           category?: number | null
-          cookbook_id?: number | null
+          cookbook_id?: string | null
           created_at?: string
           description?: string | null
-          household_id?: number | null
-          id?: number
+          household_id?: string | null
+          id?: string
           link?: string | null
           name?: string
+          old_id?: number
           owner_id?: string
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
@@ -318,7 +324,7 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "recipes_houshold_id_fkey"
+            foreignKeyName: "recipes_household_id_fkey"
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
@@ -329,17 +335,17 @@ export type Database = {
       shopping_list: {
         Row: {
           created_at: string
-          id: number
+          id: string
           name: string
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           name: string
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           name?: string
         }
         Relationships: []
@@ -349,25 +355,25 @@ export type Database = {
           amount: string
           bought: boolean
           created_at: string
-          id: number
-          item_id: number
-          shopping_list_id: number
+          id: string
+          item_id: string | null
+          shopping_list_id: string | null
         }
         Insert: {
           amount: string
           bought?: boolean
           created_at?: string
-          id?: number
-          item_id: number
-          shopping_list_id: number
+          id?: string
+          item_id?: string | null
+          shopping_list_id?: string | null
         }
         Update: {
           amount?: string
           bought?: boolean
           created_at?: string
-          id?: number
-          item_id?: number
-          shopping_list_id?: number
+          id?: string
+          item_id?: string | null
+          shopping_list_id?: string | null
         }
         Relationships: [
           {
@@ -389,7 +395,7 @@ export type Database = {
       survey_answears: {
         Row: {
           created_at: string
-          id: number
+          id: string
           question: string
           question_number: number
           selected_options: Json
@@ -397,7 +403,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: number
+          id?: string
           question: string
           question_number: number
           selected_options: Json
@@ -405,7 +411,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          id?: number
+          id?: string
           question?: string
           question_number?: number
           selected_options?: Json
@@ -427,7 +433,7 @@ export type Database = {
           email: string
           has_completed_survey: boolean
           has_seen_value_screens: boolean
-          household_id: number | null
+          household_id: string | null
           id: string
           language: string
           username: string
@@ -437,7 +443,7 @@ export type Database = {
           email: string
           has_completed_survey?: boolean
           has_seen_value_screens?: boolean
-          household_id?: number | null
+          household_id?: string | null
           id?: string
           language: string
           username?: string
@@ -447,7 +453,7 @@ export type Database = {
           email?: string
           has_completed_survey?: boolean
           has_seen_value_screens?: boolean
-          household_id?: number | null
+          household_id?: string | null
           id?: string
           language?: string
           username?: string

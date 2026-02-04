@@ -11,11 +11,11 @@ function calculateAverage(ratings: RecipeRatingWithUser[]): number | null {
   return totalStars / ratings.length;
 }
 
-export function useRecipeRatings(recipeId: number | null) {
+export function useRecipeRatings(recipeId: string | null) {
   const { supabase } = useSupabase();
 
   const query = useQuery({
-    queryKey: queryKeys.ratings.byRecipe(recipeId ?? 0),
+    queryKey: queryKeys.ratings.byRecipe(recipeId ?? ""),
     queryFn: async () => {
       if (!recipeId) return [];
       return ratingsApi.getByRecipe(supabase, recipeId);

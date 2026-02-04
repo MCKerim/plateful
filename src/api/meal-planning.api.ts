@@ -61,7 +61,7 @@ export const mealPlanningApi = {
 
   async updateDate(
     supabase: SupabaseClient,
-    id: number,
+    id: string,
     plannedDate: string | null
   ): Promise<void> {
     const { error } = await supabase
@@ -72,7 +72,7 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  async setEaten(supabase: SupabaseClient, id: number, eaten: boolean): Promise<void> {
+  async setEaten(supabase: SupabaseClient, id: string, eaten: boolean): Promise<void> {
     const { error } = await supabase
       .from("meal_planning")
       .update({ eaten })
@@ -81,7 +81,7 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  async delete(supabase: SupabaseClient, id: number): Promise<void> {
+  async delete(supabase: SupabaseClient, id: string): Promise<void> {
     const { error } = await supabase.from("meal_planning").delete().eq("id", id);
 
     if (error) throw error;
@@ -89,8 +89,8 @@ export const mealPlanningApi = {
 
   async create(
     supabase: SupabaseClient,
-    recipeId: number,
-    householdId: number,
+    recipeId: string,
+    householdId: string,
     plannedDate: string | null
   ): Promise<void> {
     const { error } = await supabase.from("meal_planning").insert({
@@ -103,7 +103,7 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  async getInfoByRecipe(supabase: SupabaseClient, recipeId: number): Promise<RecipeMealPlanInfo> {
+  async getInfoByRecipe(supabase: SupabaseClient, recipeId: string): Promise<RecipeMealPlanInfo> {
     const today = new Date();
     const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
@@ -150,7 +150,7 @@ export const mealPlanningApi = {
 
   async getPlansForRecipeInWeek(
     supabase: SupabaseClient,
-    recipeId: number,
+    recipeId: string,
     weekStart: Date,
     weekEnd: Date
   ): Promise<RecipePlanEntryRaw[]> {

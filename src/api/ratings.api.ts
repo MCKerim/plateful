@@ -2,19 +2,19 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
 export type CreateRatingParams = {
-  recipeId: number;
+  recipeId: string;
   stars: number;
   note: string;
 };
 
 export type UpdateRatingParams = {
-  ratingId: number;
+  ratingId: string;
   stars: number;
   note: string;
 };
 
 export const ratingsApi = {
-  async getByRecipe(supabase: SupabaseClient, recipeId: number): Promise<RecipeRatingWithUser[]> {
+  async getByRecipe(supabase: SupabaseClient, recipeId: string): Promise<RecipeRatingWithUser[]> {
     const { data, error } = await supabase
       .from("recipe_ratings")
       .select("*, users(created_at, email, username)")
@@ -54,7 +54,7 @@ export const ratingsApi = {
     return data;
   },
 
-  async delete(supabase: SupabaseClient, ratingId: number): Promise<void> {
+  async delete(supabase: SupabaseClient, ratingId: string): Promise<void> {
     const { error } = await supabase.from("recipe_ratings").delete().eq("id", ratingId);
 
     if (error) throw error;

@@ -15,7 +15,7 @@ import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 
 type Props = {
-  currentId: number;
+  currentId: string;
   currentName: string;
   currentAmount: string;
   onItemEdited: () => void;

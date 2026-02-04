@@ -21,7 +21,7 @@ export default function ImageImport() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<{ id: number; name: string } | null>(null);
+  const [data, setData] = useState<{ id: string; name: string } | null>(null);
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);

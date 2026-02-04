@@ -9,10 +9,10 @@ export function useDeletePlannedItem() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: number) => {
+    mutationFn: async (id: string) => {
       await mealPlanningApi.delete(supabase, id);
     },
-    onMutate: async (id: number) => {
+    onMutate: async (id: string) => {
       await queryClient.cancelQueries({ queryKey: queryKeys.mealPlanning.all });
 
       const previousData = queryClient.getQueriesData<MealPlannerItem[]>({

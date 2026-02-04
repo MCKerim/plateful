@@ -10,12 +10,12 @@ import { useDraggable } from "@dnd-kit/core";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 
 type Props = {
-  id: number;
-  recipeId: number;
+  id: string;
+  recipeId: string;
   recipeName: string;
   eaten: boolean;
   onToggleEaten: () => void;
-  onRecipeDelete: (id: number) => void;
+  onRecipeDelete: (id: string) => void;
   onEditPlan: () => void;
   isDragging?: boolean;
 };

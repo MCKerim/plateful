@@ -15,7 +15,7 @@ import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWe
 import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
 
 type Props = {
-  recipeId: number;
+  recipeId: string;
   recipeName: string;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -84,7 +84,7 @@ export default function WeeklyPlanDialog({
   }
 
   // Get the plan ID for a specific date (from recipePlans which has IDs)
-  function getPlanIdForDate(date: Date): number | null {
+  function getPlanIdForDate(date: Date): string | null {
     const plan = recipePlans.find((p) => p.planned_date && isSameDay(p.planned_date, date));
     return plan?.id ?? null;
   }
@@ -191,7 +191,7 @@ export default function WeeklyPlanDialog({
     const currentlyPlannedDates = weekDays.filter((day) => isDatePlannedForThisRecipe(day));
 
     // Determine what to add and remove
-    const planIdsToRemove: number[] = [];
+    const planIdsToRemove: string[] = [];
     for (const plannedDate of currentlyPlannedDates) {
       const isStillSelected = selectedDates.some((d) => isSameDay(d, plannedDate));
       if (!isStillSelected) {

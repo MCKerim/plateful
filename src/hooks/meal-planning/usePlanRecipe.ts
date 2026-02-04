@@ -4,8 +4,8 @@ import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 
 export type PlanRecipeParams = {
-  recipeId: number;
-  householdId: number;
+  recipeId: string;
+  householdId: string;
   plannedDate: Date | null;
 };
 

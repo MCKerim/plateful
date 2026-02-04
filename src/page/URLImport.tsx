@@ -19,7 +19,7 @@ export default function URLImport() {
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<{ id: number; name: string } | null>(null);
+  const [data, setData] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();

@@ -57,7 +57,7 @@ export default function Chatbot() {
 
   // Get recipe context from URL param
   const recipeIdParam = searchParams.get("recipeId");
-  const recipeId = recipeIdParam ? Number.parseInt(recipeIdParam) : null;
+  const recipeId = recipeIdParam ?? null;
   const { data: recipeContext } = useRecipe(recipeId);
 
   const updateRecipeMutation = useUpdateRecipe();
@@ -65,7 +65,7 @@ export default function Chatbot() {
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
   const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
-  const [knownRecipeIds, setKnownRecipeIds] = useState<number[]>(() =>
+  const [knownRecipeIds, setKnownRecipeIds] = useState<string[]>(() =>
     recipeId ? [recipeId] : []
   );
 
@@ -299,7 +299,7 @@ description: ${recipeContext.description ?? "No description"}
 
   async function saveEditedRecipe(
     proposalId: string,
-    recipeId: number,
+    recipeId: string,
     title: string,
     description: string,
     category: string,

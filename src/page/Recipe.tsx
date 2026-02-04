@@ -39,7 +39,7 @@ export default function Recipe() {
   const currentUser = useAppSelector(selectUser);
   const chatMessages = useAppSelector(selectMessages);
   const chatRecipeId = useAppSelector(selectRecipeId);
-  const recipeId = params.recipeId ? Number.parseInt(params.recipeId) : null;
+  const recipeId = params.recipeId ?? null;
 
   const ratingModalRef = useRef<RatingModalRef>(null);
 
@@ -66,7 +66,7 @@ export default function Recipe() {
     return () => globalThis.removeEventListener("popstate", handlePopState);
   }, []);
 
-  function handleDeleteRating(ratingId: number) {
+  function handleDeleteRating(ratingId: string) {
     if (!recipeId) return;
 
     deleteRatingMutation.mutate(

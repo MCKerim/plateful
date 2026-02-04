@@ -8,7 +8,7 @@ export function useDeleteRecipe() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (recipeId: number) => {
+    mutationFn: async (recipeId: string) => {
       return recipeApi.delete(supabase, recipeId);
     },
     onSettled: async (_data, _error, recipeId) => {

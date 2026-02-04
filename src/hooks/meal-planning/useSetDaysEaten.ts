@@ -9,7 +9,7 @@ export function useSetEaten() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, eaten }: { id: number; eaten: boolean }) => {
+    mutationFn: async ({ id, eaten }: { id: string; eaten: boolean }) => {
       await mealPlanningApi.setEaten(supabase, id, eaten);
     },
     onMutate: async ({ id, eaten }) => {

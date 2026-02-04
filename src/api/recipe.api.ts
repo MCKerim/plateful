@@ -6,11 +6,11 @@ export type CreateRecipeParams = {
   description: string;
   link: string;
   category: number;
-  householdId: number;
+  householdId: string;
 };
 
 export type UpdateRecipeParams = {
-  recipeId: number;
+  recipeId: string;
   name: string;
   description: string;
   link: string;
@@ -25,14 +25,14 @@ export type RecipeImageInfo = {
 const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
 
 export const recipeApi = {
-  async getById(supabase: SupabaseClient, recipeId: number): Promise<Recipes | null> {
+  async getById(supabase: SupabaseClient, recipeId: string): Promise<Recipes | null> {
     const { data, error } = await supabase.from("recipes").select("*").eq("id", recipeId).single();
 
     if (error) throw error;
     return data;
   },
 
-  async getFirstImage(supabase: SupabaseClient, recipeId: number): Promise<string | null> {
+  async getFirstImage(supabase: SupabaseClient, recipeId: string): Promise<string | null> {
     const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (error || !data || data.length === 0) return null;
@@ -44,7 +44,7 @@ export const recipeApi = {
     return signedUrlData?.signedUrl ?? null;
   },
 
-  async getImages(supabase: SupabaseClient, recipeId: number): Promise<string[]> {
+  async getImages(supabase: SupabaseClient, recipeId: string): Promise<string[]> {
     const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
     if (error || !data) return [];
@@ -63,7 +63,7 @@ export const recipeApi = {
 
   async getImageWithPath(
     supabase: SupabaseClient,
-    recipeId: number
+    recipeId: string
   ): Promise<RecipeImageInfo | null> {
     const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
@@ -113,7 +113,7 @@ export const recipeApi = {
     return data;
   },
 
-  async delete(supabase: SupabaseClient, recipeId: number): Promise<void> {
+  async delete(supabase: SupabaseClient, recipeId: string): Promise<void> {
     // Delete all images from storage first
     const { data: files } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
 
