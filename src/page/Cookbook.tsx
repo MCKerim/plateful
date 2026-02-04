@@ -21,19 +21,11 @@ import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import { CookbookRecipe } from "@/types/cookbook.types";
-import { useSupabase } from "@/utils/supabase";
-import { useQueryClient } from "@tanstack/react-query";
-import { queryKeys } from "@/lib/query-keys";
-import { selectUser } from "@/redux/slices/userSlice";
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { supabase } = useSupabase();
-  const queryClient = useQueryClient();
-  const user = useAppSelector(selectUser);
-  const householdId = user?.household_id;
 
   useScrollRestoration("cookbook-scroll");
 
@@ -42,31 +34,6 @@ export default function Cookbook() {
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
   const searchTerm = useAppSelector(selectSearchTerm);
-
-  // Subscribe to recipe changes (for realtime status updates)
-  useEffect(() => {
-    if (!householdId) return;
-
-    const channel = supabase
-      .channel("recipe-status-changes")
-      .on(
-        "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "recipes",
-          filter: `household_id=eq.${householdId}`,
-        },
-        () => {
-          queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [householdId, supabase, queryClient]);
 
   const [searchResults, setSearchResults] = useState<CookbookRecipe[]>([]);
 
@@ -197,9 +164,7 @@ export default function Cookbook() {
 
           {recentlyAddedRecipes.length > 0 && (
             <div className="mt-6">
-              <h2 className="second-font text-lg font-bold mb-2">
-                {t("cookbook.recentlyAdded")}
-              </h2>
+              <h2 className="second-font text-lg font-bold mb-2">{t("cookbook.recentlyAdded")}</h2>
               <div className="grid grid-cols-2 gap-2">
                 {recentlyAddedRecipes.map((recipe) => (
                   <RecipeCard
