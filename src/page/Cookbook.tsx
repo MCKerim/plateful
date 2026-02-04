@@ -81,6 +81,16 @@ export default function Cookbook() {
     [recipes]
   );
 
+  // Get importing recipes and recently added recipes for the main page
+  const recentlyAddedRecipes = useMemo(() => {
+    const importing = recipes.filter((r) => r.status === "importing");
+    const ready = recipes
+      .filter((r) => r.status === "ready")
+      .sort((a, b) => b.created_at.localeCompare(a.created_at))
+      .slice(0, 4);
+    return [...importing, ...ready];
+  }, [recipes]);
+
   useEffect(() => {
     let searchedRecipes = [...recipes];
 
@@ -169,20 +179,41 @@ export default function Cookbook() {
       )}
 
       {categoryId === null && searchTerm.trim() === "" && (
-        <div className="grid items-center justify-center grid-cols-2 gap-6">
-          {categories.map((cat) => {
-            return (
-              <CategoryButton
-                key={cat.id}
-                id={cat.id}
-                name={getTranslatedCategory(t, cat.id)}
-                color={cat.color}
-              />
-            );
-          })}
+        <>
+          <div className="grid items-center justify-center grid-cols-2 gap-6">
+            {categories.map((cat) => {
+              return (
+                <CategoryButton
+                  key={cat.id}
+                  id={cat.id}
+                  name={getTranslatedCategory(t, cat.id)}
+                  color={cat.color}
+                />
+              );
+            })}
 
-          <CategoryButton key={0} id={0} name={t("categorys.allRecipes")} />
-        </div>
+            <CategoryButton key={0} id={0} name={t("categorys.allRecipes")} />
+          </div>
+
+          {recentlyAddedRecipes.length > 0 && (
+            <div className="mt-6">
+              <h2 className="second-font text-lg font-bold mb-2">
+                {t("cookbook.recentlyAdded")}
+              </h2>
+              <div className="grid grid-cols-2 gap-2">
+                {recentlyAddedRecipes.map((recipe) => (
+                  <RecipeCard
+                    key={recipe.id}
+                    id={recipe.id}
+                    name={recipe.recipeName}
+                    averageRating={recipe.avg_rating}
+                    status={recipe.status}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       <AddNewRecipeDrawer

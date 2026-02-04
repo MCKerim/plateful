@@ -205,7 +205,8 @@
   "cookbook": {
     "enterRecipeName": "Search recipe...",
     "nothingFound": "No recipes found...",
-    "importing": "Importing..."
+    "importing": "Importing...",
+    "recentlyAdded": "Recently Added"
   },
   "recipe": {
     "editRecipe": "Edit recipe",
