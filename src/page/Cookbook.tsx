@@ -54,7 +54,7 @@ export default function Cookbook() {
     const ready = recipes
       .filter((r) => r.status === "ready")
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
-      .slice(0, 4);
+      .slice(0, 6);
     return [...importing, ...ready];
   }, [recipes]);
 
