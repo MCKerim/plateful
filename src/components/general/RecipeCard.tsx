@@ -10,6 +10,7 @@ import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
 import { RecipeStatus } from "@/types/cookbook.types";
 import ImportingRecipeCard from "./ImportingRecipeCard";
+import { motion } from "motion/react";
 
 type Props = {
   id: string;
@@ -35,37 +36,42 @@ export default function RecipeCard({ id, name, averageRating, status = "ready" }
 
   return (
     <NavLink to={`/recipe/${id}`} className="w-full">
-      <Card className="relative bg-transparent border-2">
-        <img
-          src={imageUrl || "/no-img.jpg"}
-          alt="Recipe"
-          className="object-cover w-full h-32 border-b-4 border-background dark:brightness-75"
-        />
+      <motion.div
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+      >
+        <Card className="relative bg-transparent border-2">
+          <img
+            src={imageUrl || "/no-img.jpg"}
+            alt="Recipe"
+            className="object-cover w-full h-32 border-b-4 border-background dark:brightness-75"
+          />
 
-        <div className="flex flex-col justify-between gap-2 p-2">
-          <div className="flex justify-between">
-            <h1 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
-              {name}
-            </h1>
-          </div>
-
-          {TAGS.length > 0 && <div className="flex gap-1">{renderTagPills()}</div>}
-
-          <div className="flex justify-between">
-            <div className="flex items-center gap-1">
-              <CalendarDays size={16} />
-
-              <p className="text-xs">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
+          <div className="flex flex-col justify-between gap-2 p-2">
+            <div className="flex justify-between">
+              <h1 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
+                {name}
+              </h1>
             </div>
 
-            <div className="flex items-center">
-              <p className="text-xs">{formatRating(averageRating)}</p>
+            {TAGS.length > 0 && <div className="flex gap-1">{renderTagPills()}</div>}
 
-              <StarIcon style={{ fontSize: "16px" }} />
+            <div className="flex justify-between">
+              <div className="flex items-center gap-1">
+                <CalendarDays size={16} />
+
+                <p className="text-xs">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
+              </div>
+
+              <div className="flex items-center">
+                <p className="text-xs">{formatRating(averageRating)}</p>
+
+                <StarIcon style={{ fontSize: "16px" }} />
+              </div>
             </div>
           </div>
-        </div>
-      </Card>
+        </Card>
+      </motion.div>
     </NavLink>
   );
 }
