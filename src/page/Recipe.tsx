@@ -189,7 +189,7 @@ export default function Recipe() {
       <Separator />
 
       {recipe.description && (
-        <p className="text-sm text-muted-foreground mt-2">{recipe.description}</p>
+        <p className="text-md font-medium mb-4 mt-2 whitespace-pre-wrap">{recipe.description}</p>
       )}
 
       {/* Ingredients Section */}
@@ -207,10 +207,7 @@ export default function Recipe() {
         <div>
           <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
 
-          <MarkdownRenderer
-            content={recipe.instructions}
-            className="font-medium"
-          />
+          <MarkdownRenderer content={recipe.instructions} className="font-medium" />
         </div>
       )}
 
