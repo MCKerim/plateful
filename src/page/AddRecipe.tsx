@@ -36,7 +36,6 @@ import {
 import type { EditorItem } from "@/components/ingredients/IngredientEditor";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
-import { Separator } from "@/components/ui/separator";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
