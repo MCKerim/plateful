@@ -58,6 +58,10 @@ Do not create `index.ts` barrel files for re-exporting. Import directly from sou
 - `src/lib/query-keys.ts` - React Query key factory for cache management
 - `src/types/database.types.ts` - Auto-generated Supabase types
 - `src/types/meal-planning.types.ts` - Domain types for meal planning feature
+- `src/types/ingredient.types.ts` - Domain types for ingredients
+- `src/components/ingredients/` - Ingredient UI components (list, editor, scaler)
+- `src/hooks/ingredients/` - Ingredient React Query hooks
+- `src/lib/ingredient-parser/` - Ingredient text parsing and scaling utilities
 - `src/locales/` - i18n translation files (en, de)
 
 ### State Management Pattern
@@ -99,6 +103,25 @@ useMealPlannerItems (hook)
   → transformMealPlannerItems (transformer)
   → MealPlannerItem[] (domain type)
 ```
+
+### Ingredients System
+
+Recipes store ingredients as structured data in the `recipe_ingredients` table, using a hybrid approach: raw text is always preserved (user sees what they typed), and parsed fields (`quantity_value`, `unit`, `ingredient_name`) enable scaling and future shopping list aggregation.
+
+**Recipe table columns:** `instructions` (separated from legacy `description`), `base_servings`, `servings_unit`.
+
+Data flow:
+
+```
+useRecipeIngredients (hook)
+  → ingredientsApi.getByRecipeId (API)
+  → transformIngredients (transformer)
+  → RecipeIngredient[] (domain type)
+```
+
+**Parser** (`src/lib/ingredient-parser/parse-ingredient.ts`): Extracts quantity, unit, and ingredient name from free-form text like `"2 cups flour"`. Handles fractions, ranges, metric/imperial, and German units. If a number is found it will scale; unrecognized text is preserved as-is.
+
+**Scaling** (`src/lib/ingredient-parser/scale-ingredients.ts`): Multiplies `quantity_value` by `targetServings / baseServings`. Uses `formatQuantity()` for smart display (0.5 → "1/2", 1.5 → "1 1/2").
 
 ## E2E Testing
 
@@ -162,3 +185,4 @@ The `setupAuth` fixture automatically mocks:
 - `/rest/v1/recipes` - Recipes list and single recipe fetch
 - `/rest/v1/meal_planning` - Meal plans
 - `/rest/v1/recipe_ratings` - Recipe ratings
+- `/rest/v1/recipe_ingredients` - Recipe ingredients
