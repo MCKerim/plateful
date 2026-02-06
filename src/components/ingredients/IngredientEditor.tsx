@@ -111,7 +111,7 @@ function SortableEditorItem({
     return (
       <div ref={setNodeRef} style={style} className="flex items-center gap-2">
         <div
-          className="text-muted-foreground cursor-grab active:cursor-grabbing"
+          className="text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
           {...attributes}
           {...listeners}
         >
@@ -140,7 +140,7 @@ function SortableEditorItem({
   return (
     <div ref={setNodeRef} style={style} className="flex items-start gap-2">
       <div
-        className="mt-2 text-muted-foreground cursor-grab active:cursor-grabbing"
+        className="mt-2 text-muted-foreground cursor-grab active:cursor-grabbing touch-none"
         {...attributes}
         {...listeners}
       >
@@ -188,6 +188,20 @@ function useEditorSensors() {
       activationConstraint: { delay: 150, tolerance: 5 },
     })
   );
+}
+
+function lockScroll() {
+  document.body.style.overflow = "hidden";
+  document.body.style.touchAction = "none";
+  const main = document.querySelector("main");
+  if (main) main.style.overflow = "hidden";
+}
+
+function unlockScroll() {
+  document.body.style.overflow = "";
+  document.body.style.touchAction = "";
+  const main = document.querySelector("main");
+  if (main) main.style.overflow = "";
 }
 
 // --- IngredientEditor (server-backed) ---
@@ -242,6 +256,7 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
   }, []);
 
   const handleDragEnd = useCallback((event: DragEndEvent) => {
+    unlockScroll();
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setLocalItems((prev) => {
@@ -293,7 +308,7 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
 
   return (
     <div className="space-y-2">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={lockScroll} onDragEnd={handleDragEnd} onDragCancel={unlockScroll}>
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {localItems.map((item, index) => (
             <SortableEditorItem
@@ -394,6 +409,7 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
+    unlockScroll();
     const { active, over } = event;
     if (over && active.id !== over.id) {
       const oldIndex = items.findIndex((item) => item.id === active.id);
@@ -406,7 +422,7 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
 
   return (
     <div className="space-y-2">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={lockScroll} onDragEnd={handleDragEnd} onDragCancel={unlockScroll}>
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {items.map((item, index) => (
             <SortableEditorItem
