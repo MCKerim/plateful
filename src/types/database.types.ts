@@ -51,21 +51,18 @@ export type Database = {
           created_at: string
           id: string
           name: string
-          old_id: number
           owner_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           name: string
-          old_id?: number
           owner_id?: string
         }
         Update: {
           created_at?: string
           id?: string
           name?: string
-          old_id?: number
           owner_id?: string
         }
         Relationships: []
@@ -191,6 +188,71 @@ export type Database = {
           },
         ]
       }
+      recipe_ingredients: {
+        Row: {
+          created_at: string | null
+          group_name: string | null
+          id: string
+          ingredient_name: string | null
+          ingredient_name_normalized: string | null
+          is_optional: boolean | null
+          is_scalable: boolean | null
+          preparation_note: string | null
+          quantity_display: string | null
+          quantity_value: number | null
+          raw_text: string
+          recipe_id: string
+          sort_order: number
+          unit: string | null
+          unit_normalized: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          group_name?: string | null
+          id?: string
+          ingredient_name?: string | null
+          ingredient_name_normalized?: string | null
+          is_optional?: boolean | null
+          is_scalable?: boolean | null
+          preparation_note?: string | null
+          quantity_display?: string | null
+          quantity_value?: number | null
+          raw_text: string
+          recipe_id: string
+          sort_order?: number
+          unit?: string | null
+          unit_normalized?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          group_name?: string | null
+          id?: string
+          ingredient_name?: string | null
+          ingredient_name_normalized?: string | null
+          is_optional?: boolean | null
+          is_scalable?: boolean | null
+          preparation_note?: string | null
+          quantity_display?: string | null
+          quantity_value?: number | null
+          raw_text?: string
+          recipe_id?: string
+          sort_order?: number
+          unit?: string | null
+          unit_normalized?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_items: {
         Row: {
           amount: string
@@ -274,44 +336,50 @@ export type Database = {
       }
       recipes: {
         Row: {
+          base_servings: number | null
           category: number | null
           cookbook_id: string | null
           created_at: string
           description: string | null
           household_id: string | null
           id: string
+          instructions: string | null
           link: string | null
           name: string
-          old_id: number
           owner_id: string
+          servings_unit: string | null
           status: string
           visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
+          base_servings?: number | null
           category?: number | null
           cookbook_id?: string | null
           created_at?: string
           description?: string | null
           household_id?: string | null
           id?: string
+          instructions?: string | null
           link?: string | null
           name: string
-          old_id?: number
           owner_id?: string
+          servings_unit?: string | null
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
+          base_servings?: number | null
           category?: number | null
           cookbook_id?: string | null
           created_at?: string
           description?: string | null
           household_id?: string | null
           id?: string
+          instructions?: string | null
           link?: string | null
           name?: string
-          old_id?: number
           owner_id?: string
+          servings_unit?: string | null
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
         }

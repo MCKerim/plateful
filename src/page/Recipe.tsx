@@ -29,6 +29,8 @@ import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
 import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
+import { IngredientList } from "@/components/ingredients/IngredientList";
+import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -51,6 +53,7 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
+  const { data: ingredients = [] } = useRecipeIngredients(recipeId);
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
@@ -185,7 +188,30 @@ export default function Recipe() {
 
       <Separator />
 
-      <MarkdownRenderer content={recipe.description || ""} className="font-medium" />
+      {/* Ingredients Section */}
+      {ingredients.length > 0 && (
+        <>
+          <h2 className="first-font text-xl font-bold mb-2">{t("ingredients.title")}</h2>
+          <IngredientList
+            recipeId={recipe.id}
+            baseServings={recipe.base_servings}
+            servingsUnit={recipe.servings_unit ?? "servings"}
+            showScalingControls={recipe.base_servings !== null}
+          />
+          <Separator className="mt-4" />
+        </>
+      )}
+
+      {/* Instructions Section */}
+      {(recipe.instructions || recipe.description) && (
+        <>
+          <h2 className="first-font text-xl font-bold mb-2">{t("recipe.instructions")}</h2>
+          <MarkdownRenderer
+            content={recipe.instructions || recipe.description || ""}
+            className="font-medium"
+          />
+        </>
+      )}
 
       <div>
         <Separator className="mb-2 mt-4" />

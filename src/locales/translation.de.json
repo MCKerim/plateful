@@ -221,7 +221,8 @@
     "noRatings": "Keine Bewertungen",
     "planningSuccessful": "Rezept erfolgreich geplant!",
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
-    "askChatbot": "KI-Koch fragen"
+    "askChatbot": "KI-Koch fragen",
+    "instructions": "Zubereitung"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
@@ -243,6 +244,9 @@
     "namePlaceholder": "Tomatensuppe",
     "description": "Beschreibung",
     "descriptionPlaceholder": "Ein leckeres gericht mit Tomaten.",
+    "instructionsPlaceholder": "Schritt 1: Ofen vorheizen...",
+    "servings": "Portionen",
+    "servingsPlaceholder": "4",
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de",
     "importRecipeData": "Rezeptdaten importieren (TikTok)",
@@ -449,8 +453,19 @@
     "editButton": "Artikel bearbeiten"
   },
 
-  "ingredients": "Zutaten",
-  "addIngredient": "Zutat hinzufügen",
+  "ingredients": {
+    "title": "Zutaten",
+    "addIngredient": "Zutat hinzufügen",
+    "saveIngredients": "Zutaten speichern",
+    "noIngredients": "Noch keine Zutaten hinzugefügt",
+    "placeholder": "z.B. 2 Tassen Mehl",
+    "reset": "Zurücksetzen",
+    "units": {
+      "servings": "Portionen",
+      "portions": "Portionen",
+      "pieces": "Stück"
+    }
+  },
 
   "dayWithCount_one": "{{count}} Tag",
   "dayWithCount_other": "{{count}} Tage",

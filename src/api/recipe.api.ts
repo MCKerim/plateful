@@ -7,6 +7,7 @@ export type CreateRecipeParams = {
   link: string;
   category: number;
   householdId: string;
+  baseServings?: number | null;
 };
 
 export type UpdateRecipeParams = {
@@ -15,6 +16,7 @@ export type UpdateRecipeParams = {
   description: string;
   link: string;
   category: number;
+  baseServings?: number | null;
 };
 
 export type RecipeImageInfo = {
@@ -84,9 +86,11 @@ export const recipeApi = {
         {
           name: params.name,
           description: params.description,
+          instructions: params.description, // Store in both for now
           link: params.link,
           category: params.category,
           household_id: params.householdId,
+          base_servings: params.baseServings,
         },
       ])
       .select()
@@ -102,8 +106,10 @@ export const recipeApi = {
       .update({
         name: params.name,
         description: params.description,
+        instructions: params.description, // Store in both for now
         link: params.link,
         category: params.category,
+        base_servings: params.baseServings,
       })
       .eq("id", params.recipeId)
       .select()

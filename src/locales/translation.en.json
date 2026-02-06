@@ -221,7 +221,8 @@
     "noRatings": "No Ratings",
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later.",
-    "askChatbot": "Ask AI-Chef"
+    "askChatbot": "Ask AI-Chef",
+    "instructions": "Instructions"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
@@ -247,6 +248,9 @@
     "namePlaceholder": "Tomato soup",
     "description": "Description",
     "descriptionPlaceholder": "A delicious dish with tomatoes.",
+    "instructionsPlaceholder": "Step 1: Preheat oven...",
+    "servings": "Servings",
+    "servingsPlaceholder": "4",
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)",
@@ -450,9 +454,19 @@
     "editButton": "Edit Item"
   },
 
-  "ingredients": "Ingredients",
-  "addIngredient": "Add ingredient",
-
+  "ingredients": {
+    "title": "Ingredients",
+    "addIngredient": "Add ingredient",
+    "saveIngredients": "Save ingredients",
+    "noIngredients": "No ingredients added yet",
+    "placeholder": "e.g. 2 cups flour",
+    "reset": "Reset",
+    "units": {
+      "servings": "servings",
+      "portions": "portions",
+      "pieces": "pieces"
+    }
+  },
   "dayWithCount_one": "{{count}} day",
   "dayWithCount_other": "{{count}} days",
 

@@ -28,6 +28,10 @@ import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
+import { SimpleIngredientEditor } from "@/components/ingredients/IngredientEditor";
+import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
+import { Separator } from "@/components/ui/separator";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -42,8 +46,10 @@ export default function AddRecipe() {
   const householdId = useAppSelector(selectHouseholdId);
 
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  const [instructions, setInstructions] = useState("");
   const [link, setLink] = useState("");
+  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [baseServings, setBaseServings] = useState<number | null>(null);
 
   const filterCategoryId = useAppSelector(selectCategoryId);
   const [category, setCategory] = useState(filterCategoryId === 0 ? null : filterCategoryId);
@@ -59,9 +65,11 @@ export default function AddRecipe() {
 
   // React Query hooks
   const { recipe, imageInfo } = useRecipeForEdit(recipeId);
+  const { data: existingIngredients = [] } = useRecipeIngredients(recipeId);
   const createRecipeMutation = useCreateRecipe();
   const updateRecipeMutation = useUpdateRecipe();
   const deleteRecipeMutation = useDeleteRecipe();
+  const replaceIngredientsMutation = useReplaceAllIngredients();
 
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
@@ -149,11 +157,19 @@ export default function AddRecipe() {
   useEffect(() => {
     if (recipe) {
       setTitle(recipe.name);
-      setDescription(recipe.description ?? "");
+      setInstructions(recipe.instructions ?? recipe.description ?? "");
       setLink(recipe.link ?? "");
       setCategory(recipe.category);
+      setBaseServings(recipe.base_servings);
     }
   }, [recipe]);
+
+  // Populate ingredients when loaded (edit mode)
+  useEffect(() => {
+    if (existingIngredients.length > 0) {
+      setIngredients(existingIngredients.map((ing) => ing.rawText));
+    }
+  }, [existingIngredients]);
 
   // Populate image when image info is loaded (edit mode)
   useEffect(() => {
@@ -228,15 +244,30 @@ export default function AddRecipe() {
       return;
     }
 
+    // Helper to save ingredients
+    const saveIngredients = async (targetRecipeId: string) => {
+      const nonEmptyIngredients = ingredients
+        .filter((ing) => ing.trim().length > 0)
+        .map((rawText, index) => ({ rawText: rawText.trim(), sortOrder: index }));
+
+      if (nonEmptyIngredients.length > 0) {
+        await replaceIngredientsMutation.mutateAsync({
+          recipeId: targetRecipeId,
+          inputs: nonEmptyIngredients,
+        });
+      }
+    };
+
     if (recipeId) {
       // Update existing recipe
       updateRecipeMutation.mutate(
         {
           recipeId,
           name: title,
-          description,
+          description: instructions,
           link,
           category,
+          baseServings,
         },
         {
           onSuccess: async () => {
@@ -245,6 +276,8 @@ export default function AddRecipe() {
               const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
+            // Save ingredients
+            await saveIngredients(recipeId);
             toast.success(t("addRecipe.recipeSaved"));
             navigate(`/recipe/${recipeId}`, { replace: true });
           },
@@ -259,10 +292,11 @@ export default function AddRecipe() {
       createRecipeMutation.mutate(
         {
           name: title,
-          description,
+          description: instructions,
           link,
           category,
           householdId: householdId!,
+          baseServings,
         },
         {
           onSuccess: async (data) => {
@@ -271,6 +305,8 @@ export default function AddRecipe() {
               const newPath = `recipe_${data.id}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
             }
+            // Save ingredients
+            await saveIngredients(data.id);
             toast.success(t("addRecipe.recipeSaved"));
             navigate(`/recipe/${data.id}`, { replace: true });
           },
@@ -377,14 +413,41 @@ export default function AddRecipe() {
           </Select>
         </div>
 
+        <Separator />
+
+        {/* Ingredients Section */}
         <div className="grid w-full gap-2">
-          <Label htmlFor="message">{t("addRecipe.description")}</Label>
+          <Label>{t("ingredients.title")}</Label>
+          <SimpleIngredientEditor
+            ingredients={ingredients}
+            onChange={setIngredients}
+          />
+        </div>
+
+        {/* Servings */}
+        <div className="grid items-center w-full gap-2">
+          <Label htmlFor="servings">{t("addRecipe.servings")}</Label>
+          <Input
+            type="number"
+            id="servings"
+            placeholder={t("addRecipe.servingsPlaceholder")}
+            value={baseServings ?? ""}
+            onChange={(e) => setBaseServings(e.target.value ? parseInt(e.target.value) : null)}
+            min={1}
+          />
+        </div>
+
+        <Separator />
+
+        {/* Instructions Section */}
+        <div className="grid w-full gap-2">
+          <Label htmlFor="instructions">{t("recipe.instructions")}</Label>
 
           <Textarea
-            id="message"
-            placeholder={t("addRecipe.descriptionPlaceholder")}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            id="instructions"
+            placeholder={t("addRecipe.instructionsPlaceholder")}
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
             enterKeyHint="enter"
           />
         </div>
