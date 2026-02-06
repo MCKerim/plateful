@@ -455,11 +455,11 @@
 
   "ingredients": {
     "title": "Zutaten",
-    "addIngredient": "Zutat hinzufügen",
+    "ingredient": "Zutat",
     "saveIngredients": "Zutaten speichern",
     "noIngredients": "Noch keine Zutaten hinzugefügt",
     "placeholder": "z.B. 2 Tassen Mehl",
-    "addSection": "Abschnitt hinzufügen",
+    "section": "Abschnitt",
     "sectionPlaceholder": "Abschnittsname (z.B. Soße, Teig)",
     "reset": "Zurücksetzen",
     "units": {

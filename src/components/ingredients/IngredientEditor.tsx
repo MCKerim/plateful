@@ -452,13 +452,15 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
 
       <div className="flex gap-2">
         <Button variant="secondary" onClick={handleAddIngredient} className="flex-1">
-          <Plus className="h-4 w-4 mr-2" />
-          {t("ingredients.addIngredient")}
+          <Plus />
+
+          {t("ingredients.ingredient")}
         </Button>
 
-        <Button variant="secondary" onClick={handleAddSection}>
-          <LayoutList className="h-4 w-4 mr-2" />
-          {t("ingredients.addSection")}
+        <Button variant="secondary" onClick={handleAddSection} className="flex-1">
+          <LayoutList />
+
+          {t("ingredients.section")}
         </Button>
       </div>
     </div>
