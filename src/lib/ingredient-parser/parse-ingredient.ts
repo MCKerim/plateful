@@ -239,7 +239,7 @@ function extractQuantity(text: string): {
   display: string | null;
   remaining: string;
 } {
-  let remaining = text.trim();
+  const remaining = text.trim();
 
   // Pattern 1: Range like "2-3" or "2 - 3"
   const rangeMatch = remaining.match(/^(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)/);
@@ -255,9 +255,7 @@ function extractQuantity(text: string): {
   }
 
   // Pattern 2: Mixed number like "1 1/2" or "1 ½"
-  const mixedMatch = remaining.match(
-    /^(\d+)\s+(\d+\/\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/
-  );
+  const mixedMatch = remaining.match(/^(\d+)\s+(\d+\/\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/);
   if (mixedMatch) {
     const whole = parseInt(mixedMatch[1], 10);
     const fractionPart = parseFraction(mixedMatch[2]);
@@ -460,8 +458,11 @@ export function parseIngredient(rawText: string): ParsedIngredient {
   }
 
   // Extract quantity
-  const { value: quantityValue, display: quantityDisplay, remaining: afterQuantity } =
-    extractQuantity(trimmed);
+  const {
+    value: quantityValue,
+    display: quantityDisplay,
+    remaining: afterQuantity,
+  } = extractQuantity(trimmed);
 
   // Extract unit
   const { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
@@ -470,8 +471,7 @@ export function parseIngredient(rawText: string): ParsedIngredient {
   const afterFiller = removeFillerWords(afterUnit);
 
   // Extract preparation notes
-  const { preparationNote, remaining: ingredientName } =
-    extractPreparationNote(afterFiller);
+  const { preparationNote, remaining: ingredientName } = extractPreparationNote(afterFiller);
 
   return {
     quantityValue,
