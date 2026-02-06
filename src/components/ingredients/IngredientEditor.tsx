@@ -161,7 +161,6 @@ function SortableEditorItem({
             : undefined
         }
         placeholder={placeholder}
-        className="min-h-[40px] resize-none flex-1"
         rows={1}
       />
 
@@ -308,7 +307,13 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
 
   return (
     <div className="space-y-2">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={lockScroll} onDragEnd={handleDragEnd} onDragCancel={unlockScroll}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={lockScroll}
+        onDragEnd={handleDragEnd}
+        onDragCancel={unlockScroll}
+      >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {localItems.map((item, index) => (
             <SortableEditorItem
@@ -422,7 +427,13 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
 
   return (
     <div className="space-y-2">
-      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={lockScroll} onDragEnd={handleDragEnd} onDragCancel={unlockScroll}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragStart={lockScroll}
+        onDragEnd={handleDragEnd}
+        onDragCancel={unlockScroll}
+      >
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {items.map((item, index) => (
             <SortableEditorItem
