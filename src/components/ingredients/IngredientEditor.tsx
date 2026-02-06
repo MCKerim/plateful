@@ -1,5 +1,21 @@
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import type { DragEndEvent } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  arrayMove,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,9 +24,14 @@ import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
 import type { RecipeIngredient, RecipeIngredientInput } from "@/types/ingredient.types";
 
+let idCounter = 0;
+function generateId() {
+  return `editor-${Date.now()}-${idCounter++}`;
+}
+
 export type EditorItem =
-  | { type: "ingredient"; rawText: string }
-  | { type: "section"; name: string };
+  | { type: "ingredient"; id: string; rawText: string }
+  | { type: "section"; id: string; name: string };
 
 /**
  * Convert server ingredients to editor items (for edit mode)
@@ -24,10 +45,10 @@ export function ingredientsToEditorItems(ingredients: RecipeIngredient[]): Edito
     if (ing.groupName !== currentGroup) {
       currentGroup = ing.groupName;
       if (currentGroup !== null) {
-        items.push({ type: "section", name: currentGroup });
+        items.push({ type: "section", id: generateId(), name: currentGroup });
       }
     }
-    items.push({ type: "ingredient", rawText: ing.rawText });
+    items.push({ type: "ingredient", id: generateId(), rawText: ing.rawText });
   }
   return items;
 }
@@ -55,9 +76,134 @@ export function editorItemsToInputs(items: EditorItem[]): RecipeIngredientInput[
   return inputs;
 }
 
-type LocalEditorItem =
-  | { type: "ingredient"; id: string; rawText: string }
-  | { type: "section"; id: string; name: string };
+// --- Shared sortable item component ---
+
+type SortableEditorItemProps = {
+  item: EditorItem;
+  index: number;
+  onUpdate: (index: number, value: string) => void;
+  onDelete: (index: number) => void;
+  onPaste?: (index: number, text: string) => boolean;
+  placeholder: string;
+  sectionPlaceholder: string;
+};
+
+function SortableEditorItem({
+  item,
+  index,
+  onUpdate,
+  onDelete,
+  onPaste,
+  placeholder,
+  sectionPlaceholder,
+}: SortableEditorItemProps) {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: item.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.4 : 1,
+  };
+
+  if (item.type === "section") {
+    return (
+      <div
+        ref={setNodeRef}
+        style={style}
+        className="flex items-center gap-2 bg-muted/50 rounded-md p-1"
+      >
+        <div
+          className="text-muted-foreground cursor-grab active:cursor-grabbing"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={16} />
+        </div>
+        <Input
+          value={item.name}
+          onChange={(e) => onUpdate(index, e.target.value)}
+          placeholder={sectionPlaceholder}
+          className="font-semibold border-none bg-transparent"
+        />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => onDelete(index)}
+          className="text-muted-foreground hover:text-destructive shrink-0"
+        >
+          <Trash2 size={16} />
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="flex items-start gap-2"
+    >
+      <div
+        className="mt-2 text-muted-foreground cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <GripVertical size={16} />
+      </div>
+
+      <Textarea
+        value={item.rawText}
+        onChange={(e) => onUpdate(index, e.target.value)}
+        onPaste={
+          onPaste
+            ? (e) => {
+                const text = e.clipboardData.getData("text");
+                if (onPaste(index, text)) {
+                  e.preventDefault();
+                }
+              }
+            : undefined
+        }
+        placeholder={placeholder}
+        className="min-h-[40px] resize-none flex-1"
+        rows={1}
+      />
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => onDelete(index)}
+        className="mt-1 text-muted-foreground hover:text-destructive shrink-0"
+      >
+        <Trash2 size={16} />
+      </Button>
+    </div>
+  );
+}
+
+// --- Shared sensors hook ---
+
+function useEditorSensors() {
+  return useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 150, tolerance: 5 },
+    })
+  );
+}
+
+// --- IngredientEditor (server-backed) ---
+
+type LocalEditorItem = EditorItem;
 
 type Props = {
   recipeId: string;
@@ -68,42 +214,30 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
   const { t } = useTranslation();
   const { data: existingIngredients = [], isLoading } = useRecipeIngredients(recipeId);
   const replaceAllMutation = useReplaceAllIngredients();
+  const sensors = useEditorSensors();
 
-  // Convert existing ingredients to local state format with section headers
-  const [localItems, setLocalItems] = useState<LocalEditorItem[]>(() => {
-    const editorItems = ingredientsToEditorItems(existingIngredients);
-    return editorItems.map((item, i) =>
-      item.type === "section"
-        ? { type: "section", id: `section-${i}`, name: item.name }
-        : { type: "ingredient", id: `ing-${i}`, rawText: item.rawText }
-    );
-  });
+  const [localItems, setLocalItems] = useState<LocalEditorItem[]>(() =>
+    ingredientsToEditorItems(existingIngredients)
+  );
 
   // Sync with server data when it loads
   useState(() => {
     if (existingIngredients.length > 0 && localItems.length === 0) {
-      const editorItems = ingredientsToEditorItems(existingIngredients);
-      setLocalItems(
-        editorItems.map((item, i) =>
-          item.type === "section"
-            ? { type: "section", id: `section-${i}`, name: item.name }
-            : { type: "ingredient", id: `ing-${i}`, rawText: item.rawText }
-        )
-      );
+      setLocalItems(ingredientsToEditorItems(existingIngredients));
     }
   });
 
   const handleAddIngredient = useCallback(() => {
     setLocalItems((prev) => [
       ...prev,
-      { type: "ingredient", id: `new-${Date.now()}`, rawText: "" },
+      { type: "ingredient", id: generateId(), rawText: "" },
     ]);
   }, []);
 
   const handleAddSection = useCallback(() => {
     setLocalItems((prev) => [
       ...prev,
-      { type: "section", id: `section-${Date.now()}`, name: "" },
+      { type: "section", id: generateId(), name: "" },
     ]);
   }, []);
 
@@ -124,14 +258,19 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
     setLocalItems((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      setLocalItems((prev) => {
+        const oldIndex = prev.findIndex((item) => item.id === active.id);
+        const newIndex = prev.findIndex((item) => item.id === over.id);
+        return arrayMove(prev, oldIndex, newIndex);
+      });
+    }
+  }, []);
+
   const handleSave = async () => {
-    const inputs = editorItemsToInputs(
-      localItems.map((item) =>
-        item.type === "section"
-          ? { type: "section", name: item.name }
-          : { type: "ingredient", rawText: item.rawText }
-      )
-    );
+    const inputs = editorItemsToInputs(localItems);
 
     await replaceAllMutation.mutateAsync({
       recipeId,
@@ -141,81 +280,56 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
     onSave?.();
   };
 
-  const handleBulkAdd = (text: string) => {
+  const handleBulkAdd = useCallback((index: number, text: string) => {
     const lines = text
       .split("\n")
       .map((line) => line.trim())
       .filter((line) => line.length > 0);
 
     if (lines.length > 1) {
-      setLocalItems((prev) => [
-        ...prev,
-        ...lines.map((line) => ({
-          type: "ingredient" as const,
-          id: `new-${Date.now()}-${Math.random()}`,
+      setLocalItems((prev) => {
+        const before = prev.slice(0, index);
+        const after = prev.slice(index + 1);
+        const newItems: LocalEditorItem[] = lines.map((line) => ({
+          type: "ingredient",
+          id: generateId(),
           rawText: line,
-        })),
-      ]);
+        }));
+        return [...before, ...newItems, ...after];
+      });
       return true;
     }
     return false;
-  };
+  }, []);
 
   if (isLoading) {
     return <div className="animate-pulse h-32 bg-muted rounded-md" />;
   }
 
+  const itemIds = localItems.map((item) => item.id);
+
   return (
     <div className="space-y-2">
-      {localItems.map((item, index) =>
-        item.type === "section" ? (
-          <div key={item.id} className="flex items-start gap-2 bg-muted/50 rounded-md p-1">
-            <Input
-              value={item.name}
-              onChange={(e) => handleUpdateItem(index, e.target.value)}
-              placeholder={t("ingredients.sectionPlaceholder")}
-              className="font-semibold border-none bg-transparent"
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDeleteItem(index)}
-              className="mt-0.5 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        ) : (
-          <div key={item.id} className="flex items-start gap-2">
-            <div className="mt-2 text-muted-foreground cursor-grab">
-              <GripVertical size={16} />
-            </div>
-
-            <Textarea
-              value={item.rawText}
-              onChange={(e) => handleUpdateItem(index, e.target.value)}
-              onPaste={(e) => {
-                const text = e.clipboardData.getData("text");
-                if (handleBulkAdd(text)) {
-                  e.preventDefault();
-                }
-              }}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+          {localItems.map((item, index) => (
+            <SortableEditorItem
+              key={item.id}
+              item={item}
+              index={index}
+              onUpdate={handleUpdateItem}
+              onDelete={handleDeleteItem}
+              onPaste={handleBulkAdd}
               placeholder={t("ingredients.placeholder")}
-              className="min-h-[40px] resize-none flex-1"
-              rows={1}
+              sectionPlaceholder={t("ingredients.sectionPlaceholder")}
             />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDeleteItem(index)}
-              className="mt-1 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        )
-      )}
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <div className="flex gap-2">
         <Button
@@ -255,10 +369,8 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
   );
 }
 
-/**
- * Simple version for inline editing in AddRecipe form
- * Takes items as controlled state instead of fetching from server
- */
+// --- SimpleIngredientEditor (controlled, for AddRecipe form) ---
+
 type SimpleEditorProps = {
   items: EditorItem[];
   onChange: (items: EditorItem[]) => void;
@@ -266,13 +378,14 @@ type SimpleEditorProps = {
 
 export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
   const { t } = useTranslation();
+  const sensors = useEditorSensors();
 
   const handleAddIngredient = () => {
-    onChange([...items, { type: "ingredient", rawText: "" }]);
+    onChange([...items, { type: "ingredient", id: generateId(), rawText: "" }]);
   };
 
   const handleAddSection = () => {
-    onChange([...items, { type: "section", name: "" }]);
+    onChange([...items, { type: "section", id: generateId(), name: "" }]);
   };
 
   const handleUpdate = (index: number, value: string) => {
@@ -301,6 +414,7 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
       const after = items.slice(index + 1);
       const newItems: EditorItem[] = lines.map((line) => ({
         type: "ingredient",
+        id: generateId(),
         rawText: line,
       }));
       onChange([...before, ...newItems, ...after]);
@@ -309,57 +423,39 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
     return false;
   };
 
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (over && active.id !== over.id) {
+      const oldIndex = items.findIndex((item) => item.id === active.id);
+      const newIndex = items.findIndex((item) => item.id === over.id);
+      onChange(arrayMove(items, oldIndex, newIndex));
+    }
+  };
+
+  const itemIds = items.map((item) => item.id);
+
   return (
     <div className="space-y-2">
-      {items.map((item, index) =>
-        item.type === "section" ? (
-          <div key={index} className="flex items-start gap-2 bg-muted/50 rounded-md p-1">
-            <Input
-              value={item.name}
-              onChange={(e) => handleUpdate(index, e.target.value)}
-              placeholder={t("ingredients.sectionPlaceholder")}
-              className="font-semibold border-none bg-transparent"
-            />
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDelete(index)}
-              className="mt-0.5 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        ) : (
-          <div key={index} className="flex items-start gap-2">
-            <div className="mt-2 text-muted-foreground cursor-grab">
-              <GripVertical size={16} />
-            </div>
-
-            <Textarea
-              value={item.rawText}
-              onChange={(e) => handleUpdate(index, e.target.value)}
-              onPaste={(e) => {
-                const text = e.clipboardData.getData("text");
-                if (handlePaste(index, text)) {
-                  e.preventDefault();
-                }
-              }}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+          {items.map((item, index) => (
+            <SortableEditorItem
+              key={item.id}
+              item={item}
+              index={index}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+              onPaste={handlePaste}
               placeholder={t("ingredients.placeholder")}
-              className="min-h-[40px] resize-none flex-1"
-              rows={1}
+              sectionPlaceholder={t("ingredients.sectionPlaceholder")}
             />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => handleDelete(index)}
-              className="mt-1 text-muted-foreground hover:text-destructive"
-            >
-              <Trash2 size={16} />
-            </Button>
-          </div>
-        )
-      )}
+          ))}
+        </SortableContext>
+      </DndContext>
 
       <div className="flex gap-2">
         <Button variant="outline" onClick={handleAddIngredient} className="flex-1">
