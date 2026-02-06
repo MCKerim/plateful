@@ -188,6 +188,10 @@ export default function Recipe() {
 
       <Separator />
 
+      {recipe.description && (
+        <p className="text-sm text-muted-foreground mt-2">{recipe.description}</p>
+      )}
+
       {/* Ingredients Section */}
       {ingredients.length > 0 && (
         <IngredientList
@@ -199,12 +203,12 @@ export default function Recipe() {
       )}
 
       {/* Instructions Section */}
-      {(recipe.instructions || recipe.description) && (
+      {recipe.instructions && (
         <div>
           <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
 
           <MarkdownRenderer
-            content={recipe.instructions || recipe.description || ""}
+            content={recipe.instructions}
             className="font-medium"
           />
         </div>

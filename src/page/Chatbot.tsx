@@ -257,7 +257,7 @@ description: ${recipeContext.description ?? "No description"}
   async function saveSuggestedRecipe(
     proposalId: string,
     title: string,
-    description: string,
+    instructions: string,
     category: string
   ) {
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
@@ -275,7 +275,7 @@ description: ${recipeContext.description ?? "No description"}
     try {
       const newRecipe = await createRecipe.mutateAsync({
         name: title,
-        description,
+        instructions,
         link: "",
         householdId,
         category: categoryId,
@@ -301,7 +301,7 @@ description: ${recipeContext.description ?? "No description"}
     proposalId: string,
     recipeId: string,
     title: string,
-    description: string,
+    instructions: string,
     category: string,
     link: string
   ) {
@@ -316,7 +316,7 @@ description: ${recipeContext.description ?? "No description"}
       await updateRecipeMutation.mutateAsync({
         recipeId,
         name: title,
-        description,
+        instructions,
         link,
         category: categoryId,
       });

@@ -50,6 +50,7 @@ export default function AddRecipe() {
   const householdId = useAppSelector(selectHouseholdId);
 
   const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const [instructions, setInstructions] = useState("");
   const [link, setLink] = useState("");
   const [ingredients, setIngredients] = useState<EditorItem[]>([]);
@@ -161,7 +162,8 @@ export default function AddRecipe() {
   useEffect(() => {
     if (recipe) {
       setTitle(recipe.name);
-      setInstructions(recipe.instructions ?? recipe.description ?? "");
+      setDescription(recipe.description ?? "");
+      setInstructions(recipe.instructions ?? "");
       setLink(recipe.link ?? "");
       setCategory(recipe.category);
       setBaseServings(recipe.base_servings);
@@ -266,7 +268,8 @@ export default function AddRecipe() {
         {
           recipeId,
           name: title,
-          description: instructions,
+          description: description || null,
+          instructions: instructions || null,
           link,
           category,
           baseServings,
@@ -294,7 +297,8 @@ export default function AddRecipe() {
       createRecipeMutation.mutate(
         {
           name: title,
-          description: instructions,
+          description: description || null,
+          instructions: instructions || null,
           link,
           category,
           householdId: householdId!,
@@ -413,6 +417,19 @@ export default function AddRecipe() {
               </SelectGroup>
             </SelectContent>
           </Select>
+        </div>
+
+        <div className="grid items-center w-full gap-2">
+          <Label htmlFor="description">{t("addRecipe.description")}</Label>
+
+          <Textarea
+            id="description"
+            placeholder={t("addRecipe.descriptionPlaceholder")}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            enterKeyHint="next"
+            rows={2}
+          />
         </div>
 
         <div className="grid items-center w-full gap-2">

@@ -3,7 +3,8 @@ import { Recipes } from "@/types/exportedDatabaseTypes.types";
 
 export type CreateRecipeParams = {
   name: string;
-  description: string;
+  description?: string | null;
+  instructions?: string | null;
   link: string;
   category: number;
   householdId: string;
@@ -13,7 +14,8 @@ export type CreateRecipeParams = {
 export type UpdateRecipeParams = {
   recipeId: string;
   name: string;
-  description: string;
+  description?: string | null;
+  instructions?: string | null;
   link: string;
   category: number;
   baseServings?: number | null;
@@ -85,8 +87,8 @@ export const recipeApi = {
       .insert([
         {
           name: params.name,
-          description: params.description,
-          instructions: params.description, // Store in both for now
+          description: params.description ?? null,
+          instructions: params.instructions ?? null,
           link: params.link,
           category: params.category,
           household_id: params.householdId,
@@ -105,8 +107,8 @@ export const recipeApi = {
       .from("recipes")
       .update({
         name: params.name,
-        description: params.description,
-        instructions: params.description, // Store in both for now
+        description: params.description ?? null,
+        instructions: params.instructions ?? null,
         link: params.link,
         category: params.category,
         base_servings: params.baseServings,

@@ -16,12 +16,12 @@ import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
-  onSaveNew: (proposalId: string, title: string, description: string, category: string) => void;
+  onSaveNew: (proposalId: string, title: string, instructions: string, category: string) => void;
   onSaveEdit: (
     proposalId: string,
     recipeId: string,
     title: string,
-    description: string,
+    instructions: string,
     category: string,
     link: string
   ) => void;
@@ -42,11 +42,11 @@ export function RecipeProposalDialog({
   const { data: originalRecipe } = useRecipe(editRecipeId ?? null);
 
   // For edit proposals, merge tool output with original recipe (tool output takes precedence)
-  const getMergedValue = (field: "title" | "description" | "category") => {
+  const getMergedValue = (field: "title" | "instructions" | "category") => {
     const toolValue =
       field === "title"
         ? toolOutput.args.title
-        : field === "description"
+        : field === "instructions"
           ? toolOutput.args.description
           : toolOutput.args.category;
 
@@ -57,7 +57,7 @@ export function RecipeProposalDialog({
     // Fall back to original recipe data for edit proposals
     if (isEditProposal && originalRecipe) {
       if (field === "title") return originalRecipe.name;
-      if (field === "description") return originalRecipe.description ?? "";
+      if (field === "instructions") return originalRecipe.instructions ?? "";
       if (field === "category") return getEnglishCategoryNameById(originalRecipe.category);
     }
 
@@ -65,7 +65,7 @@ export function RecipeProposalDialog({
   };
 
   const finalTitle = getMergedValue("title");
-  const finalDescription = getMergedValue("description");
+  const finalInstructions = getMergedValue("instructions");
   const finalCategory = getMergedValue("category");
 
   return (
@@ -94,7 +94,7 @@ export function RecipeProposalDialog({
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh] rounded-md border p-2">
-          <MarkdownRenderer content={finalDescription} className="font-medium" />
+          <MarkdownRenderer content={finalInstructions} className="font-medium" />
         </ScrollArea>
 
         <div className="text-sm text-muted-foreground">
@@ -117,12 +117,12 @@ export function RecipeProposalDialog({
                   toolOutput.proposalId,
                   editRecipeId,
                   finalTitle,
-                  finalDescription,
+                  finalInstructions,
                   finalCategory,
                   originalRecipe?.link ?? ""
                 );
               } else {
-                onSaveNew(toolOutput.proposalId, finalTitle, finalDescription, finalCategory);
+                onSaveNew(toolOutput.proposalId, finalTitle, finalInstructions, finalCategory);
               }
               setOpen(false);
             }}
