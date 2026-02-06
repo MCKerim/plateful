@@ -19,7 +19,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, GripVertical, LayoutList, X } from "lucide-react";
+import { Plus, GripVertical, LayoutList, X } from "lucide-react";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
 import type { RecipeIngredient, RecipeIngredientInput } from "@/types/ingredient.types";
