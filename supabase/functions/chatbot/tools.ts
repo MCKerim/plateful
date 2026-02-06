@@ -14,8 +14,21 @@ export const TOOLS = [
         },
         description: {
           type: "string",
+          description: "Short 1-2 sentence summary of the dish.",
+        },
+        servings: {
+          type: "number",
+          description: "Number of servings this recipe makes.",
+        },
+        ingredients: {
+          type: "string",
           description:
-            "Multi-line markdown string with real line breaks (not escaped \\n). Start with a short one-sentence summary, then a blank line, then serving size, then a blank line, then ## Ingredients with a bullet list (- item), then a blank line, then ## Instructions with numbered steps (1. step). Use ### subheadings to group (e.g. ### Sauce) if needed.",
+            "Markdown list of ingredients. Use `- item` for each ingredient. Use `### Section` headings to group ingredients (e.g. ### Sauce). Do not include a top-level heading.",
+        },
+        instructions: {
+          type: "string",
+          description:
+            "Numbered steps in markdown (1. step). Do not include a top-level heading.",
         },
         category: {
           type: "string",
@@ -23,7 +36,7 @@ export const TOOLS = [
           enum: ["Breakfast", "Main Course", "Dessert", "Drinks", "Other"],
         },
       },
-      required: ["title", "description", "category"],
+      required: ["title", "description", "servings", "ingredients", "instructions", "category"],
       additionalProperties: false,
     },
   },
@@ -45,16 +58,31 @@ export const TOOLS = [
           description:
             "New title for the recipe. OMIT this field if the title should stay the same.",
         },
+        description: {
+          type: "string",
+          description:
+            "New short 1-2 sentence summary. OMIT this field if the description should stay the same.",
+        },
+        servings: {
+          type: "number",
+          description:
+            "New serving count. OMIT this field if servings should stay the same.",
+        },
+        ingredients: {
+          type: "string",
+          description:
+            "New full ingredient list in markdown (- item, ### Section for groups). OMIT if ingredients should stay the same. If provided, must include ALL ingredients (replaces existing).",
+        },
+        instructions: {
+          type: "string",
+          description:
+            "New instructions as numbered steps. OMIT if instructions should stay the same.",
+        },
         category: {
           type: "string",
           enum: ["Breakfast", "Main Course", "Dessert", "Drinks", "Other"],
           description:
             "New category for the recipe. OMIT this field if the category should stay the same.",
-        },
-        description: {
-          type: "string",
-          description:
-            "New description/content in markdown format. OMIT this field if the description should stay the same.",
         },
       },
       required: ["recipeId"],
@@ -62,30 +90,54 @@ export const TOOLS = [
     },
   },
 ];
-export function proposeRecipe(proposalId: string, title, description, category) {
+
+export function proposeRecipe(
+  proposalId: string,
+  title,
+  description,
+  servings,
+  ingredients,
+  instructions,
+  category
+) {
   const toolOutputForUI = {
     status: `Recipe proposal ${proposalId} shown to user.`,
     proposalId,
     toolName: "propose_recipe",
     args: {
-      title: title,
-      description: description,
-      category: category,
+      title,
+      description,
+      servings,
+      ingredients,
+      instructions,
+      category,
     },
   };
   return toolOutputForUI;
 }
 
-export function proposeRecipeEdit(proposalId: string, recipeId, title, description, category) {
+export function proposeRecipeEdit(
+  proposalId: string,
+  recipeId,
+  title,
+  description,
+  servings,
+  ingredients,
+  instructions,
+  category
+) {
   const toolOutputForUI = {
     status: `Edit proposal ${proposalId} shown to user.`,
     proposalId,
     toolName: "propose_recipe_edit",
     args: {
-      recipeId: recipeId,
+      recipeId,
       // Only include fields that were provided (not undefined)
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
+      ...(servings !== undefined && { servings }),
+      ...(ingredients !== undefined && { ingredients }),
+      ...(instructions !== undefined && { instructions }),
       ...(category !== undefined && { category }),
     },
   };

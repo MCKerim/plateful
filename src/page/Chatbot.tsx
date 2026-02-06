@@ -34,12 +34,47 @@ import { Field } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupTextarea } from "@/components/ui/input-group";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
+import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
+import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import type { RecipeIngredientInput } from "@/types/ingredient.types";
 import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
 const DEFAULT_CATEGORY_ID = 5;
+
+/** Parse chatbot ingredient markdown into RecipeIngredientInput[] */
+function parseIngredientMarkdown(markdown: string): RecipeIngredientInput[] {
+  const lines = markdown.split("\n");
+  const inputs: RecipeIngredientInput[] = [];
+  let currentGroup: string | null = null;
+  let sortOrder = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+
+    // Section header: ### Sauce
+    const headerMatch = trimmed.match(/^#{1,3}\s+(.+)$/);
+    if (headerMatch) {
+      currentGroup = headerMatch[1].trim();
+      continue;
+    }
+
+    // Ingredient line: - 200g flour or * 200g flour
+    const itemMatch = trimmed.match(/^[-*]\s+(.+)$/);
+    if (itemMatch) {
+      inputs.push({
+        rawText: itemMatch[1].trim(),
+        groupName: currentGroup,
+        sortOrder: sortOrder++,
+      });
+    }
+  }
+
+  return inputs;
+}
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -61,6 +96,8 @@ export default function Chatbot() {
   const { data: recipeContext } = useRecipe(recipeId);
 
   const updateRecipeMutation = useUpdateRecipe();
+  const replaceIngredientsMutation = useReplaceAllIngredients();
+  const { data: recipeContextIngredients = [] } = useRecipeIngredients(recipeId);
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
@@ -130,11 +167,16 @@ export default function Chatbot() {
       let textContent = inputValue.trim();
       if (isFirstMessageWithContext) {
         const categoryName = getEnglishCategoryNameById(recipeContext.category);
+        const ingredientLines = recipeContextIngredients.map((ing) => `- ${ing.rawText}`).join("\n");
         const contextPrefix = `[Recipe Context]
 recipeId: ${recipeContext.id}
 title: ${recipeContext.name}
 category: ${categoryName}
 description: ${recipeContext.description ?? "No description"}
+servings: ${recipeContext.base_servings ?? "unknown"}
+ingredients:
+${ingredientLines || "No ingredients"}
+instructions: ${recipeContext.instructions ?? "No instructions"}
 [End Recipe Context]
 
 `;
@@ -257,6 +299,9 @@ description: ${recipeContext.description ?? "No description"}
   async function saveSuggestedRecipe(
     proposalId: string,
     title: string,
+    description: string,
+    servings: number | undefined,
+    ingredients: string | undefined,
     instructions: string,
     category: string
   ) {
@@ -275,11 +320,25 @@ description: ${recipeContext.description ?? "No description"}
     try {
       const newRecipe = await createRecipe.mutateAsync({
         name: title,
-        instructions,
+        description: description || null,
+        instructions: instructions || null,
         link: "",
         householdId,
         category: categoryId,
+        baseServings: servings ?? null,
       });
+
+      // Save ingredients if provided
+      if (ingredients) {
+        const inputs = parseIngredientMarkdown(ingredients);
+        if (inputs.length > 0) {
+          await replaceIngredientsMutation.mutateAsync({
+            recipeId: newRecipe.id,
+            inputs,
+          });
+        }
+      }
+
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
       setPendingFeedback((prev) => [
         ...prev,
@@ -301,7 +360,10 @@ description: ${recipeContext.description ?? "No description"}
     proposalId: string,
     recipeId: string,
     title: string,
-    instructions: string,
+    description: string | undefined,
+    servings: number | undefined,
+    ingredients: string | undefined,
+    instructions: string | undefined,
     category: string,
     link: string
   ) {
@@ -316,10 +378,24 @@ description: ${recipeContext.description ?? "No description"}
       await updateRecipeMutation.mutateAsync({
         recipeId,
         name: title,
+        description,
         instructions,
         link,
         category: categoryId,
+        baseServings: servings,
       });
+
+      // Replace ingredients if provided
+      if (ingredients) {
+        const inputs = parseIngredientMarkdown(ingredients);
+        if (inputs.length > 0) {
+          await replaceIngredientsMutation.mutateAsync({
+            recipeId,
+            inputs,
+          });
+        }
+      }
+
       setPendingFeedback((prev) => [
         ...prev,
         `Proposal ${proposalId} accepted. Recipe ${recipeId} ("${title}") updated.`,

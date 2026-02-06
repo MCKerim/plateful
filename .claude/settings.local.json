@@ -15,7 +15,8 @@
       "Bash(curl:*)",
       "mcp__supabase__list_projects",
       "mcp__supabase__generate_typescript_types",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(npx tsc:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

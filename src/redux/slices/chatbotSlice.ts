@@ -9,6 +9,9 @@ export interface ToolOutputForUI {
     recipeId?: string;
     title?: string;
     description?: string;
+    servings?: number;
+    ingredients?: string;
+    instructions?: string;
     category?: string;
   };
 }

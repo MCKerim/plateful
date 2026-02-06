@@ -91,7 +91,6 @@ Deno.serve(async (req: Request) => {
       .insert([
         {
           name: "Importing...",
-          description: "",
           category: null,
           household_id: householdId,
           status: "importing",
@@ -153,7 +152,7 @@ Deno.serve(async (req: Request) => {
     // Step 3: Update recipe with extracted data (or partial data on failure)
     const updateData = {
       name: node_data?.data?.recipe?.title || "Imported Recipe",
-      description: node_data?.data?.recipe?.description || "",
+      instructions: node_data?.data?.recipe?.description || "",
       category: node_data?.data?.recipe?.category || null,
       status: "ready",
     };

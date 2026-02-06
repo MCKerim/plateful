@@ -16,12 +16,23 @@ import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
-  onSaveNew: (proposalId: string, title: string, instructions: string, category: string) => void;
+  onSaveNew: (
+    proposalId: string,
+    title: string,
+    description: string,
+    servings: number | undefined,
+    ingredients: string | undefined,
+    instructions: string,
+    category: string
+  ) => void;
   onSaveEdit: (
     proposalId: string,
     recipeId: string,
     title: string,
-    instructions: string,
+    description: string | undefined,
+    servings: number | undefined,
+    ingredients: string | undefined,
+    instructions: string | undefined,
     category: string,
     link: string
   ) => void;
@@ -42,31 +53,27 @@ export function RecipeProposalDialog({
   const { data: originalRecipe } = useRecipe(editRecipeId ?? null);
 
   // For edit proposals, merge tool output with original recipe (tool output takes precedence)
-  const getMergedValue = (field: "title" | "instructions" | "category") => {
-    const toolValue =
-      field === "title"
-        ? toolOutput.args.title
-        : field === "instructions"
-          ? toolOutput.args.description
-          : toolOutput.args.category;
-
-    if (toolValue !== undefined && toolValue !== null) {
-      return toolValue;
-    }
-
-    // Fall back to original recipe data for edit proposals
-    if (isEditProposal && originalRecipe) {
-      if (field === "title") return originalRecipe.name;
-      if (field === "instructions") return originalRecipe.instructions ?? "";
-      if (field === "category") return getEnglishCategoryNameById(originalRecipe.category);
-    }
-
+  const getMergedString = (
+    toolValue: string | undefined,
+    fallback: string | null | undefined
+  ) => {
+    if (toolValue !== undefined && toolValue !== null) return toolValue;
+    if (isEditProposal && originalRecipe) return fallback ?? "";
     return "";
   };
 
-  const finalTitle = getMergedValue("title");
-  const finalInstructions = getMergedValue("instructions");
-  const finalCategory = getMergedValue("category");
+  const finalTitle = getMergedString(toolOutput.args.title, originalRecipe?.name);
+  const finalDescription = getMergedString(toolOutput.args.description, originalRecipe?.description);
+  const finalCategory = getMergedString(
+    toolOutput.args.category,
+    originalRecipe ? getEnglishCategoryNameById(originalRecipe.category) : undefined
+  );
+  const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings;
+  const finalIngredients = toolOutput.args.ingredients;
+  const finalInstructions = getMergedString(
+    toolOutput.args.instructions,
+    originalRecipe?.instructions
+  );
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -94,7 +101,29 @@ export function RecipeProposalDialog({
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh] rounded-md border p-2">
-          <MarkdownRenderer content={finalInstructions} className="font-medium" />
+          {finalDescription && (
+            <p className="text-sm text-muted-foreground mb-3">{finalDescription}</p>
+          )}
+
+          {finalServings && (
+            <p className="text-sm font-medium mb-3">
+              {t("addRecipe.servings")}: {finalServings}
+            </p>
+          )}
+
+          {finalIngredients && (
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold mb-1">{t("ingredients.title")}</h3>
+              <MarkdownRenderer content={finalIngredients} className="font-medium" />
+            </div>
+          )}
+
+          {finalInstructions && (
+            <div>
+              <h3 className="text-sm font-semibold mb-1">{t("recipe.instructions")}</h3>
+              <MarkdownRenderer content={finalInstructions} className="font-medium" />
+            </div>
+          )}
         </ScrollArea>
 
         <div className="text-sm text-muted-foreground">
@@ -117,12 +146,23 @@ export function RecipeProposalDialog({
                   toolOutput.proposalId,
                   editRecipeId,
                   finalTitle,
-                  finalInstructions,
+                  toolOutput.args.description,
+                  toolOutput.args.servings,
+                  toolOutput.args.ingredients,
+                  toolOutput.args.instructions,
                   finalCategory,
                   originalRecipe?.link ?? ""
                 );
               } else {
-                onSaveNew(toolOutput.proposalId, finalTitle, finalInstructions, finalCategory);
+                onSaveNew(
+                  toolOutput.proposalId,
+                  finalTitle,
+                  finalDescription,
+                  toolOutput.args.servings,
+                  toolOutput.args.ingredients,
+                  finalInstructions,
+                  finalCategory
+                );
               }
               setOpen(false);
             }}
