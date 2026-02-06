@@ -19,7 +19,7 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2, GripVertical, LayoutList } from "lucide-react";
+import { Plus, Trash2, GripVertical, LayoutList, X } from "lucide-react";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
 import type { RecipeIngredient, RecipeIngredientInput } from "@/types/ingredient.types";
@@ -97,14 +97,9 @@ function SortableEditorItem({
   placeholder,
   sectionPlaceholder,
 }: SortableEditorItemProps) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: item.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: item.id,
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -114,11 +109,7 @@ function SortableEditorItem({
 
   if (item.type === "section") {
     return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="flex items-center gap-2 bg-muted/50 rounded-md p-1"
-      >
+      <div ref={setNodeRef} style={style} className="flex items-center gap-2">
         <div
           className="text-muted-foreground cursor-grab active:cursor-grabbing"
           {...attributes}
@@ -126,30 +117,28 @@ function SortableEditorItem({
         >
           <GripVertical size={16} />
         </div>
+
         <Input
           value={item.name}
           onChange={(e) => onUpdate(index, e.target.value)}
           placeholder={sectionPlaceholder}
           className="font-semibold border-none bg-transparent"
         />
+
         <Button
           variant="ghost"
           size="icon"
           onClick={() => onDelete(index)}
-          className="text-muted-foreground hover:text-destructive shrink-0"
+          className="text-muted-foreground"
         >
-          <Trash2 size={16} />
+          <X className="!size-6" />
         </Button>
       </div>
     );
   }
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="flex items-start gap-2"
-    >
+    <div ref={setNodeRef} style={style} className="flex items-start gap-2">
       <div
         className="mt-2 text-muted-foreground cursor-grab active:cursor-grabbing"
         {...attributes}
@@ -180,9 +169,9 @@ function SortableEditorItem({
         variant="ghost"
         size="icon"
         onClick={() => onDelete(index)}
-        className="mt-1 text-muted-foreground hover:text-destructive shrink-0"
+        className="text-muted-foreground"
       >
-        <Trash2 size={16} />
+        <X className="!size-6" />
       </Button>
     </div>
   );
@@ -228,17 +217,11 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
   });
 
   const handleAddIngredient = useCallback(() => {
-    setLocalItems((prev) => [
-      ...prev,
-      { type: "ingredient", id: generateId(), rawText: "" },
-    ]);
+    setLocalItems((prev) => [...prev, { type: "ingredient", id: generateId(), rawText: "" }]);
   }, []);
 
   const handleAddSection = useCallback(() => {
-    setLocalItems((prev) => [
-      ...prev,
-      { type: "section", id: generateId(), name: "" },
-    ]);
+    setLocalItems((prev) => [...prev, { type: "section", id: generateId(), name: "" }]);
   }, []);
 
   const handleUpdateItem = useCallback((index: number, value: string) => {
@@ -310,11 +293,7 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
 
   return (
     <div className="space-y-2">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {localItems.map((item, index) => (
             <SortableEditorItem
@@ -332,19 +311,12 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
       </DndContext>
 
       <div className="flex gap-2">
-        <Button
-          variant="outline"
-          onClick={handleAddIngredient}
-          className="flex-1"
-        >
+        <Button variant="outline" onClick={handleAddIngredient} className="flex-1">
           <Plus className="h-4 w-4 mr-2" />
           {t("ingredients.addIngredient")}
         </Button>
 
-        <Button
-          variant="outline"
-          onClick={handleAddSection}
-        >
+        <Button variant="outline" onClick={handleAddSection}>
           <LayoutList className="h-4 w-4 mr-2" />
           {t("ingredients.addSection")}
         </Button>
@@ -360,9 +332,7 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
           disabled={replaceAllMutation.isPending}
           className="w-full mt-4"
         >
-          {replaceAllMutation.isPending
-            ? t("common.saving")
-            : t("ingredients.saveIngredients")}
+          {replaceAllMutation.isPending ? t("common.saving") : t("ingredients.saveIngredients")}
         </Button>
       )}
     </div>
@@ -436,11 +406,7 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
 
   return (
     <div className="space-y-2">
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-      >
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
           {items.map((item, index) => (
             <SortableEditorItem
@@ -458,12 +424,12 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
       </DndContext>
 
       <div className="flex gap-2">
-        <Button variant="outline" onClick={handleAddIngredient} className="flex-1">
+        <Button variant="secondary" onClick={handleAddIngredient} className="flex-1">
           <Plus className="h-4 w-4 mr-2" />
           {t("ingredients.addIngredient")}
         </Button>
 
-        <Button variant="outline" onClick={handleAddSection}>
+        <Button variant="secondary" onClick={handleAddSection}>
           <LayoutList className="h-4 w-4 mr-2" />
           {t("ingredients.addSection")}
         </Button>

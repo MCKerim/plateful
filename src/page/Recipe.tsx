@@ -190,27 +190,24 @@ export default function Recipe() {
 
       {/* Ingredients Section */}
       {ingredients.length > 0 && (
-        <>
-          <h2 className="first-font text-xl font-bold mb-2">{t("ingredients.title")}</h2>
-          <IngredientList
-            recipeId={recipe.id}
-            baseServings={recipe.base_servings}
-            servingsUnit={recipe.servings_unit ?? "servings"}
-            showScalingControls={recipe.base_servings !== null}
-          />
-          <Separator className="mt-4" />
-        </>
+        <IngredientList
+          recipeId={recipe.id}
+          baseServings={recipe.base_servings}
+          servingsUnit={recipe.servings_unit ?? "servings"}
+          showScalingControls={recipe.base_servings !== null}
+        />
       )}
 
       {/* Instructions Section */}
       {(recipe.instructions || recipe.description) && (
-        <>
-          <h2 className="first-font text-xl font-bold mb-2">{t("recipe.instructions")}</h2>
+        <div>
+          <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
+
           <MarkdownRenderer
             content={recipe.instructions || recipe.description || ""}
             className="font-medium"
           />
-        </>
+        </div>
       )}
 
       <div>

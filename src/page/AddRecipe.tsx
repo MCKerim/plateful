@@ -416,20 +416,23 @@ export default function AddRecipe() {
           </Select>
         </div>
 
-        <Separator />
+        <div className="grid items-center w-full gap-2">
+          <Label htmlFor="link">{t("addRecipe.link")}</Label>
 
-        {/* Ingredients Section */}
-        <div className="grid w-full gap-2">
-          <Label>{t("ingredients.title")}</Label>
-          <SimpleIngredientEditor
-            items={ingredients}
-            onChange={setIngredients}
+          <Input
+            type="text"
+            id="link"
+            placeholder={t("addRecipe.linkPlaceholder")}
+            value={link}
+            onChange={(e) => setLink(e.target.value)}
+            autoComplete="off"
           />
         </div>
 
         {/* Servings */}
         <div className="grid items-center w-full gap-2">
           <Label htmlFor="servings">{t("addRecipe.servings")}</Label>
+
           <Input
             type="number"
             id="servings"
@@ -440,7 +443,12 @@ export default function AddRecipe() {
           />
         </div>
 
-        <Separator />
+        {/* Ingredients Section */}
+        <div className="grid w-full gap-2">
+          <Label>{t("ingredients.title")}</Label>
+
+          <SimpleIngredientEditor items={ingredients} onChange={setIngredients} />
+        </div>
 
         {/* Instructions Section */}
         <div className="grid w-full gap-2">
@@ -452,19 +460,6 @@ export default function AddRecipe() {
             value={instructions}
             onChange={(e) => setInstructions(e.target.value)}
             enterKeyHint="enter"
-          />
-        </div>
-
-        <div className="grid items-center w-full gap-2">
-          <Label htmlFor="link">{t("addRecipe.link")}</Label>
-
-          <Input
-            type="text"
-            id="link"
-            placeholder={t("addRecipe.linkPlaceholder")}
-            value={link}
-            onChange={(e) => setLink(e.target.value)}
-            autoComplete="off"
           />
         </div>
       </div>

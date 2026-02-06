@@ -43,36 +43,24 @@ export function IngredientList({
   }
 
   if (scaledIngredients.length === 0) {
-    return (
-      <p className="text-sm text-muted-foreground">
-        {t("ingredients.noIngredients")}
-      </p>
-    );
+    return;
   }
 
   return (
-    <div className="space-y-4">
+    <div className="">
       {showScalingControls && baseServings && (
-        <ServingScaler
-          baseServings={effectiveBaseServings}
-          value={targetServings}
-          onChange={setTargetServings}
-          unit={servingsUnit}
-        />
+        <ServingScaler value={targetServings} onChange={setTargetServings} unit={servingsUnit} />
       )}
+
+      <h2 className="text-lg font-semibold mt-4">{t("ingredients.title")}</h2>
 
       {groupedIngredients.map((group, groupIndex) => (
         <div key={group.name ?? `group-${groupIndex}`}>
-          {group.name && (
-            <h4 className="font-medium text-sm mb-2">{group.name}</h4>
-          )}
-          <ul className="list-none">
+          {group.name && <h4 className="font-bold text-sm mt-4">{group.name}</h4>}
+
+          <ul className="list-disc ml-4">
             {group.ingredients.map((ingredient) => (
-              <IngredientRow
-                key={ingredient.id}
-                ingredient={ingredient}
-                isScaled={isScaled}
-              />
+              <IngredientRow key={ingredient.id} ingredient={ingredient} isScaled={isScaled} />
             ))}
           </ul>
         </div>
