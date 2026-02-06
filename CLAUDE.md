@@ -37,6 +37,7 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 - **State**: Redux Toolkit (user/household/chatbot state) + React Query (server state)
 - **Mobile**: Capacitor (iOS/Android) + PWA
 - **UI**: shadcn/ui components (Radix primitives) + Material UI icons + Lucide icons
+- **DnD**: @dnd-kit/core (meal planner zone-based drag) + @dnd-kit/sortable (ingredient list reordering)
 
 ### Path Alias
 
@@ -122,6 +123,8 @@ useRecipeIngredients (hook)
 **Parser** (`src/lib/ingredient-parser/parse-ingredient.ts`): Extracts quantity, unit, and ingredient name from free-form text like `"2 cups flour"`. Handles fractions, ranges, metric/imperial, and German units. If a number is found it will scale; unrecognized text is preserved as-is.
 
 **Scaling** (`src/lib/ingredient-parser/scale-ingredients.ts`): Multiplies `quantity_value` by `targetServings / baseServings`. Uses `formatQuantity()` for smart display (0.5 → "1/2", 1.5 → "1 1/2").
+
+**Sections/Groups**: Ingredients support `group_name` for organizing into sections (e.g. "Sauce", "Dough"). The editor uses a flat list of `EditorItem` (union of ingredient and section header). Section headers are positioned in the list; all ingredients after a header inherit that section name until the next header. `ingredientsToEditorItems()` and `editorItemsToInputs()` handle conversion. Both editors support drag-and-drop reordering via `@dnd-kit/sortable`.
 
 ## E2E Testing
 
