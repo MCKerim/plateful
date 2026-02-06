@@ -460,6 +460,8 @@
     "saveIngredients": "Save ingredients",
     "noIngredients": "No ingredients added yet",
     "placeholder": "e.g. 2 cups flour",
+    "addSection": "Add section",
+    "sectionPlaceholder": "Section name (e.g. Sauce, Dough)",
     "reset": "Reset",
     "units": {
       "servings": "servings",

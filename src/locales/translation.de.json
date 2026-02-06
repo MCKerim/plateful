@@ -459,6 +459,8 @@
     "saveIngredients": "Zutaten speichern",
     "noIngredients": "Noch keine Zutaten hinzugefügt",
     "placeholder": "z.B. 2 Tassen Mehl",
+    "addSection": "Abschnitt hinzufügen",
+    "sectionPlaceholder": "Abschnittsname (z.B. Soße, Teig)",
     "reset": "Zurücksetzen",
     "units": {
       "servings": "Portionen",

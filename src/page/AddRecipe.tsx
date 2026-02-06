@@ -28,7 +28,12 @@ import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
-import { SimpleIngredientEditor } from "@/components/ingredients/IngredientEditor";
+import {
+  SimpleIngredientEditor,
+  ingredientsToEditorItems,
+  editorItemsToInputs,
+} from "@/components/ingredients/IngredientEditor";
+import type { EditorItem } from "@/components/ingredients/IngredientEditor";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
 import { Separator } from "@/components/ui/separator";
@@ -48,7 +53,7 @@ export default function AddRecipe() {
   const [title, setTitle] = useState("");
   const [instructions, setInstructions] = useState("");
   const [link, setLink] = useState("");
-  const [ingredients, setIngredients] = useState<string[]>([]);
+  const [ingredients, setIngredients] = useState<EditorItem[]>([]);
   const [baseServings, setBaseServings] = useState<number | null>(null);
 
   const filterCategoryId = useAppSelector(selectCategoryId);
@@ -167,7 +172,7 @@ export default function AddRecipe() {
   // Populate ingredients when loaded (edit mode)
   useEffect(() => {
     if (existingIngredients.length > 0) {
-      setIngredients(existingIngredients.map((ing) => ing.rawText));
+      setIngredients(ingredientsToEditorItems(existingIngredients));
     }
   }, [existingIngredients]);
 
@@ -246,14 +251,12 @@ export default function AddRecipe() {
 
     // Helper to save ingredients
     const saveIngredients = async (targetRecipeId: string) => {
-      const nonEmptyIngredients = ingredients
-        .filter((ing) => ing.trim().length > 0)
-        .map((rawText, index) => ({ rawText: rawText.trim(), sortOrder: index }));
+      const inputs = editorItemsToInputs(ingredients);
 
-      if (nonEmptyIngredients.length > 0) {
+      if (inputs.length > 0) {
         await replaceIngredientsMutation.mutateAsync({
           recipeId: targetRecipeId,
-          inputs: nonEmptyIngredients,
+          inputs,
         });
       }
     };
@@ -419,7 +422,7 @@ export default function AddRecipe() {
         <div className="grid w-full gap-2">
           <Label>{t("ingredients.title")}</Label>
           <SimpleIngredientEditor
-            ingredients={ingredients}
+            items={ingredients}
             onChange={setIngredients}
           />
         </div>
