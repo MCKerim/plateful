@@ -1,15 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-
-export const CORS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-};
-export const ANSWEAR_HEADER = {
-  ...CORS,
-  "Content-Type": "application/json",
-};
+import { CORS, ANSWEAR_HEADER } from "../_shared/headers.ts";
+import { parseIngredient } from "../_shared/parse-ingredient.ts";
 
 console.info("server started");
 
@@ -150,10 +142,13 @@ Deno.serve(async (req: Request) => {
     }
 
     // Step 3: Update recipe with extracted data (or partial data on failure)
+    const recipe = node_data?.data?.recipe;
     const updateData = {
-      name: node_data?.data?.recipe?.title || "Imported Recipe",
-      instructions: node_data?.data?.recipe?.description || "",
-      category: node_data?.data?.recipe?.category || null,
+      name: recipe?.title || "Imported Recipe",
+      description: recipe?.description || null,
+      instructions: recipe?.instructions || "",
+      category: recipe?.category || null,
+      base_servings: recipe?.servings || null,
       status: "ready",
     };
 
@@ -170,8 +165,47 @@ Deno.serve(async (req: Request) => {
       throw error;
     }
 
-    // Step 4: Upload extracted image if available (better quality than user image)
-    const image = node_data?.data?.recipe?.imageAsBase64;
+    // Step 4: Insert ingredients if available
+    const ingredients = recipe?.ingredients;
+    if (Array.isArray(ingredients) && ingredients.length > 0) {
+      try {
+        const ingredientRows = ingredients.map(
+          (ing: { item: string; section: string | null }, index: number) => {
+            const parsed = parseIngredient(ing.item);
+            return {
+              recipe_id: recipeId,
+              raw_text: ing.item,
+              quantity_value: parsed.quantityValue,
+              quantity_display: parsed.quantityDisplay,
+              unit: parsed.unit,
+              unit_normalized: parsed.unitNormalized,
+              ingredient_name: parsed.ingredientName,
+              ingredient_name_normalized: parsed.ingredientNameNormalized,
+              preparation_note: parsed.preparationNote,
+              is_scalable: parsed.isScalable,
+              is_optional: false,
+              group_name: ing.section || null,
+              sort_order: index,
+            };
+          }
+        );
+
+        const { error: ingredientError } = await supabase
+          .from("recipe_ingredients")
+          .insert(ingredientRows);
+
+        if (ingredientError) {
+          console.error("Failed to insert ingredients:", ingredientError);
+        } else {
+          console.log(`Inserted ${ingredientRows.length} ingredients for recipe ${recipeId}`);
+        }
+      } catch (ingErr) {
+        console.error("Ingredient insertion error:", ingErr);
+      }
+    }
+
+    // Step 5: Upload extracted image if available (better quality than user image)
+    const image = recipe?.imageAsBase64;
 
     console.log("Image check:", {
       hasImage: !!image,
@@ -194,7 +228,7 @@ Deno.serve(async (req: Request) => {
           firstBytes: Array.from(bytes.slice(0, 10)),
         });
 
-        const imageFormat = node_data?.data?.recipe?.imageFormat || "webp";
+        const imageFormat = recipe?.imageFormat || "webp";
         const imageFileName = `${Date.now()}.${imageFormat}`;
         const imageFilePath = `recipe_${recipeId}/${imageFileName}`;
 
