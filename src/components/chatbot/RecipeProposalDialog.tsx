@@ -11,8 +11,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
+import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal } from "@/redux/slices/chatbotSlice";
+import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
@@ -31,8 +32,9 @@ export function RecipeProposalDialog({
   const isEditProposal = toolOutput.toolName === "propose_recipe_edit";
   const editRecipeId = isEditProposal ? toolOutput.args.recipeId : null;
 
-  // Fetch original recipe data for edit proposals to merge with partial updates
+  // Fetch original recipe data and ingredients for edit proposals to merge with partial updates
   const { data: originalRecipe } = useRecipe(editRecipeId ?? null);
+  const { data: originalIngredients } = useRecipeIngredients(editRecipeId ?? null);
 
   // For edit proposals, merge tool output with original recipe (tool output takes precedence)
   const getMergedString = (
@@ -51,7 +53,11 @@ export function RecipeProposalDialog({
     originalRecipe ? getEnglishCategoryNameById(originalRecipe.category) : undefined
   );
   const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings ?? undefined;
-  const finalIngredients = toolOutput.args.ingredients;
+  const finalIngredients: ChatbotIngredient[] | undefined =
+    toolOutput.args.ingredients ??
+    (isEditProposal && originalIngredients?.length
+      ? originalIngredients.map((ing) => ({ item: ing.rawText, section: ing.groupName }))
+      : undefined);
   const finalInstructions = getMergedString(
     toolOutput.args.instructions,
     originalRecipe?.instructions
