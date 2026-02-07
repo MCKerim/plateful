@@ -2,6 +2,11 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 
+export interface ChatbotIngredient {
+  item: string;
+  section: string | null;
+}
+
 export interface ToolOutputForUI {
   proposalId: string;
   toolName: string;
@@ -10,7 +15,7 @@ export interface ToolOutputForUI {
     title?: string;
     description?: string;
     servings?: number;
-    ingredients?: string;
+    ingredients?: ChatbotIngredient[];
     instructions?: string;
     category?: string;
   };

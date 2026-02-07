@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
+import { ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
@@ -21,7 +21,7 @@ interface RecipeProposalDialogProps {
     title: string,
     description: string,
     servings: number | undefined,
-    ingredients: string | undefined,
+    ingredients: ChatbotIngredient[] | undefined,
     instructions: string,
     category: string
   ) => void;
@@ -31,7 +31,7 @@ interface RecipeProposalDialogProps {
     title: string,
     description: string | undefined,
     servings: number | undefined,
-    ingredients: string | undefined,
+    ingredients: ChatbotIngredient[] | undefined,
     instructions: string | undefined,
     category: string,
     link: string
@@ -75,6 +75,22 @@ export function RecipeProposalDialog({
     originalRecipe?.instructions
   );
 
+  // Group ingredients by section for display
+  const ingredientSections = finalIngredients
+    ? finalIngredients.reduce<{ section: string | null; items: string[] }[]>(
+        (acc, ing) => {
+          const lastGroup = acc[acc.length - 1];
+          if (lastGroup && lastGroup.section === ing.section) {
+            lastGroup.items.push(ing.item);
+          } else {
+            acc.push({ section: ing.section, items: [ing.item] });
+          }
+          return acc;
+        },
+        []
+      )
+    : [];
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -111,10 +127,21 @@ export function RecipeProposalDialog({
             </p>
           )}
 
-          {finalIngredients && (
+          {ingredientSections.length > 0 && (
             <div className="mb-3">
               <h3 className="text-sm font-semibold mb-1">{t("ingredients.title")}</h3>
-              <MarkdownRenderer content={finalIngredients} className="font-medium" />
+              {ingredientSections.map((group, i) => (
+                <div key={i}>
+                  {group.section && (
+                    <p className="text-sm font-semibold mt-2 mb-0.5">{group.section}</p>
+                  )}
+                  <ul className="list-disc list-inside text-sm">
+                    {group.items.map((item, j) => (
+                      <li key={j}>{item}</li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           )}
 

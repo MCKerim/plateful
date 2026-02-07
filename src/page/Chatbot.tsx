@@ -19,6 +19,7 @@ import {
   appendToLastMessage,
   finalizeLastMessage,
   setRecipeId,
+  ChatbotIngredient,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -43,38 +44,6 @@ import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog"
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
 const DEFAULT_CATEGORY_ID = 5;
-
-/** Parse chatbot ingredient markdown into RecipeIngredientInput[] */
-function parseIngredientMarkdown(markdown: string): RecipeIngredientInput[] {
-  const lines = markdown.split("\n");
-  const inputs: RecipeIngredientInput[] = [];
-  let currentGroup: string | null = null;
-  let sortOrder = 0;
-
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed) continue;
-
-    // Section header: ### Sauce
-    const headerMatch = trimmed.match(/^#{1,3}\s+(.+)$/);
-    if (headerMatch) {
-      currentGroup = headerMatch[1].trim();
-      continue;
-    }
-
-    // Ingredient line: - 200g flour or * 200g flour
-    const itemMatch = trimmed.match(/^[-*]\s+(.+)$/);
-    if (itemMatch) {
-      inputs.push({
-        rawText: itemMatch[1].trim(),
-        groupName: currentGroup,
-        sortOrder: sortOrder++,
-      });
-    }
-  }
-
-  return inputs;
-}
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -167,7 +136,19 @@ export default function Chatbot() {
       let textContent = inputValue.trim();
       if (isFirstMessageWithContext) {
         const categoryName = getEnglishCategoryNameById(recipeContext.category);
-        const ingredientLines = recipeContextIngredients.map((ing) => `- ${ing.rawText}`).join("\n");
+        let currentGroup: string | null = null;
+        const ingredientLines = recipeContextIngredients
+          .map((ing) => {
+            let prefix = "";
+            if (ing.groupName !== currentGroup) {
+              currentGroup = ing.groupName;
+              if (currentGroup) {
+                prefix = `### ${currentGroup}\n`;
+              }
+            }
+            return `${prefix}- ${ing.rawText}`;
+          })
+          .join("\n");
         const contextPrefix = `[Recipe Context]
 recipeId: ${recipeContext.id}
 title: ${recipeContext.name}
@@ -301,7 +282,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     title: string,
     description: string,
     servings: number | undefined,
-    ingredients: string | undefined,
+    ingredients: ChatbotIngredient[] | undefined,
     instructions: string,
     category: string
   ) {
@@ -329,14 +310,16 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       });
 
       // Save ingredients if provided
-      if (ingredients) {
-        const inputs = parseIngredientMarkdown(ingredients);
-        if (inputs.length > 0) {
-          await replaceIngredientsMutation.mutateAsync({
-            recipeId: newRecipe.id,
-            inputs,
-          });
-        }
+      if (ingredients && ingredients.length > 0) {
+        const inputs: RecipeIngredientInput[] = ingredients.map((ing, i) => ({
+          rawText: ing.item,
+          groupName: ing.section,
+          sortOrder: i,
+        }));
+        await replaceIngredientsMutation.mutateAsync({
+          recipeId: newRecipe.id,
+          inputs,
+        });
       }
 
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
@@ -362,7 +345,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     title: string,
     description: string | undefined,
     servings: number | undefined,
-    ingredients: string | undefined,
+    ingredients: ChatbotIngredient[] | undefined,
     instructions: string | undefined,
     category: string,
     link: string
@@ -386,14 +369,16 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       });
 
       // Replace ingredients if provided
-      if (ingredients) {
-        const inputs = parseIngredientMarkdown(ingredients);
-        if (inputs.length > 0) {
-          await replaceIngredientsMutation.mutateAsync({
-            recipeId,
-            inputs,
-          });
-        }
+      if (ingredients && ingredients.length > 0) {
+        const inputs: RecipeIngredientInput[] = ingredients.map((ing, i) => ({
+          rawText: ing.item,
+          groupName: ing.section,
+          sortOrder: i,
+        }));
+        await replaceIngredientsMutation.mutateAsync({
+          recipeId,
+          inputs,
+        });
       }
 
       setPendingFeedback((prev) => [

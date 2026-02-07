@@ -21,9 +21,24 @@ export const TOOLS = [
           description: "Number of servings this recipe makes.",
         },
         ingredients: {
-          type: "string",
-          description:
-            "Markdown list of ingredients. Use `- item` for each ingredient. Use `### Section` headings to group ingredients (e.g. ### Sauce). Do not include a top-level heading.",
+          type: "array",
+          description: "List of ingredients for the recipe.",
+          items: {
+            type: "object",
+            properties: {
+              item: {
+                type: "string",
+                description: "Ingredient text, e.g. '200g flour' or '2 tbsp olive oil'",
+              },
+              section: {
+                type: ["string", "null"],
+                description:
+                  "Optional section/group name, e.g. 'Sauce', 'Dough'. Use null if no section.",
+              },
+            },
+            required: ["item", "section"],
+            additionalProperties: false,
+          },
         },
         instructions: {
           type: "string",
@@ -69,9 +84,24 @@ export const TOOLS = [
             "New serving count. OMIT this field if servings should stay the same.",
         },
         ingredients: {
-          type: "string",
+          type: "array",
           description:
-            "New full ingredient list in markdown (- item, ### Section for groups). OMIT if ingredients should stay the same. If provided, must include ALL ingredients (replaces existing).",
+            "New full ingredient list. OMIT if ingredients should stay the same. If provided, must include ALL ingredients (replaces existing).",
+          items: {
+            type: "object",
+            properties: {
+              item: {
+                type: "string",
+                description: "Ingredient text, e.g. '200g flour'",
+              },
+              section: {
+                type: ["string", "null"],
+                description: "Optional section/group name. Use null if no section.",
+              },
+            },
+            required: ["item", "section"],
+            additionalProperties: false,
+          },
         },
         instructions: {
           type: "string",
@@ -91,14 +121,19 @@ export const TOOLS = [
   },
 ];
 
+interface ChatbotIngredient {
+  item: string;
+  section: string | null;
+}
+
 export function proposeRecipe(
   proposalId: string,
-  title,
-  description,
-  servings,
-  ingredients,
-  instructions,
-  category
+  title: string,
+  description: string,
+  servings: number,
+  ingredients: ChatbotIngredient[],
+  instructions: string,
+  category: string
 ) {
   const toolOutputForUI = {
     status: `Recipe proposal ${proposalId} shown to user.`,
@@ -118,13 +153,13 @@ export function proposeRecipe(
 
 export function proposeRecipeEdit(
   proposalId: string,
-  recipeId,
-  title,
-  description,
-  servings,
-  ingredients,
-  instructions,
-  category
+  recipeId: number,
+  title: string | undefined,
+  description: string | undefined,
+  servings: number | undefined,
+  ingredients: ChatbotIngredient[] | undefined,
+  instructions: string | undefined,
+  category: string | undefined
 ) {
   const toolOutputForUI = {
     status: `Edit proposal ${proposalId} shown to user.`,
