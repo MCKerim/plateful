@@ -12,30 +12,12 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
+import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
-  onSaveNew: (
-    proposalId: string,
-    title: string,
-    description: string,
-    servings: number | undefined,
-    ingredients: ChatbotIngredient[] | undefined,
-    instructions: string,
-    category: string
-  ) => void;
-  onSaveEdit: (
-    proposalId: string,
-    recipeId: string,
-    title: string,
-    description: string | undefined,
-    servings: number | undefined,
-    ingredients: ChatbotIngredient[] | undefined,
-    instructions: string | undefined,
-    category: string,
-    link: string
-  ) => void;
+  onSaveNew: (proposal: NewRecipeProposal) => void;
+  onSaveEdit: (proposal: EditRecipeProposal) => void;
   t: (key: string) => string;
 }
 
@@ -68,7 +50,7 @@ export function RecipeProposalDialog({
     toolOutput.args.category,
     originalRecipe ? getEnglishCategoryNameById(originalRecipe.category) : undefined
   );
-  const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings;
+  const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings ?? undefined;
   const finalIngredients = toolOutput.args.ingredients;
   const finalInstructions = getMergedString(
     toolOutput.args.instructions,
@@ -169,27 +151,27 @@ export function RecipeProposalDialog({
             variant="accent"
             onClick={() => {
               if (isEditProposal && editRecipeId) {
-                onSaveEdit(
-                  toolOutput.proposalId,
-                  editRecipeId,
-                  finalTitle,
-                  toolOutput.args.description,
-                  toolOutput.args.servings,
-                  toolOutput.args.ingredients,
-                  toolOutput.args.instructions,
-                  finalCategory,
-                  originalRecipe?.link ?? ""
-                );
+                onSaveEdit({
+                  proposalId: toolOutput.proposalId,
+                  recipeId: editRecipeId,
+                  title: finalTitle,
+                  description: finalDescription,
+                  servings: finalServings,
+                  ingredients: finalIngredients,
+                  instructions: finalInstructions,
+                  category: finalCategory,
+                  link: originalRecipe?.link ?? "",
+                });
               } else {
-                onSaveNew(
-                  toolOutput.proposalId,
-                  finalTitle,
-                  finalDescription,
-                  toolOutput.args.servings,
-                  toolOutput.args.ingredients,
-                  finalInstructions,
-                  finalCategory
-                );
+                onSaveNew({
+                  proposalId: toolOutput.proposalId,
+                  title: finalTitle,
+                  description: finalDescription,
+                  servings: finalServings,
+                  ingredients: finalIngredients,
+                  instructions: finalInstructions,
+                  category: finalCategory,
+                });
               }
               setOpen(false);
             }}

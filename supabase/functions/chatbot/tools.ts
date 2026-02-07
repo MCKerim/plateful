@@ -65,7 +65,7 @@ export const TOOLS = [
       type: "object",
       properties: {
         recipeId: {
-          type: "number",
+          type: "string",
           description: "The ID of the recipe being edited (required)",
         },
         title: {
@@ -153,7 +153,7 @@ export function proposeRecipe(
 
 export function proposeRecipeEdit(
   proposalId: string,
-  recipeId: number,
+  recipeId: string,
   title: string | undefined,
   description: string | undefined,
   servings: number | undefined,

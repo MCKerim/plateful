@@ -7,6 +7,21 @@ export interface ChatbotIngredient {
   section: string | null;
 }
 
+export type NewRecipeProposal = {
+  proposalId: string;
+  title: string;
+  description: string;
+  servings: number | undefined;
+  ingredients: ChatbotIngredient[] | undefined;
+  instructions: string;
+  category: string;
+};
+
+export type EditRecipeProposal = NewRecipeProposal & {
+  recipeId: string;
+  link: string;
+};
+
 export interface ToolOutputForUI {
   proposalId: string;
   toolName: string;

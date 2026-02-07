@@ -19,7 +19,8 @@ import {
   appendToLastMessage,
   finalizeLastMessage,
   setRecipeId,
-  ChatbotIngredient,
+  NewRecipeProposal,
+  EditRecipeProposal,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -277,15 +278,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(
-    proposalId: string,
-    title: string,
-    description: string,
-    servings: number | undefined,
-    ingredients: ChatbotIngredient[] | undefined,
-    instructions: string,
-    category: string
-  ) {
+  async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
+    const { proposalId, title, description, servings, ingredients, instructions, category } = proposal;
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -339,17 +333,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     }
   }
 
-  async function saveEditedRecipe(
-    proposalId: string,
-    recipeId: string,
-    title: string,
-    description: string | undefined,
-    servings: number | undefined,
-    ingredients: ChatbotIngredient[] | undefined,
-    instructions: string | undefined,
-    category: string,
-    link: string
-  ) {
+  async function saveEditedRecipe(proposal: EditRecipeProposal) {
+    const { proposalId, recipeId, title, description, servings, ingredients, instructions, category, link } = proposal;
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
