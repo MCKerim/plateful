@@ -232,6 +232,18 @@ function parseFraction(fraction: string): number | null {
 }
 
 /**
+ * Format a numeric value as a clean decimal display string
+ * Rounds to 2 decimal places and strips trailing zeros
+ */
+function toDecimalDisplay(value: number): string {
+  const rounded = Math.round(value * 100) / 100;
+  if (rounded === Math.floor(rounded)) {
+    return Math.floor(rounded).toString();
+  }
+  return rounded.toString();
+}
+
+/**
  * Extract quantity value and display from a string
  */
 function extractQuantity(text: string): {
@@ -260,9 +272,10 @@ function extractQuantity(text: string): {
     const whole = parseInt(mixedMatch[1], 10);
     const fractionPart = parseFraction(mixedMatch[2]);
     if (fractionPart !== null) {
+      const value = whole + fractionPart;
       return {
-        value: whole + fractionPart,
-        display: `${mixedMatch[1]} ${mixedMatch[2]}`,
+        value,
+        display: toDecimalDisplay(value),
         remaining: remaining.slice(mixedMatch[0].length).trim(),
       };
     }
@@ -275,7 +288,7 @@ function extractQuantity(text: string): {
     if (fractionValue !== null) {
       return {
         value: fractionValue,
-        display: fractionMatch[1],
+        display: toDecimalDisplay(fractionValue),
         remaining: remaining.slice(fractionMatch[0].length).trim(),
       };
     }
