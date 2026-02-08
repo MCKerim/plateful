@@ -180,7 +180,7 @@ export default function Recipe() {
       </div>
 
       {recipe.link && (
-        <NavLink to={recipe.link} className={buttonVariants() + " w-full mt-2"}>
+        <NavLink to={recipe.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
           <Link />
           {t("recipe.toTheRecipe")}
         </NavLink>

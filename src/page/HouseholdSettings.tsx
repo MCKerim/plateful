@@ -111,7 +111,8 @@ export default function HouseholdSettings() {
       <div className="flex items-center justify-between">
         <div className="flex items-center flex-1 gap-2">
           <House />
-          <h1 className="text-2xl font-bold">{household.name}</h1>
+
+          <h1 className="text-2xl font-bold first-font">{household.name}</h1>
         </div>
 
         <Button size="sm" variant="ghost" onClick={startEditingName}>
@@ -132,11 +133,7 @@ export default function HouseholdSettings() {
       {householdMembers?.map((member) => {
         const isCurrentUser = member.id === user?.id;
         return isCurrentUser ? (
-          <Button
-            variant="secondary"
-            key={member.id}
-            className="flex items-center justify-between"
-          >
+          <Button variant="secondary" key={member.id} className="flex items-center justify-between">
             {member.username} - {member.email}
             <span className="text-sm text-muted-foreground">{t("householdSettings.you")}</span>
           </Button>
@@ -149,10 +146,7 @@ export default function HouseholdSettings() {
             cancelText={t("householdSettings.confirmations.removeMember.cancel")}
             confirmText={t("householdSettings.confirmations.removeMember.confirm")}
             customTrigger={
-              <Button
-                variant="secondary"
-                className="flex items-center justify-between w-full"
-              >
+              <Button variant="secondary" className="flex items-center justify-between w-full">
                 {member.username} - {member.email}
                 <CircleMinus />
               </Button>
