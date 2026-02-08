@@ -19,6 +19,7 @@ import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper/re
 import CategoryButton from "@/components/general/CategoryButton";
 import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
+import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import { CookbookRecipe } from "@/types/cookbook.types";
 
@@ -185,6 +186,12 @@ export default function Cookbook() {
         urlImportClicked={handleURLImportClicked}
         imageImportClicked={handleImageImportClicked}
         newRecipeClicked={handleAddRecipe}
+      />
+
+      <OnboardingSheet
+        storageKey="onboarding_recipes_seen"
+        titleKey="onboarding.recipes.title"
+        descriptionKey="onboarding.recipes.description"
       />
 
       {(categoryId !== null || searchTerm.trim() !== "") && (

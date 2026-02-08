@@ -475,6 +475,21 @@
   "recipeWithCount_one": "{{count}} Rezept",
   "recipeWithCount_other": "{{count}} Rezepte",
 
+  "onboarding": {
+    "gotIt": "Verstanden",
+    "chatbot": {
+      "title": "Dein KI-Küchenassistent",
+      "description": "Frag nach Rezeptideen, Essensvorschlägen oder Kochtipps — ich kann Rezepte direkt in deine Sammlung hinzufügen."
+    },
+    "recipes": {
+      "title": "Deine Rezeptsammlung",
+      "description": "Speichere eigene Rezepte oder importiere sie direkt aus Social-Media-Links. Organisiere sie in Kochbüchern."
+    },
+    "mealPlanner": {
+      "title": "Plane deine Woche",
+      "description": "Ziehe Rezepte auf bestimmte Tage oder behalte sie in deinem Wochenpool für flexible Planung."
+    }
+  },
   "questions": {
     "question1": {
       "question": "Was ist dein Ziel?",

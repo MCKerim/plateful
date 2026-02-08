@@ -41,6 +41,7 @@ import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
 import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlannedItemDate";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
+import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 
 const locales = {
   en: enUS,
@@ -452,6 +453,12 @@ export default function MealPlanner() {
             </>
           )}
         </div>
+
+        <OnboardingSheet
+          storageKey="onboarding_mealplanner_seen"
+          titleKey="onboarding.mealPlanner.title"
+          descriptionKey="onboarding.mealPlanner.description"
+        />
       </Layout>
 
       <DragOverlay

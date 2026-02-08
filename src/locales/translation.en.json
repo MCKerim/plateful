@@ -475,6 +475,21 @@
   "recipeWithCount_one": "{{count}} recipe",
   "recipeWithCount_other": "{{count}} recipes",
 
+  "onboarding": {
+    "gotIt": "Got it",
+    "chatbot": {
+      "title": "Your AI Kitchen Assistant",
+      "description": "Ask for recipe ideas, meal suggestions, or cooking tips — I can add recipes straight to your collection."
+    },
+    "recipes": {
+      "title": "Your Recipe Collection",
+      "description": "Save your own recipes or import them directly from social media links. Organize them in cookbooks."
+    },
+    "mealPlanner": {
+      "title": "Plan Your Week",
+      "description": "Drag recipes to specific days or keep them in your weekly pool for flexible planning."
+    }
+  },
   "questions": {
     "question1": {
       "question": "What is your goal?",

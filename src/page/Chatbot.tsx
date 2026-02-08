@@ -41,6 +41,7 @@ import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import type { RecipeIngredientInput } from "@/types/ingredient.types";
 import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
+import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -621,6 +622,12 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       </div>
 
       {ImageSourceDrawerComponent}
+
+      <OnboardingSheet
+        storageKey="onboarding_chatbot_seen"
+        titleKey="onboarding.chatbot.title"
+        descriptionKey="onboarding.chatbot.description"
+      />
     </Layout>
   );
 }
