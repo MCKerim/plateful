@@ -6,6 +6,10 @@ import type {
   RecipeIngredientInsert,
 } from "@/types/ingredient.types";
 import { parseIngredient } from "@/lib/ingredient-parser/parse-ingredient";
+import {
+  formatQuantity,
+  reconstructIngredientText,
+} from "@/lib/ingredient-parser/format-quantity";
 
 type TypedSupabaseClient = SupabaseClient<Database>;
 
@@ -216,5 +220,42 @@ export const ingredientsApi = {
 
     // Create new ingredients
     return ingredientsApi.createBulk(supabase, recipeId, inputs);
+  },
+
+  /**
+   * Scale stored quantity values for all scalable ingredients of a recipe.
+   * Used when updating base servings so stored quantities match the new base.
+   */
+  async scaleQuantities(
+    supabase: TypedSupabaseClient,
+    recipeId: string,
+    scaleFactor: number
+  ): Promise<void> {
+    const ingredients = await ingredientsApi.getByRecipeId(supabase, recipeId);
+
+    const updates = ingredients
+      .filter((ing) => ing.is_scalable && ing.quantity_value !== null)
+      .map((ing) => {
+        const scaledValue = ing.quantity_value! * scaleFactor;
+        const scaledDisplay = formatQuantity(scaledValue);
+        const newRawText = reconstructIngredientText(
+          scaledDisplay,
+          ing.unit,
+          ing.ingredient_name,
+          ing.preparation_note
+        );
+
+        return supabase
+          .from("recipe_ingredients")
+          .update({
+            quantity_value: scaledValue,
+            quantity_display: scaledDisplay,
+            raw_text: newRawText,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", ing.id);
+      });
+
+    await Promise.all(updates);
   },
 };

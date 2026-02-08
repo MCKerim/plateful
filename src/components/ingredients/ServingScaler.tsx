@@ -6,9 +6,19 @@ type Props = {
   value: number;
   onChange: (servings: number) => void;
   unit?: string;
+  showSetDefault?: boolean;
+  onSetDefault?: () => void;
+  isSettingDefault?: boolean;
 };
 
-export function ServingScaler({ value, onChange, unit = "servings" }: Props) {
+export function ServingScaler({
+  value,
+  onChange,
+  unit = "servings",
+  showSetDefault = false,
+  onSetDefault,
+  isSettingDefault = false,
+}: Props) {
   const { t } = useTranslation();
 
   const handleDecrement = () => {
@@ -45,6 +55,18 @@ export function ServingScaler({ value, onChange, unit = "servings" }: Props) {
       >
         <Plus />
       </Button>
+
+      {showSetDefault && onSetDefault && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onSetDefault}
+          disabled={isSettingDefault}
+          className="text-xs text-muted-foreground h-auto py-1"
+        >
+          {t("ingredients.setAsDefault")}
+        </Button>
+      )}
     </div>
   );
 }

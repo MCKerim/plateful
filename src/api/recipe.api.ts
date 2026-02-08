@@ -121,6 +121,19 @@ export const recipeApi = {
     return data;
   },
 
+  async updateBaseServings(
+    supabase: SupabaseClient,
+    recipeId: string,
+    baseServings: number
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("recipes")
+      .update({ base_servings: baseServings })
+      .eq("id", recipeId);
+
+    if (error) throw error;
+  },
+
   async delete(supabase: SupabaseClient, recipeId: string): Promise<void> {
     // Delete all images from storage first
     const { data: files } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);

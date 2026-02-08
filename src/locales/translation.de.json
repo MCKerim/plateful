@@ -462,6 +462,8 @@
     "section": "Abschnitt",
     "sectionPlaceholder": "Abschnittsname (z.B. Soße, Teig)",
     "reset": "Zurücksetzen",
+    "setAsDefault": "Als Standard setzen",
+    "defaultUpdated": "Standardportionen aktualisiert",
     "units": {
       "servings": "Portionen",
       "portions": "Portionen",

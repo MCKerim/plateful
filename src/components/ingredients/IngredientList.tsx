@@ -5,6 +5,14 @@ import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { ServingScaler } from "./ServingScaler";
 import { IngredientRow } from "./IngredientRow";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import {
+  selectTargetServings,
+  setTargetServings as setTargetServingsAction,
+  clearTargetServings,
+} from "@/redux/slices/servingsSlice";
+import { useUpdateBaseServings } from "@/hooks/recipe/useUpdateBaseServings";
+import { toast } from "sonner";
 
 type Props = {
   recipeId: string;
@@ -20,8 +28,36 @@ export function IngredientList({
   showScalingControls = true,
 }: Props) {
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
   const effectiveBaseServings = baseServings ?? 1;
-  const [targetServings, setTargetServings] = useState(effectiveBaseServings);
+
+  const savedServings = useAppSelector(selectTargetServings(recipeId));
+  const [targetServings, setTargetServings] = useState(
+    savedServings ?? effectiveBaseServings
+  );
+
+  const updateBaseServings = useUpdateBaseServings();
+
+  const handleServingsChange = (value: number) => {
+    setTargetServings(value);
+    dispatch(setTargetServingsAction({ recipeId, servings: value }));
+  };
+
+  const handleSetDefault = () => {
+    updateBaseServings.mutate(
+      {
+        recipeId,
+        baseServings: targetServings,
+        previousBaseServings: effectiveBaseServings,
+      },
+      {
+        onSuccess: () => {
+          dispatch(clearTargetServings(recipeId));
+          toast.success(t("ingredients.defaultUpdated"));
+        },
+      }
+    );
+  };
 
   const { data: scaledIngredients, isLoading } = useScaledIngredients(
     recipeId,
@@ -49,7 +85,14 @@ export function IngredientList({
   return (
     <div className="">
       {showScalingControls && baseServings && (
-        <ServingScaler value={targetServings} onChange={setTargetServings} unit={servingsUnit} />
+        <ServingScaler
+          value={targetServings}
+          onChange={handleServingsChange}
+          unit={servingsUnit}
+          showSetDefault={isScaled}
+          onSetDefault={handleSetDefault}
+          isSettingDefault={updateBaseServings.isPending}
+        />
       )}
 
       <h2 className="text-lg font-semibold mt-4">{t("ingredients.title")}</h2>
