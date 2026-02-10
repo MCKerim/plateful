@@ -135,7 +135,14 @@ Deno.serve(async (req: Request) => {
         node_data = await nodeResponse.json();
       } else {
         const errorText = await nodeResponse.text();
-        console.error(`Node Service Error (${nodeResponse.status}):`, errorText);
+        let errorMessage = errorText;
+        try {
+          const parsed = JSON.parse(errorText);
+          errorMessage = parsed.message ?? parsed.error ?? errorText;
+        } catch {
+          // not JSON, keep raw text
+        }
+        console.error(`Node Service Error (${nodeResponse.status}): ${errorMessage}`);
       }
     } catch (fetchError) {
       console.error("Node service fetch error:", fetchError);
