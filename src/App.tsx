@@ -223,7 +223,10 @@ function App() {
     );
   }
 
-  function guardOnboardingRoute(page: JSX.Element, requiredStep: "values" | "survey") {
+  function guardOnboardingRoute(
+    page: JSX.Element,
+    requiredStep: "values" | "survey" | "socialproof"
+  ) {
     if (!isLoggedIn()) {
       return <Navigate to="/signup" />;
     }
@@ -281,7 +284,7 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
-        <Route path="/socialproof" element={<SocialProof />} />
+        <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
 
         <Route
           path="/createhousehold"
