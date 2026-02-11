@@ -16,7 +16,11 @@ export default function TestimonialCard({ quote, name, delay, rotate = 0 }: Read
       className="bg-card rounded-2xl p-4 shadow-md border-2 border-dashed"
       initial={{ opacity: 0, y: 30, scale: 0.95, rotate: 0 }}
       animate={{ opacity: 1, y: 0, scale: 1, rotate }}
-      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      transition={{
+        default: { duration: 0.5, delay, ease: "easeOut" },
+        scale: { type: "spring", stiffness: 400, damping: 17 },
+      }}
+      whileTap={{ scale: 0.95 }}
     >
       <div className="flex gap-0.5 text-accent">
         {Array.from({ length: 5 }, (_, i) => (

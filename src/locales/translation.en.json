@@ -96,19 +96,19 @@
     "startOverButton": "Start over"
   },
   "socialProof": {
-    "title": "People love Plateful",
+    "title": "Home cooks love Plateful",
     "subtitle": "Help us grow",
     "testimonial1": {
-      "quote": "I use Plateful every single day to plan our meals. It's become my favorite part of the week!",
-      "name": "My Girlfriend"
+      "quote": "We used to argue about what to eat every night. Now I just open Plateful and we're sorted for the whole week!",
+      "name": "My Girlfriend 💕"
     },
     "testimonial2": {
-      "quote": "Best app I’ve ever seen! (She says that about everything I build, but we’ll take it.)",
-      "name": "My Mom"
+      "quote": "Best app I've ever seen! (She says that about everything I build, but we'll take it.)",
+      "name": "My Mom 🫶"
     },
     "testimonial3": {
-      "quote": "This app completely changed how I plan meals.",
-      "name": "You? 👀"
+      "quote": "Finally an app that makes cooking actually fun and not a chore!",
+      "name": "Hopefully you soon? 👀"
     },
     "reviewButton": "Leave a Review",
     "skipButton": "Skip for now"

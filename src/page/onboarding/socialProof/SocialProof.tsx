@@ -36,7 +36,14 @@ export default function SocialProof() {
       </motion.div>
 
       {/* Testimonial cards */}
-      <div className="flex flex-col w-full max-w-sm gap-6">
+      <div
+        className="flex flex-col w-full max-w-sm gap-6 px-4 overflow-y-auto flex-1 min-h-0 py-16 no-scrollbar"
+        style={{
+          maskImage: "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)",
+          WebkitMaskImage:
+            "linear-gradient(to bottom, transparent, black 10%, black 90%, transparent)",
+        }}
+      >
         <TestimonialCard
           quote={t("socialProof.testimonial1.quote")}
           name={t("socialProof.testimonial1.name")}
@@ -55,7 +62,7 @@ export default function SocialProof() {
           quote={t("socialProof.testimonial3.quote")}
           name={t("socialProof.testimonial3.name")}
           delay={0.9}
-          rotate={-1.8}
+          rotate={-1}
         />
       </div>
 
