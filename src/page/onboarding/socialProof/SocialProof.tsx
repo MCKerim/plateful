@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
-import { InAppReview } from "@capacitor-community/in-app-review";
+import { AppReview } from "@capawesome/capacitor-app-review";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
@@ -12,7 +12,7 @@ export default function SocialProof() {
 
   async function requestInAppReview() {
     try {
-      await InAppReview.requestReview();
+      await AppReview.requestReview();
     } catch {
       // In-app review not available (beta/web/simulator) — continue silently
     }
