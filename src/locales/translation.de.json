@@ -145,21 +145,21 @@
   },
   "socialProof": {
     "title": "Menschen lieben Plateful",
-    "subtitle": "Das sagen sie darüber",
+    "subtitle": "Hilf uns zu wachsen",
     "testimonial1": {
       "quote": "Ich benutze Plateful jeden Tag, um unsere Mahlzeiten zu planen. Es ist mein liebster Teil der Woche geworden!",
-      "name": "Sarah",
-      "role": "Tägliche Nutzerin"
+      "name": "Meine Freundin"
     },
     "testimonial2": {
-      "quote": "Meine Mama sagt, es ist die beste App, die sie je gesehen hat. Das sagt sie zu allem, was ich mache, aber trotzdem.",
-      "name": "Mama",
-      "role": "Größter Fan"
+      "quote": "Meine Mutter sagt, es ist die beste App, die sie je gesehen hat. Das sagt sie zu allem, was ich mache, aber trotzdem.",
+      "name": "Meine Mutter"
     },
-    "reviewCta": "Gefällt dir Plateful bisher?",
-    "reviewSubtext": "Eine kurze Bewertung hilft uns zu wachsen",
-    "reviewButton": "Bewertung schreiben",
-    "skipButton": "Jetzt überspringen"
+    "testimonial3": {
+      "quote": "",
+      "name": "Hoffentlich bald du"
+    },
+    "reviewButton": "App bewerten",
+    "skipButton": "Überspringen"
   },
   "createHousehold": {
     "title": "Erstelle deinen Haushalt",

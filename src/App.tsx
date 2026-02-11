@@ -281,14 +281,7 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
-        <Route
-          path="/socialproof"
-          element={
-            isLoggedIn() && hasCompletedSurvey() && !hasHousehold()
-              ? <SocialProof />
-              : <Navigate to={hasHousehold() ? "/home" : "/survey"} />
-          }
-        />
+        <Route path="/socialproof" element={<SocialProof />} />
 
         <Route
           path="/createhousehold"
