@@ -330,7 +330,13 @@
   },
   "home": {
     "title": "Home",
-    "enjoyCooking": "Enjoy cooking, {{username}}!"
+    "goodMorning": "Good morning, {{username}}",
+    "goodAfternoon": "Good afternoon, {{username}}",
+    "goodEvening": "Good evening, {{username}}",
+    "todayYouPlanned": "Today you planned:",
+    "nothingPlannedToday": "Nothing planned for today",
+    "goToPlanner": "Go to planner",
+    "tomorrow": "Tomorrow:"
   },
   "explore": {
     "title": "Explore"

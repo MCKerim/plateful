@@ -326,7 +326,13 @@
   },
   "home": {
     "title": "Startseite",
-    "enjoyCooking": "Viel Spaß beim Kochen, {{username}}!"
+    "goodMorning": "Guten Morgen, {{username}}",
+    "goodAfternoon": "Guten Nachmittag, {{username}}",
+    "goodEvening": "Guten Abend, {{username}}",
+    "todayYouPlanned": "Heute hast du geplant:",
+    "nothingPlannedToday": "Heute ist noch nichts geplant",
+    "goToPlanner": "Zum Planer",
+    "tomorrow": "Morgen:"
   },
   "explore": {
     "title": "Erkunden"
