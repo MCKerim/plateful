@@ -157,7 +157,7 @@ export default function Survey() {
     }
 
     dispatch(setUser({ ...user, has_completed_survey: true }));
-    navigate("/createhousehold");
+    navigate("/socialproof");
   }
 
   return (

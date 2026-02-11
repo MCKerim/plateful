@@ -95,6 +95,24 @@
     "resumeButton": "Continue where you left off",
     "startOverButton": "Start over"
   },
+  "socialProof": {
+    "title": "People love Plateful",
+    "subtitle": "Here's what they're saying",
+    "testimonial1": {
+      "quote": "I use Plateful every single day to plan our meals. It's become my favorite part of the week!",
+      "name": "Sarah",
+      "role": "Daily user"
+    },
+    "testimonial2": {
+      "quote": "My mom says it's the best app she's ever seen. She says that about everything I do, but still.",
+      "name": "Mom",
+      "role": "Biggest fan"
+    },
+    "reviewCta": "Enjoying Plateful so far?",
+    "reviewSubtext": "A quick review helps us grow",
+    "reviewButton": "Write a Review",
+    "skipButton": "Skip for now"
+  },
   "createHousehold": {
     "title": "Create Your Household",
     "description": "Share recipes and plan meals together in your household.",
