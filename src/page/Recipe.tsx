@@ -45,6 +45,11 @@ export default function Recipe() {
 
   const ratingModalRef = useRef<RatingModalRef>(null);
 
+  // Reset scroll position when page opens or recipe changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [recipeId]);
+
   // Keep screen awake while viewing recipe (for cooking)
   useWakeLock();
 
