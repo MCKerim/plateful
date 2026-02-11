@@ -74,7 +74,6 @@ export default function ChooseUsername() {
           <Label htmlFor="username">{t("chooseUsername.label")}</Label>
 
           <Input
-            type="text"
             id="username"
             placeholder={t("chooseUsername.placeholder")}
             value={username}
