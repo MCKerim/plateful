@@ -66,7 +66,7 @@ export const TOOLS = [
       properties: {
         recipeId: {
           type: "string",
-          description: "The ID of the recipe being edited (required)",
+          description: "The UUID of the recipe being edited. Must be copied exactly from a [Recipe Context] or [Proposal Outcomes] block (e.g. 'f8259c81-c46b-41c5-83cf-fa4b7c2fd9e5'). Never use a number.",
         },
         title: {
           type: "string",
