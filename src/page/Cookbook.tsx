@@ -165,7 +165,8 @@ export default function Cookbook() {
 
           {recentlyAddedRecipes.length > 0 && (
             <div className="mt-6">
-              <h2 className="second-font text-lg font-bold mb-2">{t("cookbook.recentlyAdded")}</h2>
+              <h2 className="second-font text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
+
               <div className="grid grid-cols-2 gap-2">
                 {recentlyAddedRecipes.map((recipe) => (
                   <RecipeCard

@@ -79,7 +79,7 @@ export default function Home() {
       <div className="mt-4 mb-36">
         {todaysMeals.length > 0 ? (
           <>
-            <h2 className="second-font text-xl font-bold mb-1">{t("home.todayYouPlanned")}</h2>
+            <h2 className="second-font text-xl font-bold">{t("home.todayYouPlanned")}</h2>
 
             <div className="flex flex-col gap-2">
               {todaysMeals.map((item) => (
@@ -113,7 +113,7 @@ export default function Home() {
       {/* Recently added recipes */}
       {recentlyAddedRecipes.length > 0 && (
         <div>
-          <h2 className="second-font text-lg font-bold mb-2">{t("cookbook.recentlyAdded")}</h2>
+          <h2 className="second-font text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
 
           <div className="grid grid-cols-2 gap-2">
             {recentlyAddedRecipes.map((recipe) => (
