@@ -28,7 +28,7 @@ export default function EmailVerification() {
 
   const handleResendEmail = async () => {
     if (!email) {
-      toast.error(t("Error: No email found to resend verification."));
+      toast.error(t("emailVerification.errors.noEmailFound"));
       return;
     }
 
@@ -41,7 +41,7 @@ export default function EmailVerification() {
       });
 
       if (signUpError) {
-        toast.error("Error resending verification email: " + signUpError.message);
+        toast.error(t("emailVerification.errors.resendFailed"));
         return;
       }
 

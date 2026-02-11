@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "motion/react";
+import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 
 type Props = {
   questionNumber: number;
@@ -11,6 +12,7 @@ type Props = {
   selected?: string[];
   handleSelect: (option: string) => void;
   onComplete: () => void;
+  onBack?: () => void;
   showNextButton?: boolean;
   twoColumns?: boolean;
 };
@@ -23,6 +25,7 @@ export default function SurveyLayout({
   selected,
   handleSelect,
   onComplete,
+  onBack,
   showNextButton = true,
   twoColumns = false,
 }: Readonly<Props>) {
@@ -36,7 +39,18 @@ export default function SurveyLayout({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <Progress value={(questionNumber / maxQuestionNumber) * 100} />
+        <div className="flex items-center gap-3">
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-muted transition-colors"
+              aria-label={t("survey.back")}
+            >
+              <ArrowBackIosNewRoundedIcon sx={{ fontSize: 18 }} />
+            </button>
+          )}
+          <Progress value={(questionNumber / maxQuestionNumber) * 100} className="flex-1" />
+        </div>
 
         <motion.h1
           key={`question-${questionNumber}`}

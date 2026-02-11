@@ -32,3 +32,6 @@ test-results/
 playwright-report/
 e2e/.auth/
 coverage/
+
+# Supabase
+supabase/.temp/

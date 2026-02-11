@@ -122,27 +122,6 @@ export type Database = {
           },
         ]
       }
-      item: {
-        Row: {
-          created_at: string
-          description: string | null
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          description?: string | null
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
       meal_planning: {
         Row: {
           created_at: string
@@ -246,45 +225,6 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "recipe_ingredients_recipe_id_fkey"
-            columns: ["recipe_id"]
-            isOneToOne: false
-            referencedRelation: "recipes"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      recipe_items: {
-        Row: {
-          amount: string
-          created_at: string
-          id: string
-          item_id: string | null
-          recipe_id: string | null
-        }
-        Insert: {
-          amount?: string
-          created_at?: string
-          id?: string
-          item_id?: string | null
-          recipe_id?: string | null
-        }
-        Update: {
-          amount?: string
-          created_at?: string
-          id?: string
-          item_id?: string | null
-          recipe_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "recipe_items_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "recipe_items_recipe_id_fkey"
             columns: ["recipe_id"]
             isOneToOne: false
             referencedRelation: "recipes"
@@ -400,67 +340,7 @@ export type Database = {
           },
         ]
       }
-      shopping_list: {
-        Row: {
-          created_at: string
-          id: string
-          name: string
-        }
-        Insert: {
-          created_at?: string
-          id?: string
-          name: string
-        }
-        Update: {
-          created_at?: string
-          id?: string
-          name?: string
-        }
-        Relationships: []
-      }
-      shopping_list_items: {
-        Row: {
-          amount: string
-          bought: boolean
-          created_at: string
-          id: string
-          item_id: string | null
-          shopping_list_id: string | null
-        }
-        Insert: {
-          amount: string
-          bought?: boolean
-          created_at?: string
-          id?: string
-          item_id?: string | null
-          shopping_list_id?: string | null
-        }
-        Update: {
-          amount?: string
-          bought?: boolean
-          created_at?: string
-          id?: string
-          item_id?: string | null
-          shopping_list_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shopping_list_items_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "item"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shopping_list_items_shopping_list_id_fkey"
-            columns: ["shopping_list_id"]
-            isOneToOne: false
-            referencedRelation: "shopping_list"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      survey_answears: {
+      survey_answers: {
         Row: {
           created_at: string
           id: string

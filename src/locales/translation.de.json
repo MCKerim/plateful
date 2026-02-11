@@ -73,7 +73,11 @@
     "continueButton": "Zurück nach Hause",
     "resendButton": "Erneut senden",
     "changeEmailButton": "Eine andere E-Mail verwenden",
-    "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach."
+    "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach.",
+    "errors": {
+      "noEmailFound": "Keine E-Mail-Adresse gefunden, um die Bestätigung erneut zu senden.",
+      "resendFailed": "Fehler beim erneuten Senden der Bestätigungsemail."
+    }
   },
   "login": {
     "title": "Willkommen zurück",
@@ -125,9 +129,19 @@
       "description": "Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim Einkaufen!"
     }
   },
+  "survey": {
+    "back": "Zurück",
+    "errors": {
+      "saveFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "selectOption": "Bitte wähle mindestens eine Option aus, bevor du fortfährst.",
+      "completeFailed": "Beim Speichern deines Fortschritts ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    }
+  },
   "surveyStart": {
     "title": "Lass uns zuerst dein Erlebnis personalisieren",
-    "nextButton": "Weiter"
+    "nextButton": "Weiter",
+    "resumeButton": "Da weitermachen, wo du aufgehört hast",
+    "startOverButton": "Von vorne beginnen"
   },
   "createHousehold": {
     "title": "Erstelle deinen Haushalt",
@@ -479,6 +493,9 @@
 
   "onboarding": {
     "gotIt": "Verstanden",
+    "errors": {
+      "saveFailed": "Beim Speichern deines Fortschritts ist ein Fehler aufgetreten. Bitte versuche es erneut."
+    },
     "chatbot": {
       "title": "Dein KI-Küchenassistent",
       "description": "Frag nach Rezeptideen, Essensvorschlägen oder Kochtipps — ich kann Rezepte direkt in deine Sammlung hinzufügen."

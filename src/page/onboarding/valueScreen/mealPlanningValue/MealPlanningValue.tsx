@@ -1,7 +1,7 @@
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import PhoneMockup from "@/components/onboarding/phoneMockup/PhoneMockup";
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { selectUser, setUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
@@ -11,6 +11,7 @@ export default function MealPlanningValue() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   async function completeValueScreen() {
@@ -25,10 +26,11 @@ export default function MealPlanningValue() {
 
     if (error) {
       console.error("Error updating user:", error);
-      toast.error("An error occurred while saving your progress. Please try again.");
+      toast.error(t("onboarding.errors.saveFailed"));
       return;
     }
 
+    dispatch(setUser({ ...user, has_seen_value_screens: true }));
     navigate("/beta");
   }
 

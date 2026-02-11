@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { selectUser, setUser } from "@/redux/slices/userSlice";
+import { setHousehold } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { useState } from "react";
 import { NavLink, useNavigate } from "react-router";
@@ -16,6 +17,7 @@ export default function CreateHousehold() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
 
   const [householdName, setHouseholdName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -59,6 +61,8 @@ export default function CreateHousehold() {
         return;
       }
 
+      dispatch(setUser({ ...user, household_id: data[0].id }));
+      dispatch(setHousehold(data[0]));
       setHouseholdName("");
       setIsLoading(false);
       navigate("/inviteMembers");

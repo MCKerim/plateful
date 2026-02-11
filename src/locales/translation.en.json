@@ -81,9 +81,19 @@
       "description": "Create your meal plan stress-free and save time and money while shopping!"
     }
   },
+  "survey": {
+    "back": "Back",
+    "errors": {
+      "saveFailed": "Failed to save your answer. Please try again.",
+      "selectOption": "Please select at least one option before proceeding.",
+      "completeFailed": "An error occurred while saving your progress. Please try again."
+    }
+  },
   "surveyStart": {
     "title": "Let's personalize your experience first",
-    "nextButton": "Continue"
+    "nextButton": "Continue",
+    "resumeButton": "Continue where you left off",
+    "startOverButton": "Start over"
   },
   "createHousehold": {
     "title": "Create Your Household",
@@ -170,7 +180,11 @@
     "continueButton": "Back to Home",
     "resendButton": "Resend email",
     "changeEmailButton": "Use a different email",
-    "resendSent": "Verification email resent. Please check your inbox."
+    "resendSent": "Verification email resent. Please check your inbox.",
+    "errors": {
+      "noEmailFound": "No email found to resend verification.",
+      "resendFailed": "Error resending verification email."
+    }
   },
   "login": {
     "title": "Welcome Back",
@@ -479,6 +493,9 @@
 
   "onboarding": {
     "gotIt": "Got it",
+    "errors": {
+      "saveFailed": "An error occurred while saving your progress. Please try again."
+    },
     "chatbot": {
       "title": "Your AI Kitchen Assistant",
       "description": "Ask for recipe ideas, meal suggestions, or cooking tips — I can add recipes straight to your collection."

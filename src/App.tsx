@@ -222,6 +222,19 @@ function App() {
     );
   }
 
+  function guardOnboardingRoute(page: JSX.Element, requiredStep: "values" | "survey") {
+    if (!isLoggedIn()) {
+      return <Navigate to="/signup" />;
+    }
+    if (requiredStep === "values" && hasSeenValueScreens()) {
+      return <Navigate to="/" />;
+    }
+    if (requiredStep === "survey" && hasCompletedSurvey()) {
+      return <Navigate to="/" />;
+    }
+    return page;
+  }
+
   if (loading && !user) {
     return <LoadingScreen />;
   }
@@ -241,42 +254,42 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
 
         {/* Onboarding */}
-        <Route path="/" element={isLoggedIn() ? <Navigate to="/planner" /> : <Welcome />} />
+        <Route path="/" element={isLoggedIn() ? <Navigate to="/" /> : <Welcome />} />
 
-        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/planner" /> : <SignUp />} />
+        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/" /> : <SignUp />} />
 
         <Route
           path="/signup/email"
-          element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailSignUp />}
+          element={isLoggedIn() ? <Navigate to="/" /> : <EmailSignUp />}
         />
 
         <Route
           path="/signup/verify"
-          element={isLoggedIn() ? <Navigate to="/planner" /> : <EmailVerification />}
+          element={isLoggedIn() ? <Navigate to="/" /> : <EmailVerification />}
         />
 
-        <Route path="/login" element={isLoggedIn() ? <Navigate to="/planner" /> : <Login />} />
+        <Route path="/login" element={isLoggedIn() ? <Navigate to="/" /> : <Login />} />
 
-        <Route path="/beta" element={<BetaScreen />} />
+        <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
 
-        <Route path="/values" element={<ImportRecipes />} />
-        <Route path="/values/1" element={<ImportRecipes />} />
-        <Route path="/values/2" element={<ChatbotValue />} />
-        <Route path="/values/3" element={<MealPlanningValue />} />
+        <Route path="/values" element={guardOnboardingRoute(<ImportRecipes />, "values")} />
+        <Route path="/values/1" element={guardOnboardingRoute(<ImportRecipes />, "values")} />
+        <Route path="/values/2" element={guardOnboardingRoute(<ChatbotValue />, "values")} />
+        <Route path="/values/3" element={guardOnboardingRoute(<MealPlanningValue />, "values")} />
 
-        <Route path="/survey" element={<SurveyStart />} />
-        <Route path="/survey/:questionId" element={<Survey />} />
+        <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
+        <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
         <Route
           path="/createhousehold"
-          element={hasHousehold() ? <Navigate to="/planner" /> : <CreateHousehold />}
+          element={hasHousehold() ? <Navigate to="/" /> : <CreateHousehold />}
         />
 
         <Route path="/inviteMembers" element={<InviteMembers />} />
 
         <Route
           path="/joinHousehold"
-          element={hasHousehold() ? <Navigate to="/planner" /> : <JoinHousehold />}
+          element={hasHousehold() ? <Navigate to="/" /> : <JoinHousehold />}
         />
 
         {/* Main Routes */}

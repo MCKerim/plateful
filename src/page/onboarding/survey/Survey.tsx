@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
+import { useAppSelector, useAppDispatch } from "@/redux/hooks";
+import { selectUser, setUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
@@ -12,6 +12,7 @@ export default function Survey() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const params = useParams<{ questionId: string }>();
@@ -24,11 +25,29 @@ export default function Survey() {
     return Number.isNaN(id) ? 1 : Math.max(1, Math.min(id, SURVEY_QUESTIONS.length));
   }
 
+  useEffect(() => {
+    async function loadExistingAnswer() {
+      if (!user) return;
+      const { data } = await supabase
+        .from("survey_answers")
+        .select("selected_options")
+        .eq("user_id", user.id)
+        .eq("question_number", questionId)
+        .maybeSingle();
+
+      if (data?.selected_options && Array.isArray(data.selected_options)) {
+        setSelected(data.selected_options as string[]);
+      } else {
+        setSelected([]);
+      }
+    }
+    loadExistingAnswer();
+  }, [questionId, user?.id]);
+
   const handleSelect = async (option: string) => {
     const question = SURVEY_QUESTIONS[questionId - 1];
     if (question.type === "single") {
       setSelected([option]);
-      // Auto-advance for single-type questions
       await handleSingleQuestionComplete(option);
     } else {
       setSelected((prev) =>
@@ -43,14 +62,13 @@ export default function Survey() {
     }
 
     const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
-    const translatedOption = t(`questions.${QUESTION_KEY}.${selectedOption}`);
 
-    await supabase.from("survey_answears").upsert(
+    const { error } = await supabase.from("survey_answers").upsert(
       [
         {
-          question: t(`questions.${QUESTION_KEY}.question`),
+          question: QUESTION_KEY,
           user_id: user.id,
-          selected_options: translatedOption,
+          selected_options: [selectedOption],
           question_number: questionId,
         },
       ],
@@ -58,6 +76,12 @@ export default function Survey() {
         onConflict: "user_id,question_number",
       }
     );
+
+    if (error) {
+      console.error("Error saving survey answer:", error);
+      toast.error(t("survey.errors.saveFailed"));
+      return;
+    }
 
     setSelected([]);
     goToNext();
@@ -69,19 +93,18 @@ export default function Survey() {
     }
 
     if (selected.length === 0) {
-      toast.error("Please select at least one option before proceeding.");
+      toast.error(t("survey.errors.selectOption"));
       return;
     }
 
     const QUESTION_KEY = SURVEY_QUESTIONS[questionId - 1].questionKey;
-    const translatedOptions = selected.map((option) => t(`questions.${QUESTION_KEY}.${option}`));
 
-    await supabase.from("survey_answears").upsert(
+    const { error } = await supabase.from("survey_answers").upsert(
       [
         {
-          question: t(`questions.${QUESTION_KEY}.question`),
+          question: QUESTION_KEY,
           user_id: user.id,
-          selected_options: translatedOptions.join(", "),
+          selected_options: selected,
           question_number: questionId,
         },
       ],
@@ -89,6 +112,12 @@ export default function Survey() {
         onConflict: "user_id,question_number",
       }
     );
+
+    if (error) {
+      console.error("Error saving survey answer:", error);
+      toast.error(t("survey.errors.saveFailed"));
+      return;
+    }
 
     setSelected([]);
     goToNext();
@@ -103,6 +132,14 @@ export default function Survey() {
     navigate(`/survey/${questionId + 1}`);
   }
 
+  function goBack() {
+    if (questionId === 1) {
+      navigate("/survey");
+    } else {
+      navigate(`/survey/${questionId - 1}`);
+    }
+  }
+
   async function completeSurvey() {
     if (!user) {
       return;
@@ -115,10 +152,11 @@ export default function Survey() {
 
     if (error) {
       console.error("Error updating user:", error);
-      toast.error("An error occurred while saving your progress. Please try again.");
+      toast.error(t("survey.errors.completeFailed"));
       return;
     }
 
+    dispatch(setUser({ ...user, has_completed_survey: true }));
     navigate("/createhousehold");
   }
 
@@ -131,6 +169,7 @@ export default function Survey() {
       selected={selected}
       handleSelect={handleSelect}
       onComplete={onComplete}
+      onBack={goBack}
       showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single"}
       twoColumns={SURVEY_QUESTIONS[questionId - 1].twoColumns}
     />
