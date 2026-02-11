@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
-import { getEnglishCategoryNameById } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
+import { getEnglishCategoryNameById, getCategoryIdByTranslatedEnglishName, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
@@ -58,6 +58,9 @@ export function RecipeProposalDialog({
     (isEditProposal && originalIngredients?.length
       ? originalIngredients.map((ing) => ({ item: ing.rawText, section: ing.groupName }))
       : undefined);
+  const categoryId = getCategoryIdByTranslatedEnglishName(finalCategory);
+  const displayCategory = categoryId !== null ? getTranslatedCategory(t, categoryId) : finalCategory;
+
   const finalInstructions = getMergedString(
     toolOutput.args.instructions,
     originalRecipe?.instructions
@@ -100,7 +103,7 @@ export function RecipeProposalDialog({
           <DialogTitle className="second-font text-lg font-bold mt-2">{finalTitle}</DialogTitle>
 
           <DialogDescription className="text-sm font-medium text-muted-foreground">
-            {finalCategory}
+            {displayCategory}
           </DialogDescription>
         </DialogHeader>
 
