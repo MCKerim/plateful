@@ -83,15 +83,13 @@ export default function Home() {
 
             <div className="flex flex-col gap-2">
               {todaysMeals.map((item) => (
-                <>
-                  <RecipeCard
-                    key={item.id}
-                    id={item.recipeId}
-                    name={item.recipeName}
-                    averageRating={0}
-                    status={"ready"}
-                  />
-                </>
+                <RecipeCard
+                  key={item.id}
+                  id={item.recipeId}
+                  name={item.recipeName}
+                  averageRating={0}
+                  status={"ready"}
+                />
               ))}
             </div>
           </>
