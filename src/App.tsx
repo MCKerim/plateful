@@ -227,10 +227,10 @@ function App() {
       return <Navigate to="/signup" />;
     }
     if (requiredStep === "values" && hasSeenValueScreens()) {
-      return <Navigate to="/" />;
+      return <Navigate to="/home" />;
     }
     if (requiredStep === "survey" && hasCompletedSurvey()) {
-      return <Navigate to="/" />;
+      return <Navigate to="/home" />;
     }
     return page;
   }
@@ -254,21 +254,21 @@ function App() {
         <Route path="/terms" element={<TermsOfService />} />
 
         {/* Onboarding */}
-        <Route path="/" element={isLoggedIn() ? <Navigate to="/" /> : <Welcome />} />
+        <Route path="/" element={isLoggedIn() ? <Navigate to="/home" /> : <Welcome />} />
 
-        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/" /> : <SignUp />} />
+        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/home" /> : <SignUp />} />
 
         <Route
           path="/signup/email"
-          element={isLoggedIn() ? <Navigate to="/" /> : <EmailSignUp />}
+          element={isLoggedIn() ? <Navigate to="/home" /> : <EmailSignUp />}
         />
 
         <Route
           path="/signup/verify"
-          element={isLoggedIn() ? <Navigate to="/" /> : <EmailVerification />}
+          element={isLoggedIn() ? <Navigate to="/home" /> : <EmailVerification />}
         />
 
-        <Route path="/login" element={isLoggedIn() ? <Navigate to="/" /> : <Login />} />
+        <Route path="/login" element={isLoggedIn() ? <Navigate to="/home" /> : <Login />} />
 
         <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
 
@@ -282,14 +282,14 @@ function App() {
 
         <Route
           path="/createhousehold"
-          element={hasHousehold() ? <Navigate to="/" /> : <CreateHousehold />}
+          element={hasHousehold() ? <Navigate to="/home" /> : <CreateHousehold />}
         />
 
         <Route path="/inviteMembers" element={<InviteMembers />} />
 
         <Route
           path="/joinHousehold"
-          element={hasHousehold() ? <Navigate to="/" /> : <JoinHousehold />}
+          element={hasHousehold() ? <Navigate to="/home" /> : <JoinHousehold />}
         />
 
         {/* Main Routes */}

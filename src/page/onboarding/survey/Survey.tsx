@@ -170,7 +170,7 @@ export default function Survey() {
       handleSelect={handleSelect}
       onComplete={onComplete}
       onBack={goBack}
-      showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single"}
+      showNextButton={SURVEY_QUESTIONS[questionId - 1].type !== "single" || selected.length > 0}
       twoColumns={SURVEY_QUESTIONS[questionId - 1].twoColumns}
     />
   );
