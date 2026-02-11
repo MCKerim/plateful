@@ -113,6 +113,17 @@
     "reviewButton": "Leave a Review",
     "skipButton": "Skip for now"
   },
+  "chooseUsername": {
+    "title": "What should we call you?",
+    "label": "Your name",
+    "placeholder": "e.g. Max",
+    "nextButton": "Continue",
+    "errors": {
+      "empty": "Your name cannot be empty.",
+      "length": "Your name must be between 3 and 20 characters.",
+      "updateFailed": "Failed to update your name. Please try again."
+    }
+  },
   "createHousehold": {
     "title": "Create Your Household",
     "description": "Share recipes and plan meals together in your household.",

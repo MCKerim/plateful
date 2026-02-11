@@ -16,7 +16,7 @@ export default function SocialProof() {
     } catch {
       // In-app review not available (beta/web/simulator) — continue silently
     }
-    navigate("/createhousehold");
+    navigate("/choosename");
   }
 
   return (
@@ -76,7 +76,7 @@ export default function SocialProof() {
         <OnboardingButton
           label={t("socialProof.skipButton")}
           variant="ghost"
-          onClick={() => navigate("/createhousehold")}
+          onClick={() => navigate("/choosename")}
         />
 
         <OnboardingButton label={t("socialProof.reviewButton")} onClick={requestInAppReview} />

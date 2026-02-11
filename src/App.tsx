@@ -32,6 +32,7 @@ import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
+import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
@@ -285,6 +286,8 @@ function App() {
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
+
+        <Route path="/choosename" element={<ChooseUsername />} />
 
         <Route
           path="/createhousehold"

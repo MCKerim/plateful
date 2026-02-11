@@ -161,6 +161,17 @@
     "reviewButton": "App bewerten",
     "skipButton": "Überspringen"
   },
+  "chooseUsername": {
+    "title": "Wie sollen wir dich nennen?",
+    "label": "Dein Name",
+    "placeholder": "z.B. Max",
+    "nextButton": "Weiter",
+    "errors": {
+      "empty": "Dein Name darf nicht leer sein.",
+      "length": "Dein Name muss zwischen 3 und 20 Zeichen lang sein.",
+      "updateFailed": "Dein Name konnte nicht aktualisiert werden. Bitte versuche es erneut."
+    }
+  },
   "createHousehold": {
     "title": "Erstelle deinen Haushalt",
     "description": "Teile Rezepte und plant gemeinsam Mahlzeiten in eurem Haushalt.",
