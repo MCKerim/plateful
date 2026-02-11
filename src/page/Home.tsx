@@ -12,7 +12,6 @@ import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import RecipeCard from "@/components/general/RecipeCard";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
-import PlannedMealCard from "@/components/home/PlannedMealCard";
 import { getGreetingKey } from "@/lib/greetingHelper/greetingHelper";
 
 export default function Home() {
@@ -22,42 +21,15 @@ export default function Home() {
   const household = useAppSelector(selectHousehold);
 
   const today = useMemo(() => new Date(), []);
-  const tomorrow = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d;
-  }, []);
-
-  // Fetch current and next week's meal plans (next week needed when today is Sunday)
-  const nextWeek = useMemo(() => {
-    const d = new Date();
-    d.setDate(d.getDate() + 7);
-    return d;
-  }, []);
   const { data: currentWeekItems = [] } = useMealPlannerItems(today);
-  const { data: nextWeekItems = [] } = useMealPlannerItems(nextWeek);
-  const allPlannedItems = useMemo(
-    () => [...currentWeekItems, ...nextWeekItems],
-    [currentWeekItems, nextWeekItems]
-  );
 
   // Fetch recipes for "recently added" section
   const { data: recipes = [] } = useRecipes();
 
   const todaysMeals = useMemo(
     () =>
-      allPlannedItems.filter(
-        (item) => item.planned_date && isSameDay(item.planned_date, today)
-      ),
-    [allPlannedItems, today]
-  );
-
-  const tomorrowsMeals = useMemo(
-    () =>
-      allPlannedItems.filter(
-        (item) => item.planned_date && isSameDay(item.planned_date, tomorrow)
-      ),
-    [allPlannedItems, tomorrow]
+      currentWeekItems.filter((item) => item.planned_date && isSameDay(item.planned_date, today)),
+    [currentWeekItems, today]
   );
 
   const recentlyAddedRecipes = useMemo(() => {
@@ -65,7 +37,7 @@ export default function Home() {
     const ready = recipes
       .filter((r) => r.status === "ready")
       .sort((a, b) => b.created_at.localeCompare(a.created_at))
-      .slice(0, 4);
+      .slice(0, 6);
     return [...importing, ...ready];
   }, [recipes]);
 
@@ -87,45 +59,50 @@ export default function Home() {
     <Layout>
       {/* Household name */}
       <NavLink to="/householdSettings">
-        <div className="flex items-center gap-1.5">
-          <House size={18} />
+        <div className="flex items-center gap-2">
+          <House size={20} />
 
-          <span className="second-font text-sm text-muted-foreground font-semibold">
+          <span className="second-font text-lg text-muted-foreground font-bold">
             {household?.name}
           </span>
         </div>
       </NavLink>
 
       {/* Time-based greeting */}
-      <h1 className="first-font text-3xl mt-1">
-        {t(greetingKey, { username: user?.username })}
+      <h1 className="first-font text-3xl">
+        {t(greetingKey)}
+        <br />
+        {user?.username}
       </h1>
 
       {/* Today's planned meals */}
-      <div className="mt-4">
-        <h2 className="second-font text-lg font-bold mb-2">
-          {t("home.todayYouPlanned")}
-        </h2>
-
+      <div className="mt-4 mb-36">
         {todaysMeals.length > 0 ? (
-          <div className="flex flex-col gap-2">
-            {todaysMeals.map((item) => (
-              <PlannedMealCard
-                key={item.id}
-                recipeId={item.recipeId}
-                recipeName={item.recipeName}
-              />
-            ))}
-          </div>
+          <>
+            <h2 className="second-font text-xl font-bold mb-1">{t("home.todayYouPlanned")}</h2>
+
+            <div className="flex flex-col gap-2">
+              {todaysMeals.map((item) => (
+                <>
+                  <RecipeCard
+                    key={item.id}
+                    id={item.recipeId}
+                    name={item.recipeName}
+                    averageRating={0}
+                    status={"ready"}
+                  />
+                </>
+              ))}
+            </div>
+          </>
         ) : (
           <div className="flex flex-col items-center gap-2 py-4">
-            <p className="text-sm text-muted-foreground italic">
-              {t("home.nothingPlannedToday")}
-            </p>
+            <h2 className="second-font text-lg font-bold">{t("home.nothingPlannedToday")}</h2>
 
             <NavLink to="/planner">
-              <Button variant="outline" size="sm">
-                <CalendarDays size={16} />
+              <Button variant="outline">
+                <CalendarDays />
+
                 {t("home.goToPlanner")}
               </Button>
             </NavLink>
@@ -133,31 +110,10 @@ export default function Home() {
         )}
       </div>
 
-      {/* Tomorrow's planned meals (only if any) */}
-      {tomorrowsMeals.length > 0 && (
-        <div className="mt-4">
-          <h2 className="second-font text-lg font-bold mb-2">
-            {t("home.tomorrow")}
-          </h2>
-
-          <div className="flex flex-col gap-2">
-            {tomorrowsMeals.map((item) => (
-              <PlannedMealCard
-                key={item.id}
-                recipeId={item.recipeId}
-                recipeName={item.recipeName}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
       {/* Recently added recipes */}
       {recentlyAddedRecipes.length > 0 && (
-        <div className="mt-6">
-          <h2 className="second-font text-lg font-bold mb-2">
-            {t("cookbook.recentlyAdded")}
-          </h2>
+        <div>
+          <h2 className="second-font text-lg font-bold mb-2">{t("cookbook.recentlyAdded")}</h2>
 
           <div className="grid grid-cols-2 gap-2">
             {recentlyAddedRecipes.map((recipe) => (
@@ -174,18 +130,11 @@ export default function Home() {
       )}
 
       {/* Suggest a feature */}
-      <div className="mt-6 mb-4">
-        <NavLink
-          data-canny-link
-          to="https://plateful.canny.io/support"
-          target="blank"
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            className="w-full text-muted-foreground"
-          >
-            <Donut size={16} />
+      <div className="mt-6 mb-40">
+        <NavLink data-canny-link to="https://plateful.canny.io/support" target="blank">
+          <Button variant="outline" className="w-full">
+            <Donut size={24} />
+
             {t("settings.suggestFeatureOrReportBug")}
           </Button>
         </NavLink>

@@ -326,13 +326,12 @@
   },
   "home": {
     "title": "Startseite",
-    "goodMorning": "Guten Morgen, {{username}}",
-    "goodAfternoon": "Guten Nachmittag, {{username}}",
-    "goodEvening": "Guten Abend, {{username}}",
-    "todayYouPlanned": "Heute hast du geplant:",
+    "goodMorning": "Guten Morgen,",
+    "goodAfternoon": "Guten Nachmittag,",
+    "goodEvening": "Guten Abend,",
+    "todayYouPlanned": "Geplant für heute:",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
-    "goToPlanner": "Zum Planer",
-    "tomorrow": "Morgen:"
+    "goToPlanner": "Plane deine Woche"
   },
   "explore": {
     "title": "Erkunden"
