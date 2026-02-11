@@ -130,7 +130,7 @@ export default function Home() {
       {/* Suggest a feature */}
       <div className="mt-6 mb-40">
         <NavLink data-canny-link to="https://plateful.canny.io/support" target="blank">
-          <Button variant="outline" className="w-full">
+          <Button variant="accent" className="w-full">
             <Donut size={24} />
 
             {t("settings.suggestFeatureOrReportBug")}
