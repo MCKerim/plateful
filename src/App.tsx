@@ -202,10 +202,6 @@ function App() {
     return user !== null;
   }
 
-  function hasSeenValueScreens(): boolean {
-    return user?.has_seen_value_screens ?? false;
-  }
-
   function hasCompletedSurvey(): boolean {
     return user?.has_completed_survey ?? false;
   }
@@ -218,7 +214,6 @@ function App() {
     return routeToCorrectPagePure(
       page,
       isLoggedIn,
-      hasSeenValueScreens,
       hasCompletedSurvey,
       hasHousehold
     );
@@ -226,13 +221,10 @@ function App() {
 
   function guardOnboardingRoute(
     page: JSX.Element,
-    requiredStep: "values" | "survey" | "socialproof"
+    requiredStep: "survey" | "socialproof"
   ) {
     if (!isLoggedIn()) {
       return <Navigate to="/signup" />;
-    }
-    if (requiredStep === "values" && hasSeenValueScreens()) {
-      return <Navigate to="/home" />;
     }
     if (requiredStep === "survey" && hasCompletedSurvey()) {
       return <Navigate to="/home" />;
@@ -277,10 +269,10 @@ function App() {
 
         <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
 
-        <Route path="/values" element={guardOnboardingRoute(<ImportRecipes />, "values")} />
-        <Route path="/values/1" element={guardOnboardingRoute(<ImportRecipes />, "values")} />
-        <Route path="/values/2" element={guardOnboardingRoute(<ChatbotValue />, "values")} />
-        <Route path="/values/3" element={guardOnboardingRoute(<MealPlanningValue />, "values")} />
+        <Route path="/values" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
+        <Route path="/values/1" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
+        <Route path="/values/2" element={guardOnboardingRoute(<ChatbotValue />, "survey")} />
+        <Route path="/values/3" element={guardOnboardingRoute(<MealPlanningValue />, "survey")} />
 
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />

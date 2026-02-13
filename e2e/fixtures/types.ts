@@ -5,7 +5,6 @@ export type MockUser = {
   id: string;
   email: string;
   username: string;
-  has_seen_value_screens: boolean;
   has_completed_survey: boolean;
   household_id: string | null;
   language: string;

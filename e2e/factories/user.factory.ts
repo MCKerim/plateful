@@ -7,7 +7,6 @@ export function createUser(overrides?: Partial<MockUser>): MockUser {
     id,
     email: overrides?.email ?? `testuser-${id.slice(0, 8)}@example.com`,
     username: overrides?.username ?? "TestUser",
-    has_seen_value_screens: overrides?.has_seen_value_screens ?? true,
     has_completed_survey: overrides?.has_completed_survey ?? true,
     household_id: overrides?.household_id ?? null,
     language: overrides?.language ?? "en",
@@ -17,7 +16,6 @@ export function createUser(overrides?: Partial<MockUser>): MockUser {
 
 export function createNewUser(): MockUser {
   return createUser({
-    has_seen_value_screens: false,
     has_completed_survey: false,
     household_id: null,
   });
@@ -25,7 +23,6 @@ export function createNewUser(): MockUser {
 
 export function createOnboardedUser(householdId: string): MockUser {
   return createUser({
-    has_seen_value_screens: true,
     has_completed_survey: true,
     household_id: householdId,
   });
