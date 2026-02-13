@@ -129,6 +129,7 @@ export default function Cookbook() {
           className="rounded-full"
           type="text"
           placeholder={t("cookbook.enterRecipeName")}
+          enterKeyHint="search"
           value={searchTerm}
           showDeleteButton={searchTerm.length > 0}
           onChange={(e) => dispatch(setSearchTerm(e.target.value))}
