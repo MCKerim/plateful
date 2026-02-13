@@ -3,7 +3,7 @@ import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../../ui/drawer";
-import { CalendarDays, Check, MoreVertical, Trash2 } from "lucide-react";
+import { CalendarDays, CalendarOff, Check, MoreVertical, Trash2 } from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
@@ -17,6 +17,7 @@ type Props = {
   onToggleEaten: () => void;
   onRecipeDelete: (id: string) => void;
   onEditPlan: () => void;
+  onMoveToNoDate?: () => void;
   isDragging?: boolean;
 };
 
@@ -28,6 +29,7 @@ export default function MealPlannerItem({
   onToggleEaten,
   onRecipeDelete,
   onEditPlan,
+  onMoveToNoDate,
   isDragging = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
@@ -200,6 +202,15 @@ export default function MealPlannerItem({
                 {t("mealPlannerItem.editPlan")}
               </Button>
             </DrawerClose>
+
+            {onMoveToNoDate && (
+              <DrawerClose asChild>
+                <Button className="w-full" variant="secondary" onClick={onMoveToNoDate}>
+                  <CalendarOff size={20} />
+                  {t("mealPlannerItem.moveToNoDate")}
+                </Button>
+              </DrawerClose>
+            )}
 
             <DeleteDialog
               onDelete={() => {

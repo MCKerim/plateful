@@ -269,6 +269,7 @@
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
+    "moveToNoDate": "Move to no date",
     "remove": "Remove"
   },
   "addRecipeDrawer": {

@@ -359,6 +359,7 @@ export default function MealPlanner() {
                             }}
                             onRecipeDelete={() => handleDelete(item.id)}
                             onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
+                            onMoveToNoDate={() => handleUpdateDate(item.id, null)}
                             isDragging={activeItem?.id === item.id}
                           />
                         </li>
