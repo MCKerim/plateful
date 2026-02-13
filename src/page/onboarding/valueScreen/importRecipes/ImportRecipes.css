@@ -1,47 +1,64 @@
-@keyframes flyFromLeft {
-  0% {
-    transform: scale(0) translateX(-100px);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) translateX(0px);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.3) translateX(200px);
-    opacity: 0;
-  }
-}
-
-@keyframes flyFromRight {
-  0% {
-    transform: scale(0) translateX(100px);
-    opacity: 0;
-  }
-  50% {
-    transform: scale(1.2) translateX(0px);
-    opacity: 1;
-  }
-  100% {
-    transform: scale(0.3) translateX(-200px);
-    opacity: 0;
-  }
-}
-
-.flying-icon {
-  position: absolute;
-  pointer-events: none;
-  z-index: 100;
+.phone-with-icons {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  opacity: 0;
 }
 
-.flying-icon.from-left {
-  animation: flyFromLeft 3s ease-in-out forwards;
+.app-icon-bubble {
+  position: absolute;
+  z-index: 10;
 }
 
-.flying-icon.from-right {
-  animation: flyFromRight 3s ease-in-out forwards;
+.app-icon-bubble img {
+  width: 44px;
+  height: 44px;
+}
+
+/* Positions around the phone */
+.app-icon-bubble.top-left {
+  top: 10px;
+  left: -54px;
+}
+
+.app-icon-bubble.top-right {
+  top: 10px;
+  right: -54px;
+}
+
+.app-icon-bubble.bottom-left {
+  bottom: 40px;
+  left: -54px;
+}
+
+.app-icon-bubble.bottom-right {
+  bottom: 40px;
+  right: -54px;
+}
+
+/* Arrow SVGs */
+.cartoon-arrow {
+  position: absolute;
+  z-index: 5;
+  overflow: visible;
+}
+
+.cartoon-arrow.top-left {
+  top: 30px;
+  left: -4px;
+}
+
+.cartoon-arrow.top-right {
+  top: 30px;
+  right: -4px;
+}
+
+.cartoon-arrow.bottom-left {
+  bottom: 68px;
+  left: -4px;
+}
+
+.cartoon-arrow.bottom-right {
+  bottom: 68px;
+  right: -4px;
 }
