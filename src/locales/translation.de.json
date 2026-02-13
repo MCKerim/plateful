@@ -110,23 +110,17 @@
   },
   "valueScreens": {
     "importRecipes": {
-      "title": "Speichere Rezepte",
-      "subtitle": "von überall",
-      "description": "Teile deine Lieblingsrezepte aus allen Apps und Webseiten mit Plateful!"
+      "title": "Alle Rezepte an einem Ort",
+      "description": "Importiere Rezepte von TikTok, Instagram, Webseiten und mehr — mit nur einem Tap. Schluss mit Screenshots und verlorenen Links."
     },
     "chatbot": {
-      "title": "Intelligenter Chatbot",
-      "subtitles": {
-        "mealPlan": "für dein Wochenplan",
-        "recipes": "für Rezepte",
-        "questions": "für Fragen"
-      },
-      "description": "Schreibe worauf du lust hast oder stelle Fragen zum Kochen!"
+      "title": "Dein AI-Chef passt sich an",
+      "description": "Sag einfach worauf du Lust hast — der AI-Chef erstellt Rezepte, die zu deiner Ernährung passen. Schnell, kreativ und immer passend."
     },
     "mealPlanning": {
-      "title": "Planne Mahlzeiten",
-      "subtitle": "auf die einfache Art",
-      "description": "Erstelle deinen Essensplan ohne Stress und spare Zeit und Geld beim Einkaufen!"
+      "title": "Dein Wochenplan",
+      "subtitle": "flexibel, nicht starr",
+      "description": "Plane so viel oder wenig wie du willst. Schiebe Rezepte zwischen Tagen hin und her oder wirf alles in deinen Wochenpool. Kein Druck, kein Stress."
     }
   },
   "survey": {
