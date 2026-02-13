@@ -143,12 +143,20 @@ export default function MealPlannerItem({
         {...listeners}
         {...attributes}
       >
-        <img
-          src={imageUrl || "/no-img.jpg"}
-          alt="Recipe"
-          className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
-          draggable={false}
-        />
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/recipe/${recipeId}`);
+          }}
+          className="h-full shrink-0"
+        >
+          <img
+            src={imageUrl || "/no-img.jpg"}
+            alt="Recipe"
+            className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
+            draggable={false}
+          />
+        </button>
 
         <button
           onClick={(e) => {
