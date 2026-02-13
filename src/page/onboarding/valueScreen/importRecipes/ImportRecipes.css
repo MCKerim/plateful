@@ -36,29 +36,40 @@
   right: -54px;
 }
 
-/* Arrow SVGs */
+/* Arrow images — white SVGs filtered to primary color */
 .cartoon-arrow {
   position: absolute;
   z-index: 5;
-  overflow: visible;
+  width: 60px;
+  height: auto;
+  filter: brightness(0);
+  opacity: 1;
 }
 
+/* Top-left: arrow points right-downward toward phone */
 .cartoon-arrow.top-left {
-  top: 30px;
-  left: -4px;
+  top: 20px;
+  left: -6px;
+  transform: rotate(30deg);
 }
 
+/* Top-right: arrow points left-downward toward phone (flip horizontally) */
 .cartoon-arrow.top-right {
-  top: 30px;
-  right: -4px;
+  top: 20px;
+  right: -6px;
+  transform: scaleX(-1) rotate(30deg);
 }
 
+/* Bottom-left: arrow points right-upward toward phone (flip vertically) */
 .cartoon-arrow.bottom-left {
-  bottom: 68px;
-  left: -4px;
+  bottom: 50px;
+  left: -6px;
+  transform: scaleY(-1) rotate(30deg);
 }
 
+/* Bottom-right: arrow points left-upward toward phone (flip both) */
 .cartoon-arrow.bottom-right {
-  bottom: 68px;
-  right: -4px;
+  bottom: 50px;
+  right: -6px;
+  transform: scale(-1) rotate(30deg);
 }
