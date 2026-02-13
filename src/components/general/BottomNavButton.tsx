@@ -1,5 +1,5 @@
 import { NavLink } from "react-router";
-import { BookOpen, Bot, Calendar, House, List, Search } from "lucide-react";
+import { BookOpen, Calendar, ChefHat, House, List, Search } from "lucide-react";
 import { motion } from "motion/react";
 
 type Props = {
@@ -24,7 +24,13 @@ export default function BottomNavButton({
       case "home":
         return <House size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "chatbot":
-        return <Bot size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
+        return (
+          <ChefHat
+            size={ICON_SIZE}
+            fill={active ? "currentColor" : "none"}
+            style={{ transform: "rotate(16deg)" }}
+          />
+        );
       case "explore":
         return <Search size={ICON_SIZE} strokeWidth={active ? 3 : 1.5} />;
       case "cookbook":

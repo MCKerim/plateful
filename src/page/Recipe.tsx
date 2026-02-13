@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, Bot } from "lucide-react";
+import { Pencil, Link, CalendarDays, ChefHat } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, selectMessages, selectRecipeId } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -111,7 +111,7 @@ export default function Recipe() {
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
         <Button variant="secondary" className="w-full" onClick={handleAskChatbot}>
-          <Bot />
+          <ChefHat style={{ transform: "rotate(16deg) translateY(-1px)" }} />
           {t("recipe.askChatbot")}
         </Button>
 
