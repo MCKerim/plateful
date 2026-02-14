@@ -18,22 +18,22 @@
 /* Positions around the phone */
 .app-icon-bubble.top-left {
   top: 10px;
-  left: -54px;
+  left: -60px;
 }
 
 .app-icon-bubble.top-right {
-  top: 10px;
-  right: -54px;
+  top: 0px;
+  right: -70px;
 }
 
 .app-icon-bubble.bottom-left {
   bottom: 40px;
-  left: -54px;
+  left: -60px;
 }
 
 .app-icon-bubble.bottom-right {
   bottom: 40px;
-  right: -54px;
+  right: -76px;
 }
 
 /* Arrow images — white SVGs filtered to primary color */
@@ -48,28 +48,28 @@
 
 /* Top-left: arrow points right-downward toward phone */
 .cartoon-arrow.top-left {
-  top: 20px;
-  left: -6px;
-  transform: rotate(30deg);
+  top: 60px;
+  left: -46px;
+  transform: rotate(20deg);
 }
 
 /* Top-right: arrow points left-downward toward phone (flip horizontally) */
 .cartoon-arrow.top-right {
-  top: 20px;
-  right: -6px;
-  transform: scaleX(-1) rotate(30deg);
+  top: 54px;
+  right: -46px;
+  transform: scaleX(-1) rotate(38deg);
 }
 
 /* Bottom-left: arrow points right-upward toward phone (flip vertically) */
 .cartoon-arrow.bottom-left {
-  bottom: 50px;
-  left: -6px;
-  transform: scaleY(-1) rotate(30deg);
+  bottom: 86px;
+  left: -36px;
+  transform: rotate(180deg);
 }
 
 /* Bottom-right: arrow points left-upward toward phone (flip both) */
 .cartoon-arrow.bottom-right {
-  bottom: 50px;
-  right: -6px;
-  transform: scale(-1) rotate(30deg);
+  bottom: 20px;
+  right: -40px;
+  transform: rotate(50deg);
 }
