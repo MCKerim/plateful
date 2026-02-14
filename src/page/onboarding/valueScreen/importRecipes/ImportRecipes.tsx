@@ -35,31 +35,56 @@ export default function ImportRecipes() {
 
   return (
     <OnboardingLayout onNext={() => navigate("/values/2")}>
-      <div className="text-center">
+      <motion.div
+        className="text-center"
+        initial={{ opacity: 0, y: -15 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+      >
         <h1 className="text-4xl font-bold first-font">{t("valueScreens.importRecipes.title")}</h1>
-      </div>
+      </motion.div>
 
-      <div className="phone-with-icons">
+      <motion.div
+        className="phone-with-icons"
+        initial={{ opacity: 0, scale: 0.93 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+      >
         {appIcons.map((icon, i) => (
           <motion.div
             key={icon.name}
             className={`app-icon-bubble ${icon.position}`}
+            initial={{ scale: 0, opacity: 0 }}
             animate={{
+              scale: 1,
+              opacity: 1,
               x: [floatConfigs[i].x, -floatConfigs[i].x],
               y: [floatConfigs[i].y, -floatConfigs[i].y],
             }}
             transition={{
+              scale: {
+                type: "spring",
+                stiffness: 400,
+                damping: 12,
+                delay: 0.4 + i * 0.1,
+              },
+              opacity: {
+                duration: 0.2,
+                delay: 0.4 + i * 0.1,
+              },
               x: {
                 duration: floatConfigs[i].xDuration,
                 repeat: Infinity,
                 repeatType: "mirror",
                 ease: "easeInOut",
+                delay: 0.4 + i * 0.1,
               },
               y: {
                 duration: floatConfigs[i].yDuration,
                 repeat: Infinity,
                 repeatType: "mirror",
                 ease: "easeInOut",
+                delay: 0.4 + i * 0.1,
               },
             }}
           >
@@ -67,21 +92,29 @@ export default function ImportRecipes() {
           </motion.div>
         ))}
 
-        {appIcons.map((icon) => (
-          <img
+        {appIcons.map((icon, i) => (
+          <motion.img
             key={`arrow-${icon.name}`}
             src={icon.arrow}
             alt=""
             className={`cartoon-arrow ${icon.position}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4, delay: 0.7 + i * 0.08 }}
           />
         ))}
 
         <PhoneMockup mediaUrl="/import-recipes-recording.mp4" />
-      </div>
+      </motion.div>
 
-      <p className="max-w-sm text-center text-gray-600">
+      <motion.p
+        className="max-w-sm text-center text-gray-600"
+        initial={{ opacity: 0, y: 12 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+      >
         {t("valueScreens.importRecipes.description")}
-      </p>
+      </motion.p>
     </OnboardingLayout>
   );
 }
