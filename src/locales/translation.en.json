@@ -112,6 +112,13 @@
     "reviewButton": "Leave a Review",
     "skipButton": "Skip for now"
   },
+  "howItWorks": {
+    "title": "It's this simple",
+    "step1": "Gather your recipes",
+    "step2": "Make them yours",
+    "step3": "Plan your week",
+    "step4": "Cook & enjoy"
+  },
   "chooseUsername": {
     "title": "What should we call you?",
     "label": "Your name",

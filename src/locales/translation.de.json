@@ -160,6 +160,13 @@
     "reviewButton": "App bewerten",
     "skipButton": "Überspringen"
   },
+  "howItWorks": {
+    "title": "So einfach geht's",
+    "step1": "Sammle deine Rezepte",
+    "step2": "Passe sie an",
+    "step3": "Plane deine Woche",
+    "step4": "Kochen & genießen"
+  },
   "chooseUsername": {
     "title": "Wie sollen wir dich nennen?",
     "label": "Dein Name",

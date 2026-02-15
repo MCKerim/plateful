@@ -33,6 +33,7 @@ import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
+import HowItWorks from "./page/onboarding/howItWorks/HowItWorks";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
@@ -279,6 +280,7 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
+        <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
 
         <Route path="/choosename" element={<ChooseUsername />} />
