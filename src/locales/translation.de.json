@@ -109,6 +109,11 @@
     "nextButton": "Los geht's!"
   },
   "valueScreens": {
+    "emotionalHook": {
+      "title": "Was koche ich heute?",
+      "description": "Diese Frage war gestern. Mit Plateful weißt du immer, was auf den Tisch kommt.",
+      "cta": "Los geht's"
+    },
     "importRecipes": {
       "title": "Alle Rezepte an einem Ort",
       "description": "Importiere Rezepte von TikTok, Instagram, Webseiten und mehr — mit nur einem Tap. Schluss mit Screenshots und verlorenen Links."

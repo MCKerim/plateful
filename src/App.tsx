@@ -24,6 +24,7 @@ import Home from "./page/Home";
 import Cookbook from "./page/Cookbook";
 import Chatbot from "./page/Chatbot";
 import LoadingScreen from "./components/general/LoadingScreen";
+import EmotionalHook from "./page/onboarding/valueScreen/emotionalHook/EmotionalHook";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
 import MealPlanningValue from "./page/onboarding/valueScreen/mealPlanningValue/MealPlanningValue";
 import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
@@ -269,10 +270,11 @@ function App() {
 
         <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
 
-        <Route path="/values" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
-        <Route path="/values/1" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
-        <Route path="/values/2" element={guardOnboardingRoute(<ChatbotValue />, "survey")} />
-        <Route path="/values/3" element={guardOnboardingRoute(<MealPlanningValue />, "survey")} />
+        <Route path="/values" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
+        <Route path="/values/1" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
+        <Route path="/values/2" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
+        <Route path="/values/3" element={guardOnboardingRoute(<ChatbotValue />, "survey")} />
+        <Route path="/values/4" element={guardOnboardingRoute(<MealPlanningValue />, "survey")} />
 
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />

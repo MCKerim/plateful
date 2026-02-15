@@ -1,0 +1,99 @@
+.emotional-hook-visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18rem;
+  width: 100%;
+}
+
+/* Thought bubble */
+.thought-bubble {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: white;
+  border-radius: 24px;
+  padding: 1.5rem 2.5rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.thought-question-marks {
+  font-family: "Shrikhand", serif;
+  font-size: 3rem;
+  color: var(--muted-foreground);
+  user-select: none;
+}
+
+.thought-tail {
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.thought-tail::before,
+.thought-tail::after {
+  content: "";
+  position: absolute;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.thought-tail::before {
+  width: 14px;
+  height: 14px;
+  bottom: 0;
+  left: -7px;
+}
+
+.thought-tail::after {
+  width: 8px;
+  height: 8px;
+  bottom: -12px;
+  left: -4px;
+}
+
+/* Meal reveal */
+.meal-reveal {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plate-illustration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plate-svg {
+  width: 14rem;
+  height: 14rem;
+  filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.08));
+}
+
+/* Food explosion bubbles */
+.food-bubble {
+  position: absolute;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-left: -22px;
+  margin-top: -22px;
+}
+
+.food-emoji {
+  font-size: 1.4rem;
+  line-height: 1;
+  user-select: none;
+}
