@@ -43,7 +43,7 @@ export default function EmotionalHook() {
   return (
     <OnboardingLayout
       nextButtonLabel={t("valueScreens.emotionalHook.cta")}
-      onNext={() => navigate("/values/2")}
+      onNext={() => navigate("/survey/1")}
     >
       <motion.div
         className="text-center"

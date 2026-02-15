@@ -9,7 +9,7 @@ export default function MealPlanningValue() {
   const navigate = useNavigate();
 
   return (
-    <OnboardingLayout onNext={() => navigate("/beta")}>
+    <OnboardingLayout onNext={() => navigate("/survey/5")}>
       <motion.div
         className="text-center"
         initial={{ opacity: 0, y: -15 }}

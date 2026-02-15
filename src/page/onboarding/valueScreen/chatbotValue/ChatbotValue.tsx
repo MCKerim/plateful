@@ -9,7 +9,7 @@ export default function ChatbotValue() {
   const navigate = useNavigate();
 
   return (
-    <OnboardingLayout onNext={() => navigate("/values/4")}>
+    <OnboardingLayout onNext={() => navigate("/survey/8")}>
       <motion.div
         className="text-center"
         initial={{ opacity: 0, y: -15 }}

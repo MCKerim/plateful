@@ -1,18 +1,30 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { selectUser, setUser } from "@/redux/slices/userSlice";
+import { useAppSelector } from "@/redux/hooks";
+import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 
+// Interleaved navigation: questions that exit to a value screen instead of the next question
+const NEXT_AFTER_QUESTION: Record<number, string> = {
+  4: "/values/4", // After "Wie oft kochst du?" → Planner value screen
+  7: "/values/3", // After "Sonstige Abneigungen?" → AI Chef value screen
+  9: "/values/2", // After "Wie organisierst du Rezepte?" → Import Recipes value screen
+};
+
+const PREV_BEFORE_QUESTION: Record<number, string> = {
+  1: "/values/1", // Back from first question → Emotional Hook
+  5: "/values/4", // Back from "Welche Ernährungsweise?" → Planner value screen
+  8: "/values/3", // Back from "Wo findest du Rezepte?" → AI Chef value screen
+};
+
 export default function Survey() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const params = useParams<{ questionId: string }>();
@@ -124,8 +136,9 @@ export default function Survey() {
   }
 
   function goToNext() {
-    if (questionId === SURVEY_QUESTIONS.length) {
-      completeSurvey();
+    const valueRoute = NEXT_AFTER_QUESTION[questionId];
+    if (valueRoute) {
+      navigate(valueRoute);
       return;
     }
 
@@ -133,31 +146,13 @@ export default function Survey() {
   }
 
   function goBack() {
-    if (questionId === 1) {
-      navigate("/survey");
-    } else {
-      navigate(`/survey/${questionId - 1}`);
-    }
-  }
-
-  async function completeSurvey() {
-    if (!user) {
+    const valueRoute = PREV_BEFORE_QUESTION[questionId];
+    if (valueRoute) {
+      navigate(valueRoute);
       return;
     }
 
-    const { error } = await supabase
-      .from("users")
-      .update({ has_completed_survey: true })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Error updating user:", error);
-      toast.error(t("survey.errors.completeFailed"));
-      return;
-    }
-
-    dispatch(setUser({ ...user, has_completed_survey: true }));
-    navigate("/howitworks");
+    navigate(`/survey/${questionId - 1}`);
   }
 
   return (
