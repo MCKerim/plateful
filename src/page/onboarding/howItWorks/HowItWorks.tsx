@@ -57,10 +57,14 @@ export default function HowItWorks() {
                 {/* Connecting line */}
                 {!isLast && (
                   <motion.div
-                    className="w-px bg-[var(--accent-color)]/30 origin-top"
-                    style={{ height: 32 }}
+                    className="w-0.5 origin-top"
+                    style={{
+                      height: 32,
+                      backgroundColor: "var(--accent-color)",
+                      opacity: 0,
+                    }}
                     initial={{ scaleY: 0, opacity: 0 }}
-                    animate={{ scaleY: 1, opacity: 1 }}
+                    animate={{ scaleY: 1, opacity: 0.3 }}
                     transition={{
                       duration: 0.3,
                       delay: delay + 0.15,
