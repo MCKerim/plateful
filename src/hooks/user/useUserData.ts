@@ -7,6 +7,11 @@ import { useSupabase } from "@/utils/supabase";
 import { userApi } from "@/api/user.api";
 import posthog from "posthog-js";
 import i18n from "@/i18n";
+import { identifyUser, logoutUser } from "@/lib/revenuecat";
+import {
+  setCustomerInfo,
+  resetSubscription,
+} from "@/redux/slices/subscriptionSlice";
 
 export function useUserData() {
   const { supabase } = useSupabase();
@@ -19,8 +24,12 @@ export function useUserData() {
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
+        dispatch(resetSubscription());
         queryClient.clear();
         posthog.reset();
+        logoutUser().catch((err) =>
+          console.error("Failed to logout from RevenueCat:", err)
+        );
         return;
       }
 
@@ -70,6 +79,13 @@ export function useUserData() {
           email: userData.email,
           username: userData.username,
         });
+
+        try {
+          const customerInfo = await identifyUser(userData.id);
+          dispatch(setCustomerInfo(customerInfo));
+        } catch (err) {
+          console.error("Failed to identify user with RevenueCat:", err);
+        }
 
         if (!userData.household_id) {
           return;

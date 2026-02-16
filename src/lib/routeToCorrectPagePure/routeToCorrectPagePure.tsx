@@ -6,14 +6,19 @@ export function routeToCorrectPagePure(
   page: React.JSX.Element,
   isLoggedIn: () => boolean,
   hasCompletedSurvey: () => boolean,
+  isPro: () => boolean,
   hasHousehold: () => boolean
 ) {
   if (isLoggedIn()) {
     if (hasCompletedSurvey()) {
-      if (hasHousehold()) {
-        return page;
+      if (isPro()) {
+        if (hasHousehold()) {
+          return page;
+        } else {
+          return <Navigate to="/createhousehold" />;
+        }
       } else {
-        return <Navigate to="/createhousehold" />;
+        return <Navigate to="/subscribe" />;
       }
     } else {
       return <Navigate to="/values/1" />;

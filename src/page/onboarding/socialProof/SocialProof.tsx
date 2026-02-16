@@ -32,7 +32,7 @@ export default function SocialProof() {
     }
 
     dispatch(setUser({ ...user, has_completed_survey: true }));
-    navigate("/choosename");
+    navigate("/subscribe");
   }
 
   async function requestInAppReview() {

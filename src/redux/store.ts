@@ -6,6 +6,7 @@ import chatbotReducer from "./slices/chatbotSlice";
 import filterAndSortingReducer from "./slices/filterAndSortingSlice";
 import mealPlannerReducer from "./slices/mealPlannerSlice";
 import servingsReducer from "./slices/servingsSlice";
+import subscriptionReducer from "./slices/subscriptionSlice";
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     filterAndSorting: filterAndSortingReducer,
     mealPlanner: mealPlannerReducer,
     servings: servingsReducer,
+    subscription: subscriptionReducer,
   },
 });
 

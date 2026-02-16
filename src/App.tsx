@@ -13,6 +13,8 @@ import InvitePage from "./page/InvitePage";
 import { useAppSelector } from "./redux/hooks";
 import { selectUser } from "./redux/slices/userSlice";
 import { selectHouseholdId } from "./redux/slices/householdSlice";
+import { selectIsPro } from "./redux/slices/subscriptionSlice";
+import Subscribe from "./page/onboarding/subscribe/Subscribe";
 import Welcome from "./page/onboarding/welcome/Welcome";
 import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
@@ -52,6 +54,7 @@ function App() {
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
+  const subscriptionIsPro = useAppSelector(selectIsPro);
   const [loading, setLoading] = useState(true);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
@@ -212,11 +215,16 @@ function App() {
     return householdId !== null;
   }
 
+  function isPro(): boolean {
+    return !Capacitor.isNativePlatform() || subscriptionIsPro;
+  }
+
   function routeToCorrectPage(page: React.JSX.Element) {
     return routeToCorrectPagePure(
       page,
       isLoggedIn,
       hasCompletedSurvey,
+      isPro,
       hasHousehold
     );
   }
@@ -282,6 +290,11 @@ function App() {
 
         <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
+
+        <Route
+          path="/subscribe"
+          element={isLoggedIn() ? <Subscribe /> : <Navigate to="/signup" />}
+        />
 
         <Route path="/choosename" element={<ChooseUsername />} />
 

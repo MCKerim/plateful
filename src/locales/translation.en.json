@@ -394,7 +394,13 @@
     "editUsername": "Edit Username",
     "enterNewUsername": "Enter new username",
     "usernameCannotBeEmpty": "Username cannot be empty",
-    "usernameLengthInvalid": "Username must be between 3 and 20 characters"
+    "usernameLengthInvalid": "Username must be between 3 and 20 characters",
+    "subscription": {
+      "title": "Subscription",
+      "proDescription": "You have Plateful Pro. Thank you for your support!",
+      "manageSubscription": "Manage Subscription",
+      "restorePurchases": "Restore Purchases"
+    }
   },
   "householdSettings": {
     "member": "Member",
@@ -646,5 +652,19 @@
       "option6": "Substitutes",
       "option7": "None"
     }
+  },
+  "subscription": {
+    "restoring": "Restoring purchases...",
+    "restoreSuccess": "Purchases restored successfully!",
+    "restoreNoPurchases": "No purchases found to restore",
+    "restoreError": "Failed to restore purchases. Please try again.",
+    "purchaseSuccess": "Welcome to Plateful Pro!",
+    "paywallError": "Something went wrong. Please try again.",
+    "customerCenterError": "Could not open subscription management.",
+    "notAvailableOnWeb": "Subscriptions are only available in the mobile app"
+  },
+  "subscribe": {
+    "error": "Something went wrong. Please try again.",
+    "retry": "Try again"
   }
 }

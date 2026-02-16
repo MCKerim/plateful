@@ -393,7 +393,13 @@
     "editUsername": "Benutzername bearbeiten",
     "enterNewUsername": "Neuen Benutzernamen eingeben",
     "usernameCannotBeEmpty": "Benutzername darf nicht leer sein",
-    "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein"
+    "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein",
+    "subscription": {
+      "title": "Abonnement",
+      "proDescription": "Du hast Plateful Pro. Vielen Dank für deine Unterstützung!",
+      "manageSubscription": "Abonnement verwalten",
+      "restorePurchases": "Käufe wiederherstellen"
+    }
   },
   "householdSettings": {
     "member": "Mitglied",
@@ -646,5 +652,19 @@
       "option6": "Ersatzprodukte",
       "option7": "Keine"
     }
+  },
+  "subscription": {
+    "restoring": "Käufe werden wiederhergestellt...",
+    "restoreSuccess": "Käufe erfolgreich wiederhergestellt!",
+    "restoreNoPurchases": "Keine Käufe zum Wiederherstellen gefunden",
+    "restoreError": "Wiederherstellen fehlgeschlagen. Bitte versuche es erneut.",
+    "purchaseSuccess": "Willkommen bei Plateful Pro!",
+    "paywallError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "customerCenterError": "Abonnement-Verwaltung konnte nicht geöffnet werden.",
+    "notAvailableOnWeb": "Abonnements sind nur in der mobilen App verfügbar"
+  },
+  "subscribe": {
+    "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+    "retry": "Erneut versuchen"
   }
 }

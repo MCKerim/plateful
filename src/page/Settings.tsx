@@ -7,7 +7,9 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Donut, House, LogOut, Pencil, Trash2 } from "lucide-react";
+import { CreditCard, Donut, House, LogOut, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { useSubscription } from "@/hooks/subscription/useSubscription";
+import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
 import {
@@ -33,6 +35,8 @@ export default function Settings() {
 
   const updateUsernameMutation = useUpdateUsername();
   const updateLanguageMutation = useUpdateLanguage();
+  const { restorePurchases } = useSubscription();
+  const { presentCustomerCenter } = useCustomerCenter();
 
   useEffect(() => {
     let isMounted = true;
@@ -148,6 +152,22 @@ export default function Settings() {
           <h2 className="font-medium border-b">{t("settings.appearance")}</h2>
 
           <ModeToggle />
+        </div>
+
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.subscription.title")}</h2>
+
+          <p className="text-sm">{t("settings.subscription.proDescription")}</p>
+
+          <Button variant="secondary" className="w-full" onClick={presentCustomerCenter}>
+            <CreditCard />
+            {t("settings.subscription.manageSubscription")}
+          </Button>
+
+          <Button variant="ghost" className="w-full" onClick={restorePurchases}>
+            <RotateCcw />
+            {t("settings.subscription.restorePurchases")}
+          </Button>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">

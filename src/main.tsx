@@ -7,6 +7,7 @@ import { ThemeProvider } from "./components/general/theme-provider.tsx";
 import "./i18n.ts";
 import { store } from "./redux/store.ts";
 import { SupabaseProvider } from "./utils/supabase.tsx";
+import { RevenueCatProvider } from "./providers/RevenueCatProvider.tsx";
 import AppUrlListener from "./components/AppUrlListener.tsx";
 import { PostHogProvider } from "posthog-js/react";
 import { Toaster } from "./components/ui/sonner.tsx";
@@ -57,7 +58,8 @@ createRoot(document.getElementById("root")!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <SupabaseProvider>
-          <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
+          <RevenueCatProvider>
+            <ThemeProvider defaultTheme="light" storageKey="vite-ui-theme">
             <AppProviders>
               <AppUrlListener />
 
@@ -70,6 +72,7 @@ createRoot(document.getElementById("root")!).render(
               <Toaster />
             </AppProviders>
           </ThemeProvider>
+          </RevenueCatProvider>
         </SupabaseProvider>
       </QueryClientProvider>
     </Provider>

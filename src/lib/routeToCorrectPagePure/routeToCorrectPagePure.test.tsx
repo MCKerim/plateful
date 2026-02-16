@@ -33,6 +33,7 @@ describe("routeToCorrectPagePure", () => {
       <TestPage />,
       () => false, // not logged in
       () => true,
+      () => true,
       () => true
     );
 
@@ -45,6 +46,7 @@ describe("routeToCorrectPagePure", () => {
       <TestPage />,
       () => true, // logged in
       () => false, // not completed survey
+      () => true,
       () => true
     );
 
@@ -52,11 +54,25 @@ describe("routeToCorrectPagePure", () => {
     expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/values/1");
   });
 
-  it("should redirect to /createhousehold when logged in, completed survey, but no household", () => {
+  it("should redirect to /subscribe when logged in, completed survey, but not pro", () => {
     const result = routeToCorrectPagePure(
       <TestPage />,
       () => true, // logged in
       () => true, // completed survey
+      () => false, // not pro
+      () => true
+    );
+
+    renderWithRouter(result);
+    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/subscribe");
+  });
+
+  it("should redirect to /createhousehold when logged in, completed survey, pro, but no household", () => {
+    const result = routeToCorrectPagePure(
+      <TestPage />,
+      () => true, // logged in
+      () => true, // completed survey
+      () => true, // pro
       () => false // no household
     );
 
@@ -69,6 +85,7 @@ describe("routeToCorrectPagePure", () => {
       <TestPage />,
       () => true, // logged in
       () => true, // completed survey
+      () => true, // pro
       () => true // has household
     );
 
@@ -79,35 +96,61 @@ describe("routeToCorrectPagePure", () => {
   it("should check conditions in the correct order (short-circuit evaluation)", () => {
     const isLoggedIn = vi.fn(() => false);
     const hasCompletedSurvey = vi.fn(() => true);
+    const isPro = vi.fn(() => true);
     const hasHousehold = vi.fn(() => true);
 
     routeToCorrectPagePure(
       <TestPage />,
       isLoggedIn,
       hasCompletedSurvey,
+      isPro,
       hasHousehold
     );
 
     // When not logged in, other checks should not be called
     expect(isLoggedIn).toHaveBeenCalled();
     expect(hasCompletedSurvey).not.toHaveBeenCalled();
+    expect(isPro).not.toHaveBeenCalled();
     expect(hasHousehold).not.toHaveBeenCalled();
   });
 
   it("should only check hasCompletedSurvey when logged in", () => {
     const isLoggedIn = vi.fn(() => true);
     const hasCompletedSurvey = vi.fn(() => false);
+    const isPro = vi.fn(() => true);
     const hasHousehold = vi.fn(() => true);
 
     routeToCorrectPagePure(
       <TestPage />,
       isLoggedIn,
       hasCompletedSurvey,
+      isPro,
       hasHousehold
     );
 
     expect(isLoggedIn).toHaveBeenCalled();
     expect(hasCompletedSurvey).toHaveBeenCalled();
+    expect(isPro).not.toHaveBeenCalled();
+    expect(hasHousehold).not.toHaveBeenCalled();
+  });
+
+  it("should only check isPro when survey is completed", () => {
+    const isLoggedIn = vi.fn(() => true);
+    const hasCompletedSurvey = vi.fn(() => true);
+    const isPro = vi.fn(() => false);
+    const hasHousehold = vi.fn(() => true);
+
+    routeToCorrectPagePure(
+      <TestPage />,
+      isLoggedIn,
+      hasCompletedSurvey,
+      isPro,
+      hasHousehold
+    );
+
+    expect(isLoggedIn).toHaveBeenCalled();
+    expect(hasCompletedSurvey).toHaveBeenCalled();
+    expect(isPro).toHaveBeenCalled();
     expect(hasHousehold).not.toHaveBeenCalled();
   });
 });
