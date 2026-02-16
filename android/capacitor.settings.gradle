@@ -17,6 +17,9 @@ project(':capacitor-camera').projectDir = new File('../node_modules/@capacitor/c
 include ':capacitor-clipboard'
 project(':capacitor-clipboard').projectDir = new File('../node_modules/@capacitor/clipboard/android')
 
+include ':capacitor-preferences'
+project(':capacitor-preferences').projectDir = new File('../node_modules/@capacitor/preferences/android')
+
 include ':capacitor-share'
 project(':capacitor-share').projectDir = new File('../node_modules/@capacitor/share/android')
 
@@ -25,6 +28,9 @@ project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacit
 
 include ':capawesome-capacitor-android-edge-to-edge-support'
 project(':capawesome-capacitor-android-edge-to-edge-support').projectDir = new File('../node_modules/@capawesome/capacitor-android-edge-to-edge-support/android')
+
+include ':capawesome-capacitor-app-review'
+project(':capawesome-capacitor-app-review').projectDir = new File('../node_modules/@capawesome/capacitor-app-review/android')
 
 include ':capawesome-capacitor-app-update'
 project(':capawesome-capacitor-app-update').projectDir = new File('../node_modules/@capawesome/capacitor-app-update/android')
