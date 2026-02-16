@@ -20,7 +20,8 @@
       "Bash(npm run test:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm outdated:*)",
-      "Read(//home/kerim/programming/plateful/**)"
+      "Read(//home/kerim/programming/plateful/**)",
+      "Bash(npm ls:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
