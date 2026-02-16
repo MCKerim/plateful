@@ -18,7 +18,9 @@
       "Bash(git log:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run test:*)",
-      "Bash(npm uninstall:*)"
+      "Bash(npm uninstall:*)",
+      "Bash(npm outdated:*)",
+      "Read(//home/kerim/programming/plateful/**)"
     ]
   },
   "enableAllProjectMcpServers": true,
