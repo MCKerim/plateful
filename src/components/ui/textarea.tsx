@@ -40,7 +40,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       adjustHeight();
     }, [adjustHeight, props.value]);
 
-    const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const handleInput: React.ComponentProps<"textarea">["onInput"] = (e) => {
       adjustHeight();
       if (props.onInput) {
         props.onInput(e);

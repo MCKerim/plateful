@@ -9,7 +9,7 @@ import { CookbookRecipe } from "@/types/cookbook.types";
 export function useRecipes() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
-  const previousDataRef = useRef<CookbookRecipe[] | undefined>();
+  const previousDataRef = useRef<CookbookRecipe[] | undefined>(undefined);
 
   const query = useQuery({
     queryKey: queryKeys.recipes.list,

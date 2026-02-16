@@ -29,9 +29,9 @@ interface UseImageSourcePickerResult<T extends "dataUrl" | "base64"> {
   selectFromGallery: () => Promise<ImageResult<T> | null>;
   selectMultipleFromGallery: () => Promise<ImageResult<T>[] | null>;
   isNative: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   handleFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  multipleFileInputRef: React.RefObject<HTMLInputElement>;
+  multipleFileInputRef: React.RefObject<HTMLInputElement | null>;
   handleMultipleFileInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   ImageSourceDrawerComponent: React.ReactNode;
 }

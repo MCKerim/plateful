@@ -6,7 +6,7 @@ import SignUp from "./page/onboarding/signUp/SignUp";
 import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
 import EmailVerification from "./page/onboarding/emailVerification/EmailVerification";
 import Login from "./page/onboarding/login/Login";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
 import InvitePage from "./page/InvitePage";
@@ -212,7 +212,7 @@ function App() {
     return householdId !== null;
   }
 
-  function routeToCorrectPage(page: JSX.Element) {
+  function routeToCorrectPage(page: React.JSX.Element) {
     return routeToCorrectPagePure(
       page,
       isLoggedIn,
@@ -222,7 +222,7 @@ function App() {
   }
 
   function guardOnboardingRoute(
-    page: JSX.Element,
+    page: React.JSX.Element,
     requiredStep: "survey" | "socialproof"
   ) {
     if (!isLoggedIn()) {

@@ -1,8 +1,9 @@
+import React from "react";
 import SignUp from "@/page/onboarding/signUp/SignUp";
 import { Navigate } from "react-router";
 
 export function routeToCorrectPagePure(
-  page: JSX.Element,
+  page: React.JSX.Element,
   isLoggedIn: () => boolean,
   hasCompletedSurvey: () => boolean,
   hasHousehold: () => boolean

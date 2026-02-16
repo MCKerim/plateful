@@ -34,6 +34,9 @@ export default tseslint.config(
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
+      // React Compiler rules - warn only (not using the compiler yet)
+      "react-hooks/set-state-in-effect": "warn",
+      "react-hooks/refs": "warn",
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-explicit-any": "warn",
     },

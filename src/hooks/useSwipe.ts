@@ -23,11 +23,8 @@ export function useSwipe({
   const touchStartY = useRef<number | null>(null);
   const touchCurrentX = useRef<number | null>(null);
   const wasDisabledDuringGesture = useRef(false);
-
-  // Track if disabled became true at any point during the gesture
-  if (disabled && touchStartX.current !== null) {
-    wasDisabledDuringGesture.current = true;
-  }
+  const disabledRef = useRef(disabled);
+  disabledRef.current = disabled;
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     wasDisabledDuringGesture.current = false;
@@ -39,6 +36,10 @@ export function useSwipe({
   const touchCurrentY = useRef<number | null>(null);
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
+    // Track if disabled became true at any point during the gesture
+    if (disabledRef.current && touchStartX.current !== null) {
+      wasDisabledDuringGesture.current = true;
+    }
     touchCurrentX.current = e.touches[0].clientX;
     touchCurrentY.current = e.touches[0].clientY;
   }, []);

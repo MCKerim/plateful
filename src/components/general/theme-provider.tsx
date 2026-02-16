@@ -36,6 +36,15 @@ export function ThemeProvider({
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
 
+  const setEdgeToEdgeBackgroundColor = async (color: string) => {
+    if (Capacitor.isNativePlatform()) {
+      await EdgeToEdge.setBackgroundColor({ color });
+      await StatusBar.setStyle({
+        style: color === DARK_BG_COLOR ? Style.Dark : Style.Light,
+      });
+    }
+  };
+
   useEffect(() => {
     const root = globalThis.document.documentElement;
     const mediaQuery = globalThis.matchMedia("(prefers-color-scheme: dark)");
@@ -61,15 +70,6 @@ export function ThemeProvider({
       return () => mediaQuery.removeEventListener("change", updateTheme);
     }
   }, [theme]);
-
-  const setEdgeToEdgeBackgroundColor = async (color: string) => {
-    if (Capacitor.isNativePlatform()) {
-      await EdgeToEdge.setBackgroundColor({ color });
-      await StatusBar.setStyle({
-        style: color === DARK_BG_COLOR ? Style.Dark : Style.Light,
-      });
-    }
-  };
 
   const value = useMemo(
     () => ({

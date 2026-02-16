@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
@@ -8,23 +8,17 @@ export default function EmailVerification() {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
 
-  const [email, setEmail] = useState<string>("");
-
-  useEffect(() => {
-    // Get email from URL or session storage
+  const [email] = useState<string>(() => {
     const urlParams = new URLSearchParams(globalThis.location.search);
     const emailParam = urlParams.get("email");
 
     if (emailParam) {
-      setEmail(emailParam);
       sessionStorage.setItem("signupEmail", emailParam);
-    } else {
-      const storedEmail = sessionStorage.getItem("signupEmail");
-      if (storedEmail) {
-        setEmail(storedEmail);
-      }
+      return emailParam;
     }
-  }, []);
+
+    return sessionStorage.getItem("signupEmail") ?? "";
+  });
 
   const handleResendEmail = async () => {
     if (!email) {

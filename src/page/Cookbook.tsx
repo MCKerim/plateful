@@ -1,7 +1,7 @@
 import RecipeCard from "@/components/general/RecipeCard";
 import Layout from "@/components/layout/Layout";
 import { Input } from "@/components/ui/input";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
@@ -21,7 +21,6 @@ import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
-import { CookbookRecipe } from "@/types/cookbook.types";
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
@@ -35,8 +34,6 @@ export default function Cookbook() {
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
   const searchTerm = useAppSelector(selectSearchTerm);
-
-  const [searchResults, setSearchResults] = useState<CookbookRecipe[]>([]);
 
   const fuse = useMemo(
     () =>
@@ -59,7 +56,7 @@ export default function Cookbook() {
     return [...importing, ...ready];
   }, [recipes]);
 
-  useEffect(() => {
+  const searchResults = useMemo(() => {
     let searchedRecipes = [...recipes];
 
     if (searchTerm.trim() !== "") {
@@ -89,7 +86,7 @@ export default function Cookbook() {
       return 0;
     });
 
-    setSearchResults(searchedRecipes);
+    return searchedRecipes;
   }, [searchTerm, sorting, categoryId, recipes, fuse]);
 
   useEffect(() => {

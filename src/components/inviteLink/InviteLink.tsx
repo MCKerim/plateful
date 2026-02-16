@@ -19,12 +19,6 @@ export default function InviteLink() {
 
   const [inviteLink, setInviteLink] = useState("");
 
-  useEffect(() => {
-    if (user?.household_id) {
-      createInvite();
-    }
-  }, [user?.household_id]);
-
   async function createInvite() {
     const token = uuidv4();
 
@@ -48,6 +42,12 @@ export default function InviteLink() {
 
     setInviteLink(`https://app.plateful.cloud/invite/${token}`);
   }
+
+  useEffect(() => {
+    if (user?.household_id) {
+      createInvite();
+    }
+  }, [user?.household_id]);
 
   async function shareInviteLink() {
     try {
