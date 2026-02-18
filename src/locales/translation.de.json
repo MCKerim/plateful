@@ -171,6 +171,9 @@
     "title": "Teste Plateful jetzt kostenlos.",
     "noPayment": "Keine Zahlung jetzt fällig",
     "button": "Kostenlos testen – 0,00 €",
+    "trialLabel": "7 Tage kostenlos testen",
+    "trialSub": "Jederzeit kündigen",
+    "totalLabel": "Heute fällig",
     "features": {
       "import": "Rezepte von überall importieren",
       "importDesc": "TikTok, Instagram, Webseiten & mehr",

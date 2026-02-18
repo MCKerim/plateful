@@ -123,6 +123,9 @@
     "title": "We want you to try Plateful for free.",
     "noPayment": "No Payment Due Now",
     "button": "Try for $0.00",
+    "trialLabel": "7-day free trial",
+    "trialSub": "Cancel anytime",
+    "totalLabel": "Today's total",
     "features": {
       "import": "Import recipes from anywhere",
       "importDesc": "TikTok, Instagram, websites & more",
