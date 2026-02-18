@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
-import { Check, Scissors } from "lucide-react";
+import { Check } from "lucide-react";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 
@@ -39,22 +39,12 @@ function ReceiptBottom() {
   );
 }
 
-function TearLine() {
-  return (
-    <div className="flex items-center gap-1 my-1">
-      <Scissors className="w-3.5 h-3.5 text-muted-foreground shrink-0 -ml-1" />
-      <div className="flex-1 border-t-2 border-dashed border-border" />
-    </div>
-  );
-}
-
 export default function TrialOffer() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <OnboardingLayout>
-      {/* Title */}
       <motion.div
         className="text-center px-2"
         initial={{ opacity: 0, y: -15 }}
@@ -69,31 +59,14 @@ export default function TrialOffer() {
       {/* Receipt */}
       <motion.div
         className="w-full max-w-sm"
-        style={{ filter: "drop-shadow(0 6px 16px rgba(0,0,0,0.15))" }}
+        style={{ filter: "drop-shadow(0 0px 24px rgba(0,0,0,0.2))" }}
         initial={{ opacity: 0, scale: 0.96, y: 12 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2, ease: "easeOut" }}
       >
         {/* Card body — rounded top, flush bottom (zigzag takes over) */}
-        <div className="bg-card rounded-t-3xl border-2 border-dashed border-b-0 overflow-hidden">
-
-          {/* Store header strip */}
-          <div className="bg-accent/15 flex flex-col items-center py-3 gap-0.5">
-            <p className="text-[10px] font-bold tracking-[0.2em] uppercase text-accent">
-              Plateful
-            </p>
-            <p className="first-font text-xl font-bold">
-              {t("trialOffer.trialLabel")}
-            </p>
-            <p className="text-xs text-muted-foreground second-font">
-              {t("trialOffer.trialSub")}
-            </p>
-          </div>
-
-          {/* Content body */}
+        <div className="bg-card rounded-t-md border-2 border-dashed border-b-0 overflow-hidden">
           <div className="px-5 pt-4 pb-3">
-            <TearLine />
-
             {/* Line items */}
             <div className="flex flex-col gap-2.5 py-3">
               {lineItems.map((key, i) => (
@@ -108,13 +81,14 @@ export default function TrialOffer() {
                     ease: "easeOut",
                   }}
                 >
-                  <Check className="w-4 h-4 text-green-500 shrink-0" />
-                  <span className="text-sm second-font">{t(key)}</span>
+                  <Check className="w-4 h-4 text-accent shrink-0" />
+
+                  <span className="text-sm second-font font-semibold">{t(key)}</span>
                 </motion.div>
               ))}
             </div>
 
-            <TearLine />
+            <div className="flex-1 border-t-2 border-dashed border-border" />
 
             {/* Total row */}
             <motion.div
@@ -131,6 +105,7 @@ export default function TrialOffer() {
               <span className="text-sm font-bold uppercase tracking-wide">
                 {t("trialOffer.totalLabel")}
               </span>
+
               <span className="text-2xl font-black text-accent">$0.00</span>
             </motion.div>
           </div>
