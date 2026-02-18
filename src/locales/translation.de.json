@@ -170,7 +170,15 @@
   "trialOffer": {
     "title": "Teste Plateful jetzt kostenlos.",
     "noPayment": "Keine Zahlung jetzt fällig",
-    "button": "Kostenlos testen – 0,00 €"
+    "button": "Kostenlos testen – 0,00 €",
+    "features": {
+      "import": "Rezepte von überall importieren",
+      "importDesc": "TikTok, Instagram, Webseiten & mehr",
+      "aiChef": "Dein persönlicher AI-Chef",
+      "aiChefDesc": "Rezepte passend zu deiner Ernährung",
+      "planning": "Wöchentliche Essensplanung",
+      "planningDesc": "Flexibel und stressfrei planen"
+    }
   },
   "trialReminder": {
     "title": "Wir erinnern dich, bevor dein kostenloser Testzeitraum endet",

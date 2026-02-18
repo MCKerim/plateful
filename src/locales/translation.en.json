@@ -122,7 +122,15 @@
   "trialOffer": {
     "title": "We want you to try Plateful for free.",
     "noPayment": "No Payment Due Now",
-    "button": "Try for $0.00"
+    "button": "Try for $0.00",
+    "features": {
+      "import": "Import recipes from anywhere",
+      "importDesc": "TikTok, Instagram, websites & more",
+      "aiChef": "Your personal AI Chef",
+      "aiChefDesc": "Recipes tailored to your diet & cravings",
+      "planning": "Weekly meal planning",
+      "planningDesc": "Flexible, stress-free week planning"
+    }
   },
   "trialReminder": {
     "title": "We'll send you a reminder before your free trial ends",
