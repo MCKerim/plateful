@@ -119,6 +119,16 @@
     "step3": "Plan your week",
     "step4": "Cook & enjoy"
   },
+  "trialOffer": {
+    "title": "We want you to try Plateful for free.",
+    "noPayment": "No Payment Due Now",
+    "button": "Try for $0.00"
+  },
+  "trialReminder": {
+    "title": "We'll send you a reminder before your free trial ends",
+    "noPayment": "No Payment Due Now",
+    "button": "Continue for Free"
+  },
   "chooseUsername": {
     "title": "What should we call you?",
     "label": "Your name",

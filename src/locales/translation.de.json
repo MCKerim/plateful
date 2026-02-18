@@ -167,6 +167,16 @@
     "step3": "Plane deine Woche",
     "step4": "Kochen & genießen"
   },
+  "trialOffer": {
+    "title": "Teste Plateful jetzt kostenlos.",
+    "noPayment": "Keine Zahlung jetzt fällig",
+    "button": "Kostenlos testen – 0,00 €"
+  },
+  "trialReminder": {
+    "title": "Wir erinnern dich, bevor dein kostenloser Testzeitraum endet",
+    "noPayment": "Keine Zahlung jetzt fällig",
+    "button": "Kostenlos weiter"
+  },
   "chooseUsername": {
     "title": "Wie sollen wir dich nennen?",
     "label": "Dein Name",
