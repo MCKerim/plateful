@@ -20,6 +20,7 @@ import CategoryButton from "@/components/general/CategoryButton";
 import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
+import CookbookIllustration from "@/components/onboarding/illustrations/CookbookIllustration";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 
 export default function Cookbook() {
@@ -190,7 +191,12 @@ export default function Cookbook() {
       <OnboardingSheet
         storageKey="onboarding_recipes_seen"
         titleKey="onboarding.recipes.title"
-        descriptionKey="onboarding.recipes.description"
+        bulletKeys={[
+          "onboarding.recipes.bullet1",
+          "onboarding.recipes.bullet2",
+          "onboarding.recipes.bullet3",
+        ]}
+        illustration={<CookbookIllustration />}
       />
 
       {(categoryId !== null || searchTerm.trim() !== "") && (

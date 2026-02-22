@@ -593,15 +593,21 @@
     },
     "chatbot": {
       "title": "Your AI Kitchen Assistant",
-      "description": "Ask for recipe ideas, meal suggestions, or cooking tips — I can add recipes straight to your collection."
+      "bullet1": "Ask for recipe ideas or cooking tips",
+      "bullet2": "Import & edit recipes from any link",
+      "bullet3": "Recipes get saved to your collection automatically"
     },
     "recipes": {
       "title": "Your Recipe Collection",
-      "description": "Save your own recipes or import them directly from social media links. Organize them in cookbooks."
+      "bullet1": "Scan recipes with your camera or paste a link",
+      "bullet2": "Organize recipes into custom cookbooks",
+      "bullet3": "Rate, scale & share with your household"
     },
     "mealPlanner": {
       "title": "Plan Your Week",
-      "description": "Drag recipes to specific days or keep them in your weekly pool for flexible planning."
+      "bullet1": "Hold & drag recipes onto any day",
+      "bullet2": "Keep unplanned recipes in your weekly pool",
+      "bullet3": "Mark meals as eaten and rate them"
     }
   },
   "questions": {

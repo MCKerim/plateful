@@ -593,15 +593,21 @@
     },
     "chatbot": {
       "title": "Dein KI-Küchenassistent",
-      "description": "Frag nach Rezeptideen, Essensvorschlägen oder Kochtipps — ich kann Rezepte direkt in deine Sammlung hinzufügen."
+      "bullet1": "Frag nach Rezeptideen oder Kochtipps",
+      "bullet2": "Importiere & bearbeite Rezepte von jedem Link",
+      "bullet3": "Rezepte werden automatisch in deiner Sammlung gespeichert"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
-      "description": "Speichere eigene Rezepte oder importiere sie direkt aus Social-Media-Links. Organisiere sie in Kochbüchern."
+      "bullet1": "Scanne Rezepte mit der Kamera oder füge einen Link ein",
+      "bullet2": "Organisiere Rezepte in eigenen Kochbüchern",
+      "bullet3": "Bewerte, skaliere & teile mit deinem Haushalt"
     },
     "mealPlanner": {
       "title": "Plane deine Woche",
-      "description": "Ziehe Rezepte auf bestimmte Tage oder behalte sie in deinem Wochenpool für flexible Planung."
+      "bullet1": "Halte & ziehe Rezepte auf einen beliebigen Tag",
+      "bullet2": "Behalte ungeplante Rezepte im Wochenpool",
+      "bullet3": "Markiere Gerichte als gegessen und bewerte sie"
     }
   },
   "questions": {

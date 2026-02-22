@@ -42,6 +42,7 @@ import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlanned
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
+import MealPlannerIllustration from "@/components/onboarding/illustrations/MealPlannerIllustration";
 
 const locales = {
   en: enUS,
@@ -456,7 +457,12 @@ export default function MealPlanner() {
         <OnboardingSheet
           storageKey="onboarding_mealplanner_seen"
           titleKey="onboarding.mealPlanner.title"
-          descriptionKey="onboarding.mealPlanner.description"
+          bulletKeys={[
+            "onboarding.mealPlanner.bullet1",
+            "onboarding.mealPlanner.bullet2",
+            "onboarding.mealPlanner.bullet3",
+          ]}
+          illustration={<MealPlannerIllustration />}
         />
       </Layout>
 

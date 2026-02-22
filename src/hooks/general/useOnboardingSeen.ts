@@ -8,7 +8,7 @@ export function useOnboardingSeen(storageKey: string) {
     let cancelled = false;
     Preferences.get({ key: storageKey }).then(({ value }) => {
       if (!cancelled) {
-        setSeen(value === "true");
+        setSeen(false);
       }
     });
     return () => {

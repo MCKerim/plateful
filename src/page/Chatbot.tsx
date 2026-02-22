@@ -42,6 +42,7 @@ import type { RecipeIngredientInput } from "@/types/ingredient.types";
 import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
+import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIllustration";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -637,7 +638,12 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       <OnboardingSheet
         storageKey="onboarding_chatbot_seen"
         titleKey="onboarding.chatbot.title"
-        descriptionKey="onboarding.chatbot.description"
+        bulletKeys={[
+          "onboarding.chatbot.bullet1",
+          "onboarding.chatbot.bullet2",
+          "onboarding.chatbot.bullet3",
+        ]}
+        illustration={<ChatbotIllustration />}
       />
     </Layout>
   );
