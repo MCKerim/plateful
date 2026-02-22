@@ -9,6 +9,7 @@ export type HouseholdMember = {
   id: string;
   email: string;
   username: string;
+  created_at: string;
 };
 
 export const userApi = {
@@ -35,7 +36,7 @@ export const userApi = {
   ): Promise<HouseholdMember[]> {
     const { data, error } = await supabase
       .from("users")
-      .select("id, email, username")
+      .select("id, email, username, created_at")
       .eq("household_id", householdId);
 
     if (error) {

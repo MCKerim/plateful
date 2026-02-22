@@ -3,8 +3,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { selectHousehold, selectHouseholdMembers } from "@/redux/slices/householdSlice";
-import { CircleMinus, Pencil, Trash2, House, UserRoundPlus, LogOut } from "lucide-react";
+import {
+  selectHousehold,
+  selectHouseholdMembers,
+  selectIsCurrentUserOwner,
+} from "@/redux/slices/householdSlice";
+import { Pencil, Trash2, House, UserRoundPlus, LogOut, Shield, CircleMinus } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
@@ -15,27 +19,42 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerDescription,
+} from "@/components/ui/drawer";
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { useUpdateHouseholdName } from "@/hooks/household/useUpdateHouseholdName";
 import { useRemoveMember } from "@/hooks/household/useRemoveMember";
 import { useLeaveHousehold } from "@/hooks/household/useLeaveHousehold";
+import { useTransferOwnership } from "@/hooks/household/useTransferOwnership";
+import { useDeleteHousehold } from "@/hooks/household/useDeleteHousehold";
 import { toast } from "sonner";
 import DeleteDialog from "@/components/general/DeleteDialog";
+import { HouseholdMember } from "@/api/user.api";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const household = useAppSelector(selectHousehold);
   const householdMembers = useAppSelector(selectHouseholdMembers);
+  const isOwner = useAppSelector(selectIsCurrentUserOwner);
 
   const [isEditNameDialogOpen, setIsEditNameDialogOpen] = useState(false);
   const [editedName, setEditedName] = useState("");
+  const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
 
   const updateHouseholdName = useUpdateHouseholdName();
   const removeMemberMutation = useRemoveMember();
   const leaveHouseholdMutation = useLeaveHousehold();
+  const transferOwnershipMutation = useTransferOwnership();
+  const deleteHouseholdMutation = useDeleteHousehold();
 
   function handleRemoveMember(memberId: string) {
     if (!household || !user?.household_id || memberId === user.id) {
@@ -46,6 +65,7 @@ export default function HouseholdSettings() {
       { memberId },
       {
         onSuccess: () => {
+          setSelectedMember(null);
           toast.success(t("householdSettings.success.memberRemoved"));
         },
         onError: (error) => {
@@ -73,8 +93,42 @@ export default function HouseholdSettings() {
   }
 
   function handleDeleteHousehold() {
-    // TODO: Implement delete household functionality
-    // This would typically delete the household and remove all members
+    if (!household) {
+      return;
+    }
+
+    deleteHouseholdMutation.mutate(
+      { householdId: household.id },
+      {
+        onSuccess: () => {
+          toast.success(t("householdSettings.success.householdDeleted"));
+        },
+        onError: (error) => {
+          console.error("Error deleting household:", error);
+          toast.error(t("householdSettings.errors.deleteHouseholdFailed"));
+        },
+      }
+    );
+  }
+
+  function handleTransferOwnership(memberId: string) {
+    if (!household) {
+      return;
+    }
+
+    transferOwnershipMutation.mutate(
+      { householdId: household.id, newOwnerId: memberId },
+      {
+        onSuccess: () => {
+          setSelectedMember(null);
+          toast.success(t("householdSettings.success.ownershipTransferred"));
+        },
+        onError: (error) => {
+          console.error("Error transferring ownership:", error);
+          toast.error(t("householdSettings.errors.transferOwnershipFailed"));
+        },
+      }
+    );
   }
 
   function startEditingName() {
@@ -102,9 +156,18 @@ export default function HouseholdSettings() {
     );
   }
 
+  function getLeaveConfirmationKey() {
+    if (!isOwner) return "leaveHousehold";
+    const otherMembers = householdMembers?.filter((m) => m.id !== user?.id) ?? [];
+    return otherMembers.length > 0 ? "leaveAsOwner" : "leaveAsLastMember";
+  }
+
   if (!household) {
     return null;
   }
+
+  const isMemberOwner = (memberId: string) => household.owner_id === memberId;
+  const leaveKey = getLeaveConfirmationKey();
 
   return (
     <Layout>
@@ -132,28 +195,80 @@ export default function HouseholdSettings() {
 
       {householdMembers?.map((member) => {
         const isCurrentUser = member.id === user?.id;
-        return isCurrentUser ? (
-          <Button variant="secondary" key={member.id} className="flex items-center justify-between">
-            {member.username} - {member.email}
-            <span className="text-sm text-muted-foreground">{t("householdSettings.you")}</span>
-          </Button>
-        ) : (
-          <DeleteDialog
+        const memberIsOwner = isMemberOwner(member.id);
+
+        return (
+          <Button
             key={member.id}
-            onDelete={() => handleRemoveMember(member.id)}
-            title={t("householdSettings.confirmations.removeMember.title")}
-            description={t("householdSettings.confirmations.removeMember.description")}
-            cancelText={t("householdSettings.confirmations.removeMember.cancel")}
-            confirmText={t("householdSettings.confirmations.removeMember.confirm")}
-            customTrigger={
-              <Button variant="secondary" className="flex items-center justify-between w-full">
-                {member.username} - {member.email}
-                <CircleMinus />
-              </Button>
-            }
-          />
+            variant="secondary"
+            className="flex items-center justify-between w-full"
+            onClick={() => !isCurrentUser && setSelectedMember(member)}
+          >
+            <span>
+              {member.username} - {member.email}
+            </span>
+            <span className="flex items-center gap-1.5">
+              {memberIsOwner && (
+                <span className="text-xs font-medium text-accent-foreground bg-accent px-2 py-0.5 rounded-full">
+                  {t("householdSettings.owner")}
+                </span>
+              )}
+              {isCurrentUser && (
+                <span className="text-sm text-muted-foreground">
+                  {t("householdSettings.you")}
+                </span>
+              )}
+            </span>
+          </Button>
         );
       })}
+
+      {/* Member Drawer */}
+      <Drawer
+        open={selectedMember !== null}
+        onOpenChange={(open) => {
+          if (!open) setSelectedMember(null);
+        }}
+      >
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>{selectedMember?.username}</DrawerTitle>
+            <DrawerDescription>{selectedMember?.email}</DrawerDescription>
+          </DrawerHeader>
+
+          <DrawerFooter className="gap-3 mb-4">
+            {selectedMember && isOwner && (
+              <>
+                <DeleteDialog
+                  onDelete={() => handleTransferOwnership(selectedMember.id)}
+                  title={t("householdSettings.confirmations.makeOwner.title")}
+                  description={t("householdSettings.confirmations.makeOwner.description")}
+                  cancelText={t("householdSettings.confirmations.makeOwner.cancel")}
+                  confirmText={t("householdSettings.confirmations.makeOwner.confirm")}
+                  customTrigger={
+                    <Button variant="secondary" className="w-full">
+                      <Shield size={16} /> {t("householdSettings.makeOwner")}
+                    </Button>
+                  }
+                />
+
+                <DeleteDialog
+                  onDelete={() => handleRemoveMember(selectedMember.id)}
+                  title={t("householdSettings.confirmations.removeMember.title")}
+                  description={t("householdSettings.confirmations.removeMember.description")}
+                  cancelText={t("householdSettings.confirmations.removeMember.cancel")}
+                  confirmText={t("householdSettings.confirmations.removeMember.confirm")}
+                  customTrigger={
+                    <Button variant="destructive" className="w-full">
+                      <CircleMinus size={16} /> {t("householdSettings.removeMember")}
+                    </Button>
+                  }
+                />
+              </>
+            )}
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
 
       <Dialog>
         <DialogTrigger>
@@ -178,10 +293,10 @@ export default function HouseholdSettings() {
       <div className="w-full gap-2 flex">
         <DeleteDialog
           onDelete={handleLeaveHousehold}
-          title={t("householdSettings.confirmations.leaveHousehold.title")}
-          description={t("householdSettings.confirmations.leaveHousehold.description")}
-          cancelText={t("householdSettings.confirmations.leaveHousehold.cancel")}
-          confirmText={t("householdSettings.confirmations.leaveHousehold.confirm")}
+          title={t(`householdSettings.confirmations.${leaveKey}.title`)}
+          description={t(`householdSettings.confirmations.${leaveKey}.description`)}
+          cancelText={t(`householdSettings.confirmations.${leaveKey}.cancel`)}
+          confirmText={t(`householdSettings.confirmations.${leaveKey}.confirm`)}
           customTrigger={
             <Button variant="destructive" className="w-full">
               <LogOut size={16} /> {t("householdSettings.leaveHousehold")}
@@ -196,7 +311,7 @@ export default function HouseholdSettings() {
           cancelText={t("householdSettings.confirmations.deleteHousehold.cancel")}
           confirmText={t("householdSettings.confirmations.deleteHousehold.confirm")}
           customTrigger={
-            <Button variant="destructive" className="w-full" disabled>
+            <Button variant="destructive" className="w-full" disabled={!isOwner}>
               <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
             </Button>
           }

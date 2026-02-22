@@ -14,6 +14,15 @@ export type LeaveHouseholdParams = {
   userId: string;
 };
 
+export type TransferOwnershipParams = {
+  householdId: string;
+  newOwnerId: string;
+};
+
+export type DeleteHouseholdParams = {
+  householdId: string;
+};
+
 export const householdApi = {
   async updateName(
     supabase: SupabaseClient<Database>,
@@ -51,6 +60,36 @@ export const householdApi = {
       .from("users")
       .update({ household_id: null })
       .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
+  async transferOwnership(
+    supabase: SupabaseClient<Database>,
+    params: TransferOwnershipParams
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("household")
+      .update({ owner_id: params.newOwnerId })
+      .eq("id", params.householdId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
+  async deleteHousehold(
+    supabase: SupabaseClient<Database>,
+    params: DeleteHouseholdParams
+  ): Promise<void> {
+    // Cascade delete handles recipes, meal plans, cookbooks, invites.
+    // Users are unlinked (household_id set to null) automatically.
+    const { error } = await supabase
+      .from("household")
+      .delete()
+      .eq("id", params.householdId);
 
     if (error) {
       throw error;

@@ -405,6 +405,9 @@
     "member": "Mitglied",
     "members": "Mitglieder",
     "you": "Du",
+    "owner": "Eigentümer",
+    "makeOwner": "Zum Eigentümer machen",
+    "removeMember": "Mitglied entfernen",
     "inviteMember": "Mitglied einladen",
     "scanQrOrShareLink": "Scanne den QR-Code oder teile den Link",
     "leaveHousehold": "Haushalt verlassen",
@@ -418,6 +421,18 @@
         "confirm": "Verlassen",
         "cancel": "Abbrechen"
       },
+      "leaveAsOwner": {
+        "title": "Haushalt verlassen",
+        "description": "Du bist der Eigentümer. Die Eigentümerschaft wird automatisch auf ein anderes Mitglied übertragen. Bist du sicher?",
+        "confirm": "Verlassen",
+        "cancel": "Abbrechen"
+      },
+      "leaveAsLastMember": {
+        "title": "Haushalt verlassen",
+        "description": "Du bist das letzte Mitglied. Der Haushalt wird dauerhaft gelöscht. Bist du sicher?",
+        "confirm": "Verlassen & Löschen",
+        "cancel": "Abbrechen"
+      },
       "deleteHousehold": {
         "title": "Haushalt löschen",
         "description": "Bist du sicher, dass du diesen Haushalt löschen möchtest? Diese Aktion kann nicht rückgängig gemacht werden und alle Mitglieder werden entfernt.",
@@ -429,15 +444,25 @@
         "description": "Bist du sicher, dass du dieses Mitglied aus dem Haushalt entfernen möchtest?",
         "confirm": "Entfernen",
         "cancel": "Abbrechen"
+      },
+      "makeOwner": {
+        "title": "Eigentümerschaft übertragen",
+        "description": "Bist du sicher, dass du dieses Mitglied zum Eigentümer machen möchtest? Du verlierst deine Eigentümerrechte.",
+        "confirm": "Übertragen",
+        "cancel": "Abbrechen"
       }
     },
     "errors": {
       "removeMemberFailed": "Fehler beim Entfernen des Mitglieds. Bitte versuche es später erneut.",
       "leaveHouseholdFailed": "Fehler beim Verlassen des Haushalts. Bitte versuche es später erneut.",
-      "updateNameFailed": "Fehler beim Aktualisieren des Haushaltsnamens. Bitte versuche es später erneut."
+      "updateNameFailed": "Fehler beim Aktualisieren des Haushaltsnamens. Bitte versuche es später erneut.",
+      "transferOwnershipFailed": "Fehler beim Übertragen der Eigentümerschaft. Bitte versuche es später erneut.",
+      "deleteHouseholdFailed": "Fehler beim Löschen des Haushalts. Bitte versuche es später erneut."
     },
     "success": {
-      "memberRemoved": "Mitglied erfolgreich entfernt."
+      "memberRemoved": "Mitglied erfolgreich entfernt.",
+      "ownershipTransferred": "Eigentümerschaft erfolgreich übertragen.",
+      "householdDeleted": "Haushalt erfolgreich gelöscht."
     }
   },
   "bottomNav": {

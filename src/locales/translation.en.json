@@ -406,6 +406,9 @@
     "member": "Member",
     "members": "Members",
     "you": "You",
+    "owner": "Owner",
+    "makeOwner": "Make Owner",
+    "removeMember": "Remove Member",
     "inviteMember": "Invite Member",
     "scanQrOrShareLink": "Scan the QR code or share the link",
     "leaveHousehold": "Leave Household",
@@ -419,6 +422,18 @@
         "confirm": "Leave",
         "cancel": "Cancel"
       },
+      "leaveAsOwner": {
+        "title": "Leave Household",
+        "description": "You are the owner. Ownership will be automatically transferred to another member. Are you sure?",
+        "confirm": "Leave",
+        "cancel": "Cancel"
+      },
+      "leaveAsLastMember": {
+        "title": "Leave Household",
+        "description": "You are the last member. The household will be permanently deleted. Are you sure?",
+        "confirm": "Leave & Delete",
+        "cancel": "Cancel"
+      },
       "deleteHousehold": {
         "title": "Delete Household",
         "description": "Are you sure you want to delete this household? This action cannot be undone and all members will be removed.",
@@ -430,15 +445,25 @@
         "description": "Are you sure you want to remove this member from the household?",
         "confirm": "Remove",
         "cancel": "Cancel"
+      },
+      "makeOwner": {
+        "title": "Transfer Ownership",
+        "description": "Are you sure you want to make this member the owner? You will lose your owner privileges.",
+        "confirm": "Transfer",
+        "cancel": "Cancel"
       }
     },
     "errors": {
       "removeMemberFailed": "Error removing member. Please try again later.",
       "leaveHouseholdFailed": "Error leaving household. Please try again later.",
-      "updateNameFailed": "Error updating household name. Please try again later."
+      "updateNameFailed": "Error updating household name. Please try again later.",
+      "transferOwnershipFailed": "Error transferring ownership. Please try again later.",
+      "deleteHouseholdFailed": "Error deleting household. Please try again later."
     },
     "success": {
-      "memberRemoved": "Member successfully removed."
+      "memberRemoved": "Member successfully removed.",
+      "ownershipTransferred": "Ownership transferred successfully.",
+      "householdDeleted": "Household deleted successfully."
     }
   },
   "chatbot": {

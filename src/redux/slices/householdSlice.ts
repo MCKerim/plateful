@@ -2,10 +2,11 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { createSlice } from "@reduxjs/toolkit";
 import { RootState } from "../store";
 import { Household } from "@/types/exportedDatabaseTypes.types";
+import { HouseholdMember } from "@/api/user.api";
 
 interface HouseholdState {
   household: Household | null;
-  members: { id: string; email: string; username: string }[] | null;
+  members: HouseholdMember[] | null;
 }
 const initialState: HouseholdState = {
   household: null,
@@ -22,7 +23,7 @@ export const householdSlice = createSlice({
     },
     setHouseholdMembers: (
       state,
-      action: PayloadAction<{ id: string; email: string; username: string }[] | null>
+      action: PayloadAction<HouseholdMember[] | null>
     ) => {
       state.members = action.payload;
     },
@@ -36,3 +37,8 @@ export default householdSlice.reducer;
 export const selectHousehold = (state: RootState) => state.household.household;
 export const selectHouseholdMembers = (state: RootState) => state.household.members;
 export const selectHouseholdId = (state: RootState) => state.household.household?.id ?? null;
+export const selectIsCurrentUserOwner = (state: RootState) => {
+  const household = state.household.household;
+  const userId = state.user.user?.id;
+  return !!(household && userId && household.owner_id === userId);
+};
