@@ -599,12 +599,12 @@
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
-      "bullet1": "Scanne Rezepte mit der Kamera oder füge einen Link ein",
-      "bullet2": "Organisiere Rezepte in eigenen Kochbüchern",
+      "bullet1": "Scanne Rezepte mit deiner Kamera",
+      "bullet2": "Importiere Rezepte von TikTok",
       "bullet3": "Bewerte, skaliere & teile mit deinem Haushalt"
     },
     "mealPlanner": {
-      "title": "Plane deine Woche",
+      "title": "Dein Wochenplaner",
       "bullet1": "Halte & ziehe Rezepte auf einen beliebigen Tag",
       "bullet2": "Behalte ungeplante Rezepte im Wochenpool",
       "bullet3": "Markiere Gerichte als gegessen und bewerte sie"

@@ -599,13 +599,13 @@
     },
     "recipes": {
       "title": "Your Recipe Collection",
-      "bullet1": "Scan recipes with your camera or paste a link",
-      "bullet2": "Organize recipes into custom cookbooks",
+      "bullet1": "Scan recipes from your camera",
+      "bullet2": "Import recipes from TikTok",
       "bullet3": "Rate, scale & share with your household"
     },
     "mealPlanner": {
-      "title": "Plan Your Week",
-      "bullet1": "Hold & drag recipes onto any day",
+      "title": "Your Meal Planner",
+      "bullet1": "Drag & drop recipes onto any day",
       "bullet2": "Keep unplanned recipes in your weekly pool",
       "bullet3": "Mark meals as eaten and rate them"
     }
