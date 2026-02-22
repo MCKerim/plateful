@@ -436,8 +436,10 @@
       },
       "deleteHousehold": {
         "title": "Delete Household",
-        "description": "Are you sure you want to delete this household? This action cannot be undone and all members will be removed.",
-        "confirm": "Delete",
+        "description": "This action is permanent and cannot be undone. All recipes, meal plans, and cookbooks will be permanently deleted.",
+        "confirmationText": "Type \"delete\" to confirm",
+        "confirmationPlaceholder": "delete",
+        "confirm": "Delete Household",
         "cancel": "Cancel"
       },
       "removeMember": {

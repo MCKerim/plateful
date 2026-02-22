@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/drawer";
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useTranslation } from "react-i18next";
+import i18n from "@/i18n";
 import { useState } from "react";
 import { useUpdateHouseholdName } from "@/hooks/household/useUpdateHouseholdName";
 import { useRemoveMember } from "@/hooks/household/useRemoveMember";
@@ -49,6 +50,8 @@ export default function HouseholdSettings() {
   const [isEditNameDialogOpen, setIsEditNameDialogOpen] = useState(false);
   const [editedName, setEditedName] = useState("");
   const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
+  const [isDeleteHouseholdDialogOpen, setIsDeleteHouseholdDialogOpen] = useState(false);
+  const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
 
   const updateHouseholdName = useUpdateHouseholdName();
   const removeMemberMutation = useRemoveMember();
@@ -101,6 +104,8 @@ export default function HouseholdSettings() {
       { householdId: household.id },
       {
         onSuccess: () => {
+          setIsDeleteHouseholdDialogOpen(false);
+          setDeleteConfirmationText("");
           toast.success(t("householdSettings.success.householdDeleted"));
         },
         onError: (error) => {
@@ -110,6 +115,14 @@ export default function HouseholdSettings() {
       }
     );
   }
+
+  const getDeleteConfirmationWord = () => {
+    return i18n.language === "de" ? "löschen" : "delete";
+  };
+
+  const isDeleteConfirmationValid = () => {
+    return deleteConfirmationText.toLowerCase() === getDeleteConfirmationWord();
+  };
 
   function handleTransferOwnership(memberId: string) {
     if (!household) {
@@ -304,19 +317,68 @@ export default function HouseholdSettings() {
           }
         />
 
-        <DeleteDialog
-          onDelete={handleDeleteHousehold}
-          title={t("householdSettings.confirmations.deleteHousehold.title")}
-          description={t("householdSettings.confirmations.deleteHousehold.description")}
-          cancelText={t("householdSettings.confirmations.deleteHousehold.cancel")}
-          confirmText={t("householdSettings.confirmations.deleteHousehold.confirm")}
-          customTrigger={
-            <Button variant="destructive" className="w-full" disabled={!isOwner}>
-              <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
-            </Button>
-          }
-        />
+        <Button
+          variant="destructive"
+          className="w-full"
+          disabled={!isOwner}
+          onClick={() => setIsDeleteHouseholdDialogOpen(true)}
+        >
+          <Trash2 size={16} /> {t("householdSettings.deleteHousehold")}
+        </Button>
       </div>
+
+      <Dialog
+        open={isDeleteHouseholdDialogOpen}
+        onOpenChange={(open) => {
+          setIsDeleteHouseholdDialogOpen(open);
+          if (!open) setDeleteConfirmationText("");
+        }}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>{t("householdSettings.confirmations.deleteHousehold.title")}</DialogTitle>
+          </DialogHeader>
+
+          <div className="flex flex-col gap-4 py-4">
+            <p className="text-sm text-muted-foreground">
+              {t("householdSettings.confirmations.deleteHousehold.description")}
+            </p>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">
+                {t("householdSettings.confirmations.deleteHousehold.confirmationText")}
+              </label>
+              <Input
+                value={deleteConfirmationText}
+                onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                placeholder={t("householdSettings.confirmations.deleteHousehold.confirmationPlaceholder")}
+              />
+            </div>
+
+            <div className="flex gap-2">
+              <Button
+                className="w-full"
+                variant="secondary"
+                onClick={() => {
+                  setIsDeleteHouseholdDialogOpen(false);
+                  setDeleteConfirmationText("");
+                }}
+              >
+                {t("householdSettings.confirmations.deleteHousehold.cancel")}
+              </Button>
+
+              <Button
+                className="w-full"
+                variant="destructive"
+                disabled={!isDeleteConfirmationValid()}
+                onClick={handleDeleteHousehold}
+              >
+                {t("householdSettings.confirmations.deleteHousehold.confirm")}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={isEditNameDialogOpen} onOpenChange={setIsEditNameDialogOpen}>
         <DialogContent>
