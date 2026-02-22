@@ -592,10 +592,10 @@
       "saveFailed": "Beim Speichern deines Fortschritts ist ein Fehler aufgetreten. Bitte versuche es erneut."
     },
     "chatbot": {
-      "title": "Dein KI-Küchenassistent",
+      "title": "Dein KI-Koch",
       "bullet1": "Frag nach Rezeptideen oder Kochtipps",
       "bullet2": "Importiere & bearbeite Rezepte von jedem Link",
-      "bullet3": "Rezepte werden automatisch in deiner Sammlung gespeichert"
+      "bullet3": "Speichere Rezepte direkt in dein Kochbuch"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",

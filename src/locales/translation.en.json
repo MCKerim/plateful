@@ -592,10 +592,10 @@
       "saveFailed": "An error occurred while saving your progress. Please try again."
     },
     "chatbot": {
-      "title": "Your AI Kitchen Assistant",
+      "title": "Your AI-Chef",
       "bullet1": "Ask for recipe ideas or cooking tips",
       "bullet2": "Import & edit recipes from any link",
-      "bullet3": "Recipes get saved to your collection automatically"
+      "bullet3": "Save recipes directly to your cookbook"
     },
     "recipes": {
       "title": "Your Recipe Collection",
