@@ -36,6 +36,8 @@ import TermsOfService from "./page/TermsOfService";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
 import HowItWorks from "./page/onboarding/howItWorks/HowItWorks";
+import TrialOffer from "./page/onboarding/trialOffer/TrialOffer";
+import TrialReminder from "./page/onboarding/trialReminder/TrialReminder";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
@@ -290,6 +292,8 @@ function App() {
 
         <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
+        <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "socialproof")} />
+        <Route path="/trialreminder" element={guardOnboardingRoute(<TrialReminder />, "socialproof")} />
 
         <Route
           path="/subscribe"
