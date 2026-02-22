@@ -17,9 +17,18 @@ type Props = {
   name: string;
   averageRating: number | null;
   status?: RecipeStatus;
+  showRating?: boolean;
+  showMealPlanStatus?: boolean;
 };
 
-export default function RecipeCard({ id, name, averageRating, status = "ready" }: Readonly<Props>) {
+export default function RecipeCard({
+  id,
+  name,
+  averageRating,
+  status = "ready",
+  showRating = true,
+  showMealPlanStatus = true,
+}: Readonly<Props>) {
   const { t } = useTranslation();
   const { data: imageUrl } = useRecipeFirstImage(id);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(id);
@@ -40,14 +49,14 @@ export default function RecipeCard({ id, name, averageRating, status = "ready" }
         whileTap={{ scale: 0.95 }}
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
       >
-        <Card className="relative bg-transparent border-2">
+        <Card className="relative bg-transparent">
           <img
             src={imageUrl || "/no-img.jpg"}
             alt="Recipe"
-            className="object-cover w-full h-32 border-b-4 border-background dark:brightness-75"
+            className="object-cover w-full h-32 border-background dark:brightness-75"
           />
 
-          <div className="flex flex-col justify-between gap-2 p-2">
+          <div className="flex flex-col justify-between gap-2 p-2 border-b-2 border-l-2 border-r-2 rounded-b-lg">
             <div className="flex justify-between">
               <h1 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
                 {name}
@@ -57,17 +66,21 @@ export default function RecipeCard({ id, name, averageRating, status = "ready" }
             {TAGS.length > 0 && <div className="flex gap-1">{renderTagPills()}</div>}
 
             <div className="flex justify-between">
-              <div className="flex items-center gap-1">
-                <CalendarDays size={16} />
+              {showMealPlanStatus && (
+                <div className="flex items-center gap-1">
+                  <CalendarDays size={16} />
 
-                <p className="text-xs">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
-              </div>
+                  <p className="text-xs">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
+                </div>
+              )}
 
-              <div className="flex items-center">
-                <p className="text-xs">{formatRating(averageRating)}</p>
+              {showRating && (
+                <div className="flex items-center">
+                  <p className="text-xs">{formatRating(averageRating)}</p>
 
-                <StarIcon style={{ fontSize: "16px" }} />
-              </div>
+                  <StarIcon style={{ fontSize: "16px" }} />
+                </div>
+              )}
             </div>
           </div>
         </Card>
