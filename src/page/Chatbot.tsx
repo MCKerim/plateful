@@ -280,7 +280,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
-    const { proposalId, title, description, servings, ingredients, instructions, category } = proposal;
+    const { proposalId, title, description, servings, ingredients, instructions, category } =
+      proposal;
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
@@ -335,7 +336,17 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveEditedRecipe(proposal: EditRecipeProposal) {
-    const { proposalId, recipeId, title, description, servings, ingredients, instructions, category, link } = proposal;
+    const {
+      proposalId,
+      recipeId,
+      title,
+      description,
+      servings,
+      ingredients,
+      instructions,
+      category,
+      link,
+    } = proposal;
     let categoryId = getCategoryIdByTranslatedEnglishName(category);
 
     if (categoryId === null) {
