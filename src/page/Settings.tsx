@@ -22,7 +22,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
 import { useUpdateLanguage } from "@/hooks/user/useUpdateLanguage";
+import { useDeleteAccount } from "@/hooks/user/useDeleteAccount";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 
 export default function Settings() {
   const { supabase } = useSupabase();
@@ -35,6 +37,7 @@ export default function Settings() {
 
   const updateUsernameMutation = useUpdateUsername();
   const updateLanguageMutation = useUpdateLanguage();
+  const deleteAccountMutation = useDeleteAccount();
   const { restorePurchases } = useSubscription();
   const { presentCustomerCenter } = useCustomerCenter();
 
@@ -76,12 +79,13 @@ export default function Settings() {
     }
   };
 
-  // TODO: Implement actual account deletion logic
-  // This should delete user data from Supabase and sign out the user
-  const handleDeleteAccount = async () => {
-    console.log("Delete account requested");
-    setIsDeleteAccountDialogOpen(false);
-    setDeleteConfirmationText("");
+  const handleDeleteAccount = () => {
+    deleteAccountMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsDeleteAccountDialogOpen(false);
+        setDeleteConfirmationText("");
+      },
+    });
   };
 
   const getDeleteConfirmationWord = () => {
@@ -341,6 +345,10 @@ export default function Settings() {
               {t("settings.confirmations.deleteAccount.description")}
             </p>
 
+            <p className="text-sm text-muted-foreground">
+              {t("settings.confirmations.deleteAccount.subscriptionWarning")}
+            </p>
+
             <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">
                 {t("settings.confirmations.deleteAccount.confirmationText")}
@@ -356,6 +364,7 @@ export default function Settings() {
               <Button
                 className="w-full"
                 variant="secondary"
+                disabled={deleteAccountMutation.isPending}
                 onClick={() => {
                   setIsDeleteAccountDialogOpen(false);
                   setDeleteConfirmationText("");
@@ -367,10 +376,14 @@ export default function Settings() {
               <Button
                 className="w-full"
                 variant="destructive"
-                disabled={!isDeleteConfirmationValid()}
+                disabled={!isDeleteConfirmationValid() || deleteAccountMutation.isPending}
                 onClick={handleDeleteAccount}
               >
-                {t("settings.confirmations.deleteAccount.confirm")}
+                {deleteAccountMutation.isPending ? (
+                  <Loader2 className="animate-spin" size={16} />
+                ) : (
+                  t("settings.confirmations.deleteAccount.confirm")
+                )}
               </Button>
             </div>
           </div>

@@ -20,21 +20,21 @@ export type Database = {
           household_id: string | null
           id: string
           name: string
-          owner_id: string
+          owner_id: string | null
         }
         Insert: {
           created_at?: string
           household_id?: string | null
           id?: string
           name?: string
-          owner_id?: string
+          owner_id?: string | null
         }
         Update: {
           created_at?: string
           household_id?: string | null
           id?: string
           name?: string
-          owner_id?: string
+          owner_id?: string | null
         }
         Relationships: [
           {
@@ -42,6 +42,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cookbooks_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -128,7 +135,7 @@ export type Database = {
           eaten: boolean
           household_id: string | null
           id: string
-          owner_id: string
+          owner_id: string | null
           planned_date: string | null
           recipe_id: string | null
         }
@@ -137,7 +144,7 @@ export type Database = {
           eaten?: boolean
           household_id?: string | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
         }
@@ -146,7 +153,7 @@ export type Database = {
           eaten?: boolean
           household_id?: string | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
         }
@@ -156,6 +163,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_planning_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -286,7 +300,7 @@ export type Database = {
           instructions: string | null
           link: string | null
           name: string
-          owner_id: string
+          owner_id: string | null
           servings_unit: string | null
           status: string
           visibility: Database["public"]["Enums"]["visibility"]
@@ -302,7 +316,7 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name: string
-          owner_id?: string
+          owner_id?: string | null
           servings_unit?: string | null
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
@@ -318,7 +332,7 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name?: string
-          owner_id?: string
+          owner_id?: string | null
           servings_unit?: string | null
           status?: string
           visibility?: Database["public"]["Enums"]["visibility"]
@@ -336,6 +350,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -384,6 +405,7 @@ export type Database = {
           household_id: string | null
           id: string
           language: string
+          notification_preferences: Json | null
           username: string
         }
         Insert: {
@@ -394,6 +416,7 @@ export type Database = {
           household_id?: string | null
           id?: string
           language: string
+          notification_preferences?: Json | null
           username?: string
         }
         Update: {
@@ -404,6 +427,7 @@ export type Database = {
           household_id?: string | null
           id?: string
           language?: string
+          notification_preferences?: Json | null
           username?: string
         }
         Relationships: [

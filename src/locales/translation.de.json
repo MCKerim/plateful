@@ -401,12 +401,14 @@
       "deleteAccount": {
         "title": "Konto löschen",
         "description": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Alle deine Daten werden gelöscht.",
+        "subscriptionWarning": "Wenn du ein aktives Abonnement hast, kündige es zuerst im App Store oder Google Play. Das Löschen deines Kontos kündigt dein Abonnement nicht.",
         "confirmationText": "Tippe \"löschen\" zur Bestätigung",
         "confirmationPlaceholder": "löschen",
         "confirm": "Konto löschen",
         "cancel": "Abbrechen"
       }
     },
+    "deleteAccountError": "Konto löschen fehlgeschlagen. Bitte versuche es erneut oder kontaktiere den Support.",
     "modeToggle": {
       "light": "Hell",
       "dark": "Dunkel",

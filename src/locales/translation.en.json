@@ -402,12 +402,14 @@
       "deleteAccount": {
         "title": "Delete Account",
         "description": "This action is permanent and cannot be undone. All your data will be deleted.",
+        "subscriptionWarning": "If you have an active subscription, cancel it first in the App Store or Play Store. Deleting your account does not cancel your subscription.",
         "confirmationText": "Type \"delete\" to confirm",
         "confirmationPlaceholder": "delete",
         "confirm": "Delete Account",
         "cancel": "Cancel"
       }
     },
+    "deleteAccountError": "Failed to delete account. Please try again or contact support.",
     "modeToggle": {
       "light": "Light",
       "dark": "Dark",
