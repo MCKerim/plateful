@@ -303,7 +303,6 @@ export type Database = {
           owner_id: string | null
           servings_unit: string | null
           status: string
-          visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
           base_servings?: number | null
@@ -319,7 +318,6 @@ export type Database = {
           owner_id?: string | null
           servings_unit?: string | null
           status?: string
-          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
           base_servings?: number | null
@@ -335,7 +333,6 @@ export type Database = {
           owner_id?: string | null
           servings_unit?: string | null
           status?: string
-          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Relationships: [
           {
@@ -448,7 +445,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      visibility: "private" | "public" | "household"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -575,8 +572,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      visibility: ["private", "public", "household"],
-    },
+    Enums: {},
   },
 } as const

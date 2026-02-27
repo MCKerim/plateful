@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/redux/hooks";
-import { selectHousehold } from "@/redux/slices/householdSlice";
+
 import { selectUser } from "@/redux/slices/userSlice";
 import { Donut, House, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,7 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
-  const household = useAppSelector(selectHousehold);
+
 
   const today = useMemo(() => new Date(), []);
   const { data: currentWeekItems = [] } = useMealPlannerItems(today);
