@@ -247,6 +247,12 @@ export default function Settings() {
                 {t("settings.termsOfService")}
               </Button>
             </NavLink>
+
+            <NavLink to="/imprint" className="w-full">
+              <Button variant="secondary" className="w-full">
+                {t("settings.impressum")}
+              </Button>
+            </NavLink>
           </div>
         </div>
 

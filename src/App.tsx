@@ -33,6 +33,7 @@ import SurveyStart from "./page/onboarding/surveyStart/SurveyStart";
 import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValue";
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
+import Impressum from "./page/Impressum";
 import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
 import HowItWorks from "./page/onboarding/howItWorks/HowItWorks";
@@ -261,6 +262,9 @@ function App() {
 
         {/* Terms of Service */}
         <Route path="/terms" element={<TermsOfService />} />
+
+        {/* Impressum */}
+        <Route path="/imprint" element={<Impressum />} />
 
         {/* Onboarding */}
         <Route path="/" element={isLoggedIn() ? <Navigate to="/home" /> : <Welcome />} />
