@@ -15,12 +15,6 @@
 - **Risk:** Man-in-the-middle attacks, data interception, violates GDPR Art. 32 (security of processing)
 - **Fix:** Migrate the service to HTTPS with a valid certificate. Also consider using a domain name instead of a bare IP.
 
-### 3. No in-app account deletion mechanism
-
-- **Problem:** ToS now correctly says to use Settings > Delete Account, but that feature doesn't exist in the app yet
-- **Apple requirement:** Since June 2022, Apple requires all apps with account creation to offer in-app account deletion
-- **Google requirement:** Similar policy since December 2023
-- **Fix:** Build an in-app "Delete Account" flow in Settings. Simply uninstalling the app does NOT delete the account or data.
 
 ---
 
@@ -41,7 +35,7 @@
 | --- | ------------ | ---------- | ----------------------------------------------------- | ---------- |
 | 1   | **CRITICAL** | Security   | HTTP recipe extraction (no TLS)                       | ❌ Open — needs code |
 | 2   | **CRITICAL** | Privacy    | OpenAI training opt-out unconfirmed                   | ✅ Confirmed OFF in OpenAI settings |
-| 3   | **CRITICAL** | Compliance | No in-app account deletion (Apple/Google requirement) | ❌ Open — needs code |
+| 3   | **CRITICAL** | Compliance | No in-app account deletion (Apple/Google requirement) | ✅ Implemented Settings > Delete Account flow |
 | 4   | **CRITICAL** | Compliance | Data export claimed but doesn't exist                 | ✅ PP now documents manual email export process (GDPR Art. 20) |
 | 5   | **HIGH**     | Privacy    | Third-party services not named                        | ✅ "Third-Party Services" section added to PP (incl. Google Gemini via recipe extraction server) |
 | 6   | **HIGH**     | Privacy    | AI/chatbot processing undisclosed                     | ✅ "AI-Powered Features" section added to PP |
