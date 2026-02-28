@@ -3,11 +3,13 @@ import BottomNavButton from "./BottomNavButton";
 import { useTranslation } from "react-i18next";
 import { resetFilter } from "@/redux/slices/filterAndSortingSlice";
 import { useLocation } from "react-router";
+import { useSafeArea } from "@/hooks/useSafeArea";
 
 export default function BottomNav() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const location = useLocation();
+  const { bottom } = useSafeArea();
 
   const getActiveIndex = () => {
     if (location.pathname.startsWith("/home")) return 0;
@@ -22,9 +24,12 @@ export default function BottomNav() {
 
   return (
     <>
-      <div style={{ height: "100px" }}></div>
+      <div style={{ height: `${100 + bottom}px` }}></div>
 
-      <div className="fixed bottom-0 z-40 w-full max-w-lg py-3 bg-secondary rounded-t-2xl">
+      <div
+        className="fixed bottom-0 z-40 w-full max-w-lg pt-3 bg-secondary rounded-t-2xl"
+        style={{ paddingBottom: `calc(0.75rem + ${bottom}px)` }}
+      >
         <div className="flex justify-between w-full gap-1 px-2 relative">
           <BottomNavButton
             label={t("bottomNav.home")}
