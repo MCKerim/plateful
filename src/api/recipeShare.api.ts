@@ -111,16 +111,13 @@ export const recipeShareApi = {
 
     const { image_folder } = share.snapshot;
 
-    // Remove the snapshot's private image copies, if any
-    if (image_folder) {
-      const { data: files } = await supabase.storage
-        .from("recipeimages")
-        .list(image_folder);
+    const { data: files } = await supabase.storage
+      .from("recipeimages")
+      .list(image_folder);
 
-      if (files && files.length > 0) {
-        const paths = files.map((f) => `${image_folder}/${f.name}`);
-        await supabase.storage.from("recipeimages").remove(paths);
-      }
+    if (files && files.length > 0) {
+      const paths = files.map((f) => `${image_folder}/${f.name}`);
+      await supabase.storage.from("recipeimages").remove(paths);
     }
 
     const { error } = await supabase
