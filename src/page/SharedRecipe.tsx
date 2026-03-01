@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
+import { motion } from "motion/react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,89 @@ import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
 import { Download, BookmarkPlus } from "lucide-react";
+
+function SadPlateMascot() {
+  return (
+    <motion.svg
+      viewBox="0 0 200 200"
+      width="180"
+      height="180"
+      aria-hidden="true"
+      initial={{ opacity: 0, scale: 0.7, y: -20 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      transition={{ type: "spring", stiffness: 260, damping: 18, delay: 0.1 }}
+    >
+      {/* Plate shadow */}
+      <ellipse cx="100" cy="178" rx="52" ry="8" fill="var(--muted-foreground)" opacity="0.12" />
+
+      {/* Plate body — gently sways */}
+      <motion.g
+        style={{ transformOrigin: "100px 120px" }}
+        animate={{ rotate: [-1.5, 1.5, -1.5] }}
+        transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* Plate rim */}
+        <circle cx="100" cy="112" r="68" fill="var(--secondary)" stroke="var(--border)" strokeWidth="1.5" />
+
+        {/* Plate face area */}
+        <circle cx="100" cy="112" r="56" fill="var(--background)" stroke="var(--border)" strokeWidth="1" />
+
+        {/* Sad left eyebrow */}
+        <path
+          d="M 72,88 Q 80,84 88,87"
+          stroke="var(--foreground)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.7"
+        />
+
+        {/* Sad right eyebrow */}
+        <path
+          d="M 112,87 Q 120,84 128,88"
+          stroke="var(--foreground)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.7"
+        />
+
+        {/* Left eye */}
+        <ellipse cx="82" cy="100" rx="5" ry="6" fill="var(--foreground)" opacity="0.85" />
+
+        {/* Right eye */}
+        <ellipse cx="118" cy="100" rx="5" ry="6" fill="var(--foreground)" opacity="0.85" />
+
+        {/* Sad mouth (frown — control point is above the corners) */}
+        <path
+          d="M 78,130 Q 100,120 122,130"
+          stroke="var(--foreground)"
+          strokeWidth="2.5"
+          strokeLinecap="round"
+          fill="none"
+          opacity="0.75"
+        />
+
+        {/* Tear drop — falls from left eye, repeating */}
+        <motion.ellipse
+          cx="78"
+          cy="110"
+          rx="3"
+          ry="4"
+          fill="var(--accent-color)"
+          opacity="0.7"
+          animate={{ cy: [110, 142], opacity: [0.7, 0] }}
+          transition={{
+            duration: 1.4,
+            repeat: Infinity,
+            repeatDelay: 2.8,
+            ease: "easeIn",
+          }}
+        />
+      </motion.g>
+    </motion.svg>
+  );
+}
 
 const APP_STORE_URL = "https://apps.apple.com/app/plateful/id6740278718";
 const PLAY_STORE_URL =
@@ -101,11 +185,31 @@ export default function SharedRecipe() {
   }
 
   if (isError || !share) {
+    const notFoundFooter = !isNative ? (
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 border-border border-t-[1px]">
+        <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
+          <Download size={18} />
+          {t("share.downloadApp")}
+        </Button>
+      </div>
+    ) : undefined;
+
     return (
-      <Layout showFooter={false}>
-        <div className="flex flex-col items-center justify-center py-12 gap-4 text-center">
-          <p className="text-lg font-semibold">{t("share.notFound")}</p>
-          <p className="text-muted-foreground">{t("share.notFoundDescription")}</p>
+      <Layout showHeader={false} showFooter={false} footer={notFoundFooter}>
+        <div className="flex flex-col items-center justify-center flex-1 gap-4 text-center py-16 px-4">
+          <SadPlateMascot />
+
+          <motion.div
+            className="flex flex-col gap-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35, duration: 0.4 }}
+          >
+            <p className="first-font text-xl font-bold">{t("share.notFound")}</p>
+            <p className="text-muted-foreground text-sm">{t("share.notFoundDescription")}</p>
+          </motion.div>
+
+          {!isNative && <div className="h-16" />}
         </div>
       </Layout>
     );

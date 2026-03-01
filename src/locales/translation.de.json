@@ -733,7 +733,7 @@
     "importError": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
     "loginToSave": "Anmelden, um dieses Rezept zu speichern",
     "downloadApp": "Plateful App herunterladen",
-    "notFound": "Rezept nicht gefunden",
-    "notFoundDescription": "Dieser Link ist ungültig oder das Rezept wurde entfernt."
+    "notFound": "Dieses Rezept ist verschwunden",
+    "notFoundDescription": "Der Link ist ungültig oder das Rezept wurde vom Ersteller gelöscht."
   }
 }
