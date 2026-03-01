@@ -40,7 +40,7 @@ const s = {
   } as React.CSSProperties,
 
   description: {
-    margin: "0 0 8px 0",
+    margin: "0 0 16px 0",
     fontSize: "9pt",
   } as React.CSSProperties,
 
