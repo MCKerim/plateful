@@ -1,5 +1,6 @@
+import { createPortal } from "react-dom";
 import { Recipes } from "@/types/exportedDatabaseTypes.types";
-import { RecipeIngredient } from "@/types/ingredient.types";
+import { ScaledIngredient } from "@/types/ingredient.types";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { QRCodeSVG } from "qrcode.react";
 import "./recipe-print.css";
@@ -7,7 +8,7 @@ import "./recipe-print.css";
 type Props = {
   recipe: Recipes;
   imageUrl?: string;
-  ingredients: RecipeIngredient[];
+  ingredients: ScaledIngredient[];
   targetServings?: number;
   servingsUnit?: string;
 };
@@ -99,7 +100,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
   const groupedIngredients = groupIngredients(ingredients);
   const deeplink = `https://app.plateful.cloud/recipe/${recipe.id}`;
 
-  return (
+  return createPortal(
     <div id="recipe-print-view">
       <div style={s.wrapper}>
         <div style={s.header}>
@@ -133,7 +134,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
                 <ul style={s.ingredientList}>
                   {group.ingredients.map((ing) => (
                     <li key={ing.id} style={s.ingredientItem}>
-                      {ing.rawText}
+                      {ing.scaledQuantity.display}
                     </li>
                   ))}
                 </ul>
@@ -157,6 +158,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
