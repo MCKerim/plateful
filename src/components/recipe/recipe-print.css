@@ -33,12 +33,6 @@
   }
 
   /* Tighten MarkdownRenderer prose spacing for print */
-  #recipe-print-view .prose p {
-    margin-bottom: 4px;
-  }
-
-  #recipe-print-view .prose li {
-    font-size: 9pt;
-    margin-bottom: 2px;
-  }
+  #recipe-print-view .prose p { margin-bottom: 4px; }
+  #recipe-print-view .prose li { font-size: 9pt; margin-bottom: 2px; }
 }

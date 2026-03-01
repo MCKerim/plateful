@@ -25,17 +25,20 @@ const s = {
     padding: "0",
   } as React.CSSProperties,
 
-  header: {
-    borderBottom: "2px solid #111111",
-    paddingBottom: "6px",
+  topBar: {
+    display: "flex",
+    flexDirection: "row" as const,
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: "10px",
   } as React.CSSProperties,
 
-  title: {
-    fontFamily: "'Georgia', serif",
-    fontSize: "18pt",
-    fontWeight: "bold",
+  brandingText: {
+    fontFamily: "'Shrikhand', serif",
+    fontSize: "11pt",
+    color: "#111111",
     margin: "0",
+    lineHeight: "1",
   } as React.CSSProperties,
 
   image: {
@@ -43,8 +46,14 @@ const s = {
     maxHeight: "160px",
     objectFit: "cover" as const,
     display: "block",
-    marginBottom: "10px",
     borderRadius: "6px",
+  } as React.CSSProperties,
+
+  title: {
+    fontFamily: "'Shrikhand', serif",
+    fontSize: "20pt",
+    margin: "8px 0 6px 0",
+    lineHeight: "1.1",
   } as React.CSSProperties,
 
   description: {
@@ -63,8 +72,6 @@ const s = {
     fontSize: "10.5pt",
     fontWeight: "bold",
     margin: "0 0 4px 0",
-    borderBottom: "1px solid #cccccc",
-    paddingBottom: "2px",
   } as React.CSSProperties,
 
   groupHeading: {
@@ -84,24 +91,6 @@ const s = {
     marginBottom: "1px",
     fontSize: "9pt",
   } as React.CSSProperties,
-
-  qrRow: {
-    display: "flex",
-    flexDirection: "row" as const,
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-    marginTop: "12px",
-    paddingTop: "10px",
-    borderTop: "1px solid #cccccc",
-  } as React.CSSProperties,
-
-  brandingText: {
-    fontFamily: "'Shrikhand', serif",
-    fontSize: "18pt",
-    color: "#111111",
-    margin: "0",
-    lineHeight: "1",
-  } as React.CSSProperties,
 };
 
 export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings, servingsUnit }: Props) {
@@ -113,13 +102,16 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
     <div id="recipe-print-view">
       <div style={s.wrapper}>
 
-        <div style={s.header}>
-          <h1 style={s.title}>{recipe.name}</h1>
+        <div style={s.topBar}>
+          <p style={s.brandingText}>Plateful</p>
+          <QRCodeSVG value={deeplink} size={40} />
         </div>
 
         {imageUrl && (
           <img src={imageUrl} alt={recipe.name} style={s.image} crossOrigin="anonymous" />
         )}
+
+        <h1 style={s.title}>{recipe.name}</h1>
 
         {recipe.description && (
           <p style={{ ...s.description, whiteSpace: "pre-wrap" }}>{recipe.description}</p>
@@ -159,11 +151,6 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
               <MarkdownRenderer content={recipe.instructions} />
             </div>
           )}
-        </div>
-
-        <div style={s.qrRow}>
-          <QRCodeSVG value={deeplink} size={52} />
-          <p style={s.brandingText}>Plateful</p>
         </div>
 
       </div>
