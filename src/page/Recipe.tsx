@@ -182,7 +182,15 @@ export default function Recipe() {
           variant="secondary"
           size="icon"
           className="absolute top-14 right-2 z-10"
-          onClick={() => window.print()}
+          onClick={() => {
+            const prev = document.title;
+            document.title = `Plateful - ${recipe.name}`;
+            window.print();
+            window.onafterprint = () => {
+              document.title = prev;
+              window.onafterprint = null;
+            };
+          }}
           aria-label={t("recipe.printPdf")}
         >
           <Printer size={18} />
