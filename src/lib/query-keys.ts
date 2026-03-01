@@ -19,4 +19,7 @@ export const queryKeys = {
     all: ["ratings"] as const,
     byRecipe: (recipeId: string) => ["ratings", "recipe", recipeId] as const,
   },
+  sharedRecipes: {
+    byToken: (token: string) => ["shared-recipes", token] as const,
+  },
 } as const;

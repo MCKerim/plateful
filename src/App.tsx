@@ -50,6 +50,7 @@ import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-upda
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
+import SharedRecipe from "./page/SharedRecipe";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 
@@ -334,6 +335,9 @@ function App() {
 
         <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
         <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+
+        {/* Public share route — no auth required */}
+        <Route path="/share/:token" element={<SharedRecipe />} />
 
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />

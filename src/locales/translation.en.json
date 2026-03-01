@@ -723,5 +723,17 @@
   "subscribe": {
     "error": "Something went wrong. Please try again.",
     "retry": "Try again"
+  },
+  "share": {
+    "shareRecipe": "Share recipe",
+    "sharedRecipeBadge": "Shared recipe",
+    "saveToMyRecipes": "Save to my recipes",
+    "importing": "Saving...",
+    "importSuccess": "Recipe saved to your cookbook!",
+    "importError": "Could not save the recipe. Please try again.",
+    "loginToSave": "Log in to save this recipe",
+    "downloadApp": "Get the Plateful app",
+    "notFound": "Recipe not found",
+    "notFoundDescription": "This share link may be invalid or the recipe was removed."
   }
 }

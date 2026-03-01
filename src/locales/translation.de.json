@@ -723,5 +723,17 @@
   "subscribe": {
     "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "retry": "Erneut versuchen"
+  },
+  "share": {
+    "shareRecipe": "Rezept teilen",
+    "sharedRecipeBadge": "Geteiltes Rezept",
+    "saveToMyRecipes": "Zu meinen Rezepten hinzufügen",
+    "importing": "Speichern...",
+    "importSuccess": "Rezept wurde deinem Kochbuch hinzugefügt!",
+    "importError": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
+    "loginToSave": "Anmelden, um dieses Rezept zu speichern",
+    "downloadApp": "Plateful App herunterladen",
+    "notFound": "Rezept nicht gefunden",
+    "notFoundDescription": "Dieser Link ist ungültig oder das Rezept wurde entfernt."
   }
 }
