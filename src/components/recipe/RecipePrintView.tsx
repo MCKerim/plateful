@@ -44,6 +44,7 @@ const s = {
     objectFit: "cover" as const,
     display: "block",
     marginBottom: "10px",
+    borderRadius: "6px",
   } as React.CSSProperties,
 
   description: {
@@ -84,12 +85,6 @@ const s = {
     fontSize: "9pt",
   } as React.CSSProperties,
 
-  instructions: {
-    margin: "0",
-    fontSize: "9pt",
-    whiteSpace: "pre-wrap" as const,
-  } as React.CSSProperties,
-
   qrRow: {
     display: "flex",
     flexDirection: "row" as const,
@@ -127,23 +122,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
         )}
 
         {recipe.description && (
-          <div style={s.description}>
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => <p style={{ margin: "0 0 4px 0" }}>{children}</p>,
-                ul: ({ children }) => <ul style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ul>,
-                ol: ({ children }) => <ol style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ol>,
-                li: ({ children }) => <li style={{ marginBottom: "1px" }}>{children}</li>,
-                strong: ({ children }) => <strong style={{ fontWeight: "bold" }}>{children}</strong>,
-                em: ({ children }) => <em style={{ fontStyle: "italic" }}>{children}</em>,
-                h1: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "4px 0 2px" }}>{children}</h3>,
-                h2: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "4px 0 2px" }}>{children}</h3>,
-                h3: ({ children }) => <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", margin: "4px 0 2px" }}>{children}</h3>,
-              }}
-            >
-              {recipe.description}
-            </ReactMarkdown>
-          </div>
+          <p style={{ ...s.description, whiteSpace: "pre-wrap" }}>{recipe.description}</p>
         )}
 
         <div style={s.columns}>
@@ -177,7 +156,21 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
           {recipe.instructions && (
             <div>
               <h2 style={s.sectionHeading}>{t("recipe.instructions")}</h2>
-              <p style={s.instructions}>{recipe.instructions}</p>
+              <ReactMarkdown
+                components={{
+                  p: ({ children }) => <p style={{ margin: "0 0 4px 0", fontSize: "9pt" }}>{children}</p>,
+                  ul: ({ children }) => <ul style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ul>,
+                  ol: ({ children }) => <ol style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ol>,
+                  li: ({ children }) => <li style={{ marginBottom: "2px", fontSize: "9pt" }}>{children}</li>,
+                  strong: ({ children }) => <strong style={{ fontWeight: "bold" }}>{children}</strong>,
+                  em: ({ children }) => <em style={{ fontStyle: "italic" }}>{children}</em>,
+                  h1: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "6px 0 2px" }}>{children}</h3>,
+                  h2: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "6px 0 2px" }}>{children}</h3>,
+                  h3: ({ children }) => <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", margin: "4px 0 2px" }}>{children}</h3>,
+                }}
+              >
+                {recipe.instructions}
+              </ReactMarkdown>
             </div>
           )}
         </div>
