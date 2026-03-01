@@ -22,23 +22,6 @@ const s = {
     background: "#ffffff",
     fontSize: "9.5pt",
     lineHeight: "1.4",
-    padding: "0",
-  } as React.CSSProperties,
-
-  topBar: {
-    display: "flex",
-    flexDirection: "row" as const,
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: "10px",
-  } as React.CSSProperties,
-
-  brandingText: {
-    fontFamily: "'Shrikhand', serif",
-    fontSize: "11pt",
-    color: "#111111",
-    margin: "0",
-    lineHeight: "1",
   } as React.CSSProperties,
 
   image: {
@@ -100,12 +83,6 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
   return createPortal(
     <div id="recipe-print-view">
       <div style={s.wrapper}>
-
-        <div style={s.topBar}>
-          <p style={s.brandingText}>Plateful</p>
-          <QRCodeSVG value={deeplink} size={40} />
-        </div>
-
         {imageUrl && (
           <img src={imageUrl} alt={recipe.name} style={s.image} crossOrigin="anonymous" />
         )}
@@ -151,7 +128,13 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
             </div>
           )}
         </div>
+      </div>
 
+      <div id="recipe-print-footer">
+        <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1" }}>
+          Plateful
+        </p>
+        <QRCodeSVG value={deeplink} size={36} />
       </div>
     </div>,
     document.body
