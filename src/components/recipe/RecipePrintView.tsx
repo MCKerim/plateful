@@ -26,7 +26,7 @@ const s = {
 
   image: {
     width: "100%",
-    maxHeight: "160px",
+    aspectRatio: "3 / 1",
     objectFit: "cover" as const,
     display: "block",
     borderRadius: "6px",
@@ -34,9 +34,17 @@ const s = {
 
   title: {
     fontFamily: "'Shrikhand', serif",
-    fontSize: "20pt",
-    margin: "8px 0 6px 0",
+    fontSize: "17pt",
+    margin: "10px 0 4px 0",
     lineHeight: "1.1",
+    letterSpacing: "-0.3px",
+  } as React.CSSProperties,
+
+  meta: {
+    margin: "0 0 12px 0",
+    fontSize: "8.5pt",
+    color: "#666",
+    letterSpacing: "0.03em",
   } as React.CSSProperties,
 
   description: {
@@ -52,9 +60,13 @@ const s = {
   } as React.CSSProperties,
 
   sectionHeading: {
-    fontSize: "10.5pt",
+    fontSize: "7.5pt",
     fontWeight: "bold",
-    margin: "0 0 4px 0",
+    margin: "0 0 8px 0",
+    textTransform: "uppercase" as const,
+    letterSpacing: "0.12em",
+    borderLeft: "3px solid #ff9d00",
+    paddingLeft: "7px",
   } as React.CSSProperties,
 
   groupHeading: {
@@ -65,8 +77,8 @@ const s = {
 
   ingredientList: {
     margin: "0",
-    paddingLeft: "14px",
-    listStyleType: "disc",
+    paddingLeft: "10px",
+    listStyleType: "none",
   } as React.CSSProperties,
 
   ingredientItem: {
@@ -89,6 +101,12 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
 
         <h1 style={s.title}>{recipe.name}</h1>
 
+        {targetServings != null && (
+          <p style={s.meta}>
+            {targetServings} {t(`ingredients.units.${servingsUnit ?? "servings"}`, { defaultValue: servingsUnit ?? "servings" })}
+          </p>
+        )}
+
         {recipe.description && (
           <p style={{ ...s.description, whiteSpace: "pre-wrap" }}>{recipe.description}</p>
         )}
@@ -97,14 +115,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
           {/* Left column: ingredients */}
           {ingredients.length > 0 && (
             <div>
-              <h2 style={s.sectionHeading}>
-                {t("ingredients.title")}
-                {targetServings != null && (
-                  <span style={{ fontWeight: "normal", fontSize: "8pt", marginLeft: "6px", color: "#555" }}>
-                    ({targetServings} {t(`ingredients.units.${servingsUnit ?? "servings"}`, { defaultValue: servingsUnit ?? "servings" })})
-                  </span>
-                )}
-              </h2>
+              <h2 style={s.sectionHeading}>{t("ingredients.title")}</h2>
               {groupedIngredients.map((group, i) => (
                 <div key={group.name ?? `g-${i}`}>
                   {group.name && <p style={s.groupHeading}>{group.name}</p>}
@@ -131,9 +142,14 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
       </div>
 
       <div id="recipe-print-footer">
-        <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1" }}>
-          Plateful
-        </p>
+        <div>
+          <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1", color: "#ff9d00" }}>
+            Plateful
+          </p>
+          <p style={{ fontSize: "7pt", margin: "2px 0 0 0", color: "#888", letterSpacing: "0.02em" }}>
+            app.plateful.cloud
+          </p>
+        </div>
         <QRCodeSVG value={deeplink} size={36} />
       </div>
     </div>,

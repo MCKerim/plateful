@@ -42,6 +42,14 @@
   #recipe-print-view .prose p { margin-bottom: 4px; }
   #recipe-print-view .prose li { font-size: 9pt; margin-bottom: 2px; }
 
+  /* Custom bullet marker for ingredient lists */
+  #recipe-print-view ul li::before {
+    content: "· ";
+    color: #ff9d00;
+    font-weight: bold;
+    margin-right: 3px;
+  }
+
   /* Footer: fixed at page bottom, repeats on every printed page */
   #recipe-print-footer {
     display: flex !important;
@@ -53,6 +61,7 @@
     left: 0;
     right: 0;
     padding-top: 6px;
+    border-top: 1px solid #e0e0e0;
     background: #ffffff;
   }
 }
