@@ -726,6 +726,7 @@
   },
   "share": {
     "shareRecipe": "Share recipe",
+    "shareMessage": "Check out this recipe in Plateful: {{recipeName}}",
     "sharedRecipeBadge": "Shared recipe",
     "saveToMyRecipes": "Save to my recipes",
     "importing": "Saving...",

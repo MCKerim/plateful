@@ -4,15 +4,17 @@ import { recipeShareApi } from "@/api/recipeShare.api";
 import { recipeApi } from "@/api/recipe.api";
 import { ingredientsApi } from "@/api/ingredients.api";
 import { Share } from "@capacitor/share";
+import { useTranslation } from "react-i18next";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 
 const SHARE_BASE_URL = "https://app.plateful.cloud/share";
 
 export function useCreateRecipeShare() {
   const { supabase } = useSupabase();
+  const { t } = useTranslation();
 
   return useMutation({
-    mutationFn: async (recipeId: string): Promise<string> => {
+    mutationFn: async (recipeId: string): Promise<{ token: string; recipeName: string }> => {
       // 1. Fetch recipe details
       const recipe = await recipeApi.getById(supabase, recipeId);
       if (!recipe) throw new Error("Recipe not found");
@@ -47,16 +49,18 @@ export function useCreateRecipeShare() {
         ingredients,
       });
 
-      return token;
+      return { token, recipeName: recipe.name };
     },
 
-    onSuccess: async (token, recipeId) => {
+    onSuccess: async ({ token, recipeName }) => {
       const shareUrl = `${SHARE_BASE_URL}/${token}`;
 
       try {
         await Share.share({
+          title: recipeName,
+          text: t("share.shareMessage", { recipeName }),
           url: shareUrl,
-          dialogTitle: "Share Recipe",
+          dialogTitle: t("share.shareRecipe"),
         });
       } catch {
         // Share dialog dismissed or not available — URL is still usable
