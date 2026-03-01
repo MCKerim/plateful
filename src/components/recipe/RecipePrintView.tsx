@@ -125,7 +125,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
                 {t("ingredients.title")}
                 {targetServings != null && (
                   <span style={{ fontWeight: "normal", fontSize: "8pt", marginLeft: "6px", color: "#555" }}>
-                    ({targetServings} {servingsUnit ?? t("ingredients.servings")})
+                    ({targetServings} {t(`ingredients.units.${servingsUnit ?? "servings"}`, { defaultValue: servingsUnit ?? "servings" })})
                   </span>
                 )}
               </h2>
