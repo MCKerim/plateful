@@ -192,12 +192,6 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
             <QRCodeSVG value={deeplink} size={52} />
             <p style={s.qrLabel}>{t("recipe.printQrLabel")}</p>
           </div>
-          {recipe.link && (
-            <div style={s.qrItem}>
-              <QRCodeSVG value={recipe.link} size={52} />
-              <p style={s.qrLabel}>{t("recipe.printSourceLabel")}</p>
-            </div>
-          )}
         </div>
 
       </div>

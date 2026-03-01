@@ -294,8 +294,7 @@
     "askChatbot": "KI-Koch fragen",
     "instructions": "Zubereitung",
     "printPdf": "Rezept drucken",
-    "printQrLabel": "In Plateful öffnen",
-    "printSourceLabel": "Originalrezept"
+    "printQrLabel": "In Plateful öffnen"
   },
   "addRecipeDrawer": {
     "importFromUrl": {

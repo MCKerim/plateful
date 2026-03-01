@@ -294,8 +294,7 @@
     "askChatbot": "Ask AI-Chef",
     "instructions": "Instructions",
     "printPdf": "Print recipe",
-    "printQrLabel": "Open in Plateful",
-    "printSourceLabel": "Original recipe"
+    "printQrLabel": "Open in Plateful"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
