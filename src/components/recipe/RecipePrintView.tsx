@@ -143,7 +143,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
 
       <div id="recipe-print-footer">
         <div>
-          <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1", color: "#ff9d00" }}>
+          <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1", color: "#1b1602" }}>
             Plateful
           </p>
           <p style={{ fontSize: "7pt", margin: "2px 0 0 0", color: "#888", letterSpacing: "0.02em" }}>
