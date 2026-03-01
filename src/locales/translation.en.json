@@ -293,8 +293,7 @@
     "planningFailed": "Error planning recipe. Please try again later.",
     "askChatbot": "Ask AI-Chef",
     "instructions": "Instructions",
-    "printPdf": "Print recipe",
-    "printQrLabel": "Open in Plateful"
+    "printPdf": "Print recipe"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
