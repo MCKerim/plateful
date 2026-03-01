@@ -30,7 +30,6 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
-import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
@@ -61,12 +60,13 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
-  const { data: ingredients = [] } = useRecipeIngredients(recipeId);
-  const savedServings = useAppSelector(selectTargetServings(recipeId ?? ""));
+  const savedServings = useAppSelector(
+    (state) => recipeId != null ? selectTargetServings(recipeId)(state) : undefined
+  );
   const effectiveBaseServings = recipe?.base_servings ?? 1;
   const effectiveTargetServings = savedServings ?? effectiveBaseServings;
   const { data: scaledIngredients = [] } = useScaledIngredients(
-    recipeId,
+    recipe ? recipeId : null,
     effectiveBaseServings,
     effectiveTargetServings
   );
@@ -223,7 +223,7 @@ export default function Recipe() {
       )}
 
       {/* Ingredients Section */}
-      {ingredients.length > 0 && (
+      {scaledIngredients.length > 0 && (
         <IngredientList
           recipeId={recipe.id}
           baseServings={recipe.base_servings}
