@@ -32,6 +32,8 @@ import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { RecipePrintView } from "@/components/recipe/RecipePrintView";
+import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
+import { selectTargetServings } from "@/redux/slices/servingsSlice";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -60,6 +62,14 @@ export default function Recipe() {
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
   const { data: ingredients = [] } = useRecipeIngredients(recipeId);
+  const savedServings = useAppSelector(selectTargetServings(recipeId ?? ""));
+  const effectiveBaseServings = recipe?.base_servings ?? 1;
+  const effectiveTargetServings = savedServings ?? effectiveBaseServings;
+  const { data: scaledIngredients = [] } = useScaledIngredients(
+    recipeId,
+    effectiveBaseServings,
+    effectiveTargetServings
+  );
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
@@ -254,7 +264,9 @@ export default function Recipe() {
       <RecipePrintView
         recipe={recipe}
         imageUrl={imageUrls[0]}
-        ingredients={ingredients}
+        ingredients={scaledIngredients}
+        targetServings={effectiveTargetServings}
+        servingsUnit={recipe.servings_unit ?? undefined}
       />
     </Layout>
   );

@@ -8,6 +8,8 @@ type Props = {
   recipe: Recipes;
   imageUrl?: string;
   ingredients: RecipeIngredient[];
+  targetServings?: number;
+  servingsUnit?: string;
 };
 
 const s = {
@@ -93,7 +95,7 @@ const s = {
   } as React.CSSProperties,
 };
 
-export function RecipePrintView({ recipe, imageUrl, ingredients }: Props) {
+export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings, servingsUnit }: Props) {
   const groupedIngredients = groupIngredients(ingredients);
   const deeplink = `https://app.plateful.cloud/recipe/${recipe.id}`;
 
@@ -117,7 +119,14 @@ export function RecipePrintView({ recipe, imageUrl, ingredients }: Props) {
 
         {ingredients.length > 0 && (
           <>
-            <h2 style={s.sectionHeading}>Ingredients</h2>
+            <h2 style={s.sectionHeading}>
+              Ingredients
+              {targetServings != null && (
+                <span style={{ fontWeight: "normal", fontSize: "10pt", marginLeft: "8px", color: "#555" }}>
+                  ({targetServings} {servingsUnit ?? "servings"})
+                </span>
+              )}
+            </h2>
             {groupedIngredients.map((group, i) => (
               <div key={group.name ?? `g-${i}`}>
                 {group.name && <p style={s.groupHeading}>{group.name}</p>}
