@@ -8,23 +8,38 @@ export const recipeShareApi = {
   /**
    * Create a shared recipe snapshot in the DB and return the generated token.
    * Caller is responsible for building the snapshot (name, ingredients, etc.).
-   * Images in the `recipeimages` bucket are signed here with a very long TTL
-   * so unauthenticated viewers can load them without hitting auth.
+   * Images are copied into a dedicated `shared_<uuid>/` folder so the snapshot
+   * is unaffected if the owner later deletes or replaces the original image.
    */
   async create(
     supabase: SupabaseClient,
     recipeId: string,
-    snapshot: Omit<SharedRecipeSnapshot, "image_urls"> & { image_paths: string[] }
+    snapshot: Omit<SharedRecipeSnapshot, "image_urls" | "image_folder"> & { image_paths: string[] }
   ): Promise<string> {
-    // Generate long-lived signed URLs for each image path
-    const imageUrls = await Promise.all(
-      snapshot.image_paths.map(async (path) => {
-        const { data } = await supabase.storage
-          .from("recipeimages")
-          .createSignedUrl(path, SHARE_IMAGE_EXPIRY_SECONDS);
-        return data?.signedUrl ?? null;
-      })
-    );
+    // Copy each image into a share-owned folder, then sign the copy.
+    // This ensures the shared view is never affected by changes to the original.
+    const imageFolder = `shared_${crypto.randomUUID()}`;
+
+    const imageUrls = (
+      await Promise.all(
+        snapshot.image_paths.map(async (srcPath) => {
+          const filename = srcPath.split("/").pop()!;
+          const destPath = `${imageFolder}/${filename}`;
+
+          const { error: copyError } = await supabase.storage
+            .from("recipeimages")
+            .copy(srcPath, destPath);
+
+          if (copyError) return null;
+
+          const { data } = await supabase.storage
+            .from("recipeimages")
+            .createSignedUrl(destPath, SHARE_IMAGE_EXPIRY_SECONDS);
+
+          return data?.signedUrl ?? null;
+        })
+      )
+    ).filter((url): url is string => url !== null);
 
     const fullSnapshot: SharedRecipeSnapshot = {
       name: snapshot.name,
@@ -33,7 +48,8 @@ export const recipeShareApi = {
       category: snapshot.category,
       base_servings: snapshot.base_servings,
       servings_unit: snapshot.servings_unit,
-      image_urls: imageUrls.filter((url): url is string => url !== null),
+      image_urls: imageUrls,
+      image_folder: imageFolder,
       ingredients: snapshot.ingredients,
     };
 
@@ -83,6 +99,36 @@ export const recipeShareApi = {
 
     if (error || !data) return [];
     return data.map((file) => `recipe_${recipeId}/${file.name}`);
+  },
+
+  /**
+   * Delete a share by token. Removes the snapshot-owned image copies from
+   * storage (if present) and then deletes the DB row.
+   */
+  async deleteByToken(supabase: SupabaseClient, token: string): Promise<void> {
+    const share = await recipeShareApi.getByToken(supabase, token);
+    if (!share) return;
+
+    const { image_folder } = share.snapshot;
+
+    // Remove the snapshot's private image copies, if any
+    if (image_folder) {
+      const { data: files } = await supabase.storage
+        .from("recipeimages")
+        .list(image_folder);
+
+      if (files && files.length > 0) {
+        const paths = files.map((f) => `${image_folder}/${f.name}`);
+        await supabase.storage.from("recipeimages").remove(paths);
+      }
+    }
+
+    const { error } = await supabase
+      .from("shared_recipes")
+      .delete()
+      .eq("token", token);
+
+    if (error) throw error;
   },
 
   /**

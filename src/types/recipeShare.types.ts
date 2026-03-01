@@ -20,6 +20,12 @@ export type SharedRecipeSnapshot = {
   servings_unit: string | null;
   /** Long-lived signed URLs for the recipe images */
   image_urls: string[];
+  /**
+   * Storage folder that owns the snapshot's image copies (e.g. "shared_<uuid>").
+   * Present on shares created after image-copy support was added; absent on older rows.
+   * Used to clean up storage when the share is deleted.
+   */
+  image_folder?: string;
   ingredients: SnapshotIngredient[];
 };
 
