@@ -24,4 +24,21 @@
   #recipe-print-view {
     display: block !important;
   }
+
+  /* Ensure Tailwind CSS vars resolve to print-safe values */
+  #recipe-print-view {
+    --color-primary: #111111;
+    color: #111111;
+    font-size: 9.5pt;
+  }
+
+  /* Tighten MarkdownRenderer prose spacing for print */
+  #recipe-print-view .prose p {
+    margin-bottom: 4px;
+  }
+
+  #recipe-print-view .prose li {
+    font-size: 9pt;
+    margin-bottom: 2px;
+  }
 }

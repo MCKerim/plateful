@@ -4,20 +4,8 @@ import { Recipes } from "@/types/exportedDatabaseTypes.types";
 import { ScaledIngredient } from "@/types/ingredient.types";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { QRCodeSVG } from "qrcode.react";
-import ReactMarkdown, { Components } from "react-markdown";
+import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import "./recipe-print.css";
-
-const markdownComponents: Components = {
-  p: ({ children }) => <p style={{ margin: "0 0 4px 0", fontSize: "9pt" }}>{children}</p>,
-  ul: ({ children }) => <ul style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ul>,
-  ol: ({ children }) => <ol style={{ paddingLeft: "16px", margin: "0 0 4px 0" }}>{children}</ol>,
-  li: ({ children }) => <li style={{ marginBottom: "2px", fontSize: "9pt" }}>{children}</li>,
-  strong: ({ children }) => <strong style={{ fontWeight: "bold" }}>{children}</strong>,
-  em: ({ children }) => <em style={{ fontStyle: "italic" }}>{children}</em>,
-  h1: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "6px 0 2px" }}>{children}</h3>,
-  h2: ({ children }) => <h3 style={{ fontSize: "10pt", fontWeight: "bold", margin: "6px 0 2px" }}>{children}</h3>,
-  h3: ({ children }) => <h3 style={{ fontSize: "9.5pt", fontWeight: "bold", margin: "4px 0 2px" }}>{children}</h3>,
-};
 
 type Props = {
   recipe: Recipes;
@@ -168,9 +156,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
           {recipe.instructions && (
             <div>
               <h2 style={s.sectionHeading}>{t("recipe.instructions")}</h2>
-              <ReactMarkdown components={markdownComponents}>
-                {recipe.instructions}
-              </ReactMarkdown>
+              <MarkdownRenderer content={recipe.instructions} />
             </div>
           )}
         </div>
