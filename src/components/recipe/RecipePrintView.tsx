@@ -17,7 +17,7 @@ type Props = {
 
 const s = {
   wrapper: {
-    fontFamily: "'Georgia', 'Times New Roman', serif",
+    fontFamily: "'Roboto', sans-serif",
     color: "#111111",
     background: "#ffffff",
     fontSize: "9.5pt",
@@ -78,7 +78,6 @@ const s = {
     fontSize: "9pt",
     fontWeight: "bold",
     margin: "6px 0 2px 0",
-    fontStyle: "italic",
   } as React.CSSProperties,
 
   ingredientList: {
