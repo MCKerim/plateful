@@ -91,9 +91,21 @@ const s = {
   } as React.CSSProperties,
 
   qrRow: {
+    display: "flex",
+    flexDirection: "row" as const,
+    justifyContent: "space-between",
+    alignItems: "flex-end",
     marginTop: "12px",
     paddingTop: "10px",
     borderTop: "1px solid #cccccc",
+  } as React.CSSProperties,
+
+  brandingText: {
+    fontFamily: "'Shrikhand', serif",
+    fontSize: "18pt",
+    color: "#111111",
+    margin: "0",
+    lineHeight: "1",
   } as React.CSSProperties,
 };
 
@@ -172,6 +184,7 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
 
         <div style={s.qrRow}>
           <QRCodeSVG value={deeplink} size={52} />
+          <p style={s.brandingText}>Plateful</p>
         </div>
 
       </div>
