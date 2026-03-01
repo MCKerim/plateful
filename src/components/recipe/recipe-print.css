@@ -1,0 +1,36 @@
+/* recipe-print.css
+ * Handles visibility of the dedicated recipe print view.
+ * RecipePrintView is hidden in normal screen view and shown only when printing.
+ * The rest of the app is hidden during print so only this component renders.
+ */
+
+#recipe-print-view {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  /* Hide the entire app UI */
+  body {
+    visibility: hidden;
+  }
+
+  /* Show only the print component and all its descendants */
+  #recipe-print-view,
+  #recipe-print-view * {
+    visibility: visible;
+  }
+
+  #recipe-print-view {
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+  }
+}

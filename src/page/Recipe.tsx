@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat } from "lucide-react";
+import { Pencil, Link, CalendarDays, ChefHat, Printer } from "lucide-react";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, selectMessages, selectRecipeId } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -31,6 +31,7 @@ import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -166,6 +167,16 @@ export default function Recipe() {
         >
           <Pencil size={18} />
         </Button>
+
+        <Button
+          variant="secondary"
+          size="icon"
+          className="absolute top-14 right-2 z-10"
+          onClick={() => window.print()}
+          aria-label={t("recipe.printPdf")}
+        >
+          <Printer size={18} />
+        </Button>
       </div>
 
       <div className="flex justify-between">
@@ -185,7 +196,11 @@ export default function Recipe() {
       </div>
 
       {recipe.link && (
-        <NavLink to={recipe.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
+        <NavLink
+          to={recipe.link}
+          target="blank"
+          className={buttonVariants() + " w-full mt-2"}
+        >
           <Link />
           {t("recipe.toTheRecipe")}
         </NavLink>
@@ -235,6 +250,12 @@ export default function Recipe() {
           />
         ))}
       </div>
+
+      <RecipePrintView
+        recipe={recipe}
+        imageUrl={imageUrls[0]}
+        ingredients={ingredients}
+      />
     </Layout>
   );
 }
