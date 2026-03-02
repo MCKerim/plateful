@@ -120,6 +120,11 @@ body {
   }
 }
 
+/* Offset Sonner toasts below the status bar / notch */
+[data-sonner-toaster][data-y-position='top'] {
+  --offset: calc(1rem + var(--safe-area-top, 0px)) !important;
+}
+
 @layer utilities {
   /* Hide scrollbar for Chrome, Safari and Opera */
   .no-scrollbar::-webkit-scrollbar {

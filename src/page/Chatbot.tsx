@@ -551,7 +551,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       </div>
 
       {/* Input Area */}
-      <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
+      <div className="w-full max-w-lg fixed z-10 pr-8" style={{ bottom: "calc(5rem + var(--safe-area-bottom, 0px))" }}>
         {/* Recipe context and image previews before sending */}
         {(recipeContext || selectedImagesAsbase64.length > 0) && (
           <div className="flex gap-2 flex-wrap mb-2 items-center">

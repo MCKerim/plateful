@@ -2,7 +2,7 @@ import { Separator } from "@/components/ui/separator";
 
 export default function Privacy() {
   return (
-    <div className="w-full max-w-4xl mx-auto p-6 min-h-screen bg-background">
+    <div className="w-full max-w-4xl mx-auto p-6 min-h-screen bg-background" style={{ paddingTop: "calc(1.5rem + var(--safe-area-top, 0px))" }}>
       <div className="space-y-2 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Privacy Policy</h1>

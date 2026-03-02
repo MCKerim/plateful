@@ -107,9 +107,9 @@ export default function Recipe() {
 
   const saveFooter = (
     <>
-      <div className="h-[100px]"></div>
+      <div style={{ height: "calc(100px + var(--safe-area-bottom, 0px))" }}></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 px-4 pt-4 flex gap-2 border-border border-t-[1px]" style={{ paddingBottom: "calc(1rem + var(--safe-area-bottom, 0px))" }}>
         <Button variant="secondary" className="w-full" onClick={handleAskChatbot}>
           <ChefHat style={{ transform: "rotate(16deg) translateY(-1px)" }} />
           {t("recipe.askChatbot")}

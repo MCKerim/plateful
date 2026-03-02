@@ -20,7 +20,12 @@ export default function Layout({
     <div className="flex flex-col items-center w-full max-w-lg min-h-screen m-auto">
       {showHeader && <Header buttons={headerButtons} />}
 
-      <div className="flex flex-col flex-1 w-full gap-2 px-4 py-4">{children}</div>
+      <div
+        className="flex flex-col flex-1 w-full gap-2 px-4 py-4"
+        style={!showHeader ? { paddingTop: "calc(1rem + var(--safe-area-top, 0px))" } : undefined}
+      >
+        {children}
+      </div>
 
       {footer ?? (showFooter && <BottomNav />)}
     </div>

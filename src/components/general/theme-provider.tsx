@@ -24,7 +24,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 async function updateStatusBar(isDark: boolean) {
   if (Capacitor.isNativePlatform()) {
-    await StatusBar.setStyle({ style: isDark ? Style.Light : Style.Dark });
+    await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
   }
 }
 

@@ -1,17 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Capacitor } from "@capacitor/core";
 import { SafeArea } from "capacitor-plugin-safe-area";
 
-interface SafeAreaInsets {
-  top: number;
-  right: number;
-  bottom: number;
-  left: number;
-}
-
-const DEFAULT_INSETS: SafeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 };
-
-function applyCssVars(insets: SafeAreaInsets) {
+function applyCssVars(insets: { top: number; right: number; bottom: number; left: number }) {
   const root = document.documentElement;
   root.style.setProperty("--safe-area-top", `${insets.top}px`);
   root.style.setProperty("--safe-area-bottom", `${insets.bottom}px`);
@@ -20,8 +11,6 @@ function applyCssVars(insets: SafeAreaInsets) {
 }
 
 export function useSafeArea() {
-  const [insets, setInsets] = useState<SafeAreaInsets>(DEFAULT_INSETS);
-
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
@@ -31,7 +20,6 @@ export function useSafeArea() {
     Promise.all([
       SafeArea.getSafeAreaInsets(),
       SafeArea.addListener("safeAreaChanged", ({ insets }) => {
-        setInsets(insets);
         applyCssVars(insets);
       }),
     ])
@@ -40,7 +28,6 @@ export function useSafeArea() {
           handle.remove();
         } else {
           listenerHandle = handle;
-          setInsets(initial);
           applyCssVars(initial);
         }
       })
@@ -51,6 +38,4 @@ export function useSafeArea() {
       listenerHandle?.remove();
     };
   }, []);
-
-  return insets;
 }
