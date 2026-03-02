@@ -1,11 +1,11 @@
-import { useParams, useNavigate } from "react-router";
+import { useParams, useNavigate, NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import { motion } from "motion/react";
 import Rive from "@rive-app/react-canvas";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/layout/Layout";
@@ -19,7 +19,7 @@ import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
-import { Download, BookmarkPlus } from "lucide-react";
+import { Download, BookmarkPlus, Link } from "lucide-react";
 
 const APP_STORE_URL = "https://apps.apple.com/app/plateful/id6740278718";
 const PLAY_STORE_URL =
@@ -69,7 +69,7 @@ export default function SharedRecipe() {
       {
         onSuccess: (newRecipeId) => {
           toast.success(t("share.importSuccess"));
-          navigate(`/recipe/${newRecipeId}`);
+          navigate(`/recipe/${newRecipeId}`, { replace: true });
         },
         onError: () => {
           toast.error(t("share.importError"));
@@ -157,12 +157,11 @@ export default function SharedRecipe() {
     </Button>
   ) : null;
 
-  const loginButton =
-    isNative && !isLoggedIn ? (
-      <Button className="w-full" onClick={() => navigate("/signup")}>
-        {t("share.loginToSave")}
-      </Button>
-    ) : null;
+  const loginButton = !isLoggedIn ? (
+    <Button className="w-full" onClick={() => navigate("/signup")}>
+      {t("share.loginToSave")}
+    </Button>
+  ) : null;
 
   const footer = (
     <>
@@ -204,10 +203,14 @@ export default function SharedRecipe() {
         </PhotoProvider>
       )}
 
-      {/* Shared-by banner */}
-      <div className="mt-1 text-xs text-muted-foreground">{t("share.sharedRecipeBadge")}</div>
-
       <h1 className="first-font text-2xl font-bold break-words w-full">{snapshot.name}</h1>
+
+      {snapshot.link && (
+        <NavLink to={snapshot.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
+          <Link />
+          {t("recipe.toTheRecipe")}
+        </NavLink>
+      )}
 
       <Separator />
 

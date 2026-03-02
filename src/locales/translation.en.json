@@ -735,6 +735,8 @@
     "loginToSave": "Log in to save this recipe",
     "downloadApp": "Get the Plateful app",
     "notFound": "This recipe has gone missing",
-    "notFoundDescription": "This link may be invalid or the share was revoked."
+    "notFoundDescription": "This link may be invalid or the share was revoked.",
+    "linkCopied": "Link copied to clipboard",
+    "copyError": "Could not copy link"
   }
 }

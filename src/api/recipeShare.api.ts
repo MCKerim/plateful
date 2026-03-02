@@ -13,7 +13,6 @@ export const recipeShareApi = {
    */
   async create(
     supabase: SupabaseClient,
-    recipeId: string,
     snapshot: Omit<SharedRecipeSnapshot, "image_urls" | "image_folder"> & { image_paths: string[] }
   ): Promise<string> {
     // Copy each image into a share-owned folder, then sign the copy.
@@ -48,6 +47,7 @@ export const recipeShareApi = {
       category: snapshot.category,
       base_servings: snapshot.base_servings,
       servings_unit: snapshot.servings_unit,
+      link: snapshot.link ?? null,
       image_urls: imageUrls,
       image_folder: imageFolder,
       ingredients: snapshot.ingredients,
@@ -152,7 +152,7 @@ export const recipeShareApi = {
         servings_unit: snapshot.servings_unit ?? null,
         household_id: householdId,
         owner_id: authData.user.id,
-        link: null,
+        link: snapshot.link ?? null,
       })
       .select("id")
       .single();

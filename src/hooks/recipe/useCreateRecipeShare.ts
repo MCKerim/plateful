@@ -6,6 +6,8 @@ import { ingredientsApi } from "@/api/ingredients.api";
 import { Share } from "@capacitor/share";
 import { useTranslation } from "react-i18next";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
+import { writeClipboardText } from "@/utils/nativeClipboard";
+import { toast } from "sonner";
 
 const SHARE_BASE_URL = "https://app.plateful.cloud/share";
 
@@ -38,13 +40,14 @@ export function useCreateRecipeShare() {
       const imagePaths = await recipeShareApi.getImagePaths(supabase, recipeId);
 
       // 4. Create the share record (signs images server-side with ~10y TTL)
-      const token = await recipeShareApi.create(supabase, recipeId, {
+      const token = await recipeShareApi.create(supabase, {
         name: recipe.name,
         description: recipe.description,
         instructions: recipe.instructions,
         category: recipe.category,
         base_servings: recipe.base_servings,
         servings_unit: recipe.servings_unit,
+        link: recipe.link ?? null,
         image_paths: imagePaths,
         ingredients,
       });
@@ -63,7 +66,13 @@ export function useCreateRecipeShare() {
           dialogTitle: t("share.shareRecipe"),
         });
       } catch {
-        // Share dialog dismissed or not available — URL is still usable
+        // Web Share API not available — fall back to clipboard
+        try {
+          await writeClipboardText(shareUrl);
+          toast.success(t("share.linkCopied"));
+        } catch {
+          toast.error(t("share.copyError"));
+        }
       }
     },
   });

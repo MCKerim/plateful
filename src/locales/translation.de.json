@@ -735,6 +735,8 @@
     "loginToSave": "Anmelden, um dieses Rezept zu speichern",
     "downloadApp": "Plateful App herunterladen",
     "notFound": "Dieses Rezept ist verschwunden",
-    "notFoundDescription": "Dieser Link ist ungültig oder der Freigabe-Link wurde widerrufen."
+    "notFoundDescription": "Dieser Link ist ungültig oder der Freigabe-Link wurde widerrufen.",
+    "linkCopied": "Link in Zwischenablage kopiert",
+    "copyError": "Link konnte nicht kopiert werden"
   }
 }
