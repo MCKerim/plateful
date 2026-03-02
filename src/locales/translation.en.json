@@ -375,6 +375,8 @@
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",
 
+    "notifications": "Notifications",
+    "manageNotifications": "Manage notifications",
     "manageYourHousehold": "Manage your household",
 
     "supportFeedback": "Support & Feedback",
@@ -714,5 +716,26 @@
   "subscribe": {
     "error": "Something went wrong. Please try again.",
     "retry": "Try again"
+  },
+  "notificationSettings": {
+    "title": "Notifications",
+    "mobileOnly": "Push notifications are only available in the mobile app. Download Plateful on iOS or Android to enable reminders.",
+    "permissionDenied": "Notification permission denied. Enable it in your device settings.",
+    "weeklyReminder": {
+      "title": "Weekly Planning Reminder",
+      "label": "Weekly meal planning reminder",
+      "description": "Get reminded to plan your meals each week",
+      "dayOfWeek": "Day of the week",
+      "time": "Time"
+    },
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    }
   }
 }

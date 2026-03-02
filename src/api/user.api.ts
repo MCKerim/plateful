@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "@/types/database.types";
+import { Database, Json } from "@/types/database.types";
+import { NotificationPreferences } from "@/types/notification.types";
 
 export type UserWithHousehold = Database["public"]["Tables"]["users"]["Row"] & {
   household: Database["public"]["Tables"]["household"]["Row"] | null;
@@ -67,6 +68,20 @@ export const userApi = {
     const { error } = await supabase
       .from("users")
       .update({ language: params.language })
+      .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
+  async updateNotificationPreferences(
+    supabase: SupabaseClient<Database>,
+    params: { userId: string; preferences: NotificationPreferences }
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("users")
+      .update({ notification_preferences: params.preferences as unknown as Json })
       .eq("id", params.userId);
 
     if (error) {

@@ -46,9 +46,11 @@ import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
+import NotificationSettings from "./page/NotificationSettings";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 
@@ -153,6 +155,21 @@ function App() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const listener = LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      () => {
+        navigate("/planner");
+      }
+    );
+
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [navigate]);
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
@@ -317,6 +334,7 @@ function App() {
         {/* Main Routes */}
         <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
         <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
+        <Route path="/notificationSettings" element={routeToCorrectPage(<NotificationSettings />)} />
         <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />

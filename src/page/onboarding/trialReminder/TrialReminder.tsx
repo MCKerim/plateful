@@ -4,10 +4,25 @@ import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
+import { useNotificationPermission } from "@/hooks/notifications/useNotificationPermission";
+import { useUpdateNotificationPreferences } from "@/hooks/notifications/useUpdateNotificationPreferences";
+import { DEFAULT_NOTIFICATION_PREFERENCES } from "@/types/notification.types";
 
 export default function TrialReminder() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { requestPermission, isSupported } = useNotificationPermission();
+  const updatePreferences = useUpdateNotificationPreferences();
+
+  async function handleContinue() {
+    if (isSupported) {
+      const granted = await requestPermission();
+      if (granted) {
+        await updatePreferences.mutateAsync(DEFAULT_NOTIFICATION_PREFERENCES);
+      }
+    }
+    navigate("/subscribe");
+  }
 
   return (
     <OnboardingLayout>
@@ -64,7 +79,7 @@ export default function TrialReminder() {
 
         <OnboardingButton
           label={t("trialReminder.button")}
-          onClick={() => navigate("/subscribe")}
+          onClick={handleContinue}
         />
       </motion.div>
     </OnboardingLayout>

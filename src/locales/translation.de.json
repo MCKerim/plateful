@@ -374,6 +374,8 @@
     "appearance": "Darstellung",
     "household": "Haushalt",
     "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
+    "notifications": "Benachrichtigungen",
+    "manageNotifications": "Benachrichtigungen verwalten",
     "manageYourHousehold": "Verwalte dein Haushalt",
 
     "supportFeedback": "Support & Feedback",
@@ -714,5 +716,26 @@
   "subscribe": {
     "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "retry": "Erneut versuchen"
+  },
+  "notificationSettings": {
+    "title": "Benachrichtigungen",
+    "mobileOnly": "Push-Benachrichtigungen sind nur in der mobilen App verfügbar. Lade Plateful auf iOS oder Android herunter, um Erinnerungen zu aktivieren.",
+    "permissionDenied": "Benachrichtigungsberechtigung abgelehnt. Aktiviere sie in den Geräteeinstellungen.",
+    "weeklyReminder": {
+      "title": "Wöchentliche Planungserinnerung",
+      "label": "Wöchentliche Essensplanungserinnerung",
+      "description": "Werde daran erinnert, deine Mahlzeiten jede Woche zu planen",
+      "dayOfWeek": "Wochentag",
+      "time": "Uhrzeit"
+    },
+    "days": {
+      "sunday": "Sonntag",
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag"
+    }
   }
 }

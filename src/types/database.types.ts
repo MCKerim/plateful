@@ -384,6 +384,7 @@ export type Database = {
           household_id: string | null
           id: string
           language: string
+          notification_preferences: Json | null
           username: string
         }
         Insert: {
@@ -394,6 +395,7 @@ export type Database = {
           household_id?: string | null
           id?: string
           language: string
+          notification_preferences?: Json | null
           username?: string
         }
         Update: {
@@ -404,6 +406,7 @@ export type Database = {
           household_id?: string | null
           id?: string
           language?: string
+          notification_preferences?: Json | null
           username?: string
         }
         Relationships: [
