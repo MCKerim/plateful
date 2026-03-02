@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { useAppSelector } from "@/redux/hooks";
-import { selectHousehold } from "@/redux/slices/householdSlice";
+
 import { selectUser } from "@/redux/slices/userSlice";
 import { Donut, House, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -18,7 +18,7 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
-  const household = useAppSelector(selectHousehold);
+
 
   const today = useMemo(() => new Date(), []);
   const { data: currentWeekItems = [] } = useMealPlannerItems(today);
@@ -56,38 +56,35 @@ export default function Home() {
   }
 
   return (
-    <Layout>
-      {/* Household name */}
-      <NavLink to="/householdSettings">
-        <div className="flex items-center gap-2">
-          <House size={20} />
-
-          <span className="second-font text-lg text-muted-foreground font-bold">
-            {household?.name}
-          </span>
-        </div>
-      </NavLink>
-
+    <Layout
+      headerButtons={
+        <NavLink to="/householdSettings">
+          <Button variant="ghost" size="icon">
+            <House />
+          </Button>
+        </NavLink>
+      }
+    >
       {/* Time-based greeting */}
-      <h1 className="first-font text-3xl">
-        {t(greetingKey)}
-        <br />
-        {user?.username}
+      <h1 className="first-font text-xl">
+        {t(greetingKey)} {user?.username}
       </h1>
 
       {/* Today's planned meals */}
       <div className="mt-4 mb-36">
         {todaysMeals.length > 0 ? (
           <>
-            <h2 className="second-font text-xl font-bold">{t("home.todayYouPlanned")}</h2>
+            <h2 className="second-font text-lg font-semibold">{t("home.todayYouPlanned")}</h2>
 
             <div className="flex flex-col gap-2">
-              {todaysMeals.map((item) => (
+              {todaysMeals.map((recipe) => (
                 <RecipeCard
-                  key={item.id}
-                  id={item.recipeId}
-                  name={item.recipeName}
-                  averageRating={0}
+                  key={recipe.id}
+                  id={recipe.recipeId}
+                  name={recipe.recipeName}
+                  averageRating={null}
+                  showRating={false}
+                  showMealPlanStatus={false}
                   status={"ready"}
                 />
               ))}
@@ -111,7 +108,7 @@ export default function Home() {
       {/* Recently added recipes */}
       {recentlyAddedRecipes.length > 0 && (
         <div>
-          <h2 className="second-font text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
+          <h2 className="second-font text-lg font-semibold">{t("cookbook.recentlyAdded")}</h2>
 
           <div className="grid grid-cols-2 gap-2">
             {recentlyAddedRecipes.map((recipe) => (

@@ -20,21 +20,21 @@ export type Database = {
           household_id: string | null
           id: string
           name: string
-          owner_id: string
+          owner_id: string | null
         }
         Insert: {
           created_at?: string
           household_id?: string | null
           id?: string
           name?: string
-          owner_id?: string
+          owner_id?: string | null
         }
         Update: {
           created_at?: string
           household_id?: string | null
           id?: string
           name?: string
-          owner_id?: string
+          owner_id?: string | null
         }
         Relationships: [
           {
@@ -42,6 +42,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cookbooks_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -128,7 +135,7 @@ export type Database = {
           eaten: boolean
           household_id: string | null
           id: string
-          owner_id: string
+          owner_id: string | null
           planned_date: string | null
           recipe_id: string | null
         }
@@ -137,7 +144,7 @@ export type Database = {
           eaten?: boolean
           household_id?: string | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
         }
@@ -146,7 +153,7 @@ export type Database = {
           eaten?: boolean
           household_id?: string | null
           id?: string
-          owner_id?: string
+          owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
         }
@@ -156,6 +163,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_planning_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
           {
@@ -286,10 +300,9 @@ export type Database = {
           instructions: string | null
           link: string | null
           name: string
-          owner_id: string
+          owner_id: string | null
           servings_unit: string | null
           status: string
-          visibility: Database["public"]["Enums"]["visibility"]
         }
         Insert: {
           base_servings?: number | null
@@ -302,10 +315,9 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name: string
-          owner_id?: string
+          owner_id?: string | null
           servings_unit?: string | null
           status?: string
-          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Update: {
           base_servings?: number | null
@@ -318,10 +330,9 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name?: string
-          owner_id?: string
+          owner_id?: string | null
           servings_unit?: string | null
           status?: string
-          visibility?: Database["public"]["Enums"]["visibility"]
         }
         Relationships: [
           {
@@ -336,6 +347,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -427,7 +445,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      visibility: "private" | "public" | "household"
+      [_ in never]: never
     }
     CompositeTypes: {
       [_ in never]: never
@@ -554,8 +572,6 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {
-      visibility: ["private", "public", "household"],
-    },
+    Enums: {},
   },
 } as const

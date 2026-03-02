@@ -42,6 +42,7 @@ import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlanned
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
+import MealPlannerIllustration from "@/components/onboarding/illustrations/MealPlannerIllustration";
 
 const locales = {
   en: enUS,
@@ -99,9 +100,7 @@ export default function MealPlanner() {
   );
 
   // Derived state
-  const notPlannedItems = plannedItems.filter(
-    (item) => item.planned_date === null && !item.eaten
-  );
+  const notPlannedItems = plannedItems.filter((item) => item.planned_date === null && !item.eaten);
   const isDraggingFromDrawer = activeItem?.planned_date === null;
 
   // Auto-open drawer when there are unplanned items
@@ -262,7 +261,7 @@ export default function MealPlanner() {
         layoutShiftCompensation: false,
       }}
     >
-      <Layout>
+      <Layout showHeader={false}>
         <RatingModal ref={ratingModalRef} recipeId={recipeToRate} showTriggerButton={false} />
 
         {/* Weekly Plan Dialog for editing */}
@@ -276,7 +275,7 @@ export default function MealPlanner() {
         />
 
         {/* Week Navigation */}
-        <div className="sticky flex items-center justify-between px-2 pb-1 border-b bg-background top-11 z-10">
+        <div className="sticky flex items-center justify-between px-2 pb-1 border-b bg-background top-4 z-10">
           <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
             <ChevronLeft size={20} />
           </Button>
@@ -458,7 +457,12 @@ export default function MealPlanner() {
         <OnboardingSheet
           storageKey="onboarding_mealplanner_seen"
           titleKey="onboarding.mealPlanner.title"
-          descriptionKey="onboarding.mealPlanner.description"
+          bulletKeys={[
+            "onboarding.mealPlanner.bullet1",
+            "onboarding.mealPlanner.bullet2",
+            "onboarding.mealPlanner.bullet3",
+          ]}
+          illustration={<MealPlannerIllustration />}
         />
       </Layout>
 

@@ -361,7 +361,7 @@
     "goodMorning": "Good morning,",
     "goodAfternoon": "Good afternoon,",
     "goodEvening": "Good evening,",
-    "todayYouPlanned": "Planned for today:",
+    "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
     "goToPlanner": "Plan your week"
   },
@@ -389,6 +389,7 @@
 
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms of Service",
+    "impressum": "Impressum",
 
     "account": "Account",
     "signOut": "Sign out",
@@ -403,12 +404,14 @@
       "deleteAccount": {
         "title": "Delete Account",
         "description": "This action is permanent and cannot be undone. All your data will be deleted.",
+        "subscriptionWarning": "If you have an active subscription, cancel it first in the App Store or Play Store. Deleting your account does not cancel your subscription.",
         "confirmationText": "Type \"delete\" to confirm",
         "confirmationPlaceholder": "delete",
         "confirm": "Delete Account",
         "cancel": "Cancel"
       }
     },
+    "deleteAccountError": "Failed to delete account. Please try again or contact support.",
     "modeToggle": {
       "light": "Light",
       "dark": "Dark",
@@ -594,16 +597,22 @@
       "saveFailed": "An error occurred while saving your progress. Please try again."
     },
     "chatbot": {
-      "title": "Your AI Kitchen Assistant",
-      "description": "Ask for recipe ideas, meal suggestions, or cooking tips — I can add recipes straight to your collection."
+      "title": "Your AI-Chef",
+      "bullet1": "Ask for recipe ideas or cooking tips",
+      "bullet2": "Import & edit recipes from any link",
+      "bullet3": "Save recipes directly to your cookbook"
     },
     "recipes": {
       "title": "Your Recipe Collection",
-      "description": "Save your own recipes or import them directly from social media links. Organize them in cookbooks."
+      "bullet1": "Scan recipes from your camera",
+      "bullet2": "Import recipes from TikTok",
+      "bullet3": "Rate, scale & share with your household"
     },
     "mealPlanner": {
-      "title": "Plan Your Week",
-      "description": "Drag recipes to specific days or keep them in your weekly pool for flexible planning."
+      "title": "Your Meal Planner",
+      "bullet1": "Drag & drop recipes onto any day",
+      "bullet2": "Keep unplanned recipes in your weekly pool",
+      "bullet3": "Mark meals as eaten and rate them"
     }
   },
   "questions": {

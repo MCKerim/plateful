@@ -356,7 +356,7 @@
     "goodMorning": "Guten Morgen,",
     "goodAfternoon": "Guten Nachmittag,",
     "goodEvening": "Guten Abend,",
-    "todayYouPlanned": "Geplant für heute:",
+    "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
     "goToPlanner": "Plane deine Woche"
   },
@@ -388,6 +388,7 @@
 
     "privacyPolicy": "Datenschutz",
     "termsOfService": "AGB",
+    "impressum": "Impressum",
 
     "account": "Konto",
     "signOut": "Abmelden",
@@ -402,12 +403,14 @@
       "deleteAccount": {
         "title": "Konto löschen",
         "description": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Alle deine Daten werden gelöscht.",
+        "subscriptionWarning": "Wenn du ein aktives Abonnement hast, kündige es zuerst im App Store oder Google Play. Das Löschen deines Kontos kündigt dein Abonnement nicht.",
         "confirmationText": "Tippe \"löschen\" zur Bestätigung",
         "confirmationPlaceholder": "löschen",
         "confirm": "Konto löschen",
         "cancel": "Abbrechen"
       }
     },
+    "deleteAccountError": "Konto löschen fehlgeschlagen. Bitte versuche es erneut oder kontaktiere den Support.",
     "modeToggle": {
       "light": "Hell",
       "dark": "Dunkel",
@@ -594,16 +597,22 @@
       "saveFailed": "Beim Speichern deines Fortschritts ist ein Fehler aufgetreten. Bitte versuche es erneut."
     },
     "chatbot": {
-      "title": "Dein KI-Küchenassistent",
-      "description": "Frag nach Rezeptideen, Essensvorschlägen oder Kochtipps — ich kann Rezepte direkt in deine Sammlung hinzufügen."
+      "title": "Dein KI-Koch",
+      "bullet1": "Frag nach Rezeptideen oder Kochtipps",
+      "bullet2": "Importiere & bearbeite Rezepte von jedem Link",
+      "bullet3": "Speichere Rezepte direkt in dein Kochbuch"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
-      "description": "Speichere eigene Rezepte oder importiere sie direkt aus Social-Media-Links. Organisiere sie in Kochbüchern."
+      "bullet1": "Scanne Rezepte mit deiner Kamera",
+      "bullet2": "Importiere Rezepte von TikTok",
+      "bullet3": "Bewerte, skaliere & teile mit deinem Haushalt"
     },
     "mealPlanner": {
-      "title": "Plane deine Woche",
-      "description": "Ziehe Rezepte auf bestimmte Tage oder behalte sie in deinem Wochenpool für flexible Planung."
+      "title": "Dein Wochenplaner",
+      "bullet1": "Halte & ziehe Rezepte auf einen beliebigen Tag",
+      "bullet2": "Behalte ungeplante Rezepte im Wochenpool",
+      "bullet3": "Markiere Gerichte als gegessen und bewerte sie"
     }
   },
   "questions": {

@@ -6,7 +6,7 @@ export default function TermsOfService() {
       <div className="space-y-6 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Terms of Service</h1>
-          <p className="text-sm text-muted-foreground">Last updated: July 22, 2025</p>
+          <p className="text-sm text-muted-foreground">Last updated: February 27, 2026</p>
         </div>
 
         <Separator />
@@ -19,6 +19,16 @@ export default function TermsOfService() {
               to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms,
               please do not use our App.
             </p>
+            <p>
+              The App is operated by:
+            </p>
+            <div className="bg-muted p-4 rounded-lg space-y-1">
+              <p className="font-medium">KBlanks (Einzelunternehmen)</p>
+              <p>Im Kassemänneken 5</p>
+              <p>46325 Borken (Weseke)</p>
+              <p>Germany</p>
+              <p>Email: MCKerim@gmx.de</p>
+            </div>
           </section>
 
           <section className="space-y-3">
@@ -26,11 +36,12 @@ export default function TermsOfService() {
             <p>Plateful is a recipe and meal planning application that allows users to:</p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>Create, store, and organize recipes</li>
-              <li>Plan meals and create shopping lists</li>
+              <li>Plan meals</li>
               <li>Import recipes from various sources</li>
               <li>Share recipes with other users</li>
               <li>Rate and review recipes</li>
               <li>Sync data across multiple devices</li>
+              <li>Use AI-powered cooking assistance via the in-app chatbot</li>
             </ul>
           </section>
 
@@ -43,7 +54,7 @@ export default function TermsOfService() {
                 <li>
                   You are responsible for maintaining the security of your account credentials
                 </li>
-                <li>You must be at least 13 years old to create an account</li>
+                <li>You must be at least 16 years old to create an account</li>
                 <li>One person may not maintain more than one account</li>
               </ul>
             </div>
@@ -59,6 +70,67 @@ export default function TermsOfService() {
           </section>
 
           <section className="space-y-3">
+            <h2 className="text-lg font-semibold">Subscriptions and Payments</h2>
+            <p>
+              Plateful is a paid subscription app. By subscribing, you agree to the following terms:
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>
+                Subscription pricing and available plans are displayed in the App and in the
+                respective app store (Apple App Store or Google Play Store)
+              </li>
+              <li>
+                Subscriptions automatically renew at the end of each billing period unless cancelled
+                before the renewal date
+              </li>
+              <li>
+                Payments are charged to your App Store or Google Play account upon confirmation of
+                purchase and at the start of each renewal period
+              </li>
+              <li>
+                You can cancel your subscription at any time through your App Store or Google Play
+                account settings. Cancellation takes effect at the end of the current billing period.
+              </li>
+              <li>
+                Refunds are handled by Apple or Google in accordance with their respective refund
+                policies. We do not process refunds directly.
+              </li>
+              <li>
+                Subscription management is handled by RevenueCat. By subscribing, you agree that
+                your purchase information is shared with RevenueCat for this purpose.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">AI-Generated Content</h2>
+            <p>
+              Plateful includes an AI chatbot that can suggest recipes, propose edits, and provide
+              cooking assistance. Please be aware of the following:
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>
+                AI-generated recipes and suggestions are provided for convenience only and may
+                contain errors, inaccurate quantities, incorrect cooking times, or unsafe
+                combinations.
+              </li>
+              <li>
+                Always verify ingredients, quantities, allergens, and cooking instructions
+                independently before preparing any AI-generated recipe.
+              </li>
+              <li>
+                We are not responsible for the accuracy, safety, or suitability of AI-generated
+                content. Users with food allergies or dietary restrictions should exercise
+                particular caution.
+              </li>
+              <li>
+                Your chat messages and uploaded images are transmitted to OpenAI for processing.
+                See our Privacy Policy for details.
+              </li>
+            </ul>
+          </section>
+
+          <section className="space-y-3">
             <h2 className="text-lg font-semibold">Acceptable Use</h2>
             <p>You agree not to use the App to:</p>
             <ul className="list-disc list-inside space-y-1 ml-4">
@@ -69,6 +141,12 @@ export default function TermsOfService() {
               <li>Distribute malware or other harmful code</li>
               <li>Use the App for commercial purposes without permission</li>
               <li>Share recipes that you do not have the right to share</li>
+              <li>
+                Import recipes from external sources without having the right to use and store
+                that content. When importing recipes from URLs or other external sources, you are
+                solely responsible for ensuring you have the legal right to use and store that
+                content.
+              </li>
               <li>Harass or abuse other users</li>
             </ul>
           </section>
@@ -103,6 +181,34 @@ export default function TermsOfService() {
                 community standards, with or without notice.
               </p>
             </div>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">Household Accounts</h2>
+            <p>
+              Plateful allows users to form households to share recipes, meal plans, and cookbooks:
+            </p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>
+                By joining a household, your recipes, meal plans, and cookbooks become visible to
+                all household members
+              </li>
+              <li>
+                Content you create remains your own, but household members can view and interact
+                with it while you are a member of the household
+              </li>
+              <li>
+                You may leave a household at any time through your account settings. Upon leaving,
+                your content will no longer be visible to other household members.
+              </li>
+              <li>
+                The household owner may remove members at any time
+              </li>
+              <li>
+                We are not responsible for disputes between household members regarding shared
+                content
+              </li>
+            </ul>
           </section>
 
           <section className="space-y-3">
@@ -148,6 +254,16 @@ export default function TermsOfService() {
             </div>
 
             <div className="space-y-2">
+              <h3 className="font-medium">Third-Party Service Dependency</h3>
+              <p>
+                Plateful relies on third-party services including Supabase, OpenAI, Google, and
+                RevenueCat. We are not liable for disruptions, outages, or changes to these
+                third-party services that affect the functionality of the App. We will make
+                reasonable efforts to notify users of significant disruptions.
+              </p>
+            </div>
+
+            <div className="space-y-2">
               <h3 className="font-medium">Service Disclaimer</h3>
               <p>
                 The App is provided "as is" without warranties of any kind. We disclaim all
@@ -159,9 +275,9 @@ export default function TermsOfService() {
             <div className="space-y-2">
               <h3 className="font-medium">Limitation of Liability</h3>
               <p>
-                To the maximum extent permitted by law, we shall not be liable for any indirect,
-                incidental, special, consequential, or punitive damages arising from your use of the
-                App.
+                To the maximum extent permitted by applicable law, we shall not be liable for any
+                indirect, incidental, special, consequential, or punitive damages arising from your
+                use of the App.
               </p>
             </div>
           </section>
@@ -171,9 +287,10 @@ export default function TermsOfService() {
             <div className="space-y-2">
               <h3 className="font-medium">Termination by You</h3>
               <p>
-                You may terminate your account at any time by deleting the App or contacting our
-                support team. Upon termination, your access to the App will cease, and your data may
-                be deleted according to our data retention policy.
+                You may terminate your account at any time using the "Delete Account" option in
+                the app's Settings, or by contacting our support team. Upon termination, your
+                access to the App will cease and your data will be deleted in accordance with our
+                Privacy Policy. Note: uninstalling the app does not delete your account or data.
               </p>
             </div>
 
@@ -199,17 +316,35 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Governing Law</h2>
             <p>
-              These Terms are governed by and construed in accordance with the laws of the
-              jurisdiction where Plateful operates, without regard to conflict of law principles.
+              These Terms are governed by and construed in accordance with the laws of the Federal
+              Republic of Germany, without regard to conflict of law principles.
             </p>
           </section>
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Dispute Resolution</h2>
             <p>
-              Any disputes arising from these Terms or your use of the App will be resolved through
-              binding arbitration in accordance with the rules of the relevant arbitration
-              authority, except where prohibited by law.
+              Any disputes arising from these Terms or your use of the App shall be subject to
+              the exclusive jurisdiction of the competent courts in Weseke, Germany, unless
+              applicable EU law requires otherwise.
+            </p>
+            <p>
+              In accordance with EU Regulation No. 524/2013, we are required to inform you of
+              the EU Online Dispute Resolution platform, which is available at{" "}
+              <a
+                href="https://ec.europa.eu/consumers/odr"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-primary"
+              >
+                https://ec.europa.eu/consumers/odr
+              </a>
+              . We are not obliged to and do not participate in dispute resolution proceedings
+              before a consumer arbitration board.
+            </p>
+            <p>
+              Nothing in these Terms limits any rights you may have under applicable EU consumer
+              protection law.
             </p>
           </section>
 
@@ -225,6 +360,10 @@ export default function TermsOfService() {
             <h2 className="text-lg font-semibold">Contact Information</h2>
             <p>If you have questions about these Terms of Service, please contact us:</p>
             <div className="bg-muted p-4 rounded-lg space-y-1">
+              <p className="font-medium">KBlanks (Einzelunternehmen)</p>
+              <p>Im Kassemänneken 5</p>
+              <p>46325 Borken (Weseke)</p>
+              <p>Germany</p>
               <p>Email: MCKerim@gmx.de</p>
               <p>Through the app's support feature</p>
               <p>Via our social media channels</p>
