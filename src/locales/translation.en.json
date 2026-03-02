@@ -745,6 +745,12 @@
       "thursday": "Thursday",
       "friday": "Friday",
       "saturday": "Saturday"
+    },
+    "dailyMealReminder": {
+      "title": "Daily Meal Reminder",
+      "label": "Daily meal reminder",
+      "description": "Get reminded to check what's planned for today",
+      "time": "Time"
     }
   }
 }

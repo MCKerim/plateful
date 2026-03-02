@@ -2,6 +2,9 @@ import { LocalNotifications } from "@capacitor/local-notifications";
 import { Capacitor } from "@capacitor/core";
 
 const WEEKLY_REMINDER_ID = 1001;
+const DAILY_MEAL_REMINDER_ID = 1002;
+
+export type NotificationType = "weekly_planning_reminder" | "daily_meal_reminder";
 
 export function isNotificationSupported(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.isPluginAvailable("LocalNotifications");
@@ -23,6 +26,8 @@ export async function requestNotificationPermission(): Promise<boolean> {
   return result.display === "granted";
 }
 
+// --- Weekly Planning Reminder ---
+
 export async function scheduleWeeklyReminder(
   dayOfWeek: number,
   time: string,
@@ -30,7 +35,6 @@ export async function scheduleWeeklyReminder(
 ): Promise<void> {
   if (!isNotificationSupported()) return;
 
-  // Cancel any existing weekly reminder first
   await cancelWeeklyReminder();
 
   const [hours, minutes] = time.split(":").map(Number);
@@ -39,8 +43,8 @@ export async function scheduleWeeklyReminder(
     notifications: [
       {
         id: WEEKLY_REMINDER_ID,
-        title: getLocalizedTitle(language),
-        body: getLocalizedBody(language),
+        title: getWeeklyReminderTitle(language),
+        body: getWeeklyReminderBody(language),
         schedule: {
           on: {
             weekday: dayOfWeek === 0 ? 1 : dayOfWeek + 1, // Capacitor uses 1=Sunday, 2=Monday, etc.
@@ -49,6 +53,7 @@ export async function scheduleWeeklyReminder(
           },
           repeats: true,
         },
+        extra: { type: "weekly_planning_reminder" satisfies NotificationType },
       },
     ],
   });
@@ -60,16 +65,67 @@ export async function cancelWeeklyReminder(): Promise<void> {
   try {
     await LocalNotifications.cancel({ notifications: [{ id: WEEKLY_REMINDER_ID }] });
   } catch {
-    // Notification may not exist yet, that's fine
+    // Notification may not exist yet
   }
 }
 
-function getLocalizedTitle(language: string): string {
+function getWeeklyReminderTitle(language: string): string {
   return language === "de" ? "Wochenplanung" : "Weekly Planning";
 }
 
-function getLocalizedBody(language: string): string {
+function getWeeklyReminderBody(language: string): string {
   return language === "de"
     ? "Zeit, deine Mahlzeiten für die Woche zu planen! 🍽️"
     : "Time to plan your meals for the week! 🍽️";
+}
+
+// --- Daily Meal Reminder ---
+
+export async function scheduleDailyMealReminder(
+  time: string,
+  language: string
+): Promise<void> {
+  if (!isNotificationSupported()) return;
+
+  await cancelDailyMealReminder();
+
+  const [hours, minutes] = time.split(":").map(Number);
+
+  await LocalNotifications.schedule({
+    notifications: [
+      {
+        id: DAILY_MEAL_REMINDER_ID,
+        title: getDailyReminderTitle(language),
+        body: getDailyReminderBody(language),
+        schedule: {
+          on: {
+            hour: hours,
+            minute: minutes,
+          },
+          repeats: true,
+        },
+        extra: { type: "daily_meal_reminder" satisfies NotificationType },
+      },
+    ],
+  });
+}
+
+export async function cancelDailyMealReminder(): Promise<void> {
+  if (!isNotificationSupported()) return;
+
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id: DAILY_MEAL_REMINDER_ID }] });
+  } catch {
+    // Notification may not exist yet
+  }
+}
+
+function getDailyReminderTitle(language: string): string {
+  return language === "de" ? "Was gibt's heute?" : "What's cooking today?";
+}
+
+function getDailyReminderBody(language: string): string {
+  return language === "de"
+    ? "Schau dir deinen Essensplan für heute an! 🍽️"
+    : "Check out your meal plan for today! 🍽️";
 }

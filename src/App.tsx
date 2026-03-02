@@ -162,15 +162,38 @@ function App() {
 
     const listener = LocalNotifications.addListener(
       "localNotificationActionPerformed",
-      () => {
-        navigate("/planner");
+      async (event) => {
+        const notificationType = event.notification.extra?.type as string | undefined;
+
+        if (notificationType === "daily_meal_reminder") {
+          try {
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+            const { data } = await supabase
+              .from("meal_planning")
+              .select("recipe_id")
+              .eq("planned_date", todayStr);
+
+            const meals = data ?? [];
+            if (meals.length === 1 && meals[0].recipe_id) {
+              navigate(`/recipe/${meals[0].recipe_id}`);
+            } else {
+              navigate("/home");
+            }
+          } catch {
+            navigate("/home");
+          }
+        } else {
+          navigate("/planner");
+        }
       }
     );
 
     return () => {
       listener.then((l) => l.remove());
     };
-  }, [navigate]);
+  }, [navigate, supabase]);
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);

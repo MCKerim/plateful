@@ -7,6 +7,8 @@ import { NotificationPreferences } from "@/types/notification.types";
 import {
   scheduleWeeklyReminder,
   cancelWeeklyReminder,
+  scheduleDailyMealReminder,
+  cancelDailyMealReminder,
   isNotificationSupported,
 } from "@/lib/notifications";
 
@@ -28,6 +30,15 @@ export function useUpdateNotificationPreferences() {
           );
         } else {
           await cancelWeeklyReminder();
+        }
+
+        if (preferences.daily_meal_reminder.enabled) {
+          await scheduleDailyMealReminder(
+            preferences.daily_meal_reminder.time,
+            user.language
+          );
+        } else {
+          await cancelDailyMealReminder();
         }
       }
 

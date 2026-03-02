@@ -41,6 +41,8 @@ export default function NotificationSettings() {
     return granted;
   }
 
+  // --- Weekly Reminder Handlers ---
+
   async function handleToggleWeeklyReminder(enabled: boolean) {
     if (enabled) {
       const granted = await ensurePermissionGranted();
@@ -66,12 +68,40 @@ export default function NotificationSettings() {
     });
   }
 
-  function handleChangeTime(time: string) {
+  function handleChangeWeeklyTime(time: string) {
     if (!time) return;
     updatePreferences.mutate({
       ...preferences,
       weekly_planning_reminder: {
         ...preferences.weekly_planning_reminder,
+        time,
+      },
+    });
+  }
+
+  // --- Daily Meal Reminder Handlers ---
+
+  async function handleToggleDailyReminder(enabled: boolean) {
+    if (enabled) {
+      const granted = await ensurePermissionGranted();
+      if (!granted) return;
+    }
+
+    updatePreferences.mutate({
+      ...preferences,
+      daily_meal_reminder: {
+        ...preferences.daily_meal_reminder,
+        enabled,
+      },
+    });
+  }
+
+  function handleChangeDailyTime(time: string) {
+    if (!time) return;
+    updatePreferences.mutate({
+      ...preferences,
+      daily_meal_reminder: {
+        ...preferences.daily_meal_reminder,
         time,
       },
     });
@@ -88,6 +118,7 @@ export default function NotificationSettings() {
           </p>
         )}
 
+        {/* Weekly Planning Reminder */}
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">
             {t("notificationSettings.weeklyReminder.title")}
@@ -141,9 +172,45 @@ export default function NotificationSettings() {
                 <Input
                   type="time"
                   value={preferences.weekly_planning_reminder.time}
-                  onChange={(e) => handleChangeTime(e.target.value)}
+                  onChange={(e) => handleChangeWeeklyTime(e.target.value)}
                 />
               </div>
+            </div>
+          )}
+        </div>
+
+        {/* Daily Meal Reminder */}
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">
+            {t("notificationSettings.dailyMealReminder.title")}
+          </h2>
+
+          <div className="flex items-center justify-between py-1">
+            <div className="flex-1 pr-4">
+              <p className="text-sm font-medium">
+                {t("notificationSettings.dailyMealReminder.label")}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {t("notificationSettings.dailyMealReminder.description")}
+              </p>
+            </div>
+            <Switch
+              checked={preferences.daily_meal_reminder.enabled}
+              onCheckedChange={handleToggleDailyReminder}
+              disabled={!isNotificationSupported()}
+            />
+          </div>
+
+          {preferences.daily_meal_reminder.enabled && (
+            <div className="flex flex-col gap-1 pt-2 border-t">
+              <label className="text-sm font-medium">
+                {t("notificationSettings.dailyMealReminder.time")}
+              </label>
+              <Input
+                type="time"
+                value={preferences.daily_meal_reminder.time}
+                onChange={(e) => handleChangeDailyTime(e.target.value)}
+              />
             </div>
           )}
         </div>

@@ -745,6 +745,12 @@
       "thursday": "Donnerstag",
       "friday": "Freitag",
       "saturday": "Samstag"
+    },
+    "dailyMealReminder": {
+      "title": "Tägliche Essenserinnerung",
+      "label": "Tägliche Essenserinnerung",
+      "description": "Lass dich daran erinnern, was heute geplant ist",
+      "time": "Uhrzeit"
     }
   }
 }
