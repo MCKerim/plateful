@@ -1,5 +1,9 @@
 import { useRef, useState, KeyboardEvent } from "react";
 import { cn } from "@/lib/utils";
+import { Capacitor } from "@capacitor/core";
+import { DatetimePicker } from "@capawesome-team/capacitor-datetime-picker";
+import { useTranslation } from "react-i18next";
+import { toast } from "sonner";
 
 interface TimeInputProps {
   value: string; // "HH:MM"
@@ -8,6 +12,60 @@ interface TimeInputProps {
 }
 
 export function TimeInput({ value, onChange, className }: TimeInputProps) {
+  const { i18n } = useTranslation();
+
+  if (Capacitor.isNativePlatform()) {
+    return <NativeTimeInput value={value} onChange={onChange} className={className} locale={i18n.language} />;
+  }
+
+  return <WebTimeInput value={value} onChange={onChange} className={className} />;
+}
+
+// --- Native picker (iOS / Android) ---
+
+interface NativeTimeInputProps extends TimeInputProps {
+  locale: string;
+}
+
+function NativeTimeInput({ value, onChange, className, locale }: NativeTimeInputProps) {
+  async function openPicker() {
+    try {
+      const isoValue = `1970-01-01T${value}:00.000Z`;
+      const result = await DatetimePicker.present({
+        mode: "time",
+        value: isoValue,
+        locale,
+        theme: "auto",
+      });
+      if (result?.value) {
+        // Parse as UTC since we passed a Z-suffixed value
+        const d = new Date(result.value);
+        const h = String(d.getUTCHours()).padStart(2, "0");
+        const m = String(d.getUTCMinutes()).padStart(2, "0");
+        onChange(`${h}:${m}`);
+      }
+    } catch (e) {
+      toast.error(String(e));
+    }
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={openPicker}
+      className={cn(
+        "flex items-center h-9 w-fit rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm cursor-pointer active:opacity-70",
+        className
+      )}
+    >
+      {value}
+    </button>
+  );
+}
+
+// --- Web segmented input ---
+
+function WebTimeInput({ value, onChange, className }: TimeInputProps) {
   const [hours, minutes] = value.split(":");
   const hoursNum = parseInt(hours) || 0;
   const minutesNum = parseInt(minutes) || 0;

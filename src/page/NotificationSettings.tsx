@@ -115,9 +115,6 @@ export default function NotificationSettings() {
           {preferences.weekly_planning_reminder.enabled && (
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <label className="text-sm text-muted-foreground">
-                  {t("notificationSettings.weeklyReminder.dayOfWeek")}
-                </label>
                 <Select
                   value={preferences.weekly_planning_reminder.day_of_week.toString()}
                   onValueChange={handleChangeDayOfWeek}
