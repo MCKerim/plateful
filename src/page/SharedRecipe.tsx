@@ -21,9 +21,7 @@ import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
 import { Download, BookmarkPlus, Link } from "lucide-react";
 
-const APP_STORE_URL = "https://apps.apple.com/app/plateful/id6740278718";
-const PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.kblanks.plateful";
+const PLATEFUL_URL = "https://plateful.cloud";
 
 /** Map a snapshot ingredient to the RecipeIngredient shape needed by groupIngredients */
 function toDisplayIngredient(ing: SnapshotIngredient, index: number): RecipeIngredient {
@@ -79,11 +77,7 @@ export default function SharedRecipe() {
   }
 
   function handleDownloadApp() {
-    const url =
-      Capacitor.getPlatform() === "android"
-        ? PLAY_STORE_URL
-        : APP_STORE_URL;
-    window.open(url, "_blank");
+    window.open(PLATEFUL_URL, "_blank");
   }
 
   if (isLoading) {
