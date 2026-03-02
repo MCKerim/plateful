@@ -9,98 +9,62 @@ interface TimeInputProps {
 
 export function TimeInput({ value, onChange, className }: TimeInputProps) {
   const [hours, minutes] = value.split(":");
+  const hoursNum = parseInt(hours) || 0;
+  const minutesNum = parseInt(minutes) || 0;
   const [focusedSegment, setFocusedSegment] = useState<"hours" | "minutes" | null>(null);
   const [hoursBuffer, setHoursBuffer] = useState("");
   const [minutesBuffer, setMinutesBuffer] = useState("");
   const hoursRef = useRef<HTMLSpanElement>(null);
   const minutesRef = useRef<HTMLSpanElement>(null);
 
-  function commit(h: string, m: string) {
-    const hNum = Math.min(23, Math.max(0, parseInt(h) || 0));
-    const mNum = Math.min(59, Math.max(0, parseInt(m) || 0));
+  function commit(h: number, m: number) {
+    const hNum = Math.min(23, Math.max(0, h));
+    const mNum = Math.min(59, Math.max(0, m));
     onChange(`${String(hNum).padStart(2, "0")}:${String(mNum).padStart(2, "0")}`);
   }
 
   function handleHoursKey(e: KeyboardEvent) {
-    e.preventDefault();
     if (e.key === "Tab") {
-      minutesRef.current?.focus();
+      if (!e.shiftKey) minutesRef.current?.focus();
       return;
     }
-    if (e.key === "ArrowUp") {
-      const next = (parseInt(hours) + 1) % 24;
-      commit(String(next), minutes);
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      const next = (parseInt(hours) - 1 + 24) % 24;
-      commit(String(next), minutes);
-      return;
-    }
-    if (e.key === "Backspace") {
-      setHoursBuffer("");
-      commit("0", minutes);
-      return;
-    }
+    e.preventDefault();
+    if (e.key === "ArrowUp") { commit((hoursNum + 1) % 24, minutesNum); return; }
+    if (e.key === "ArrowDown") { commit((hoursNum - 1 + 24) % 24, minutesNum); return; }
+    if (e.key === "Backspace") { setHoursBuffer(""); commit(0, minutesNum); return; }
     if (!/^\d$/.test(e.key)) return;
 
     const next = hoursBuffer + e.key;
     if (next.length === 1) {
       const num = parseInt(next);
       setHoursBuffer(num > 2 ? "" : next);
-      if (num > 2) {
-        commit(next, minutes);
-        minutesRef.current?.focus();
-      } else {
-        commit(next, minutes);
-      }
+      commit(num, minutesNum);
+      if (num > 2) minutesRef.current?.focus();
     } else {
       const num = parseInt(next);
-      if (num <= 23) {
-        commit(next, minutes);
-        setHoursBuffer("");
-        minutesRef.current?.focus();
-      } else {
-        commit(e.key, minutes);
-        setHoursBuffer("");
-      }
+      commit(num <= 23 ? num : parseInt(e.key), minutesNum);
+      setHoursBuffer("");
+      if (num <= 23) minutesRef.current?.focus();
     }
   }
 
   function handleMinutesKey(e: KeyboardEvent) {
-    e.preventDefault();
     if (e.key === "Tab") return;
-    if (e.key === "ArrowUp") {
-      const next = (parseInt(minutes) + 1) % 60;
-      commit(hours, String(next));
-      return;
-    }
-    if (e.key === "ArrowDown") {
-      const next = (parseInt(minutes) - 1 + 60) % 60;
-      commit(hours, String(next));
-      return;
-    }
-    if (e.key === "Backspace") {
-      setMinutesBuffer("");
-      commit(hours, "0");
-      return;
-    }
+    e.preventDefault();
+    if (e.key === "ArrowUp") { commit(hoursNum, (minutesNum + 1) % 60); return; }
+    if (e.key === "ArrowDown") { commit(hoursNum, (minutesNum - 1 + 60) % 60); return; }
+    if (e.key === "Backspace") { setMinutesBuffer(""); commit(hoursNum, 0); return; }
     if (!/^\d$/.test(e.key)) return;
 
     const next = minutesBuffer + e.key;
     if (next.length === 1) {
       const num = parseInt(next);
       setMinutesBuffer(num > 5 ? "" : next);
-      commit(hours, next);
+      commit(hoursNum, num);
     } else {
       const num = parseInt(next);
-      if (num <= 59) {
-        commit(hours, next);
-        setMinutesBuffer("");
-      } else {
-        commit(hours, e.key);
-        setMinutesBuffer("");
-      }
+      commit(hoursNum, num <= 59 ? num : parseInt(e.key));
+      setMinutesBuffer("");
     }
   }
 
@@ -117,7 +81,7 @@ export function TimeInput({ value, onChange, className }: TimeInputProps) {
         tabIndex={0}
         role="spinbutton"
         aria-label="Hours"
-        aria-valuenow={parseInt(hours)}
+        aria-valuenow={hoursNum}
         aria-valuemin={0}
         aria-valuemax={23}
         onFocus={() => { setFocusedSegment("hours"); setHoursBuffer(""); }}
@@ -136,7 +100,7 @@ export function TimeInput({ value, onChange, className }: TimeInputProps) {
         tabIndex={0}
         role="spinbutton"
         aria-label="Minutes"
-        aria-valuenow={parseInt(minutes)}
+        aria-valuenow={minutesNum}
         aria-valuemin={0}
         aria-valuemax={59}
         onFocus={() => { setFocusedSegment("minutes"); setMinutesBuffer(""); }}
