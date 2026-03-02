@@ -1,10 +1,16 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat } from "lucide-react";
+import { Pencil, Link, CalendarDays, ChefHat, Loader2 } from "lucide-react";
+import imageCompression from "browser-image-compression";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
+import { useNativeCamera } from "@/hooks/general/useNativeCamera";
+import { useSupabase } from "@/utils/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, selectMessages, selectRecipeId } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -60,6 +66,12 @@ export default function Recipe() {
   const { ratings, averageRating } = useRecipeRatings(recipeId);
   const { data: ingredients = [] } = useRecipeIngredients(recipeId);
 
+  // Image upload (placeholder click)
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+  const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   // Mutations
   const deleteRatingMutation = useDeleteRating();
 
@@ -105,6 +117,42 @@ export default function Recipe() {
     }
   }
 
+  async function handlePlaceholderClick() {
+    if (!recipeId) return;
+
+    let result: { file: File; dataUrl: string } | null = null;
+    try {
+      result = await takePhoto();
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+      return;
+    }
+
+    if (!result) return;
+
+    setIsUploadingImage(true);
+    try {
+      const compressedFile = await imageCompression(result.file, IMAGE_COMPRESSION_OPTIONS);
+      const fileExt = compressedFile.name.split(".").pop();
+      const filePath = `recipe_${recipeId}/${Date.now()}.${fileExt}`;
+
+      const { error } = await supabase.storage
+        .from("recipeimages")
+        .upload(filePath, compressedFile, { upsert: true });
+
+      if (error) {
+        toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) });
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
+
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
@@ -133,11 +181,18 @@ export default function Recipe() {
       <div className="relative">
         {imageUrls.length === 0 ? (
           <AspectRatio ratio={16 / 9}>
-            <img
-              src={"/no-img.jpg"}
-              alt="Recipe"
-              className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-            />
+            <div className="relative w-full h-full" onClick={handlePlaceholderClick}>
+              <img
+                src={"/no-img.jpg"}
+                alt="Recipe"
+                className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+              />
+              {isUploadingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
           </AspectRatio>
         ) : (
           <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
@@ -235,6 +290,7 @@ export default function Recipe() {
           />
         ))}
       </div>
+      {ImageSourceDrawerComponent}
     </Layout>
   );
 }
