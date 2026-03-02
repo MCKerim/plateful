@@ -375,6 +375,8 @@
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",
 
+    "notifications": "Notifications",
+    "manageNotifications": "Manage notifications",
     "manageYourHousehold": "Manage your household",
 
     "supportFeedback": "Support & Feedback",
@@ -386,7 +388,7 @@
     "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
 
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "Terms",
     "impressum": "Impressum",
 
     "account": "Account",
@@ -738,5 +740,32 @@
     "notFoundDescription": "This link doesn't seem to work anymore. Just ask to have the recipe sent again.",
     "linkCopied": "Link copied to clipboard",
     "copyError": "Could not copy link"
+  },
+  "notificationSettings": {
+    "title": "Notifications",
+    "mobileOnly": "Push notifications are only available in the mobile app. Download Plateful on iOS or Android to enable reminders.",
+    "permissionDenied": "Notification permission denied. Enable it in your device settings.",
+    "weeklyReminder": {
+      "title": "Weekly Planning Reminder",
+      "label": "Weekly meal planning reminder",
+      "description": "Get reminded to plan your meals each week",
+      "dayOfWeek": "Day of the week",
+      "time": "Time"
+    },
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    },
+    "dailyMealReminder": {
+      "title": "Daily Meal Reminder",
+      "label": "Daily meal reminder",
+      "description": "Get reminded to check what's planned for today",
+      "time": "Time"
+    }
   }
 }
