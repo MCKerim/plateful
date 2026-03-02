@@ -4,7 +4,7 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat, Loader2 } from "lucide-react";
+import { Pencil, Link, CalendarDays, ChefHat, Share2, Loader2 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useNativeCamera } from "@/hooks/general/useNativeCamera";
@@ -37,6 +37,7 @@ import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -74,6 +75,7 @@ export default function Recipe() {
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
+  const createShareMutation = useCreateRecipeShare();
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -212,15 +214,29 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-2 right-2 z-10"
-          onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
-          aria-label="Edit Recipe"
-        >
-          <Pencil size={18} />
-        </Button>
+        <div className="absolute top-2 right-2 z-10 flex gap-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => {
+              if (!recipe) return;
+              createShareMutation.mutate(recipe.id);
+            }}
+            disabled={createShareMutation.isPending}
+            aria-label={t("share.shareRecipe")}
+          >
+            <Share2 size={18} />
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
+            aria-label="Edit Recipe"
+          >
+            <Pencil size={18} />
+          </Button>
+        </div>
       </div>
 
       <div className="flex justify-between">
