@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
+import { TimeInput } from "@/components/ui/time-input";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
@@ -169,10 +169,9 @@ export default function NotificationSettings() {
                 <label className="text-sm font-medium">
                   {t("notificationSettings.weeklyReminder.time")}
                 </label>
-                <Input
-                  type="time"
+                <TimeInput
                   value={preferences.weekly_planning_reminder.time}
-                  onChange={(e) => handleChangeWeeklyTime(e.target.value)}
+                  onChange={handleChangeWeeklyTime}
                 />
               </div>
             </div>
@@ -206,10 +205,9 @@ export default function NotificationSettings() {
               <label className="text-sm font-medium">
                 {t("notificationSettings.dailyMealReminder.time")}
               </label>
-              <Input
-                type="time"
+              <TimeInput
                 value={preferences.daily_meal_reminder.time}
-                onChange={(e) => handleChangeDailyTime(e.target.value)}
+                onChange={handleChangeDailyTime}
               />
             </div>
           )}
