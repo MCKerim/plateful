@@ -41,7 +41,7 @@ export default function SurveyStart() {
     : 0;
 
   return (
-    <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">
+    <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs mx-auto" style={{ paddingTop: "calc(2.5rem + var(--safe-area-top, 0px))", paddingBottom: "calc(2.5rem + var(--safe-area-bottom, 0px))" }}>
       <div className="flex flex-col w-full gap-8">
         <Progress value={progressValue} />
       </div>

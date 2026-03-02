@@ -42,7 +42,6 @@ import TrialReminder from "./page/onboarding/trialReminder/TrialReminder";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
-import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
@@ -52,8 +51,10 @@ import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
+import { useSafeArea } from "./hooks/useSafeArea";
 
 function App() {
+  useSafeArea(); // populates --safe-area-top/bottom/left/right CSS vars globally
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
@@ -146,14 +147,6 @@ function App() {
       globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
     };
   }, [navigate]);
-
-  useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      EdgeToEdge.enable().catch((e) => {
-        console.error("Error enabling edge to edge:", e);
-      });
-    }
-  }, []);
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);

@@ -10,6 +10,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       position="top-right"
+      offset="calc(1rem + var(--safe-area-top, 0px))"
       richColors
       theme={theme as ToasterProps["theme"]}
       className="toaster group"

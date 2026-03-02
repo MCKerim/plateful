@@ -11,27 +11,43 @@ interface SafeAreaInsets {
 
 const DEFAULT_INSETS: SafeAreaInsets = { top: 0, right: 0, bottom: 0, left: 0 };
 
+function applyCssVars(insets: SafeAreaInsets) {
+  const root = document.documentElement;
+  root.style.setProperty("--safe-area-top", `${insets.top}px`);
+  root.style.setProperty("--safe-area-bottom", `${insets.bottom}px`);
+  root.style.setProperty("--safe-area-left", `${insets.left}px`);
+  root.style.setProperty("--safe-area-right", `${insets.right}px`);
+}
+
 export function useSafeArea() {
   const [insets, setInsets] = useState<SafeAreaInsets>(DEFAULT_INSETS);
 
   useEffect(() => {
     if (!Capacitor.isNativePlatform()) return;
 
-    SafeArea.getSafeAreaInsets()
-      .then(({ insets }) => setInsets(insets))
-      .catch((err) => console.warn("Failed to get safe area insets:", err));
-
+    let cancelled = false;
     let listenerHandle: { remove: () => void } | null = null;
 
-    SafeArea.addListener("safeAreaChanged", ({ insets }) => {
-      setInsets(insets);
-    })
-      .then((handle) => {
-        listenerHandle = handle;
+    Promise.all([
+      SafeArea.getSafeAreaInsets(),
+      SafeArea.addListener("safeAreaChanged", ({ insets }) => {
+        setInsets(insets);
+        applyCssVars(insets);
+      }),
+    ])
+      .then(([{ insets: initial }, handle]) => {
+        if (cancelled) {
+          handle.remove();
+        } else {
+          listenerHandle = handle;
+          setInsets(initial);
+          applyCssVars(initial);
+        }
       })
-      .catch((err) => console.warn("Failed to add safe area listener:", err));
+      .catch((err) => console.warn("Failed to initialize safe area:", err));
 
     return () => {
+      cancelled = true;
       listenerHandle?.remove();
     };
   }, []);

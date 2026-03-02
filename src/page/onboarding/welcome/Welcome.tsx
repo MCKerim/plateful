@@ -1,18 +1,16 @@
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
-import { useSafeArea } from "@/hooks/useSafeArea";
 
 export default function Welcome() {
   const { t } = useTranslation();
-  const { top, bottom } = useSafeArea();
 
   return (
     <div
       className="flex flex-col items-center h-screen px-4 bg-accent"
       style={{
-        paddingTop: `calc(2.5rem + ${top}px)`,
-        paddingBottom: `calc(2.5rem + ${bottom}px)`,
+        paddingTop: "calc(2.5rem + var(--safe-area-top, 0px))",
+        paddingBottom: "calc(2.5rem + var(--safe-area-bottom, 0px))",
       }}
     >
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-primary-foreground overflow-hidden">
