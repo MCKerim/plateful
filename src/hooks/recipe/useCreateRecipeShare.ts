@@ -21,8 +21,11 @@ export function useCreateRecipeShare() {
       const recipe = await recipeApi.getById(supabase, recipeId);
       if (!recipe) throw new Error("Recipe not found");
 
-      // 2. Fetch ingredients
-      const ingredientRows = await ingredientsApi.getByRecipeId(supabase, recipeId);
+      // 2+3. Fetch ingredients and image paths in parallel
+      const [ingredientRows, imagePaths] = await Promise.all([
+        ingredientsApi.getByRecipeId(supabase, recipeId),
+        recipeShareApi.getImagePaths(supabase, recipeId),
+      ]);
       const ingredients: SnapshotIngredient[] = ingredientRows.map((row) => ({
         raw_text: row.raw_text,
         quantity_value: row.quantity_value,
@@ -35,9 +38,6 @@ export function useCreateRecipeShare() {
         is_optional: row.is_optional,
         preparation_note: row.preparation_note,
       }));
-
-      // 3. Get image paths for long-lived signing
-      const imagePaths = await recipeShareApi.getImagePaths(supabase, recipeId);
 
       // 4. Create the share record (signs images server-side with ~10y TTL)
       const token = await recipeShareApi.create(supabase, {

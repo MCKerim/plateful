@@ -40,17 +40,11 @@ export const recipeShareApi = {
       )
     ).filter((url): url is string => url !== null);
 
+    const { image_paths: _, ...snapshotFields } = snapshot;
     const fullSnapshot: SharedRecipeSnapshot = {
-      name: snapshot.name,
-      description: snapshot.description,
-      instructions: snapshot.instructions,
-      category: snapshot.category,
-      base_servings: snapshot.base_servings,
-      servings_unit: snapshot.servings_unit,
-      link: snapshot.link ?? null,
+      ...snapshotFields,
       image_urls: imageUrls,
       image_folder: imageFolder,
-      ingredients: snapshot.ingredients,
     };
 
     const { data: authData } = await supabase.auth.getUser();
@@ -160,31 +154,26 @@ export const recipeShareApi = {
     if (recipeError) throw recipeError;
     const newRecipeId = recipe.id;
 
-    // 2. Bulk insert ingredients
-    if (snapshot.ingredients.length > 0) {
-      const ingredientRows = snapshot.ingredients.map((ing) => ({
-        recipe_id: newRecipeId,
-        raw_text: ing.raw_text,
-        quantity_value: ing.quantity_value,
-        quantity_display: ing.quantity_display,
-        unit: ing.unit,
-        ingredient_name: ing.ingredient_name,
-        group_name: ing.group_name,
-        sort_order: ing.sort_order,
-        is_scalable: ing.is_scalable,
-        is_optional: ing.is_optional,
-        preparation_note: ing.preparation_note,
-      }));
+    // 2+3. Insert ingredients and copy images in parallel
+    const ingredientInsert = snapshot.ingredients.length > 0
+      ? supabase.from("recipe_ingredients").insert(
+          snapshot.ingredients.map((ing) => ({
+            recipe_id: newRecipeId,
+            raw_text: ing.raw_text,
+            quantity_value: ing.quantity_value,
+            quantity_display: ing.quantity_display,
+            unit: ing.unit,
+            ingredient_name: ing.ingredient_name,
+            group_name: ing.group_name,
+            sort_order: ing.sort_order,
+            is_scalable: ing.is_scalable,
+            is_optional: ing.is_optional,
+            preparation_note: ing.preparation_note,
+          }))
+        ).then(({ error }) => { if (error) throw error; })
+      : Promise.resolve();
 
-      const { error: ingError } = await supabase
-        .from("recipe_ingredients")
-        .insert(ingredientRows);
-
-      if (ingError) throw ingError;
-    }
-
-    // 3. Copy images: download from snapshot signed URLs and upload to new recipe storage
-    await Promise.allSettled(
+    const imageCopy = Promise.allSettled(
       snapshot.image_urls.map(async (url, index) => {
         try {
           const response = await fetch(url);
@@ -204,6 +193,8 @@ export const recipeShareApi = {
         }
       })
     );
+
+    await Promise.all([ingredientInsert, imageCopy]);
 
     return newRecipeId;
   },
