@@ -38,9 +38,7 @@ export function RecipePrintView({
           />
         )}
 
-        <h1 className="first-font text-[16pt] mt-2.5 mb-0.5">
-          {recipe.name}
-        </h1>
+        <h1 className="first-font text-[16pt] mt-2.5 mb-0.5">{recipe.name}</h1>
 
         {targetServings != null && (
           <p className="mb-1 text-[8pt] text-[#666] tracking-[0.03em]">
@@ -59,14 +57,11 @@ export function RecipePrintView({
           {/* Left column: ingredients */}
           {ingredients.length > 0 && (
             <div>
-              <h2 className="second-font text-[10pt] font-bold mb-1">
-                {t("ingredients.title")}
-              </h2>
+              <h2 className="second-font text-[10pt] font-bold mb-1">{t("ingredients.title")}</h2>
               {groupedIngredients.map((group, i) => (
                 <div key={group.name ?? `g-${i}`}>
-                  {group.name && (
-                    <p className="text-[8pt] font-bold mt-1.5 mb-0.5">{group.name}</p>
-                  )}
+                  {group.name && <p className="text-[8pt] font-bold mt-1.5 mb-0.5">{group.name}</p>}
+
                   <ul className="m-0 list-none">
                     {group.ingredients.map((ing) => (
                       <li key={ing.id} className="mb-px text-[8pt]">
@@ -82,9 +77,8 @@ export function RecipePrintView({
           {/* Right column: instructions */}
           {recipe.instructions && (
             <div>
-              <h2 className="second-font text-[10pt] font-bold mb-1">
-                {t("recipe.instructions")}
-              </h2>
+              <h2 className="second-font text-[10pt] font-bold mb-1">{t("recipe.instructions")}</h2>
+
               <MarkdownRenderer content={recipe.instructions} />
             </div>
           )}
@@ -96,9 +90,7 @@ export function RecipePrintView({
         className="hidden print:flex print:flex-row print:justify-between print:items-end print:fixed print:bottom-0 print:left-0 print:right-0 print:bg-white"
       >
         <div>
-          <p className="first-font text-[12pt] m-0 leading-none text-[#1b1602]">
-            Plateful
-          </p>
+          <p className="first-font text-[12pt] m-0 leading-none text-[#1b1602]">Plateful</p>
         </div>
 
         <QRCodeSVG value={deeplink} size={48} />
