@@ -35,13 +35,11 @@ const s = {
   title: {
     fontFamily: "'Shrikhand', serif",
     fontSize: "16pt",
-    margin: "10px 0 4px 0",
-    lineHeight: "1.1",
-    letterSpacing: "-0.3px",
+    margin: "10px 0 2px 0",
   } as React.CSSProperties,
 
   meta: {
-    margin: "0 0 12px 0",
+    margin: "0 0 4px 0",
     fontSize: "8pt",
     color: "#666",
     letterSpacing: "0.03em",
