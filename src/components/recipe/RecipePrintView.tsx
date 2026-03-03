@@ -20,7 +20,7 @@ const s = {
     fontFamily: "'Roboto', sans-serif",
     color: "#111111",
     background: "#ffffff",
-    fontSize: "9.5pt",
+    fontSize: "8pt",
     lineHeight: "1.4",
   } as React.CSSProperties,
 
@@ -34,7 +34,7 @@ const s = {
 
   title: {
     fontFamily: "'Shrikhand', serif",
-    fontSize: "17pt",
+    fontSize: "16pt",
     margin: "10px 0 4px 0",
     lineHeight: "1.1",
     letterSpacing: "-0.3px",
@@ -42,14 +42,14 @@ const s = {
 
   meta: {
     margin: "0 0 12px 0",
-    fontSize: "8.5pt",
+    fontSize: "8pt",
     color: "#666",
     letterSpacing: "0.03em",
   } as React.CSSProperties,
 
   description: {
     margin: "0 0 16px 0",
-    fontSize: "9pt",
+    fontSize: "8pt",
   } as React.CSSProperties,
 
   columns: {
@@ -60,34 +60,36 @@ const s = {
   } as React.CSSProperties,
 
   sectionHeading: {
-    fontSize: "7.5pt",
+    fontFamily: "'Lora', serif",
+    fontSize: "10pt",
     fontWeight: "bold",
-    margin: "0 0 8px 0",
-    textTransform: "uppercase" as const,
-    letterSpacing: "0.12em",
-    borderLeft: "3px solid #ff9d00",
-    paddingLeft: "7px",
+    margin: "0 0 4px 0",
   } as React.CSSProperties,
 
   groupHeading: {
-    fontSize: "9pt",
+    fontSize: "8pt",
     fontWeight: "bold",
     margin: "6px 0 2px 0",
   } as React.CSSProperties,
 
   ingredientList: {
     margin: "0",
-    paddingLeft: "10px",
     listStyleType: "none",
   } as React.CSSProperties,
 
   ingredientItem: {
     marginBottom: "1px",
-    fontSize: "9pt",
+    fontSize: "8pt",
   } as React.CSSProperties,
 };
 
-export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings, servingsUnit }: Props) {
+export function RecipePrintView({
+  recipe,
+  imageUrl,
+  ingredients,
+  targetServings,
+  servingsUnit,
+}: Props) {
   const { t } = useTranslation();
   const groupedIngredients = groupIngredients(ingredients);
   const deeplink = `https://app.plateful.cloud/recipe/${recipe.id}`;
@@ -103,7 +105,10 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
 
         {targetServings != null && (
           <p style={s.meta}>
-            {targetServings} {t(`ingredients.units.${servingsUnit ?? "servings"}`, { defaultValue: servingsUnit ?? "servings" })}
+            {targetServings}{" "}
+            {t(`ingredients.units.${servingsUnit ?? "servings"}`, {
+              defaultValue: servingsUnit ?? "servings",
+            })}
           </p>
         )}
 
@@ -143,14 +148,20 @@ export function RecipePrintView({ recipe, imageUrl, ingredients, targetServings,
 
       <div id="recipe-print-footer">
         <div>
-          <p style={{ fontFamily: "'Shrikhand', serif", fontSize: "10pt", margin: "0", lineHeight: "1", color: "#1b1602" }}>
+          <p
+            style={{
+              fontFamily: "'Shrikhand', serif",
+              fontSize: "12pt",
+              margin: "0",
+              lineHeight: "1",
+              color: "#1b1602",
+            }}
+          >
             Plateful
           </p>
-          <p style={{ fontSize: "7pt", margin: "2px 0 0 0", color: "#888", letterSpacing: "0.02em" }}>
-            app.plateful.cloud
-          </p>
         </div>
-        <QRCodeSVG value={deeplink} size={36} />
+
+        <QRCodeSVG value={deeplink} size={48} />
       </div>
     </div>,
     document.body
