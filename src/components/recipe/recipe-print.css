@@ -5,14 +5,6 @@
  * and only the print view is shown.
  */
 
-#recipe-print-view {
-  display: none;
-}
-
-#recipe-print-footer {
-  display: none;
-}
-
 @media print {
   @page {
     size: A4 portrait;
@@ -24,18 +16,9 @@
     display: none !important;
   }
 
-  /* Show the portal-rendered print view */
-  #recipe-print-view {
-    display: block !important;
-  }
-
   /* Ensure Tailwind CSS vars resolve to print-safe values */
   #recipe-print-view {
     --color-primary: #111111;
-    color: #111111;
-    font-size: 8pt;
-    /* Reserve space so content doesn't slide behind the fixed footer */
-    padding-bottom: 20mm;
   }
 
   /* Tighten MarkdownRenderer prose spacing for print */
@@ -53,18 +36,5 @@
     color: #111111;
     font-weight: bold;
     margin-right: 3px;
-  }
-
-  /* Footer: fixed at page bottom, repeats on every printed page */
-  #recipe-print-footer {
-    display: flex !important;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: flex-end;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: #ffffff;
   }
 }

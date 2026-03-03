@@ -15,72 +15,6 @@ type Props = {
   servingsUnit?: string;
 };
 
-const s = {
-  wrapper: {
-    fontFamily: "'Roboto', sans-serif",
-    color: "#111111",
-    background: "#ffffff",
-    fontSize: "8pt",
-    lineHeight: "1.4",
-  } as React.CSSProperties,
-
-  image: {
-    width: "100%",
-    aspectRatio: "3 / 1",
-    objectFit: "cover" as const,
-    display: "block",
-    borderRadius: "6px",
-  } as React.CSSProperties,
-
-  title: {
-    fontFamily: "'Shrikhand', serif",
-    fontSize: "16pt",
-    margin: "10px 0 2px 0",
-  } as React.CSSProperties,
-
-  meta: {
-    margin: "0 0 4px 0",
-    fontSize: "8pt",
-    color: "#666",
-    letterSpacing: "0.03em",
-  } as React.CSSProperties,
-
-  description: {
-    margin: "0 0 16px 0",
-    fontSize: "8pt",
-  } as React.CSSProperties,
-
-  columns: {
-    display: "grid",
-    gridTemplateColumns: "1fr 2fr",
-    gap: "16px",
-    alignItems: "start",
-  } as React.CSSProperties,
-
-  sectionHeading: {
-    fontFamily: "'Lora', serif",
-    fontSize: "10pt",
-    fontWeight: "bold",
-    margin: "0 0 4px 0",
-  } as React.CSSProperties,
-
-  groupHeading: {
-    fontSize: "8pt",
-    fontWeight: "bold",
-    margin: "6px 0 2px 0",
-  } as React.CSSProperties,
-
-  ingredientList: {
-    margin: "0",
-    listStyleType: "none",
-  } as React.CSSProperties,
-
-  ingredientItem: {
-    marginBottom: "1px",
-    fontSize: "8pt",
-  } as React.CSSProperties,
-};
-
 export function RecipePrintView({
   recipe,
   imageUrl,
@@ -93,16 +27,23 @@ export function RecipePrintView({
   const deeplink = `https://app.plateful.cloud/recipe/${recipe.id}`;
 
   return createPortal(
-    <div id="recipe-print-view">
-      <div style={s.wrapper}>
+    <div id="recipe-print-view" className="hidden print:block print:pb-[20mm]">
+      <div className="text-[#111111] bg-white text-[8pt] leading-[1.4]">
         {imageUrl && (
-          <img src={imageUrl} alt={recipe.name} style={s.image} crossOrigin="anonymous" />
+          <img
+            src={imageUrl}
+            alt={recipe.name}
+            className="w-full aspect-[3/1] object-cover block rounded-[6px]"
+            crossOrigin="anonymous"
+          />
         )}
 
-        <h1 style={s.title}>{recipe.name}</h1>
+        <h1 className="first-font text-[16pt] mt-2.5 mb-0.5">
+          {recipe.name}
+        </h1>
 
         {targetServings != null && (
-          <p style={s.meta}>
+          <p className="mb-1 text-[8pt] text-[#666] tracking-[0.03em]">
             {targetServings}{" "}
             {t(`ingredients.units.${servingsUnit ?? "servings"}`, {
               defaultValue: servingsUnit ?? "servings",
@@ -111,20 +52,24 @@ export function RecipePrintView({
         )}
 
         {recipe.description && (
-          <p style={{ ...s.description, whiteSpace: "pre-wrap" }}>{recipe.description}</p>
+          <p className="mb-4 text-[8pt] whitespace-pre-wrap">{recipe.description}</p>
         )}
 
-        <div style={s.columns}>
+        <div className="grid grid-cols-[1fr_2fr] gap-4 items-start">
           {/* Left column: ingredients */}
           {ingredients.length > 0 && (
             <div>
-              <h2 style={s.sectionHeading}>{t("ingredients.title")}</h2>
+              <h2 className="second-font text-[10pt] font-bold mb-1">
+                {t("ingredients.title")}
+              </h2>
               {groupedIngredients.map((group, i) => (
                 <div key={group.name ?? `g-${i}`}>
-                  {group.name && <p style={s.groupHeading}>{group.name}</p>}
-                  <ul style={s.ingredientList}>
+                  {group.name && (
+                    <p className="text-[8pt] font-bold mt-1.5 mb-0.5">{group.name}</p>
+                  )}
+                  <ul className="m-0 list-none">
                     {group.ingredients.map((ing) => (
-                      <li key={ing.id} style={s.ingredientItem}>
+                      <li key={ing.id} className="mb-px text-[8pt]">
                         {ing.scaledQuantity.display}
                       </li>
                     ))}
@@ -137,24 +82,21 @@ export function RecipePrintView({
           {/* Right column: instructions */}
           {recipe.instructions && (
             <div>
-              <h2 style={s.sectionHeading}>{t("recipe.instructions")}</h2>
+              <h2 className="second-font text-[10pt] font-bold mb-1">
+                {t("recipe.instructions")}
+              </h2>
               <MarkdownRenderer content={recipe.instructions} />
             </div>
           )}
         </div>
       </div>
 
-      <div id="recipe-print-footer">
+      <div
+        id="recipe-print-footer"
+        className="hidden print:flex print:flex-row print:justify-between print:items-end print:fixed print:bottom-0 print:left-0 print:right-0 print:bg-white"
+      >
         <div>
-          <p
-            style={{
-              fontFamily: "'Shrikhand', serif",
-              fontSize: "12pt",
-              margin: "0",
-              lineHeight: "1",
-              color: "#1b1602",
-            }}
-          >
+          <p className="first-font text-[12pt] m-0 leading-none text-[#1b1602]">
             Plateful
           </p>
         </div>
