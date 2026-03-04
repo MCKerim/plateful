@@ -1,0 +1,59 @@
+/* recipe-print.css
+ * RecipePrintView is rendered via a React portal directly into document.body
+ * so it is a sibling of #root, not nested inside it.
+ * In normal view it is hidden. When printing, #root is removed from layout
+ * and only the print view is shown.
+ */
+
+@media print {
+  @page {
+    size: A4 portrait;
+    margin: 15mm;
+  }
+
+  /* Hide the entire React app */
+  #root {
+    display: none !important;
+  }
+
+  /* Ensure Tailwind CSS vars resolve to print-safe values */
+  #recipe-print-view {
+    --color-primary: #111111;
+  }
+
+  /* Tighten MarkdownRenderer prose spacing for print */
+  #recipe-print-view .prose p {
+    margin-bottom: 4px;
+  }
+  #recipe-print-view .prose li {
+    font-size: 8pt;
+    margin-bottom: 2px;
+  }
+
+  /* Replace CSS grid with floats for print — grid treats itself as atomic
+   * and pushes entirely to the next page; floats allow page breaks through */
+  #recipe-print-view .grid {
+    display: block !important;
+  }
+  #recipe-print-view .grid::after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  #recipe-print-view .grid > div:first-child {
+    float: left;
+    width: 31%;
+  }
+  #recipe-print-view .grid > div:last-child {
+    float: right;
+    width: 65%;
+  }
+
+  /* Custom bullet marker for ingredient lists */
+  #recipe-print-view ul li::before {
+    content: "· ";
+    color: #111111;
+    font-weight: bold;
+    margin-right: 3px;
+  }
+}

@@ -4,7 +4,16 @@ import { Button, buttonVariants } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat, Share2, Loader2 } from "lucide-react";
+import {
+  Pencil,
+  Link,
+  CalendarDays,
+  ChefHat,
+  Printer,
+  Share2,
+  Loader2,
+  MoreHorizontal,
+} from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useNativeCamera } from "@/hooks/general/useNativeCamera";
@@ -36,8 +45,11 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
-import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import { RecipePrintView } from "@/components/recipe/RecipePrintView";
+import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
+import { selectTargetServings } from "@/redux/slices/servingsSlice";
 import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
+import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -65,13 +77,24 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
-  const { data: ingredients = [] } = useRecipeIngredients(recipeId);
+  const savedServings = useAppSelector((state) =>
+    recipeId != null ? selectTargetServings(recipeId)(state) : undefined
+  );
+  const effectiveBaseServings = recipe?.base_servings ?? 1;
+  const effectiveTargetServings = savedServings ?? effectiveBaseServings;
+  const { data: scaledIngredients = [] } = useScaledIngredients(
+    recipe ? recipeId : null,
+    effectiveBaseServings,
+    effectiveTargetServings
+  );
 
   // Image upload (placeholder click)
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const [actionsDrawerOpen, setActionsDrawerOpen] = useState(false);
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
@@ -214,29 +237,72 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <div className="absolute top-2 right-2 z-10 flex gap-2">
+        <div className="absolute top-2 right-2 z-10">
           <Button
             variant="secondary"
             size="icon"
-            onClick={() => {
-              if (!recipe) return;
-              createShareMutation.mutate(recipe.id);
-            }}
-            disabled={createShareMutation.isPending}
-            aria-label={t("share.shareRecipe")}
+            onClick={() => setActionsDrawerOpen(true)}
+            aria-label="More actions"
           >
-            <Share2 size={18} />
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="icon"
-            onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
-            aria-label="Edit Recipe"
-          >
-            <Pencil size={18} />
+            <MoreHorizontal size={18} />
           </Button>
         </div>
+
+        <Drawer open={actionsDrawerOpen} onOpenChange={setActionsDrawerOpen}>
+          <DrawerContent>
+            <DrawerFooter className="gap-4 mb-8 mt-4">
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  setActionsDrawerOpen(false);
+                  navigate(`/recipe/edit/${recipe?.id}`);
+                }}
+              >
+                <div className="flex justify-start gap-4 w-full h-full items-center">
+                  <Pencil />
+                  <p className="second-font font-semibold">{t("recipe.editRecipe")}</p>
+                </div>
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  if (!recipe) return;
+                  setActionsDrawerOpen(false);
+                  createShareMutation.mutate(recipe.id);
+                }}
+                disabled={createShareMutation.isPending}
+              >
+                <div className="flex justify-start gap-4 w-full h-full items-center">
+                  <Share2 />
+                  <p className="second-font font-semibold">{t("share.shareRecipe")}</p>
+                </div>
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  setActionsDrawerOpen(false);
+                  const prev = document.title;
+                  document.title = `Plateful - ${recipe.name}`;
+                  window.print();
+                  window.onafterprint = () => {
+                    document.title = prev;
+                    window.onafterprint = null;
+                  };
+                }}
+              >
+                <div className="flex justify-start gap-4 w-full h-full items-center">
+                  <Printer />
+                  <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
+                </div>
+              </Button>
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       </div>
 
       <div className="flex justify-between">
@@ -269,7 +335,7 @@ export default function Recipe() {
       )}
 
       {/* Ingredients Section */}
-      {ingredients.length > 0 && (
+      {scaledIngredients.length > 0 && (
         <IngredientList
           recipeId={recipe.id}
           baseServings={recipe.base_servings}
@@ -306,6 +372,14 @@ export default function Recipe() {
           />
         ))}
       </div>
+
+      <RecipePrintView
+        recipe={recipe}
+        imageUrl={imageUrls[0]}
+        ingredients={scaledIngredients}
+        targetServings={effectiveTargetServings}
+        servingsUnit={recipe.servings_unit ?? undefined}
+      />
       {ImageSourceDrawerComponent}
     </Layout>
   );

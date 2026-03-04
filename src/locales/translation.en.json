@@ -292,7 +292,8 @@
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later.",
     "askChatbot": "Ask AI-Chef",
-    "instructions": "Instructions"
+    "instructions": "Instructions",
+    "printPdf": "Print recipe"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",

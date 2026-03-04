@@ -292,7 +292,8 @@
     "planningSuccessful": "Rezept erfolgreich geplant!",
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
     "askChatbot": "KI-Koch fragen",
-    "instructions": "Zubereitung"
+    "instructions": "Zubereitung",
+    "printPdf": "Rezept drucken"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
