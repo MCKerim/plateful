@@ -229,6 +229,15 @@ export default function Recipe() {
           <Button
             variant="secondary"
             size="icon"
+            onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
+            aria-label="Edit Recipe"
+          >
+            <Pencil size={18} />
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="icon"
             onClick={() => {
               if (!recipe) return;
               createShareMutation.mutate(recipe.id);
@@ -242,17 +251,6 @@ export default function Recipe() {
           <Button
             variant="secondary"
             size="icon"
-            className="absolute top-2 right-2 z-10"
-            onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
-            aria-label="Edit Recipe"
-          >
-            <Pencil size={18} />
-          </Button>
-
-          <Button
-            variant="secondary"
-            size="icon"
-            className="absolute top-14 right-2 z-10"
             onClick={() => {
               const prev = document.title;
               document.title = `Plateful - ${recipe.name}`;
