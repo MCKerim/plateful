@@ -12,7 +12,7 @@ import {
   Printer,
   Share2,
   Loader2,
-  MoreHorizontal,
+  MoreVertical,
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
@@ -237,14 +237,15 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <div className="absolute top-2 right-2 z-10">
+        <div className="absolute top-1 right-1 z-10">
           <Button
-            variant="secondary"
+            variant="ghost"
+            className="text-white"
             size="icon"
             onClick={() => setActionsDrawerOpen(true)}
             aria-label="More actions"
           >
-            <MoreHorizontal size={18} />
+            <MoreVertical className="!size-5" />
           </Button>
         </div>
 
