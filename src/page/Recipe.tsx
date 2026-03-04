@@ -1,10 +1,16 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat, Printer } from "lucide-react";
+import { Pencil, Link, CalendarDays, ChefHat, Printer, Share2, Loader2 } from "lucide-react";
+import imageCompression from "browser-image-compression";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
+import { useNativeCamera } from "@/hooks/general/useNativeCamera";
+import { useSupabase } from "@/utils/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, selectMessages, selectRecipeId } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -33,6 +39,7 @@ import { IngredientList } from "@/components/ingredients/IngredientList";
 import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
+import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -60,8 +67,8 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
-  const savedServings = useAppSelector(
-    (state) => recipeId != null ? selectTargetServings(recipeId)(state) : undefined
+  const savedServings = useAppSelector((state) =>
+    recipeId != null ? selectTargetServings(recipeId)(state) : undefined
   );
   const effectiveBaseServings = recipe?.base_servings ?? 1;
   const effectiveTargetServings = savedServings ?? effectiveBaseServings;
@@ -71,8 +78,15 @@ export default function Recipe() {
     effectiveTargetServings
   );
 
+  // Image upload (placeholder click)
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+  const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
   // Mutations
   const deleteRatingMutation = useDeleteRating();
+  const createShareMutation = useCreateRecipeShare();
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -116,6 +130,42 @@ export default function Recipe() {
     }
   }
 
+  async function handlePlaceholderClick() {
+    if (!recipeId) return;
+
+    let result: { file: File; dataUrl: string } | null = null;
+    try {
+      result = await takePhoto();
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+      return;
+    }
+
+    if (!result) return;
+
+    setIsUploadingImage(true);
+    try {
+      const compressedFile = await imageCompression(result.file, IMAGE_COMPRESSION_OPTIONS);
+      const fileExt = compressedFile.name.split(".").pop();
+      const filePath = `recipe_${recipeId}/${Date.now()}.${fileExt}`;
+
+      const { error } = await supabase.storage
+        .from("recipeimages")
+        .upload(filePath, compressedFile, { upsert: true });
+
+      if (error) {
+        toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) });
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+    } finally {
+      setIsUploadingImage(false);
+    }
+  }
+
   const saveFooter = (
     <>
       <div className="h-[100px]"></div>
@@ -144,11 +194,18 @@ export default function Recipe() {
       <div className="relative">
         {imageUrls.length === 0 ? (
           <AspectRatio ratio={16 / 9}>
-            <img
-              src={"/no-img.jpg"}
-              alt="Recipe"
-              className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-            />
+            <div className="relative w-full h-full" onClick={handlePlaceholderClick}>
+              <img
+                src={"/no-img.jpg"}
+                alt="Recipe"
+                className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+              />
+              {isUploadingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
           </AspectRatio>
         ) : (
           <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
@@ -168,33 +225,48 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-2 right-2 z-10"
-          onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
-          aria-label="Edit Recipe"
-        >
-          <Pencil size={18} />
-        </Button>
+        <div className="absolute top-2 right-2 z-10 flex gap-2">
+          <Button
+            variant="secondary"
+            size="icon"
+            onClick={() => {
+              if (!recipe) return;
+              createShareMutation.mutate(recipe.id);
+            }}
+            disabled={createShareMutation.isPending}
+            aria-label={t("share.shareRecipe")}
+          >
+            <Share2 size={18} />
+          </Button>
 
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-14 right-2 z-10"
-          onClick={() => {
-            const prev = document.title;
-            document.title = `Plateful - ${recipe.name}`;
-            window.print();
-            window.onafterprint = () => {
-              document.title = prev;
-              window.onafterprint = null;
-            };
-          }}
-          aria-label={t("recipe.printPdf")}
-        >
-          <Printer size={18} />
-        </Button>
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute top-2 right-2 z-10"
+            onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
+            aria-label="Edit Recipe"
+          >
+            <Pencil size={18} />
+          </Button>
+
+          <Button
+            variant="secondary"
+            size="icon"
+            className="absolute top-14 right-2 z-10"
+            onClick={() => {
+              const prev = document.title;
+              document.title = `Plateful - ${recipe.name}`;
+              window.print();
+              window.onafterprint = () => {
+                document.title = prev;
+                window.onafterprint = null;
+              };
+            }}
+            aria-label={t("recipe.printPdf")}
+          >
+            <Printer size={18} />
+          </Button>
+        </div>
       </div>
 
       <div className="flex justify-between">
@@ -214,11 +286,7 @@ export default function Recipe() {
       </div>
 
       {recipe.link && (
-        <NavLink
-          to={recipe.link}
-          target="blank"
-          className={buttonVariants() + " w-full mt-2"}
-        >
+        <NavLink to={recipe.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
           <Link />
           {t("recipe.toTheRecipe")}
         </NavLink>
@@ -276,6 +344,7 @@ export default function Recipe() {
         targetServings={effectiveTargetServings}
         servingsUnit={recipe.servings_unit ?? undefined}
       />
+      {ImageSourceDrawerComponent}
     </Layout>
   );
 }

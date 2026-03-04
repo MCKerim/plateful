@@ -47,9 +47,12 @@ import { SendIntent } from "@supernotes/capacitor-send-intent";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
+import SharedRecipe from "./page/SharedRecipe";
+import NotificationSettings from "./page/NotificationSettings";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 
@@ -154,6 +157,44 @@ function App() {
       });
     }
   }, []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const listener = LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      async (event) => {
+        const notificationType = event.notification.extra?.type as string | undefined;
+
+        if (notificationType === "daily_meal_reminder") {
+          try {
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+            const { data } = await supabase
+              .from("meal_planning")
+              .select("recipe_id")
+              .eq("planned_date", todayStr);
+
+            const meals = data ?? [];
+            if (meals.length === 1 && meals[0].recipe_id) {
+              navigate(`/recipe/${meals[0].recipe_id}`);
+            } else {
+              navigate("/home");
+            }
+          } catch {
+            navigate("/home");
+          }
+        } else {
+          navigate("/planner");
+        }
+      }
+    );
+
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [navigate, supabase]);
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
@@ -321,6 +362,7 @@ function App() {
         {/* Main Routes */}
         <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
         <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
+        <Route path="/notificationSettings" element={routeToCorrectPage(<NotificationSettings />)} />
         <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
@@ -334,6 +376,9 @@ function App() {
 
         <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
         <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+
+        {/* Public share route — no auth required */}
+        <Route path="/share/:token" element={<SharedRecipe />} />
 
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />

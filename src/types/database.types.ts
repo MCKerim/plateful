@@ -358,6 +358,30 @@ export type Database = {
           },
         ]
       }
+      shared_recipes: {
+        Row: {
+          id: string
+          token: string
+          snapshot: Json
+          created_by: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          token?: string
+          snapshot: Json
+          created_by?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          token?: string
+          snapshot?: Json
+          created_by?: string | null
+          created_at?: string
+        }
+        Relationships: []
+      }
       survey_answers: {
         Row: {
           created_at: string

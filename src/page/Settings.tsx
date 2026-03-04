@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { CreditCard, Donut, House, LogOut, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Bell, CreditCard, Donut, House, LogOut, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { useSubscription } from "@/hooks/subscription/useSubscription";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import DeleteDialog from "@/components/general/DeleteDialog";
@@ -156,6 +156,18 @@ export default function Settings() {
           <h2 className="font-medium border-b">{t("settings.appearance")}</h2>
 
           <ModeToggle />
+        </div>
+
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("settings.notifications")}</h2>
+
+          <NavLink to="/notificationSettings">
+            <Button variant="secondary" className="w-full">
+              <Bell />
+
+              {t("settings.manageNotifications")}
+            </Button>
+          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
