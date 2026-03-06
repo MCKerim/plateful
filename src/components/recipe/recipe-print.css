@@ -16,9 +16,20 @@
     display: none !important;
   }
 
+  /* Hide drawer/dialog portals rendered outside #root */
+  [data-vaul-drawer-wrapper],
+  [data-vaul-overlay],
+  [role="dialog"] {
+    display: none !important;
+  }
+
   /* Ensure Tailwind CSS vars resolve to print-safe values */
   #recipe-print-view {
-    --color-primary: #111111;
+    --primary: #111111;
+    --primary-color: #111111;
+    --foreground: #111111;
+    --muted-foreground: #555555;
+    color: #111111;
   }
 
   /* Tighten MarkdownRenderer prose spacing for print */

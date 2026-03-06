@@ -50,6 +50,7 @@ import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
 import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
+import { Capacitor } from "@capacitor/core";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -131,6 +132,19 @@ export default function Recipe() {
   const canModifyRating = (rating: RecipeRatingWithUser): boolean => {
     return (currentUser && rating.owner_id === currentUser.id) || false;
   };
+
+  function handlePrint() {
+    setActionsDrawerOpen(false);
+    setTimeout(() => {
+      const prev = document.title;
+      document.title = `Plateful - ${recipe?.name}`;
+      window.print();
+      window.onafterprint = () => {
+        document.title = prev;
+        window.onafterprint = null;
+      };
+    }, 350);
+  }
 
   function handleAskChatbot() {
     if (!recipe) return;
@@ -282,25 +296,18 @@ export default function Recipe() {
                 </div>
               </Button>
 
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  setActionsDrawerOpen(false);
-                  const prev = document.title;
-                  document.title = `Plateful - ${recipe.name}`;
-                  window.print();
-                  window.onafterprint = () => {
-                    document.title = prev;
-                    window.onafterprint = null;
-                  };
-                }}
-              >
-                <div className="flex justify-start gap-4 w-full h-full items-center">
-                  <Printer />
-                  <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
-                </div>
-              </Button>
+              {!Capacitor.isNativePlatform() && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={handlePrint}
+                >
+                  <div className="flex justify-start gap-4 w-full h-full items-center">
+                    <Printer />
+                    <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
+                  </div>
+                </Button>
+              )}
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
