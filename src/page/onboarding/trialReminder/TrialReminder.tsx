@@ -7,12 +7,19 @@ import OnboardingButton from "@/components/onboarding/onboardingButton/Onboardin
 import { useNotificationPermission } from "@/hooks/notifications/useNotificationPermission";
 import { useUpdateNotificationPreferences } from "@/hooks/notifications/useUpdateNotificationPreferences";
 import { DEFAULT_NOTIFICATION_PREFERENCES } from "@/types/notification.types";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function TrialReminder() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { requestPermission, isSupported } = useNotificationPermission();
   const updatePreferences = useUpdateNotificationPreferences();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("trial_reminder");
+  }, []);
 
   async function handleContinue() {
     if (isSupported) {

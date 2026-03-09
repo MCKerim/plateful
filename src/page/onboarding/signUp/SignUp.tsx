@@ -8,12 +8,18 @@ import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function SignUp() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showTransition, setShowTransition] = useState(true);
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("signup");
+  }, []);
 
   const { rive, RiveComponent } = useRive({
     src: "/plateful-character.riv",

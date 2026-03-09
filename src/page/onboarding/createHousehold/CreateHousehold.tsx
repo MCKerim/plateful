@@ -7,10 +7,11 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectUser, setUser } from "@/redux/slices/userSlice";
 import { setHousehold } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function CreateHousehold() {
   const { supabase } = useSupabase();
@@ -18,6 +19,11 @@ export default function CreateHousehold() {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("create_household");
+  }, []);
 
   const [householdName, setHouseholdName] = useState("");
   const [isLoading, setIsLoading] = useState(false);

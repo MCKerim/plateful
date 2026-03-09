@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
@@ -9,6 +9,7 @@ import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function ChooseUsername() {
   const { t } = useTranslation();
@@ -16,6 +17,11 @@ export default function ChooseUsername() {
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
   const updateUsernameMutation = useUpdateUsername();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("choose_username");
+  }, []);
 
   const [username, setUsername] = useState(user?.username || "");
 

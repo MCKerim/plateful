@@ -7,12 +7,18 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { SURVEY_QUESTIONS } from "@/page/onboarding/survey/SurveyQuestions";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function SurveyStart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const { supabase } = useSupabase();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("survey_start");
+  }, []);
 
   const [resumeQuestion, setResumeQuestion] = useState<number | null>(null);
 

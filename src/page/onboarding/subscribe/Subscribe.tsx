@@ -9,6 +9,7 @@ import { isNativePlatform } from "@/lib/revenuecat";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import LoadingScreen from "@/components/general/LoadingScreen";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function Subscribe() {
   const { t } = useTranslation();
@@ -17,6 +18,11 @@ export default function Subscribe() {
   const { presentPaywall } = usePresentPaywall();
   const [error, setError] = useState(false);
   const presenting = useRef(false);
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("subscribe");
+  }, []);
 
   useEffect(() => {
     // Already Pro — skip forward

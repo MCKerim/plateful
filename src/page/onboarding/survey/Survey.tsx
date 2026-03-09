@@ -7,6 +7,7 @@ import SurveyLayout from "@/components/layout/surveyLayout/SurveyLayout";
 import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 // Interleaved navigation: questions that exit to a value screen instead of the next question
 const NEXT_AFTER_QUESTION: Record<number, string> = {
@@ -26,6 +27,7 @@ export default function Survey() {
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const navigate = useNavigate();
+  const { trackSurveyAnswered } = useOnboardingTracking();
 
   const params = useParams<{ questionId: string }>();
   const questionId = parseQuestionId();
@@ -95,6 +97,12 @@ export default function Survey() {
       return;
     }
 
+    trackSurveyAnswered({
+      question_number: questionId,
+      question_key: QUESTION_KEY,
+      selected_options: [selectedOption],
+    });
+
     setSelected([]);
     goToNext();
   }
@@ -130,6 +138,12 @@ export default function Survey() {
       toast.error(t("survey.errors.saveFailed"));
       return;
     }
+
+    trackSurveyAnswered({
+      question_number: questionId,
+      question_key: QUESTION_KEY,
+      selected_options: selected,
+    });
 
     setSelected([]);
     goToNext();

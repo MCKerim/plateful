@@ -4,6 +4,8 @@ import { motion } from "motion/react";
 import { Check } from "lucide-react";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 const lineItems = [
   "trialOffer.features.import",
@@ -42,6 +44,11 @@ function ReceiptBottom() {
 export default function TrialOffer() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("trial_offer");
+  }, []);
 
   return (
     <OnboardingLayout>

@@ -1,9 +1,16 @@
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function Welcome() {
   const { t } = useTranslation();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("welcome");
+  }, []);
 
   return (
     <div className="flex flex-col items-center h-screen px-4 py-10 bg-accent">
