@@ -600,14 +600,14 @@
     "chatbot": {
       "title": "Dein KI-Koch",
       "bullet1": "Frag nach Rezeptideen oder Kochtipps",
-      "bullet2": "Importiere & bearbeite Rezepte von jedem Link",
+      "bullet2": "Frage nach Änderungen",
       "bullet3": "Speichere Rezepte direkt in dein Kochbuch"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
       "bullet1": "Scanne Rezepte mit deiner Kamera",
       "bullet2": "Importiere Rezepte von TikTok",
-      "bullet3": "Bewerte, skaliere & teile mit deinem Haushalt"
+      "bullet3": "Bewerte & Koche mit deinem Haushalt"
     },
     "mealPlanner": {
       "title": "Dein Wochenplaner",

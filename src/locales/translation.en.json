@@ -600,14 +600,14 @@
     "chatbot": {
       "title": "Your AI-Chef",
       "bullet1": "Ask for recipe ideas or cooking tips",
-      "bullet2": "Import & edit recipes from any link",
+      "bullet2": "Ask for changes",
       "bullet3": "Save recipes directly to your cookbook"
     },
     "recipes": {
       "title": "Your Recipe Collection",
       "bullet1": "Scan recipes from your camera",
       "bullet2": "Import recipes from TikTok",
-      "bullet3": "Rate, scale & share with your household"
+      "bullet3": "Rate & cook with your household"
     },
     "mealPlanner": {
       "title": "Your Meal Planner",

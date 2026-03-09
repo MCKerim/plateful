@@ -41,18 +41,13 @@ export default function OnboardingSheet({
           </div>
         )}
         <DrawerHeader className="text-center">
-          <DrawerTitle className="text-xl font-bold second-font">
-            {t(titleKey)}
-          </DrawerTitle>
+          <DrawerTitle className="text-xl font-bold second-font">{t(titleKey)}</DrawerTitle>
         </DrawerHeader>
 
-        <ul className="flex flex-col gap-2 px-6 pb-2">
+        <ul className="flex flex-col gap-2 pl-10 pb-2 list-disc">
           {bulletKeys.map((key) => (
-            <li key={key} className="flex items-start gap-2 text-sm text-muted-foreground">
-              <span className="mt-0.5 text-accent-foreground bg-accent rounded-full w-5 h-5 flex items-center justify-center text-xs flex-shrink-0">
-                {bulletKeys.indexOf(key) + 1}
-              </span>
-              <span>{t(key)}</span>
+            <li key={key} className="text-sm">
+              {t(key)}
             </li>
           ))}
         </ul>
