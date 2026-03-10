@@ -43,7 +43,7 @@ import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
-import { SendIntent } from "@supernotes/capacitor-send-intent";
+import { CapacitorShareTarget } from "@capgo/capacitor-share-target";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
@@ -119,36 +119,32 @@ function App() {
   };
 
   useEffect(() => {
-    const handleIntentReceived = (result: unknown) => {
-      if (!result || typeof result !== "object") return;
+    let listenerHandle: { remove: () => Promise<void> } | null = null;
+    let cancelled = false;
 
-      const { url, title, text } = result as { url?: string; title?: string; text?: string };
-      if (url || title || text) {
+    CapacitorShareTarget.addListener("shareReceived", (event) => {
+      const rawText = event.texts?.[0];
+      const url = rawText?.startsWith("http://") || rawText?.startsWith("https://") ? rawText : undefined;
+      const title = event.title;
+      if (url || title) {
         const params = new URLSearchParams();
         if (url) params.set("url", url);
         if (title) params.set("title", title);
-        if (text) params.set("text", text);
-
         navigate(`/urlImport?${params.toString()}`);
       }
-    };
-
-    // Check on app startup
-    SendIntent.checkSendIntentReceived()
-      .then(handleIntentReceived)
-      .catch((err) => {
-        if (err?.message !== "No processing needed") {
-          console.error("SendIntent error", err);
-        }
-      });
-
-    // Listen for new share intents while app is running
-    globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
+    }).then((handle) => {
+      if (cancelled) {
+        handle.remove();
+      } else {
+        listenerHandle = handle;
+      }
+    });
 
     return () => {
-      globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
+      cancelled = true;
+      listenerHandle?.remove();
     };
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {

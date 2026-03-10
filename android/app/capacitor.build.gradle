@@ -22,9 +22,9 @@ dependencies {
     implementation project(':capawesome-capacitor-android-edge-to-edge-support')
     implementation project(':capawesome-capacitor-app-review')
     implementation project(':capawesome-capacitor-app-update')
+    implementation project(':capgo-capacitor-share-target')
     implementation project(':revenuecat-purchases-capacitor')
     implementation project(':revenuecat-purchases-capacitor-ui')
-    implementation project(':supernotes-capacitor-send-intent')
 
 }
 
