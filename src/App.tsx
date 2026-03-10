@@ -92,27 +92,37 @@ function App() {
     setShowUpdateDialog(false);
     try {
       const platform = Capacitor.getPlatform();
+
+      const reloadOnReturn = async () => {
+        // Only reload after the app has actually gone to the background first,
+        // to avoid reloading immediately if the store redirect bounces back instantly.
+        let wentToBackground = false;
+        const listener = await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+          if (!isActive) {
+            wentToBackground = true;
+          } else if (wentToBackground) {
+            listener.remove();
+            window.location.reload();
+          }
+        });
+      };
+
       if (platform === "android") {
         const result = await AppUpdate.getAppUpdateInfo();
         if (result.immediateUpdateAllowed) {
+          // performImmediateUpdate blocks until complete; the OS restarts the app
+          // on success, so no listener needed here.
           await AppUpdate.performImmediateUpdate();
         } else {
           await AppUpdate.openAppStore();
+          await reloadOnReturn();
         }
       } else if (platform === "ios") {
-        // TODO: iOS App Store update flow
-        // await AppUpdate.openAppStore({ appId: "..."});
+        await AppUpdate.openAppStore();
+        await reloadOnReturn();
       } else {
         await AppUpdate.openAppStore();
       }
-
-      // Reload the webview when the user returns from the store
-      const listener = await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
-        if (isActive) {
-          listener.remove();
-          window.location.reload();
-        }
-      });
     } catch (error) {
       console.error("Error performing app update:", error);
     }
