@@ -24,9 +24,9 @@ let package = Package(
         .package(name: "CapawesomeTeamCapacitorDatetimePicker", path: "../../../node_modules/@capawesome-team/capacitor-datetime-picker"),
         .package(name: "CapawesomeCapacitorAppReview", path: "../../../node_modules/@capawesome/capacitor-app-review"),
         .package(name: "CapawesomeCapacitorAppUpdate", path: "../../../node_modules/@capawesome/capacitor-app-update"),
+        .package(name: "CapgoCapacitorShareTarget", path: "../../../node_modules/@capgo/capacitor-share-target"),
         .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor"),
-        .package(name: "RevenuecatPurchasesCapacitorUi", path: "../../../node_modules/@revenuecat/purchases-capacitor-ui"),
-        .package(name: "SupernotesCapacitorSendIntent", path: "../../../node_modules/@supernotes/capacitor-send-intent")
+        .package(name: "RevenuecatPurchasesCapacitorUi", path: "../../../node_modules/@revenuecat/purchases-capacitor-ui")
     ],
     targets: [
         .target(
@@ -46,9 +46,9 @@ let package = Package(
                 .product(name: "CapawesomeTeamCapacitorDatetimePicker", package: "CapawesomeTeamCapacitorDatetimePicker"),
                 .product(name: "CapawesomeCapacitorAppReview", package: "CapawesomeCapacitorAppReview"),
                 .product(name: "CapawesomeCapacitorAppUpdate", package: "CapawesomeCapacitorAppUpdate"),
+                .product(name: "CapgoCapacitorShareTarget", package: "CapgoCapacitorShareTarget"),
                 .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor"),
-                .product(name: "RevenuecatPurchasesCapacitorUi", package: "RevenuecatPurchasesCapacitorUi"),
-                .product(name: "SupernotesCapacitorSendIntent", package: "SupernotesCapacitorSendIntent")
+                .product(name: "RevenuecatPurchasesCapacitorUi", package: "RevenuecatPurchasesCapacitorUi")
             ]
         )
     ]
