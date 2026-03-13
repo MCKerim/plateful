@@ -424,7 +424,7 @@
     "usernameLengthInvalid": "Username must be between 3 and 20 characters",
     "subscription": {
       "title": "Subscription",
-      "proDescription": "You have Plateful Pro. Thank you for your support!",
+      "proDescription": "You have Plateful Premium. Thank you for your support!",
       "manageSubscription": "Manage Subscription",
       "restorePurchases": "Restore Purchases"
     }
@@ -718,7 +718,7 @@
     "restoreSuccess": "Purchases restored successfully!",
     "restoreNoPurchases": "No purchases found to restore",
     "restoreError": "Failed to restore purchases. Please try again.",
-    "purchaseSuccess": "Welcome to Plateful Pro!",
+    "purchaseSuccess": "Welcome to Plateful Premium!",
     "paywallError": "Something went wrong. Please try again.",
     "customerCenterError": "Could not open subscription management.",
     "notAvailableOnWeb": "Subscriptions are only available in the mobile app"

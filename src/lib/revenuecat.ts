@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { LOG_LEVEL, Purchases } from "@revenuecat/purchases-capacitor";
+import { Purchases } from "@revenuecat/purchases-capacitor";
 import type { CustomerInfo } from "@revenuecat/purchases-capacitor";
 import { REVENUECAT_API_KEY } from "@/types/subscription.types";
 

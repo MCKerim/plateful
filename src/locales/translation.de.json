@@ -423,7 +423,7 @@
     "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein",
     "subscription": {
       "title": "Abonnement",
-      "proDescription": "Du hast Plateful Pro. Vielen Dank für deine Unterstützung!",
+      "proDescription": "Du hast Plateful Premium. Vielen Dank für deine Unterstützung!",
       "manageSubscription": "Abonnement verwalten",
       "restorePurchases": "Käufe wiederherstellen"
     }
@@ -718,7 +718,7 @@
     "restoreSuccess": "Käufe erfolgreich wiederhergestellt!",
     "restoreNoPurchases": "Keine Käufe zum Wiederherstellen gefunden",
     "restoreError": "Wiederherstellen fehlgeschlagen. Bitte versuche es erneut.",
-    "purchaseSuccess": "Willkommen bei Plateful Pro!",
+    "purchaseSuccess": "Willkommen bei Plateful Premium!",
     "paywallError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "customerCenterError": "Abonnement-Verwaltung konnte nicht geöffnet werden.",
     "notAvailableOnWeb": "Abonnements sind nur in der mobilen App verfügbar"
