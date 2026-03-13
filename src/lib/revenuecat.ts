@@ -1,5 +1,5 @@
 import { Capacitor } from "@capacitor/core";
-import { Purchases } from "@revenuecat/purchases-capacitor";
+import { LOG_LEVEL, Purchases } from "@revenuecat/purchases-capacitor";
 import type { CustomerInfo } from "@revenuecat/purchases-capacitor";
 import { REVENUECAT_API_KEY } from "@/types/subscription.types";
 
@@ -13,9 +13,7 @@ export async function initializeRevenueCat(): Promise<void> {
   await Purchases.configure({ apiKey: REVENUECAT_API_KEY });
 }
 
-export async function identifyUser(
-  userId: string
-): Promise<CustomerInfo | null> {
+export async function identifyUser(userId: string): Promise<CustomerInfo | null> {
   if (!isNativePlatform()) return null;
 
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
