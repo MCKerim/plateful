@@ -22,4 +22,7 @@ export const queryKeys = {
   sharedRecipes: {
     byToken: (token: string) => ["shared-recipes", token] as const,
   },
+  subscription: {
+    byHousehold: (householdId: string) => ["subscription", "household", householdId] as const,
+  },
 } as const;

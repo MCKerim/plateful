@@ -10,6 +10,8 @@ import { selectUser } from "@/redux/slices/userSlice";
 import { Bell, CreditCard, Donut, House, LogOut, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { useSubscription } from "@/hooks/subscription/useSubscription";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
+import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
+import { isNativePlatform } from "@/lib/revenuecat";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { FaInstagram, FaThreads, FaTiktok, FaXTwitter } from "react-icons/fa6";
 import {
@@ -40,6 +42,10 @@ export default function Settings() {
   const deleteAccountMutation = useDeleteAccount();
   const { restorePurchases } = useSubscription();
   const { presentCustomerCenter } = useCustomerCenter();
+  const { isActive: isActiveSub, data: householdSub } = useHouseholdSubscription();
+
+  const isCurrentUserPayer = householdSub?.payer_user_id === user?.id;
+  const payerName = householdSub?.payer?.username;
 
   useEffect(() => {
     let isMounted = true;
@@ -173,17 +179,27 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">{t("settings.subscription.title")}</h2>
 
-          <p className="text-sm">{t("settings.subscription.proDescription")}</p>
+          {isActiveSub && isCurrentUserPayer && isNativePlatform() && (
+            <>
+              <p className="text-sm">{t("settings.subscription.proDescription")}</p>
 
-          <Button variant="secondary" className="w-full" onClick={presentCustomerCenter}>
-            <CreditCard />
-            {t("settings.subscription.manageSubscription")}
-          </Button>
+              <Button variant="secondary" className="w-full" onClick={presentCustomerCenter}>
+                <CreditCard />
+                {t("settings.subscription.manageSubscription")}
+              </Button>
 
-          <Button variant="ghost" className="w-full" onClick={restorePurchases}>
-            <RotateCcw />
-            {t("settings.subscription.restorePurchases")}
-          </Button>
+              <Button variant="ghost" className="w-full" onClick={restorePurchases}>
+                <RotateCcw />
+                {t("settings.subscription.restorePurchases")}
+              </Button>
+            </>
+          )}
+
+          {isActiveSub && !isCurrentUserPayer && (
+            <p className="text-sm">
+              {t("settings.subscription.managedBy", { name: payerName })}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">

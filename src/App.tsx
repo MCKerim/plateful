@@ -13,8 +13,9 @@ import InvitePage from "./page/InvitePage";
 import { useAppSelector } from "./redux/hooks";
 import { selectUser } from "./redux/slices/userSlice";
 import { selectHouseholdId } from "./redux/slices/householdSlice";
-import { selectIsPro } from "./redux/slices/subscriptionSlice";
 import Subscribe from "./page/onboarding/subscribe/Subscribe";
+import SubscribeWeb from "./page/onboarding/subscribe/SubscribeWeb";
+import { useHouseholdSubscription } from "./hooks/subscription/useHouseholdSubscription";
 import Welcome from "./page/onboarding/welcome/Welcome";
 import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
@@ -60,7 +61,8 @@ function App() {
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
-  const subscriptionIsPro = useAppSelector(selectIsPro);
+  const { isActive: householdIsActive, isLoading: subLoading } = useHouseholdSubscription();
+  const isSubLoading = !!householdId && subLoading;
   const [loading, setLoading] = useState(true);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
@@ -266,7 +268,7 @@ function App() {
   }
 
   function isPro(): boolean {
-    return !Capacitor.isNativePlatform() || subscriptionIsPro;
+    return isSubLoading || householdIsActive;
   }
 
   function routeToCorrectPage(page: React.JSX.Element) {
@@ -292,7 +294,7 @@ function App() {
     return page;
   }
 
-  if (loading && !user) {
+  if ((loading && !user) || isSubLoading) {
     return <LoadingScreen />;
   }
 
@@ -348,7 +350,13 @@ function App() {
 
         <Route
           path="/subscribe"
-          element={isLoggedIn() ? <Subscribe /> : <Navigate to="/signup" />}
+          element={
+            isLoggedIn()
+              ? Capacitor.isNativePlatform()
+                ? <Subscribe />
+                : <SubscribeWeb />
+              : <Navigate to="/signup" />
+          }
         />
 
         <Route path="/choosename" element={<ChooseUsername />} />

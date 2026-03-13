@@ -2,10 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { PAYWALL_RESULT } from "@revenuecat/purchases-capacitor";
-import { useAppSelector } from "@/redux/hooks";
-import { selectIsPro } from "@/redux/slices/subscriptionSlice";
 import { usePresentPaywall } from "@/hooks/subscription/usePresentPaywall";
-import { isNativePlatform } from "@/lib/revenuecat";
+import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import LoadingScreen from "@/components/general/LoadingScreen";
@@ -14,7 +12,7 @@ import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 export default function Subscribe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const isPro = useAppSelector(selectIsPro);
+  const { isActive, isLoading: subLoading } = useHouseholdSubscription();
   const { presentPaywall } = usePresentPaywall();
   const [error, setError] = useState(false);
   const presenting = useRef(false);
@@ -25,20 +23,16 @@ export default function Subscribe() {
   }, []);
 
   useEffect(() => {
-    // Already Pro — skip forward
-    if (isPro) {
-      navigate("/choosename", { replace: true });
-      return;
-    }
+    if (subLoading) return;
 
-    // On web — skip paywall (dev mode)
-    if (!isNativePlatform()) {
+    // Household already has an active subscription — skip paywall
+    if (isActive) {
       navigate("/choosename", { replace: true });
       return;
     }
 
     showPaywall();
-  }, [isPro]);
+  }, [isActive, subLoading]);
 
   async function showPaywall() {
     // Prevent multiple concurrent paywall presentations

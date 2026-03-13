@@ -426,7 +426,8 @@
       "title": "Subscription",
       "proDescription": "You have Plateful Premium. Thank you for your support!",
       "manageSubscription": "Manage Subscription",
-      "restorePurchases": "Restore Purchases"
+      "restorePurchases": "Restore Purchases",
+      "managedBy": "Subscription managed by {{name}}"
     }
   },
   "householdSettings": {
@@ -725,7 +726,11 @@
   },
   "subscribe": {
     "error": "Something went wrong. Please try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "web": {
+      "title": "Subscribe in the Plateful App",
+      "description": "Subscriptions are available on iOS and Android. Download the app to get started."
+    }
   },
   "share": {
     "shareRecipe": "Share recipe",
