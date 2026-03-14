@@ -751,6 +751,8 @@
     "title": "Notifications",
     "mobileOnly": "Push notifications are only available in the mobile app. Download Plateful on iOS or Android to enable reminders.",
     "permissionDenied": "Notification permission denied. Enable it in your device settings.",
+    "permissionRequired": "Allow notifications to enable reminders.",
+    "grantPermission": "Allow",
     "weeklyReminder": {
       "title": "Weekly Planning Reminder",
       "label": "Weekly meal planning reminder",

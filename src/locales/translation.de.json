@@ -751,6 +751,8 @@
     "title": "Benachrichtigungen",
     "mobileOnly": "Push-Benachrichtigungen sind nur in der mobilen App verfügbar. Lade Plateful auf iOS oder Android herunter, um Erinnerungen zu aktivieren.",
     "permissionDenied": "Benachrichtigungsberechtigung abgelehnt. Aktiviere sie in den Geräteeinstellungen.",
+    "permissionRequired": "Erlaube Benachrichtigungen, um Erinnerungen zu aktivieren.",
+    "grantPermission": "Erlauben",
     "weeklyReminder": {
       "title": "Wöchentliche Planungserinnerung",
       "label": "Wöchentliche Essensplanungserinnerung",

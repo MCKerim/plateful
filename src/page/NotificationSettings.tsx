@@ -1,5 +1,7 @@
+import { useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { Switch } from "@/components/ui/switch";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -18,34 +20,26 @@ import {
   DEFAULT_NOTIFICATION_PREFERENCES,
 } from "@/types/notification.types";
 import { isNotificationSupported } from "@/lib/notifications";
-import { toast } from "sonner";
 
 export default function NotificationSettings() {
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
   const updatePreferences = useUpdateNotificationPreferences();
-  const { requestPermission, checkPermission } = useNotificationPermission();
+  const { permissionState, requestPermission, checkPermission } = useNotificationPermission();
+
+  useEffect(() => {
+    if (isNotificationSupported()) {
+      checkPermission();
+    }
+  }, [checkPermission]);
 
   const preferences: NotificationPreferences =
     (user?.notification_preferences as unknown as NotificationPreferences) ??
     DEFAULT_NOTIFICATION_PREFERENCES;
 
-  async function ensurePermissionGranted(): Promise<boolean> {
-    const status = await checkPermission();
-    if (status === "granted") return true;
+  const switchesDisabled = !isNotificationSupported() || permissionState !== "granted";
 
-    const granted = await requestPermission();
-    if (!granted) {
-      toast.error(t("notificationSettings.permissionDenied"));
-    }
-    return granted;
-  }
-
-  async function handleToggleWeeklyReminder(enabled: boolean) {
-    if (enabled) {
-      const granted = await ensurePermissionGranted();
-      if (!granted) return;
-    }
+  function handleToggleWeeklyReminder(enabled: boolean) {
     updatePreferences.mutate({
       ...preferences,
       weekly_planning_reminder: { ...preferences.weekly_planning_reminder, enabled },
@@ -70,11 +64,7 @@ export default function NotificationSettings() {
     });
   }
 
-  async function handleToggleDailyReminder(enabled: boolean) {
-    if (enabled) {
-      const granted = await ensurePermissionGranted();
-      if (!granted) return;
-    }
+  function handleToggleDailyReminder(enabled: boolean) {
     updatePreferences.mutate({
       ...preferences,
       daily_meal_reminder: { ...preferences.daily_meal_reminder, enabled },
@@ -98,6 +88,23 @@ export default function NotificationSettings() {
           <p className="text-sm text-muted-foreground">{t("notificationSettings.mobileOnly")}</p>
         )}
 
+        {isNotificationSupported() && permissionState === "prompt" && (
+          <div className="flex items-center justify-between p-4 border rounded-lg">
+            <p className="text-sm text-muted-foreground">
+              {t("notificationSettings.permissionRequired")}
+            </p>
+            <Button size="sm" onClick={requestPermission}>
+              {t("notificationSettings.grantPermission")}
+            </Button>
+          </div>
+        )}
+
+        {isNotificationSupported() && permissionState === "denied" && (
+          <p className="text-sm text-muted-foreground p-4 border rounded-lg">
+            {t("notificationSettings.permissionDenied")}
+          </p>
+        )}
+
         {/* Weekly Planning Reminder */}
         <div className="flex flex-col gap-3 p-4 border rounded-lg">
           <div className="flex items-center justify-between border-b pb-2">
@@ -105,7 +112,7 @@ export default function NotificationSettings() {
             <Switch
               checked={preferences.weekly_planning_reminder.enabled}
               onCheckedChange={handleToggleWeeklyReminder}
-              disabled={!isNotificationSupported()}
+              disabled={switchesDisabled}
             />
           </div>
           <p className="text-xs text-muted-foreground">
@@ -148,7 +155,7 @@ export default function NotificationSettings() {
             <Switch
               checked={preferences.daily_meal_reminder.enabled}
               onCheckedChange={handleToggleDailyReminder}
-              disabled={!isNotificationSupported()}
+              disabled={switchesDisabled}
             />
           </div>
           <p className="text-xs text-muted-foreground">
