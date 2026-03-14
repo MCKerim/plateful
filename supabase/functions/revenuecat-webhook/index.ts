@@ -29,7 +29,7 @@ Deno.serve(async (req: Request) => {
   // Validate shared secret
   const authHeader = req.headers.get("authorization");
   const webhookSecret = Deno.env.get("REVENUECAT_WEBHOOK_SECRET");
-  if (!webhookSecret || authHeader !== `Bearer ${webhookSecret}`) {
+  if (!webhookSecret || authHeader !== webhookSecret) {
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: ANSWEAR_HEADER,
