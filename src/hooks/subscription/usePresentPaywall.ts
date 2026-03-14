@@ -7,6 +7,8 @@ import { setCustomerInfo } from "@/redux/slices/subscriptionSlice";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { getCustomerInfo, isNativePlatform } from "@/lib/revenuecat";
+import { scheduleTrialEndingReminder } from "@/lib/notifications";
+import { ENTITLEMENT_ID } from "@/types/subscription.types";
 import { subscriptionApi } from "@/api/subscription.api";
 import { queryKeys } from "@/lib/query-keys";
 import { useSupabase } from "@/utils/supabase";
@@ -14,7 +16,7 @@ import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
 
 export function usePresentPaywall() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { supabase } = useSupabase();
@@ -52,6 +54,13 @@ export function usePresentPaywall() {
           }
 
           if (result === PAYWALL_RESULT.PURCHASED) {
+            const entitlement = customerInfo?.entitlements.active[ENTITLEMENT_ID];
+            if (
+              entitlement?.periodType === "TRIAL" &&
+              entitlement.expirationDateMillis != null
+            ) {
+              await scheduleTrialEndingReminder(i18n.language, entitlement.expirationDateMillis);
+            }
             toast.success(t("subscription.purchaseSuccess"));
           } else {
             toast.success(t("subscription.restoreSuccess"));
@@ -65,7 +74,7 @@ export function usePresentPaywall() {
         return null;
       }
     },
-    [dispatch, t, householdId, user, supabase, queryClient]
+    [dispatch, t, i18n.language, householdId, user, supabase, queryClient]
   );
 
   return { presentPaywall };

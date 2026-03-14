@@ -3,8 +3,9 @@ import { Capacitor } from "@capacitor/core";
 
 const WEEKLY_REMINDER_ID = 1001;
 const DAILY_MEAL_REMINDER_ID = 1002;
+const TRIAL_ENDING_REMINDER_ID = 1003;
 
-export type NotificationType = "weekly_planning_reminder" | "daily_meal_reminder";
+export type NotificationType = "weekly_planning_reminder" | "daily_meal_reminder" | "trial_ending_reminder";
 
 export function isNotificationSupported(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.isPluginAvailable("LocalNotifications");
@@ -128,4 +129,43 @@ function getDailyReminderBody(language: string): string {
   return language === "de"
     ? "Schau dir deinen Essensplan für heute an! 🍽️"
     : "Check out your meal plan for today! 🍽️";
+}
+
+// --- Trial Ending Reminder ---
+
+export async function scheduleTrialEndingReminder(
+  language: string,
+  trialEndDateMillis: number
+): Promise<void> {
+  if (!isNotificationSupported()) return;
+
+  await cancelTrialEndingReminder();
+
+  const fireAt = new Date(trialEndDateMillis - 2 * 24 * 60 * 60 * 1000);
+  fireAt.setHours(10, 0, 0, 0);
+
+  await LocalNotifications.schedule({
+    notifications: [
+      {
+        id: TRIAL_ENDING_REMINDER_ID,
+        title: language === "de" ? "Deine Testphase endet bald" : "Your trial ends soon",
+        body:
+          language === "de"
+            ? "Noch 2 Tage übrig – danach verlängerst du automatisch. 🍽️"
+            : "2 days left – then you'll automatically continue. 🍽️",
+        schedule: { at: fireAt },
+        extra: { type: "trial_ending_reminder" satisfies NotificationType },
+      },
+    ],
+  });
+}
+
+export async function cancelTrialEndingReminder(): Promise<void> {
+  if (!isNotificationSupported()) return;
+
+  try {
+    await LocalNotifications.cancel({ notifications: [{ id: TRIAL_ENDING_REMINDER_ID }] });
+  } catch {
+    // Notification may not exist yet
+  }
 }
