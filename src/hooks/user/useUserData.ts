@@ -81,7 +81,7 @@ export function useUserData() {
         });
 
         try {
-          const customerInfo = await identifyUser(userData.id);
+          const customerInfo = await identifyUser(userData.id, userData.email);
           dispatch(setCustomerInfo(customerInfo));
         } catch (err) {
           console.error("Failed to identify user with RevenueCat:", err);
