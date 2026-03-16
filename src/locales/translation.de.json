@@ -343,9 +343,6 @@
   },
   "home": {
     "title": "Startseite",
-    "goodMorning": "Guten Morgen,",
-    "goodAfternoon": "Guten Nachmittag,",
-    "goodEvening": "Guten Abend,",
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
     "goToPlanner": "Plane deine Woche"

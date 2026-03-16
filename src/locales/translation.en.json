@@ -348,9 +348,6 @@
   },
   "home": {
     "title": "Home",
-    "goodMorning": "Good morning,",
-    "goodAfternoon": "Good afternoon,",
-    "goodEvening": "Good evening,",
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
     "goToPlanner": "Plan your week"

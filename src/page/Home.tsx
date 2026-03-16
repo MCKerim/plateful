@@ -1,8 +1,5 @@
 import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
-import { useAppSelector } from "@/redux/hooks";
-
-import { selectUser } from "@/redux/slices/userSlice";
 import { Donut, House, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useNavigate } from "react-router";
@@ -12,12 +9,10 @@ import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import RecipeCard from "@/components/general/RecipeCard";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
-import { getGreetingKey } from "@/lib/greetingHelper/greetingHelper";
 
 export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const user = useAppSelector(selectUser);
 
 
   const today = useMemo(() => new Date(), []);
@@ -41,8 +36,6 @@ export default function Home() {
     return [...importing, ...ready];
   }, [recipes]);
 
-  const greetingKey = getGreetingKey(new Date().getHours());
-
   function handleURLImportClicked() {
     navigate("/urlImport");
   }
@@ -65,11 +58,6 @@ export default function Home() {
         </NavLink>
       }
     >
-      {/* Time-based greeting */}
-      <h1 className="first-font text-xl">
-        {t(greetingKey)} {user?.username}
-      </h1>
-
       {/* Today's planned meals */}
       <div className="mt-4 mb-36">
         {todaysMeals.length > 0 ? (
