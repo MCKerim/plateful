@@ -261,7 +261,7 @@ export default function MealPlanner() {
         layoutShiftCompensation: false,
       }}
     >
-      <Layout showHeader={false}>
+      <Layout showHeader={false} noTopPadding>
         <RatingModal ref={ratingModalRef} recipeId={recipeToRate} showTriggerButton={false} />
 
         {/* Weekly Plan Dialog for editing */}
@@ -275,7 +275,7 @@ export default function MealPlanner() {
         />
 
         {/* Week Navigation */}
-        <div className="sticky flex items-center justify-between px-2 pb-1 border-b bg-background top-4 z-10">
+        <div className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10">
           <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
             <ChevronLeft size={20} />
           </Button>
