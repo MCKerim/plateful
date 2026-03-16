@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "postinstall": "patch-package",
     "dev": "vite --host",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
@@ -128,6 +129,7 @@
     "i18next-resources-for-ts": "^2.0.0",
     "jsdom": "^27.0.1",
     "mkcert": "^3.2.0",
+    "patch-package": "^8.0.1",
     "playwright": "^1.53.1",
     "postcss": "^8.4.49",
     "prettier": "^3.8.1",
