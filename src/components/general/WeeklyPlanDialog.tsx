@@ -6,6 +6,7 @@ import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-rea
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
+import { useSwipe } from "@/hooks/useSwipe";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
@@ -181,6 +182,11 @@ export default function WeeklyPlanDialog({
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
   }
 
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: goToNextWeek,
+    onSwipeRight: goToPreviousWeek,
+  });
+
   function goToCurrentWeek() {
     setCurrentWeek(new Date());
   }
@@ -316,6 +322,7 @@ export default function WeeklyPlanDialog({
         </div>
 
         {/* Day Buttons */}
+        <div className="flex flex-col gap-2" {...swipeHandlers}>
         {getWeekdays(currentWeek).map((day) => {
           const isToday = isSameDay(day, new Date());
           const isSelected = selectedDates.some((d) => isSameDay(d, day));
@@ -361,6 +368,7 @@ export default function WeeklyPlanDialog({
             </Button>
           );
         })}
+        </div>
 
         {/* Without Date Button */}
         <Button
