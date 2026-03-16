@@ -64,6 +64,10 @@ export default function WeeklyPlanDialog({
   const [currentWeek, setCurrentWeek] = useState(new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
+  // Track original plan IDs per initialized week (needed for cross-week deletes)
+  const [planIdsByWeek, setPlanIdsByWeek] = useState<
+    Map<string, Array<{ id: string; date: Date }>>
+  >(new Map());
 
   // Fetch all planned items summary (for showing recipes on each day - includes recipe names)
   const { data: plannedItems = [], isFetching: isFetchingPlannedItems } = usePlannedItemsSummary(
@@ -72,7 +76,11 @@ export default function WeeklyPlanDialog({
   );
 
   // Fetch existing plans for THIS recipe in the current week (needed for IDs to delete)
-  const { data: recipePlans = [] } = useRecipePlansForWeek(recipeId, currentWeek, isDialogOpen);
+  const { data: recipePlans = [], isFetching: isFetchingRecipePlans } = useRecipePlansForWeek(
+    recipeId,
+    currentWeek,
+    isDialogOpen
+  );
 
   // Mutation for saving
   const saveMutation = useSaveRecipePlans();
@@ -83,12 +91,6 @@ export default function WeeklyPlanDialog({
     return itemsForDay.some((item) => item.recipe_name === recipeName);
   }
 
-  // Get the plan ID for a specific date (from recipePlans which has IDs)
-  function getPlanIdForDate(date: Date): string | null {
-    const plan = recipePlans.find((p) => p.planned_date && isSameDay(p.planned_date, date));
-    return plan?.id ?? null;
-  }
-
   // Reset state when dialog closes
   useEffect(() => {
     if (!isDialogOpen) {
@@ -97,6 +99,7 @@ export default function WeeklyPlanDialog({
       setWithoutDateCount(1);
       setCurrentWeek(new Date());
       setInitializedWeeks(new Set());
+      setPlanIdsByWeek(new Map());
     }
   }, [isDialogOpen]);
 
@@ -106,13 +109,14 @@ export default function WeeklyPlanDialog({
     setWithoutDate(false);
     setCurrentWeek(new Date());
     setInitializedWeeks(new Set());
+    setPlanIdsByWeek(new Map());
   }, [recipeId]);
 
   // Initialize/update selected dates when week changes or data loads
   // This adds already-planned dates for weeks that haven't been initialized yet
   useEffect(() => {
     // Don't initialize while data is still being fetched for this week
-    if (!isDialogOpen || isFetchingPlannedItems) return;
+    if (!isDialogOpen || isFetchingPlannedItems || isFetchingRecipePlans) return;
 
     const weekKey = getWeekdays(currentWeek)[0].toISOString();
 
@@ -136,6 +140,18 @@ export default function WeeklyPlanDialog({
       });
     }
 
+    // Store plan IDs for this week (needed for cross-week deletes on save)
+    setPlanIdsByWeek((prev) => {
+      const updated = new Map(prev);
+      updated.set(
+        weekKey,
+        recipePlans
+          .filter((p) => p.planned_date)
+          .map((p) => ({ id: p.id, date: p.planned_date! }))
+      );
+      return updated;
+    });
+
     // Mark this week as initialized
     setInitializedWeeks((prev) => new Set(prev).add(weekKey));
   }, [
@@ -145,6 +161,8 @@ export default function WeeklyPlanDialog({
     initializedWeeks,
     recipeName,
     isFetchingPlannedItems,
+    isFetchingRecipePlans,
+    recipePlans,
   ]);
 
   function handleOpenChange(open: boolean) {
@@ -186,25 +204,32 @@ export default function WeeklyPlanDialog({
       return;
     }
 
-    // Get all days in current week that have this recipe planned
-    const weekDays = getWeekdays(currentWeek);
-    const currentlyPlannedDates = weekDays.filter((day) => isDatePlannedForThisRecipe(day));
-
-    // Determine what to add and remove
+    // Process all initialized weeks to compute adds/removes across week navigation
     const planIdsToRemove: string[] = [];
-    for (const plannedDate of currentlyPlannedDates) {
-      const isStillSelected = selectedDates.some((d) => isSameDay(d, plannedDate));
-      if (!isStillSelected) {
-        const planId = getPlanIdForDate(plannedDate);
-        if (planId) {
-          planIdsToRemove.push(planId);
+    const datesToAdd: Date[] = [];
+
+    for (const [weekKey, originalPlans] of planIdsByWeek.entries()) {
+      const weekStart = new Date(weekKey);
+      const weekDays = getWeekdays(weekStart);
+
+      const selectedInThisWeek = selectedDates.filter((d) =>
+        weekDays.some((wd) => isSameDay(wd, d))
+      );
+
+      // Plans that were originally there but are now deselected → remove
+      for (const plan of originalPlans) {
+        if (!selectedInThisWeek.some((d) => isSameDay(d, plan.date))) {
+          planIdsToRemove.push(plan.id);
+        }
+      }
+
+      // Dates that are selected but weren't originally planned → add
+      for (const date of selectedInThisWeek) {
+        if (!originalPlans.some((p) => isSameDay(p.date, date))) {
+          datesToAdd.push(date);
         }
       }
     }
-
-    const datesToAdd = selectedDates.filter(
-      (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date))
-    );
 
     // Only show error if nothing is selected AND there's nothing to remove (i.e., no changes)
     if (selectedDates.length === 0 && !withoutDate && planIdsToRemove.length === 0) {
