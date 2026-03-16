@@ -9,8 +9,9 @@ import { enUS, es, fr, de } from "date-fns/locale";
 import { useSwipe } from "@/hooks/useSwipe";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { setCurrentWeek as setMealPlannerWeek } from "@/redux/slices/mealPlannerSlice";
 import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
 import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
 import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
@@ -54,6 +55,7 @@ export default function WeeklyPlanDialog({
 }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
 
   // Support both controlled and uncontrolled modes
@@ -268,6 +270,7 @@ export default function WeeklyPlanDialog({
       onSaveComplete?.({ success: true, ...result });
 
       if (navigateOnSuccess) {
+        dispatch(setMealPlannerWeek(currentWeek.toISOString()));
         navigate("/planner");
       }
     } catch {
