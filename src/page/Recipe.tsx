@@ -13,6 +13,7 @@ import {
   Share2,
   Loader2,
   MoreVertical,
+  Trash2,
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
@@ -49,6 +50,8 @@ import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
 import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
+import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
+import DeleteDialog from "@/components/general/DeleteDialog";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Capacitor } from "@capacitor/core";
 
@@ -100,6 +103,21 @@ export default function Recipe() {
   // Mutations
   const deleteRatingMutation = useDeleteRating();
   const createShareMutation = useCreateRecipeShare();
+  const deleteRecipeMutation = useDeleteRecipe();
+
+  function handleDeleteRecipe() {
+    if (!recipeId) return;
+    deleteRecipeMutation.mutate(recipeId, {
+      onSuccess: () => {
+        toast.success(t("addRecipe.recipeDeleted"));
+        navigate("/cookbook");
+      },
+      onError: (error) => {
+        console.error("Error while deleting recipe: ", error);
+        toast.error(t("addRecipe.errors.deleteFailed"));
+      },
+    });
+  }
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -308,6 +326,18 @@ export default function Recipe() {
                   </div>
                 </Button>
               )}
+              <DeleteDialog
+                onDelete={handleDeleteRecipe}
+                loading={deleteRecipeMutation.isPending}
+                customTrigger={
+                  <Button variant="secondary" size="lg" className="w-full">
+                    <div className="flex justify-start gap-4 w-full h-full items-center">
+                      <Trash2 />
+                      <p className="second-font font-semibold">{t("common.delete")}</p>
+                    </div>
+                  </Button>
+                }
+              />
             </DrawerFooter>
           </DrawerContent>
         </Drawer>
