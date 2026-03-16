@@ -226,11 +226,6 @@ export default function HouseholdSettings() {
                   {t("householdSettings.owner")}
                 </span>
               )}
-              {isCurrentUser && (
-                <span className="text-sm text-muted-foreground">
-                  {t("householdSettings.you")}
-                </span>
-              )}
             </span>
           </Button>
         );
@@ -351,7 +346,9 @@ export default function HouseholdSettings() {
               <Input
                 value={deleteConfirmationText}
                 onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                placeholder={t("householdSettings.confirmations.deleteHousehold.confirmationPlaceholder")}
+                placeholder={t(
+                  "householdSettings.confirmations.deleteHousehold.confirmationPlaceholder"
+                )}
               />
             </div>
 

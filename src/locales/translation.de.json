@@ -409,7 +409,6 @@
     "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein",
     "subscription": {
       "title": "Abonnement",
-      "proDescription": "Du hast Plateful Premium. Vielen Dank für deine Unterstützung!",
       "manageSubscription": "Abonnement verwalten",
       "restorePurchases": "Käufe wiederherstellen",
       "managedBy": "Abonnement verwaltet von {{name}}"

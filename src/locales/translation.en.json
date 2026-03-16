@@ -410,7 +410,6 @@
     "usernameLengthInvalid": "Username must be between 3 and 20 characters",
     "subscription": {
       "title": "Subscription",
-      "proDescription": "You have Plateful Premium. Thank you for your support!",
       "manageSubscription": "Manage Subscription",
       "restorePurchases": "Restore Purchases",
       "managedBy": "Subscription managed by {{name}}"
