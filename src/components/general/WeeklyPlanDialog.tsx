@@ -23,6 +23,7 @@ type Props = {
   trigger?: ReactNode | null;
   onSaveComplete?: (result: { success: boolean; added: number; removed: number }) => void;
   navigateOnSuccess?: boolean;
+  initialWeek?: Date;
 };
 
 const locales = {
@@ -49,6 +50,7 @@ export default function WeeklyPlanDialog({
   trigger,
   onSaveComplete,
   navigateOnSuccess = false,
+  initialWeek,
 }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
@@ -62,7 +64,7 @@ export default function WeeklyPlanDialog({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [withoutDateCount, setWithoutDateCount] = useState(1);
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(initialWeek ?? new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
   // Track original plan IDs per initialized week (needed for cross-week deletes)
@@ -98,7 +100,7 @@ export default function WeeklyPlanDialog({
       setSelectedDates([]);
       setWithoutDate(false);
       setWithoutDateCount(1);
-      setCurrentWeek(new Date());
+      setCurrentWeek(initialWeek ?? new Date());
       setInitializedWeeks(new Set());
       setPlanIdsByWeek(new Map());
     }
@@ -108,7 +110,7 @@ export default function WeeklyPlanDialog({
   useEffect(() => {
     setSelectedDates([]);
     setWithoutDate(false);
-    setCurrentWeek(new Date());
+    setCurrentWeek(initialWeek ?? new Date());
     setInitializedWeeks(new Set());
     setPlanIdsByWeek(new Map());
   }, [recipeId]);

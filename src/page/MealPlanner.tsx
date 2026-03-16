@@ -272,6 +272,7 @@ export default function MealPlanner() {
           onOpenChange={(open) => !open && setEditingRecipe(null)}
           trigger={null}
           navigateOnSuccess={false}
+          initialWeek={currentWeek}
         />
 
         {/* Week Navigation */}
