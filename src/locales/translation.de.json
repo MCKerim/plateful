@@ -97,17 +97,6 @@
     "subtitle": "smarte Essensplanung beginnt jetzt!",
     "nextButton": "Jetzt Loslegen!"
   },
-  "beta": {
-    "title": "Plateful Beta",
-    "thankYou": "Danke, dass du dabei bist!",
-    "description": "Deine Erfahrungen werden uns dabei helfen, die beste Kochapp zu entwickeln.",
-    "benefits": {
-      "newFeatures": "Du bekommst alle neuen Features zuerst",
-      "directInput": "Deine Meinung fließt direkt in die Entwicklung ein",
-      "helpImprove": "Du hilfst dabei, Plateful noch besser zu machen"
-    },
-    "nextButton": "Los geht's!"
-  },
   "valueScreens": {
     "emotionalHook": {
       "title": "Was koche ich heute?",

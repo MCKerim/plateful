@@ -49,17 +49,6 @@
     "subtitle": "smart food planning starts now!",
     "nextButton": "Get Started!"
   },
-  "beta": {
-    "title": "Plateful Beta",
-    "thankYou": "Thanks for being part of this!",
-    "description": "Your experiences will help us build the best cooking app.",
-    "benefits": {
-      "newFeatures": "You get all new features first",
-      "directInput": "Your feedback flows directly into development",
-      "helpImprove": "You help make Plateful even better"
-    },
-    "nextButton": "Let's go!"
-  },
   "valueScreens": {
     "emotionalHook": {
       "title": "What should I cook today?",

@@ -35,7 +35,6 @@ import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValu
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import Impressum from "./page/Impressum";
-import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
 import HowItWorks from "./page/onboarding/howItWorks/HowItWorks";
 import TrialOffer from "./page/onboarding/trialOffer/TrialOffer";
@@ -136,7 +135,8 @@ function App() {
 
     CapacitorShareTarget.addListener("shareReceived", (event) => {
       const rawText = event.texts?.[0];
-      const url = rawText?.startsWith("http://") || rawText?.startsWith("https://") ? rawText : undefined;
+      const url =
+        rawText?.startsWith("http://") || rawText?.startsWith("https://") ? rawText : undefined;
       const title = event.title;
       if (url || title) {
         const params = new URLSearchParams();
@@ -272,19 +272,10 @@ function App() {
   }
 
   function routeToCorrectPage(page: React.JSX.Element) {
-    return routeToCorrectPagePure(
-      page,
-      isLoggedIn,
-      hasCompletedSurvey,
-      isPro,
-      hasHousehold
-    );
+    return routeToCorrectPagePure(page, isLoggedIn, hasCompletedSurvey, isPro, hasHousehold);
   }
 
-  function guardOnboardingRoute(
-    page: React.JSX.Element,
-    requiredStep: "survey" | "socialproof"
-  ) {
+  function guardOnboardingRoute(page: React.JSX.Element, requiredStep: "survey" | "socialproof") {
     if (!isLoggedIn()) {
       return <Navigate to="/signup" />;
     }
@@ -332,8 +323,6 @@ function App() {
 
         <Route path="/login" element={isLoggedIn() ? <Navigate to="/home" /> : <Login />} />
 
-        <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
-
         <Route path="/values" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/1" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/2" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
@@ -346,16 +335,23 @@ function App() {
         <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
         <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "socialproof")} />
-        <Route path="/trialreminder" element={guardOnboardingRoute(<TrialReminder />, "socialproof")} />
+        <Route
+          path="/trialreminder"
+          element={guardOnboardingRoute(<TrialReminder />, "socialproof")}
+        />
 
         <Route
           path="/subscribe"
           element={
-            isLoggedIn()
-              ? Capacitor.isNativePlatform()
-                ? <Subscribe />
-                : <SubscribeWeb />
-              : <Navigate to="/signup" />
+            isLoggedIn() ? (
+              Capacitor.isNativePlatform() ? (
+                <Subscribe />
+              ) : (
+                <SubscribeWeb />
+              )
+            ) : (
+              <Navigate to="/signup" />
+            )
           }
         />
 
@@ -376,7 +372,10 @@ function App() {
         {/* Main Routes */}
         <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
         <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
-        <Route path="/notificationSettings" element={routeToCorrectPage(<NotificationSettings />)} />
+        <Route
+          path="/notificationSettings"
+          element={routeToCorrectPage(<NotificationSettings />)}
+        />
         <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
