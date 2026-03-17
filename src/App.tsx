@@ -134,6 +134,16 @@ function App() {
     let cancelled = false;
 
     CapacitorShareTarget.addListener("shareReceived", (event) => {
+      // Handle shared images
+      const imageFiles = event.files?.filter((f) => f.mimeType?.startsWith("image/")) ?? [];
+      if (imageFiles.length > 0) {
+        const params = new URLSearchParams();
+        imageFiles.forEach((f) => params.append("fileUri", f.uri));
+        navigate(`/imageImport?${params.toString()}`);
+        return;
+      }
+
+      // Handle shared text/URL
       const rawText = event.texts?.[0];
       const urlRegex = /(https?:\/\/[^\s]+)/i;
       const urlMatch = rawText ? urlRegex.exec(rawText) : null;
