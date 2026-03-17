@@ -135,8 +135,9 @@ function App() {
 
     CapacitorShareTarget.addListener("shareReceived", (event) => {
       const rawText = event.texts?.[0];
-      const url =
-        rawText?.startsWith("http://") || rawText?.startsWith("https://") ? rawText : undefined;
+      const urlRegex = /(https?:\/\/[^\s]+)/i;
+      const urlMatch = rawText ? urlRegex.exec(rawText) : null;
+      const url = urlMatch ? urlMatch[1] : undefined;
       const title = event.title;
       if (url || title) {
         const params = new URLSearchParams();
