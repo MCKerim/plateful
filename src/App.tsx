@@ -138,12 +138,8 @@ function App() {
       const urlRegex = /(https?:\/\/[^\s]+)/i;
       const urlMatch = rawText ? urlRegex.exec(rawText) : null;
       const url = urlMatch ? urlMatch[1] : undefined;
-      const title = event.title;
-      if (url || title) {
-        const params = new URLSearchParams();
-        if (url) params.set("url", url);
-        if (title) params.set("title", title);
-        navigate(`/urlImport?${params.toString()}`);
+      if (url) {
+        navigate(`/urlImport?url=${encodeURIComponent(url)}`);
       }
     }).then((handle) => {
       if (cancelled) {
