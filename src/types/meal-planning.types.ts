@@ -2,6 +2,7 @@ export type MealPlannerItem = {
   id: string;
   recipeId: string;
   recipeName: string;
+  recipeCategory: number | null;
   planned_date: Date | null;
   eaten: boolean;
 };
@@ -10,7 +11,7 @@ export type MealPlannerItemRaw = {
   id: string;
   planned_date: string | null;
   eaten: boolean;
-  recipes: { id: string; name: string } | null;
+  recipes: { id: string; name: string; category: number | null } | null;
 };
 
 export type PlannedItemSummaryRaw = {
