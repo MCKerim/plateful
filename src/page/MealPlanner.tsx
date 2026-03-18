@@ -150,7 +150,9 @@ export default function MealPlanner() {
   }
 
   function getItemsByDate(date: Date) {
-    return plannedItems.filter((item) => item.planned_date && isSameDay(item.planned_date, date));
+    return plannedItems
+      .filter((item) => item.planned_date && isSameDay(item.planned_date, date))
+      .sort((a, b) => (a.recipeCategory ?? 999) - (b.recipeCategory ?? 999));
   }
 
   useEffect(() => {
