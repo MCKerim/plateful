@@ -63,9 +63,13 @@ async function setupAuthentication(
   const storageKey = getSupabaseStorageKey();
 
   // Inject session into localStorage before page loads
+  // Also pre-dismiss onboarding sheets (Capacitor Preferences uses _cap_ prefix in web)
   await context.addInitScript(
     ({ storageKey, session }) => {
       localStorage.setItem(storageKey, JSON.stringify(session));
+      localStorage.setItem("CapacitorStorage.onboarding_recipes_seen", "true");
+      localStorage.setItem("CapacitorStorage.onboarding_mealplanner_seen", "true");
+      localStorage.setItem("CapacitorStorage.onboarding_chatbot_seen", "true");
     },
     { storageKey, session }
   );
