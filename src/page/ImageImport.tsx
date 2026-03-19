@@ -16,6 +16,8 @@ import imageCompression from "browser-image-compression";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 
+let lastAutoImportedFileUris: string | null = null;
+
 export default function ImageImport() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -26,7 +28,6 @@ export default function ImageImport() {
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-  const hasProcessedSharedFiles = useRef(false);
   const [searchParams] = useSearchParams();
 
   // Cleanup on unmount - abort any pending API calls
@@ -62,8 +63,9 @@ export default function ImageImport() {
   // Load images shared via the Android share intent
   useEffect(() => {
     const fileUris = searchParams.getAll("fileUri");
-    if (fileUris.length === 0 || hasProcessedSharedFiles.current) return;
-    hasProcessedSharedFiles.current = true;
+    const fileUrisKey = fileUris.join(",");
+    if (fileUris.length === 0 || lastAutoImportedFileUris === fileUrisKey) return;
+    lastAutoImportedFileUris = fileUrisKey;
 
     const loadSharedFiles = async () => {
       for (const uri of fileUris) {
