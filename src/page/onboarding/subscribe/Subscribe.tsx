@@ -43,10 +43,7 @@ export default function Subscribe() {
     try {
       const result = await presentPaywall({ displayCloseButton: false });
 
-      if (
-        result === PAYWALL_RESULT.PURCHASED ||
-        result === PAYWALL_RESULT.RESTORED
-      ) {
+      if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
         navigate("/choosename", { replace: true });
       } else if (result === PAYWALL_RESULT.CANCELLED) {
         // Cannot skip — re-present
@@ -66,14 +63,9 @@ export default function Subscribe() {
     return (
       <OnboardingLayout>
         <div className="flex flex-col items-center gap-4 text-center">
-          <h1 className="text-2xl font-bold first-font">
-            {t("subscribe.error")}
-          </h1>
+          <h1 className="text-2xl font-bold first-font">{t("subscribe.error")}</h1>
 
-          <OnboardingButton
-            label={t("subscribe.retry")}
-            onClick={showPaywall}
-          />
+          <OnboardingButton label={t("subscribe.retry")} onClick={showPaywall} />
         </div>
       </OnboardingLayout>
     );

@@ -1,6 +1,6 @@
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
@@ -91,10 +91,13 @@ export default function WeeklyPlanDialog({
   const saveMutation = useSaveRecipePlans();
 
   // Check if a date has THIS recipe planned (using the always-fresh plannedItems data)
-  function isDatePlannedForThisRecipe(date: Date): boolean {
-    const itemsForDay = getPlannedItemsForDate(plannedItems, date);
-    return itemsForDay.some((item) => item.recipe_name === recipeName);
-  }
+  const isDatePlannedForThisRecipe = useCallback(
+    (date: Date): boolean => {
+      const itemsForDay = getPlannedItemsForDate(plannedItems, date);
+      return itemsForDay.some((item) => item.recipe_name === recipeName);
+    },
+    [plannedItems, recipeName]
+  );
 
   // Reset state when dialog closes
   useEffect(() => {
@@ -150,9 +153,7 @@ export default function WeeklyPlanDialog({
       const updated = new Map(prev);
       updated.set(
         weekKey,
-        recipePlans
-          .filter((p) => p.planned_date)
-          .map((p) => ({ id: p.id, date: p.planned_date! }))
+        recipePlans.filter((p) => p.planned_date).map((p) => ({ id: p.id, date: p.planned_date! }))
       );
       return updated;
     });
@@ -168,6 +169,7 @@ export default function WeeklyPlanDialog({
     isFetchingPlannedItems,
     isFetchingRecipePlans,
     recipePlans,
+    isDatePlannedForThisRecipe,
   ]);
 
   function handleOpenChange(open: boolean) {
@@ -328,51 +330,51 @@ export default function WeeklyPlanDialog({
 
         {/* Day Buttons */}
         <div className="flex flex-col gap-2" {...swipeHandlers}>
-        {getWeekdays(currentWeek).map((day) => {
-          const isToday = isSameDay(day, new Date());
-          const isSelected = selectedDates.some((d) => isSameDay(d, day));
-          const plannedForDay = getPlannedItemsForDate(plannedItems, day);
-          const hasPlannedItems = plannedForDay.length > 0;
-          // Use the fresh plannedItems data to check if this recipe is planned
-          const hasExistingPlan = isDatePlannedForThisRecipe(day);
+          {getWeekdays(currentWeek).map((day) => {
+            const isToday = isSameDay(day, new Date());
+            const isSelected = selectedDates.some((d) => isSameDay(d, day));
+            const plannedForDay = getPlannedItemsForDate(plannedItems, day);
+            const hasPlannedItems = plannedForDay.length > 0;
+            // Use the fresh plannedItems data to check if this recipe is planned
+            const hasExistingPlan = isDatePlannedForThisRecipe(day);
 
-          return (
-            <Button
-              key={day.toISOString()}
-              variant="outline"
-              onClick={() => toggleWeekDate(day)}
-              className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
-                isSelected
-                  ? "bg-accent text-accent-foreground border-accent"
-                  : hasExistingPlan
-                    ? "border-destructive"
-                    : ""
-              }`}
-            >
-              <p className="font-bold">
-                {format(day, "EEE - dd.MM", {
-                  locale: locales[i18n.language as keyof typeof locales] || enUS,
-                })}
+            return (
+              <Button
+                key={day.toISOString()}
+                variant="outline"
+                onClick={() => toggleWeekDate(day)}
+                className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
+                  isSelected
+                    ? "bg-accent text-accent-foreground border-accent"
+                    : hasExistingPlan
+                      ? "border-destructive"
+                      : ""
+                }`}
+              >
+                <p className="font-bold">
+                  {format(day, "EEE - dd.MM", {
+                    locale: locales[i18n.language as keyof typeof locales] || enUS,
+                  })}
 
-                {isToday && ` - ${t("common.today")}`}
-              </p>
+                  {isToday && ` - ${t("common.today")}`}
+                </p>
 
-              {/* Show planned items */}
-              {hasPlannedItems && (
-                <div className="w-full flex flex-wrap gap-1 pl-2">
-                  {plannedForDay.map((item, index) => (
-                    <p
-                      key={index}
-                      className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
-                    >
-                      {item.recipe_name}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </Button>
-          );
-        })}
+                {/* Show planned items */}
+                {hasPlannedItems && (
+                  <div className="w-full flex flex-wrap gap-1 pl-2">
+                    {plannedForDay.map((item, index) => (
+                      <p
+                        key={index}
+                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
+                      >
+                        {item.recipe_name}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </Button>
+            );
+          })}
         </div>
 
         {/* Without Date Button */}

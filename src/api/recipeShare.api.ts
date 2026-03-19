@@ -40,7 +40,8 @@ export const recipeShareApi = {
       )
     ).filter((url): url is string => url !== null);
 
-    const { image_paths: _, ...snapshotFields } = snapshot;
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { image_paths: _imagePaths, ...snapshotFields } = snapshot;
     const fullSnapshot: SharedRecipeSnapshot = {
       ...snapshotFields,
       image_urls: imageUrls,

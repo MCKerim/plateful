@@ -337,7 +337,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
 
     // Track chatbot requests
     let chatbotRequestCount = 0;
-    let secondRequestBody: any = null;
+    let secondRequestBody: { messages: Array<{ content: Array<{ type: string; text?: string }> }> } | null = null;
 
     await page.route("**/functions/v1/chatbot", async (route) => {
       chatbotRequestCount++;
@@ -402,11 +402,11 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
 
     // Verify the second request included proposal feedback
     expect(secondRequestBody).not.toBeNull();
-    const messageContent = secondRequestBody.messages[0].content;
-    const textPart = messageContent.find((p: any) => p.type === "input_text");
-    expect(textPart.text).toContain("[Proposal Outcomes]");
-    expect(textPart.text).toContain("p_1");
-    expect(textPart.text).toContain(createdRecipeId);
+    const messageContent = secondRequestBody!.messages[0].content;
+    const textPart = messageContent.find((p: { type: string; text?: string }) => p.type === "input_text");
+    expect(textPart?.text).toContain("[Proposal Outcomes]");
+    expect(textPart?.text).toContain("p_1");
+    expect(textPart?.text).toContain(createdRecipeId);
   });
 
   test("should stream response text incrementally", async ({ page, setupAuth }) => {

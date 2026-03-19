@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import { App, URLOpenListenerEvent } from "@capacitor/app";
 import { useSupabase } from "@/utils/supabase";
 
-const AppUrlListener: React.FC<any> = () => {
+const AppUrlListener: React.FC = () => {
   const navigate = useNavigate();
   const { supabase } = useSupabase();
 

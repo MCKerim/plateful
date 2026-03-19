@@ -40,11 +40,9 @@ export default function SurveyStart() {
       }
     }
     checkResume();
-  }, [user?.id]);
+  }, [user, supabase]);
 
-  const progressValue = resumeQuestion
-    ? ((resumeQuestion - 1) / SURVEY_QUESTIONS.length) * 100
-    : 0;
+  const progressValue = resumeQuestion ? ((resumeQuestion - 1) / SURVEY_QUESTIONS.length) * 100 : 0;
 
   return (
     <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">

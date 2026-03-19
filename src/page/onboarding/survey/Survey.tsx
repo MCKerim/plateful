@@ -56,7 +56,7 @@ export default function Survey() {
       }
     }
     loadExistingAnswer();
-  }, [questionId, user?.id]);
+  }, [questionId, user, supabase]);
 
   const handleSelect = async (option: string) => {
     const question = SURVEY_QUESTIONS[questionId - 1];

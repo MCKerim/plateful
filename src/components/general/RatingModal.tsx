@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import HotelClassIcon from "@mui/icons-material/HotelClass";
 import StarIcon from "@mui/icons-material/Star";
@@ -64,15 +64,12 @@ const RatingModal = forwardRef<RatingModalRef, Props>(
       },
     }));
 
-    useEffect(() => {
-      if (!isDialogOpen) {
+    function handleDialogOpenChange(isOpen: boolean) {
+      if (!isOpen) {
         setNote("");
         setRating(1);
         setEditingRating(null);
       }
-    }, [isDialogOpen]);
-
-    function handleDialogOpenChange(isOpen: boolean) {
       setIsDialogOpen(isOpen);
     }
 
