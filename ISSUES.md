@@ -5,6 +5,10 @@
 1. **Recipe import logic** — `URLImport.tsx` and `ImageImport.tsx` share near-identical error handling, history replacement, and toast patterns. Consider extracting a `useRecipeImport()` hook (medium-risk refactor).
 2. **Recipe save logic** — `Chatbot.tsx:254-334` and `AddRecipe.tsx:221-284` duplicate category validation and recipe creation. Consider extracting a `useRecipeSaver()` hook (medium-risk refactor).
 
+## Directory Structure
+
+- `src/utils/` contains mixed concerns: `supabase.tsx` (a React context/provider) and `nativeBrowser.ts`/`nativeClipboard.ts` (Capacitor utilities). The Supabase provider likely belongs in `src/providers/` alongside `RevenueCatProvider.tsx`. Low-priority cleanup.
+
 ## Other Issues
 
 - `src/hooks/user/useUserData.ts:51,66` — language saved to both localStorage and Supabase with no conflict resolution
