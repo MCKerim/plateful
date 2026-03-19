@@ -8,6 +8,7 @@ import { userApi } from "@/api/user.api";
 import posthog from "posthog-js";
 import i18n from "@/i18n";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
+import { SocialLogin } from "@capgo/capacitor-social-login";
 import {
   setCustomerInfo,
   resetSubscription,
@@ -30,6 +31,9 @@ export function useUserData() {
         logoutUser().catch((err) =>
           console.error("Failed to logout from RevenueCat:", err)
         );
+        SocialLogin.logout({ provider: "google" }).catch(() => {
+          // Ignore — user may not have signed in with Google
+        });
         return;
       }
 

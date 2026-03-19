@@ -28,8 +28,13 @@ export async function identifyUser(userId: string, email?: string): Promise<Cust
 export async function logoutUser(): Promise<CustomerInfo | null> {
   if (!isNativePlatform()) return null;
 
-  const { customerInfo } = await Purchases.logOut();
-  return customerInfo;
+  try {
+    const { customerInfo } = await Purchases.logOut();
+    return customerInfo;
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("anonymous")) return null;
+    throw err;
+  }
 }
 
 export async function getCustomerInfo(): Promise<CustomerInfo | null> {
