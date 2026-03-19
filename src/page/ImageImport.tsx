@@ -36,6 +36,29 @@ export default function ImageImport() {
     };
   }, []);
 
+  const {
+    selectFromCamera,
+    selectMultipleFromGallery,
+    isNative,
+    multipleFileInputRef,
+    handleMultipleFileInputChange,
+  } = useImageSourcePicker();
+
+  const processImage = useCallback(async (file: File, dataUrl: string) => {
+    setIsLoadingImage(true);
+    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (reader.result) {
+        const base64 = reader.result.toString();
+        setImages((prev) => [...prev, { file: compressedFile, preview: dataUrl, base64 }]);
+        setIsLoadingImage(false);
+      }
+    };
+    reader.readAsDataURL(compressedFile);
+  }, []);
+
   // Load images shared via the Android share intent
   useEffect(() => {
     const fileUris = searchParams.getAll("fileUri");
@@ -59,29 +82,6 @@ export default function ImageImport() {
 
     loadSharedFiles();
   }, [searchParams, processImage]);
-
-  const {
-    selectFromCamera,
-    selectMultipleFromGallery,
-    isNative,
-    multipleFileInputRef,
-    handleMultipleFileInputChange,
-  } = useImageSourcePicker();
-
-  const processImage = useCallback(async (file: File, dataUrl: string) => {
-    setIsLoadingImage(true);
-    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) {
-        const base64 = reader.result.toString();
-        setImages((prev) => [...prev, { file: compressedFile, preview: dataUrl, base64 }]);
-        setIsLoadingImage(false);
-      }
-    };
-    reader.readAsDataURL(compressedFile);
-  }, []);
 
   const handleCameraClick = async () => {
     const result = await selectFromCamera();
