@@ -102,7 +102,8 @@ Deno.serve(async (req: Request) => {
     const firstUserImage = images[0];
     if (firstUserImage) {
       try {
-        const binaryString = atob(firstUserImage);
+        const rawBase64 = firstUserImage.includes(",") ? firstUserImage.split(",")[1] : firstUserImage;
+        const binaryString = atob(rawBase64);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
           bytes[i] = binaryString.charCodeAt(i);
