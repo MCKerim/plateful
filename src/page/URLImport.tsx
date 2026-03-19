@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/general/LoadingDots";
@@ -12,6 +12,8 @@ import RecipeCard from "@/components/general/RecipeCard";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { readClipboardText } from "@/utils/nativeClipboard";
+
+let lastAutoImportedUrl: string | null = null;
 
 export default function URLImport() {
   const { t } = useTranslation();
@@ -23,7 +25,6 @@ export default function URLImport() {
   const queryClient = useQueryClient();
 
   const [searchParams] = useSearchParams();
-  const hasProcessedUrlParam = useRef(false);
 
   const handleSave = useCallback(
     async (url: string, signal?: AbortSignal) => {
@@ -87,8 +88,8 @@ export default function URLImport() {
     const abortController = new AbortController();
 
     const urlFromParams = searchParams.get("url");
-    if (urlFromParams && !hasProcessedUrlParam.current) {
-      hasProcessedUrlParam.current = true;
+    if (urlFromParams && lastAutoImportedUrl !== urlFromParams) {
+      lastAutoImportedUrl = urlFromParams;
       setUrlInput(urlFromParams);
       handleSave(urlFromParams, abortController.signal);
     } else if (!urlFromParams) {

@@ -98,26 +98,6 @@ Deno.serve(async (req: Request) => {
     const recipeId = placeholderData[0].id;
     console.log("Created placeholder recipe with id:", recipeId);
 
-    // Upload first user-provided image as fallback (before extraction)
-    const firstUserImage = images[0];
-    if (firstUserImage) {
-      try {
-        const binaryString = atob(firstUserImage);
-        const bytes = new Uint8Array(binaryString.length);
-        for (let i = 0; i < binaryString.length; i++) {
-          bytes[i] = binaryString.charCodeAt(i);
-        }
-        const fallbackImagePath = `recipe_${recipeId}/${Date.now()}_user.webp`;
-        await supabase.storage.from("recipeimages").upload(fallbackImagePath, bytes, {
-          contentType: "image/webp",
-          upsert: true,
-        });
-        console.log("Uploaded fallback user image");
-      } catch (imgErr) {
-        console.error("Failed to upload fallback image:", imgErr);
-      }
-    }
-
     // Step 2: Call Node service for extraction
     const NODE_SERVICE_URL = "http://91.99.166.5:3000/api/extract-recipe-from-images";
 
