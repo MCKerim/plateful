@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
-import { Bell, CreditCard, Donut, House, LogOut, Pencil, RotateCcw, Trash2 } from "lucide-react";
+import { Bell, CreditCard, Donut, House, LogOut, Pencil, Trash2 } from "lucide-react";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
 import { isNativePlatform } from "@/lib/revenuecat";

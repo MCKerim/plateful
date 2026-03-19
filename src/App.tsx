@@ -134,15 +134,22 @@ function App() {
     let cancelled = false;
 
     CapacitorShareTarget.addListener("shareReceived", (event) => {
-      const rawText = event.texts?.[0];
-      const url =
-        rawText?.startsWith("http://") || rawText?.startsWith("https://") ? rawText : undefined;
-      const title = event.title;
-      if (url || title) {
+      // Handle shared images
+      const imageFiles = event.files?.filter((f) => f.mimeType?.startsWith("image/")) ?? [];
+      if (imageFiles.length > 0) {
         const params = new URLSearchParams();
-        if (url) params.set("url", url);
-        if (title) params.set("title", title);
-        navigate(`/urlImport?${params.toString()}`);
+        imageFiles.forEach((f) => params.append("fileUri", f.uri));
+        navigate(`/imageImport?${params.toString()}`);
+        return;
+      }
+
+      // Handle shared text/URL
+      const rawText = event.texts?.[0];
+      const urlRegex = /(https?:\/\/[^\s]+)/i;
+      const urlMatch = rawText ? urlRegex.exec(rawText) : null;
+      const url = urlMatch ? urlMatch[1] : undefined;
+      if (url) {
+        navigate(`/urlImport?url=${encodeURIComponent(url)}`);
       }
     }).then((handle) => {
       if (cancelled) {
