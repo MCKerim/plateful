@@ -27,9 +27,7 @@ let package = Package(
         .package(name: "CapgoCapacitorShareTarget", path: "../../../node_modules/@capgo/capacitor-share-target"),
         .package(name: "CapgoCapacitorSocialLogin", path: "../../../node_modules/@capgo/capacitor-social-login"),
         .package(name: "RevenuecatPurchasesCapacitor", path: "../../../node_modules/@revenuecat/purchases-capacitor"),
-        .package(name: "RevenuecatPurchasesCapacitorUi", path: "../../../node_modules/@revenuecat/purchases-capacitor-ui")
         .package(name: "RevenuecatPurchasesCapacitorUi", path: "../../../node_modules/@revenuecat/purchases-capacitor-ui"),
-        .package(name: "SupernotesCapacitorSendIntent", path: "../../../node_modules/@supernotes/capacitor-send-intent"),
         .package(name: "CapacitorPluginSafeArea", path: "../../../node_modules/capacitor-plugin-safe-area")
     ],
     targets: [
@@ -53,9 +51,7 @@ let package = Package(
                 .product(name: "CapgoCapacitorShareTarget", package: "CapgoCapacitorShareTarget"),
                 .product(name: "CapgoCapacitorSocialLogin", package: "CapgoCapacitorSocialLogin"),
                 .product(name: "RevenuecatPurchasesCapacitor", package: "RevenuecatPurchasesCapacitor"),
-                .product(name: "RevenuecatPurchasesCapacitorUi", package: "RevenuecatPurchasesCapacitorUi")
                 .product(name: "RevenuecatPurchasesCapacitorUi", package: "RevenuecatPurchasesCapacitorUi"),
-                .product(name: "SupernotesCapacitorSendIntent", package: "SupernotesCapacitorSendIntent"),
                 .product(name: "CapacitorPluginSafeArea", package: "CapacitorPluginSafeArea")
             ]
         )
