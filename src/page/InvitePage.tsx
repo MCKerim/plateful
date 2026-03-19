@@ -58,7 +58,7 @@ export default function InvitePage() {
     };
 
     handleInvite();
-  }, [token]);
+  }, [token, supabase, t]);
 
   async function updateHousehold() {
     if (!invite) {

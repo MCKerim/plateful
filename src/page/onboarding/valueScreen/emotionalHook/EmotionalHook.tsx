@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
 import "./EmotionalHook.css";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 // Scattered positions around the center plate (x, y offsets in px)
 const foodItems = [
@@ -34,6 +35,11 @@ export default function EmotionalHook() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [cycle, setCycle] = useState(0);
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("value_emotional_hook");
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => setCycle((c) => c + 1), CYCLE_MS);

@@ -74,6 +74,48 @@ export type Database = {
         }
         Relationships: []
       }
+      household_subscriptions: {
+        Row: {
+          created_at: string
+          household_id: string
+          id: string
+          is_active: boolean
+          payer_user_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          household_id: string
+          id?: string
+          is_active?: boolean
+          payer_user_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          household_id?: string
+          id?: string
+          is_active?: boolean
+          payer_user_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_subscriptions_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: true
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_subscriptions_payer_user_id_fkey"
+            columns: ["payer_user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invites: {
         Row: {
           created_at: string
@@ -357,6 +399,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      shared_recipes: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          snapshot: Json
+          token: string
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          snapshot: Json
+          token?: string
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          snapshot?: Json
+          token?: string
+        }
+        Relationships: []
       }
       survey_answers: {
         Row: {

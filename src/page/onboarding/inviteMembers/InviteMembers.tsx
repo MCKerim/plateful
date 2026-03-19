@@ -2,10 +2,17 @@ import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLay
 import InviteLink from "@/components/inviteLink/InviteLink";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function InviteMembers() {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("invite_members");
+  }, []);
 
   async function completeScreen() {
     navigate("/");

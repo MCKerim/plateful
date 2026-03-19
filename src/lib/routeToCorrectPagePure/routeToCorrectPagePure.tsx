@@ -11,14 +11,14 @@ export function routeToCorrectPagePure(
 ) {
   if (isLoggedIn()) {
     if (hasCompletedSurvey()) {
-      if (isPro()) {
-        if (hasHousehold()) {
+      if (hasHousehold()) {
+        if (isPro()) {
           return page;
         } else {
-          return <Navigate to="/createhousehold" />;
+          return <Navigate to="/subscribe" />;
         }
       } else {
-        return <Navigate to="/subscribe" />;
+        return <Navigate to="/createhousehold" />;
       }
     } else {
       return <Navigate to="/values/1" />;

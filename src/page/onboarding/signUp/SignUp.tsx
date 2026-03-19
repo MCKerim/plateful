@@ -4,16 +4,52 @@ import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
 import CircleTransition from "@/components/general/CircleTransition";
-import { openBrowser } from "@/utils/nativeBrowser";
 import { useNavigate } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
+import { SocialLogin } from "@capgo/capacitor-social-login";
+import { Capacitor } from "@capacitor/core";
+
+function getUrlSafeNonce(): string {
+  const bytes = new Uint8Array(32);
+  crypto.getRandomValues(bytes);
+  const charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~";
+  return Array.from(bytes, (b) => charset[b % charset.length]).join("");
+}
+
+async function sha256(message: string): Promise<string> {
+  const data = new TextEncoder().encode(message);
+  const buffer = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(buffer))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
 
 export default function SignUp() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const [showTransition, setShowTransition] = useState(true);
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("signup");
+  }, []);
+
+  useEffect(() => {
+    SocialLogin.initialize({
+      google: {
+        webClientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID,
+        iOSClientId: Capacitor.isNativePlatform()
+          ? import.meta.env.VITE_GOOGLE_IOS_CLIENT_ID
+          : undefined,
+        redirectUrl: Capacitor.isNativePlatform()
+          ? undefined
+          : `${globalThis.location?.origin}/signup`,
+      },
+    });
+  }, []);
 
   const { rive, RiveComponent } = useRive({
     src: "/plateful-character.riv",
@@ -44,43 +80,27 @@ export default function SignUp() {
 
   const signUp = async () => {
     try {
-      const currentUrl = globalThis.location.origin;
-      let redirectUri: string;
+      const rawNonce = getUrlSafeNonce();
+      const nonceDigest = await sha256(rawNonce);
 
-      // Determine the correct redirect URI based on platform
-      if (
-        globalThis.location.hostname === "localhost" ||
-        globalThis.location.hostname === "127.0.0.1" ||
-        globalThis.location.hostname === "plateful-git-staging-mckerims-projects.vercel.app"
-      ) {
-        // Development environment
-        redirectUri = currentUrl;
-      } else {
-        // Production
-        redirectUri = "https://app.plateful.cloud/";
-      }
-
-      const { data, error } = await supabase.auth.signInWithOAuth({
+      const result = await SocialLogin.login({
         provider: "google",
-        options: {
-          redirectTo: redirectUri,
-          skipBrowserRedirect: true,
-          queryParams: {
-            access_type: "offline",
-            prompt: "consent",
-          },
-        },
+        options: { nonce: nonceDigest },
       });
 
-      if (error) {
-        console.error("OAuth error:", error);
-        toast.error("Authentication failed. Please try again.");
-      }
+      const idToken = "idToken" in result.result ? result.result.idToken : null;
+      if (!idToken) throw new Error("No idToken returned from Google Sign-In");
 
-      await openBrowser(data?.url || "");
+      const { error } = await supabase.auth.signInWithIdToken({
+        provider: "google",
+        token: idToken,
+        nonce: rawNonce,
+      });
+
+      if (error) throw error;
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
-      toast.error("An unexpected error occurred. Please try again.");
+      toast.error("Authentication failed. Please try again.");
     }
   };
 

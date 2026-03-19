@@ -1,15 +1,17 @@
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
+import { useSwipe } from "@/hooks/useSwipe";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useAppSelector } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { setCurrentWeek as setMealPlannerWeek } from "@/redux/slices/mealPlannerSlice";
 import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
 import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
 import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
@@ -22,6 +24,7 @@ type Props = {
   trigger?: ReactNode | null;
   onSaveComplete?: (result: { success: boolean; added: number; removed: number }) => void;
   navigateOnSuccess?: boolean;
+  initialWeek?: Date;
 };
 
 const locales = {
@@ -48,9 +51,11 @@ export default function WeeklyPlanDialog({
   trigger,
   onSaveComplete,
   navigateOnSuccess = false,
+  initialWeek,
 }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
 
   // Support both controlled and uncontrolled modes
@@ -61,9 +66,13 @@ export default function WeeklyPlanDialog({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [withoutDateCount, setWithoutDateCount] = useState(1);
-  const [currentWeek, setCurrentWeek] = useState(new Date());
+  const [currentWeek, setCurrentWeek] = useState(initialWeek ?? new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
+  // Track original plan IDs per initialized week (needed for cross-week deletes)
+  const [planIdsByWeek, setPlanIdsByWeek] = useState<
+    Map<string, Array<{ id: string; date: Date }>>
+  >(new Map());
 
   // Fetch all planned items summary (for showing recipes on each day - includes recipe names)
   const { data: plannedItems = [], isFetching: isFetchingPlannedItems } = usePlannedItemsSummary(
@@ -72,22 +81,23 @@ export default function WeeklyPlanDialog({
   );
 
   // Fetch existing plans for THIS recipe in the current week (needed for IDs to delete)
-  const { data: recipePlans = [] } = useRecipePlansForWeek(recipeId, currentWeek, isDialogOpen);
+  const { data: recipePlans = [], isFetching: isFetchingRecipePlans } = useRecipePlansForWeek(
+    recipeId,
+    currentWeek,
+    isDialogOpen
+  );
 
   // Mutation for saving
   const saveMutation = useSaveRecipePlans();
 
   // Check if a date has THIS recipe planned (using the always-fresh plannedItems data)
-  function isDatePlannedForThisRecipe(date: Date): boolean {
-    const itemsForDay = getPlannedItemsForDate(plannedItems, date);
-    return itemsForDay.some((item) => item.recipe_name === recipeName);
-  }
-
-  // Get the plan ID for a specific date (from recipePlans which has IDs)
-  function getPlanIdForDate(date: Date): string | null {
-    const plan = recipePlans.find((p) => p.planned_date && isSameDay(p.planned_date, date));
-    return plan?.id ?? null;
-  }
+  const isDatePlannedForThisRecipe = useCallback(
+    (date: Date): boolean => {
+      const itemsForDay = getPlannedItemsForDate(plannedItems, date);
+      return itemsForDay.some((item) => item.recipe_name === recipeName);
+    },
+    [plannedItems, recipeName]
+  );
 
   // Reset state when dialog closes
   useEffect(() => {
@@ -95,8 +105,9 @@ export default function WeeklyPlanDialog({
       setSelectedDates([]);
       setWithoutDate(false);
       setWithoutDateCount(1);
-      setCurrentWeek(new Date());
+      setCurrentWeek(initialWeek ?? new Date());
       setInitializedWeeks(new Set());
+      setPlanIdsByWeek(new Map());
     }
   }, [isDialogOpen]);
 
@@ -104,15 +115,16 @@ export default function WeeklyPlanDialog({
   useEffect(() => {
     setSelectedDates([]);
     setWithoutDate(false);
-    setCurrentWeek(new Date());
+    setCurrentWeek(initialWeek ?? new Date());
     setInitializedWeeks(new Set());
+    setPlanIdsByWeek(new Map());
   }, [recipeId]);
 
   // Initialize/update selected dates when week changes or data loads
   // This adds already-planned dates for weeks that haven't been initialized yet
   useEffect(() => {
     // Don't initialize while data is still being fetched for this week
-    if (!isDialogOpen || isFetchingPlannedItems) return;
+    if (!isDialogOpen || isFetchingPlannedItems || isFetchingRecipePlans) return;
 
     const weekKey = getWeekdays(currentWeek)[0].toISOString();
 
@@ -136,6 +148,16 @@ export default function WeeklyPlanDialog({
       });
     }
 
+    // Store plan IDs for this week (needed for cross-week deletes on save)
+    setPlanIdsByWeek((prev) => {
+      const updated = new Map(prev);
+      updated.set(
+        weekKey,
+        recipePlans.filter((p) => p.planned_date).map((p) => ({ id: p.id, date: p.planned_date! }))
+      );
+      return updated;
+    });
+
     // Mark this week as initialized
     setInitializedWeeks((prev) => new Set(prev).add(weekKey));
   }, [
@@ -145,6 +167,9 @@ export default function WeeklyPlanDialog({
     initializedWeeks,
     recipeName,
     isFetchingPlannedItems,
+    isFetchingRecipePlans,
+    recipePlans,
+    isDatePlannedForThisRecipe,
   ]);
 
   function handleOpenChange(open: boolean) {
@@ -162,6 +187,11 @@ export default function WeeklyPlanDialog({
   function goToNextWeek() {
     setCurrentWeek((prevWeek) => addWeeks(prevWeek, 1));
   }
+
+  const swipeHandlers = useSwipe({
+    onSwipeLeft: goToNextWeek,
+    onSwipeRight: goToPreviousWeek,
+  });
 
   function goToCurrentWeek() {
     setCurrentWeek(new Date());
@@ -186,25 +216,32 @@ export default function WeeklyPlanDialog({
       return;
     }
 
-    // Get all days in current week that have this recipe planned
-    const weekDays = getWeekdays(currentWeek);
-    const currentlyPlannedDates = weekDays.filter((day) => isDatePlannedForThisRecipe(day));
-
-    // Determine what to add and remove
+    // Process all initialized weeks to compute adds/removes across week navigation
     const planIdsToRemove: string[] = [];
-    for (const plannedDate of currentlyPlannedDates) {
-      const isStillSelected = selectedDates.some((d) => isSameDay(d, plannedDate));
-      if (!isStillSelected) {
-        const planId = getPlanIdForDate(plannedDate);
-        if (planId) {
-          planIdsToRemove.push(planId);
+    const datesToAdd: Date[] = [];
+
+    for (const [weekKey, originalPlans] of planIdsByWeek.entries()) {
+      const weekStart = new Date(weekKey);
+      const weekDays = getWeekdays(weekStart);
+
+      const selectedInThisWeek = selectedDates.filter((d) =>
+        weekDays.some((wd) => isSameDay(wd, d))
+      );
+
+      // Plans that were originally there but are now deselected → remove
+      for (const plan of originalPlans) {
+        if (!selectedInThisWeek.some((d) => isSameDay(d, plan.date))) {
+          planIdsToRemove.push(plan.id);
+        }
+      }
+
+      // Dates that are selected but weren't originally planned → add
+      for (const date of selectedInThisWeek) {
+        if (!originalPlans.some((p) => isSameDay(p.date, date))) {
+          datesToAdd.push(date);
         }
       }
     }
-
-    const datesToAdd = selectedDates.filter(
-      (date) => !currentlyPlannedDates.some((pd) => isSameDay(pd, date))
-    );
 
     // Only show error if nothing is selected AND there's nothing to remove (i.e., no changes)
     if (selectedDates.length === 0 && !withoutDate && planIdsToRemove.length === 0) {
@@ -235,6 +272,7 @@ export default function WeeklyPlanDialog({
       onSaveComplete?.({ success: true, ...result });
 
       if (navigateOnSuccess) {
+        dispatch(setMealPlannerWeek(currentWeek.toISOString()));
         navigate("/planner");
       }
     } catch {
@@ -291,51 +329,53 @@ export default function WeeklyPlanDialog({
         </div>
 
         {/* Day Buttons */}
-        {getWeekdays(currentWeek).map((day) => {
-          const isToday = isSameDay(day, new Date());
-          const isSelected = selectedDates.some((d) => isSameDay(d, day));
-          const plannedForDay = getPlannedItemsForDate(plannedItems, day);
-          const hasPlannedItems = plannedForDay.length > 0;
-          // Use the fresh plannedItems data to check if this recipe is planned
-          const hasExistingPlan = isDatePlannedForThisRecipe(day);
+        <div className="flex flex-col gap-2" {...swipeHandlers}>
+          {getWeekdays(currentWeek).map((day) => {
+            const isToday = isSameDay(day, new Date());
+            const isSelected = selectedDates.some((d) => isSameDay(d, day));
+            const plannedForDay = getPlannedItemsForDate(plannedItems, day);
+            const hasPlannedItems = plannedForDay.length > 0;
+            // Use the fresh plannedItems data to check if this recipe is planned
+            const hasExistingPlan = isDatePlannedForThisRecipe(day);
 
-          return (
-            <Button
-              key={day.toISOString()}
-              variant="outline"
-              onClick={() => toggleWeekDate(day)}
-              className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
-                isSelected
-                  ? "bg-accent text-accent-foreground border-accent"
-                  : hasExistingPlan
-                    ? "border-destructive"
-                    : ""
-              }`}
-            >
-              <p className="font-bold">
-                {format(day, "EEE - dd.MM", {
-                  locale: locales[i18n.language as keyof typeof locales] || enUS,
-                })}
+            return (
+              <Button
+                key={day.toISOString()}
+                variant="outline"
+                onClick={() => toggleWeekDate(day)}
+                className={`h-auto min-h-10 py-2 flex flex-col items-start gap-1 ${
+                  isSelected
+                    ? "bg-accent text-accent-foreground border-accent"
+                    : hasExistingPlan
+                      ? "border-destructive"
+                      : ""
+                }`}
+              >
+                <p className="font-bold">
+                  {format(day, "EEE - dd.MM", {
+                    locale: locales[i18n.language as keyof typeof locales] || enUS,
+                  })}
 
-                {isToday && ` - ${t("common.today")}`}
-              </p>
+                  {isToday && ` - ${t("common.today")}`}
+                </p>
 
-              {/* Show planned items */}
-              {hasPlannedItems && (
-                <div className="w-full flex flex-wrap gap-1 pl-2">
-                  {plannedForDay.map((item, index) => (
-                    <p
-                      key={index}
-                      className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
-                    >
-                      {item.recipe_name}
-                    </p>
-                  ))}
-                </div>
-              )}
-            </Button>
-          );
-        })}
+                {/* Show planned items */}
+                {hasPlannedItems && (
+                  <div className="w-full flex flex-wrap gap-1 pl-2">
+                    {plannedForDay.map((item, index) => (
+                      <p
+                        key={index}
+                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
+                      >
+                        {item.recipe_name}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </Button>
+            );
+          })}
+        </div>
 
         {/* Without Date Button */}
         <Button

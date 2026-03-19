@@ -4,6 +4,8 @@ import PhoneMockup from "@/components/onboarding/phoneMockup/PhoneMockup";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 import tiktokIcon from "@/assets/icons/tiktok.svg";
 import instagramIcon from "@/assets/icons/instagram.svg";
@@ -32,6 +34,11 @@ const floatConfigs = [
 export default function ImportRecipes() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("value_import_recipes");
+  }, []);
 
   return (
     <OnboardingLayout onNext={() => navigate("/howitworks")}>

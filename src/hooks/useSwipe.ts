@@ -1,4 +1,4 @@
-import { useRef, useCallback } from "react";
+import { useRef, useCallback, useEffect } from "react";
 
 interface SwipeHandlers {
   onTouchStart: (e: React.TouchEvent) => void;
@@ -24,7 +24,9 @@ export function useSwipe({
   const touchCurrentX = useRef<number | null>(null);
   const wasDisabledDuringGesture = useRef(false);
   const disabledRef = useRef(disabled);
-  disabledRef.current = disabled;
+  useEffect(() => {
+    disabledRef.current = disabled;
+  });
 
   const onTouchStart = useCallback((e: React.TouchEvent) => {
     wasDisabledDuringGesture.current = false;

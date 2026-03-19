@@ -9,6 +9,8 @@ import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectUser, setUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { toast } from "sonner";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function SocialProof() {
   const { t } = useTranslation();
@@ -16,6 +18,11 @@ export default function SocialProof() {
   const { supabase } = useSupabase();
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("social_proof");
+  }, []);
 
   async function completeSurveyAndNavigate() {
     if (!user) return;

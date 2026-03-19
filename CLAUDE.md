@@ -38,6 +38,8 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 - **Mobile**: Capacitor (iOS/Android) + PWA
 - **UI**: shadcn/ui components (Radix primitives) + Material UI icons + Lucide icons
 - **DnD**: @dnd-kit/core (meal planner zone-based drag) + @dnd-kit/sortable (ingredient list reordering)
+- **Subscriptions**: RevenueCat (in-app purchases, paywall)
+- **Analytics**: PostHog (`src/hooks/analytics/`)
 
 ### Path Alias
 
@@ -55,7 +57,8 @@ Do not create `index.ts` barrel files for re-exporting. Import directly from sou
 - `src/api/` - API layer functions (Supabase queries)
 - `src/hooks/` - Custom React hooks organized by domain (meal-planning/, recipe/, ratings/, etc.)
 - `src/lib/transformers/` - Data transformation functions (raw API → domain types)
-- `src/redux/slices/` - Redux slices (user, household, chatbot, filterAndSorting)
+- `src/redux/slices/` - Redux slices (user, household, chatbot, filterAndSorting, mealPlanner, servings, subscription)
+- `src/providers/` - React context providers (RevenueCat)
 - `src/lib/query-keys.ts` - React Query key factory for cache management
 - `src/types/database.types.ts` - Auto-generated Supabase types
 - `src/types/meal-planning.types.ts` - Domain types for meal planning feature
@@ -67,7 +70,7 @@ Do not create `index.ts` barrel files for re-exporting. Import directly from sou
 
 ### State Management Pattern
 
-- **Redux**: User session, household data, chatbot state, UI filters
+- **Redux**: User session, household data, chatbot state, UI filters, meal planner week navigation, per-recipe serving size overrides (session-only), subscription/paywall state
 - **React Query**: Server data (recipes, meal plans, ratings) with 5-minute stale time
 - **Supabase Realtime**: Live updates for user/household changes
 
@@ -83,6 +86,28 @@ The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/li
 ### Supabase Access
 
 Use the `useSupabase()` hook to get the typed Supabase client. Types are generated from the schema in `src/types/database.types.ts`.
+
+### Subscription & Paywall
+
+The app has a hard paywall — users must subscribe (monthly or yearly) to use the app. Subscriptions are **household-based**: only one household member needs to pay.
+
+- **RevenueCat** handles purchase management and entitlement checks
+- `src/lib/revenuecat.ts` — RevenueCat SDK wrapper
+- `src/providers/RevenueCatProvider.tsx` — initializes RevenueCat and syncs state
+- `src/redux/slices/subscriptionSlice.ts` — stores `isPro` and loading state
+- `src/hooks/subscription/` — hooks: `useSubscription`, `useHouseholdSubscription`, `usePresentPaywall`, `useCustomerCenter`
+- `src/api/subscription.api.ts` — Supabase-side subscription data
+- Entitlement ID is defined in `src/types/subscription.types.ts`
+
+When adding new features, check `isPro` via `useSubscription()` to gate access behind the paywall.
+
+### Notifications
+
+Push notification permission management is in `src/hooks/notifications/`. Firebase integration for push notifications is planned but not yet implemented.
+
+### Known Issues
+
+`ISSUES.md` at the project root tracks known bugs and improvement areas that are low-priority but worth fixing eventually. Check it when working in affected areas.
 
 ### Internationalization
 

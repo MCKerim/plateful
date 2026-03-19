@@ -13,20 +13,28 @@ export async function initializeRevenueCat(): Promise<void> {
   await Purchases.configure({ apiKey: REVENUECAT_API_KEY });
 }
 
-export async function identifyUser(
-  userId: string
-): Promise<CustomerInfo | null> {
+export async function identifyUser(userId: string, email?: string): Promise<CustomerInfo | null> {
   if (!isNativePlatform()) return null;
 
   const { customerInfo } = await Purchases.logIn({ appUserID: userId });
+
+  if (email) {
+    await Purchases.setAttributes({ $email: email });
+  }
+
   return customerInfo;
 }
 
 export async function logoutUser(): Promise<CustomerInfo | null> {
   if (!isNativePlatform()) return null;
 
-  const { customerInfo } = await Purchases.logOut();
-  return customerInfo;
+  try {
+    const { customerInfo } = await Purchases.logOut();
+    return customerInfo;
+  } catch (err: unknown) {
+    if (err instanceof Error && err.message.includes("anonymous")) return null;
+    throw err;
+  }
 }
 
 export async function getCustomerInfo(): Promise<CustomerInfo | null> {

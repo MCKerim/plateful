@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -8,12 +8,15 @@ import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
 import { Trash2, Camera, ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useSupabase } from "@/utils/supabase";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
+import { Capacitor } from "@capacitor/core";
 import LoadingDots from "@/components/general/LoadingDots";
 import RecipeCard from "@/components/general/RecipeCard";
 import imageCompression from "browser-image-compression";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+
+let lastAutoImportedFileUris: string | null = null;
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -25,6 +28,7 @@ export default function ImageImport() {
   const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const [searchParams] = useSearchParams();
 
   // Cleanup on unmount - abort any pending API calls
   useEffect(() => {
@@ -41,7 +45,7 @@ export default function ImageImport() {
     handleMultipleFileInputChange,
   } = useImageSourcePicker();
 
-  const processImage = async (file: File, dataUrl: string) => {
+  const processImage = useCallback(async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
     const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
 
@@ -54,7 +58,32 @@ export default function ImageImport() {
       }
     };
     reader.readAsDataURL(compressedFile);
-  };
+  }, []);
+
+  // Load images shared via the Android share intent
+  useEffect(() => {
+    const fileUris = searchParams.getAll("fileUri");
+    const fileUrisKey = fileUris.join(",");
+    if (fileUris.length === 0 || lastAutoImportedFileUris === fileUrisKey) return;
+    lastAutoImportedFileUris = fileUrisKey;
+
+    const loadSharedFiles = async () => {
+      for (const uri of fileUris) {
+        try {
+          const webUri = Capacitor.convertFileSrc(uri);
+          const response = await fetch(webUri);
+          const blob = await response.blob();
+          const file = new File([blob], "shared-image", { type: blob.type || "image/jpeg" });
+          const dataUrl = URL.createObjectURL(blob);
+          await processImage(file, dataUrl);
+        } catch (err) {
+          console.error("Failed to load shared image:", err);
+        }
+      }
+    };
+
+    loadSharedFiles();
+  }, [searchParams, processImage]);
 
   const handleCameraClick = async () => {
     const result = await selectFromCamera();

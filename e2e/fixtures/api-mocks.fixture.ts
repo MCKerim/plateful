@@ -121,6 +121,22 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
+  // Subscription endpoint - return active subscription so paywall is bypassed
+  await page.route("**/rest/v1/household_subscriptions?*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: "test-sub-id",
+        household_id: scenario.household?.id ?? "test-household-id",
+        payer_user_id: scenario.user.id,
+        is_active: true,
+        updated_at: new Date().toISOString(),
+        payer: { username: scenario.user.username },
+      }),
+    });
+  });
+
   // Storage endpoint for recipe images
   await page.route("**/storage/v1/**", async (route) => {
     await route.fulfill({

@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { Download, Wand2, CalendarDays, Heart } from "lucide-react";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 const steps = [
   { icon: Download, key: "step1" },
@@ -16,6 +18,11 @@ const popSpring = { type: "spring" as const, stiffness: 400, damping: 12 };
 export default function HowItWorks() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("how_it_works");
+  }, []);
 
   return (
     <OnboardingLayout onNext={() => navigate("/socialproof")}>

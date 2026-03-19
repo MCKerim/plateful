@@ -1,10 +1,26 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Pencil, Link, CalendarDays, ChefHat } from "lucide-react";
+import {
+  Pencil,
+  Link,
+  CalendarDays,
+  ChefHat,
+  Printer,
+  Share2,
+  Loader2,
+  MoreVertical,
+  Trash2,
+} from "lucide-react";
+import imageCompression from "browser-image-compression";
+import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
+import { useNativeCamera } from "@/hooks/general/useNativeCamera";
+import { useSupabase } from "@/utils/supabase";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 import { useAppDispatch } from "@/redux/hooks";
 import { resetChat, selectMessages, selectRecipeId } from "@/redux/slices/chatbotSlice";
 import RatingModal, {
@@ -30,7 +46,14 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
-import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
+import { RecipePrintView } from "@/components/recipe/RecipePrintView";
+import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
+import { selectTargetServings } from "@/redux/slices/servingsSlice";
+import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
+import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
+import DeleteDialog from "@/components/general/DeleteDialog";
+import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
+import { Capacitor } from "@capacitor/core";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -58,10 +81,43 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
-  const { data: ingredients = [] } = useRecipeIngredients(recipeId);
+  const savedServings = useAppSelector((state) =>
+    recipeId != null ? selectTargetServings(recipeId)(state) : undefined
+  );
+  const effectiveBaseServings = recipe?.base_servings ?? 1;
+  const effectiveTargetServings = savedServings ?? effectiveBaseServings;
+  const { data: scaledIngredients = [] } = useScaledIngredients(
+    recipe ? recipeId : null,
+    effectiveBaseServings,
+    effectiveTargetServings
+  );
+
+  // Image upload (placeholder click)
+  const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
+  const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+
+  const [actionsDrawerOpen, setActionsDrawerOpen] = useState(false);
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
+  const createShareMutation = useCreateRecipeShare();
+  const deleteRecipeMutation = useDeleteRecipe();
+
+  function handleDeleteRecipe() {
+    if (!recipeId) return;
+    deleteRecipeMutation.mutate(recipeId, {
+      onSuccess: () => {
+        toast.success(t("addRecipe.recipeDeleted"));
+        navigate("/cookbook");
+      },
+      onError: (error) => {
+        console.error("Error while deleting recipe: ", error);
+        toast.error(t("addRecipe.errors.deleteFailed"));
+      },
+    });
+  }
 
   useEffect(() => {
     const handlePopState = (event: PopStateEvent) => {
@@ -95,6 +151,19 @@ export default function Recipe() {
     return (currentUser && rating.owner_id === currentUser.id) || false;
   };
 
+  function handlePrint() {
+    setActionsDrawerOpen(false);
+    setTimeout(() => {
+      const prev = document.title;
+      document.title = `Plateful - ${recipe?.name}`;
+      window.print();
+      window.onafterprint = () => {
+        document.title = prev;
+        window.onafterprint = null;
+      };
+    }, 350);
+  }
+
   function handleAskChatbot() {
     if (!recipe) return;
     if (chatMessages.length > 0 && chatRecipeId === recipe.id) {
@@ -102,6 +171,42 @@ export default function Recipe() {
     } else {
       dispatch(resetChat());
       navigate(`/chatbot?recipeId=${recipe.id}`);
+    }
+  }
+
+  async function handlePlaceholderClick() {
+    if (!recipeId) return;
+
+    let result: { file: File; dataUrl: string } | null = null;
+    try {
+      result = await takePhoto();
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+      return;
+    }
+
+    if (!result) return;
+
+    setIsUploadingImage(true);
+    try {
+      const compressedFile = await imageCompression(result.file, IMAGE_COMPRESSION_OPTIONS);
+      const fileExt = compressedFile.name.split(".").pop();
+      const filePath = `recipe_${recipeId}/${Date.now()}.${fileExt}`;
+
+      const { error } = await supabase.storage
+        .from("recipeimages")
+        .upload(filePath, compressedFile, { upsert: true });
+
+      if (error) {
+        toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
+        return;
+      }
+
+      queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) });
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+    } finally {
+      setIsUploadingImage(false);
     }
   }
 
@@ -133,11 +238,18 @@ export default function Recipe() {
       <div className="relative">
         {imageUrls.length === 0 ? (
           <AspectRatio ratio={16 / 9}>
-            <img
-              src={"/no-img.jpg"}
-              alt="Recipe"
-              className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-            />
+            <div className="relative w-full h-full" onClick={handlePlaceholderClick}>
+              <img
+                src={"/no-img.jpg"}
+                alt="Recipe"
+                className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
+              />
+              {isUploadingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
           </AspectRatio>
         ) : (
           <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
@@ -157,15 +269,78 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <Button
-          variant="secondary"
-          size="icon"
-          className="absolute top-2 right-2 z-10"
-          onClick={() => navigate(`/recipe/edit/${recipe?.id}`)}
-          aria-label="Edit Recipe"
-        >
-          <Pencil size={18} />
-        </Button>
+        <div className="absolute top-1 right-1 z-10">
+          <Button
+            variant="ghost"
+            className="text-white"
+            size="icon"
+            onClick={() => setActionsDrawerOpen(true)}
+            aria-label="More actions"
+          >
+            <MoreVertical className="!size-5" />
+          </Button>
+        </div>
+
+        <Drawer open={actionsDrawerOpen} onOpenChange={setActionsDrawerOpen}>
+          <DrawerContent>
+            <DrawerFooter className="gap-4 mb-8 mt-4">
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  setActionsDrawerOpen(false);
+                  navigate(`/recipe/edit/${recipe?.id}`);
+                }}
+              >
+                <div className="flex justify-start gap-4 w-full h-full items-center">
+                  <Pencil />
+                  <p className="second-font font-semibold">{t("recipe.editRecipe")}</p>
+                </div>
+              </Button>
+
+              <Button
+                variant="secondary"
+                size="lg"
+                onClick={() => {
+                  if (!recipe) return;
+                  setActionsDrawerOpen(false);
+                  createShareMutation.mutate(recipe.id);
+                }}
+                disabled={createShareMutation.isPending}
+              >
+                <div className="flex justify-start gap-4 w-full h-full items-center">
+                  <Share2 />
+                  <p className="second-font font-semibold">{t("share.shareRecipe")}</p>
+                </div>
+              </Button>
+
+              {!Capacitor.isNativePlatform() && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={handlePrint}
+                >
+                  <div className="flex justify-start gap-4 w-full h-full items-center">
+                    <Printer />
+                    <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
+                  </div>
+                </Button>
+              )}
+              <DeleteDialog
+                onDelete={handleDeleteRecipe}
+                loading={deleteRecipeMutation.isPending}
+                customTrigger={
+                  <Button variant="secondary" size="lg" className="w-full">
+                    <div className="flex justify-start gap-4 w-full h-full items-center">
+                      <Trash2 />
+                      <p className="second-font font-semibold">{t("common.delete")}</p>
+                    </div>
+                  </Button>
+                }
+              />
+            </DrawerFooter>
+          </DrawerContent>
+        </Drawer>
       </div>
 
       <div className="flex justify-between">
@@ -198,7 +373,7 @@ export default function Recipe() {
       )}
 
       {/* Ingredients Section */}
-      {ingredients.length > 0 && (
+      {scaledIngredients.length > 0 && (
         <IngredientList
           recipeId={recipe.id}
           baseServings={recipe.base_servings}
@@ -235,6 +410,15 @@ export default function Recipe() {
           />
         ))}
       </div>
+
+      <RecipePrintView
+        recipe={recipe}
+        imageUrl={imageUrls[0]}
+        ingredients={scaledIngredients}
+        targetServings={effectiveTargetServings}
+        servingsUnit={recipe.servings_unit ?? undefined}
+      />
+      {ImageSourceDrawerComponent}
     </Layout>
   );
 }

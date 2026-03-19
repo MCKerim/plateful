@@ -49,17 +49,6 @@
     "subtitle": "smart food planning starts now!",
     "nextButton": "Get Started!"
   },
-  "beta": {
-    "title": "Plateful Beta",
-    "thankYou": "Thanks for being part of this!",
-    "description": "Your experiences will help us build the best cooking app.",
-    "benefits": {
-      "newFeatures": "You get all new features first",
-      "directInput": "Your feedback flows directly into development",
-      "helpImprove": "You help make Plateful even better"
-    },
-    "nextButton": "Let's go!"
-  },
   "valueScreens": {
     "emotionalHook": {
       "title": "What should I cook today?",
@@ -292,7 +281,8 @@
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later.",
     "askChatbot": "Ask AI-Chef",
-    "instructions": "Instructions"
+    "instructions": "Instructions",
+    "printPdf": "Print recipe"
   },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
@@ -358,9 +348,6 @@
   },
   "home": {
     "title": "Home",
-    "goodMorning": "Good morning,",
-    "goodAfternoon": "Good afternoon,",
-    "goodEvening": "Good evening,",
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
     "goToPlanner": "Plan your week"
@@ -375,6 +362,8 @@
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",
 
+    "notifications": "Notifications",
+    "manageNotifications": "Manage notifications",
     "manageYourHousehold": "Manage your household",
 
     "supportFeedback": "Support & Feedback",
@@ -386,7 +375,7 @@
     "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
 
     "privacyPolicy": "Privacy Policy",
-    "termsOfService": "Terms of Service",
+    "termsOfService": "Terms",
     "impressum": "Impressum",
 
     "account": "Account",
@@ -421,9 +410,9 @@
     "usernameLengthInvalid": "Username must be between 3 and 20 characters",
     "subscription": {
       "title": "Subscription",
-      "proDescription": "You have Plateful Pro. Thank you for your support!",
       "manageSubscription": "Manage Subscription",
-      "restorePurchases": "Restore Purchases"
+      "restorePurchases": "Restore Purchases",
+      "managedBy": "Subscription managed by {{name}}"
     }
   },
   "householdSettings": {
@@ -597,14 +586,14 @@
     "chatbot": {
       "title": "Your AI-Chef",
       "bullet1": "Ask for recipe ideas or cooking tips",
-      "bullet2": "Import & edit recipes from any link",
+      "bullet2": "Ask for changes",
       "bullet3": "Save recipes directly to your cookbook"
     },
     "recipes": {
       "title": "Your Recipe Collection",
       "bullet1": "Scan recipes from your camera",
       "bullet2": "Import recipes from TikTok",
-      "bullet3": "Rate, scale & share with your household"
+      "bullet3": "Rate & cook with your household"
     },
     "mealPlanner": {
       "title": "Your Meal Planner",
@@ -715,13 +704,61 @@
     "restoreSuccess": "Purchases restored successfully!",
     "restoreNoPurchases": "No purchases found to restore",
     "restoreError": "Failed to restore purchases. Please try again.",
-    "purchaseSuccess": "Welcome to Plateful Pro!",
+    "purchaseSuccess": "Welcome to Plateful Premium!",
     "paywallError": "Something went wrong. Please try again.",
     "customerCenterError": "Could not open subscription management.",
     "notAvailableOnWeb": "Subscriptions are only available in the mobile app"
   },
   "subscribe": {
     "error": "Something went wrong. Please try again.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "web": {
+      "title": "Subscribe in the Plateful App",
+      "description": "Subscriptions are available on iOS and Android. Download the app to get started."
+    }
+  },
+  "share": {
+    "shareRecipe": "Share recipe",
+    "shareMessage": "Check out this recipe in Plateful: {{recipeName}}",
+    "sharedRecipeBadge": "Shared recipe",
+    "saveToMyRecipes": "Save to my recipes",
+    "importing": "Saving...",
+    "importSuccess": "Recipe saved to your cookbook!",
+    "importError": "Could not save the recipe. Please try again.",
+    "loginToSave": "Log in to save this recipe",
+    "downloadApp": "Get the Plateful app",
+    "notFound": "This recipe has gone missing",
+    "notFoundDescription": "This link doesn't seem to work anymore. Just ask to have the recipe sent again.",
+    "linkCopied": "Link copied to clipboard",
+    "copyError": "Could not copy link"
+  },
+  "notificationSettings": {
+    "title": "Notifications",
+    "mobileOnly": "Push notifications are only available in the mobile app. Download Plateful on iOS or Android to enable reminders.",
+    "permissionDenied": "Notification permission denied. Enable it in your device settings.",
+    "permissionRequired": "Allow notifications to enable reminders.",
+    "grantPermission": "Allow",
+    "weeklyReminder": {
+      "title": "Weekly Planning Reminder",
+      "label": "Weekly meal planning reminder",
+      "description": "Get reminded to plan your meals each week",
+      "dayOfWeek": "Day of the week",
+      "time": "Time"
+    },
+    "days": {
+      "sunday": "Sunday",
+      "monday": "Monday",
+      "tuesday": "Tuesday",
+      "wednesday": "Wednesday",
+      "thursday": "Thursday",
+      "friday": "Friday",
+      "saturday": "Saturday"
+    },
+    "dailyMealReminder": {
+      "title": "Daily Meal Reminder",
+      "label": "Daily meal reminder",
+      "description": "Get reminded to check what's planned for today",
+      "time": "Time"
+    }
   }
 }

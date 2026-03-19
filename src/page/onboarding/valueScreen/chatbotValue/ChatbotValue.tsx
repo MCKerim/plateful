@@ -3,10 +3,17 @@ import PhoneMockup from "@/components/onboarding/phoneMockup/PhoneMockup";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
+import { useEffect } from "react";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function ChatbotValue() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("value_chatbot");
+  }, []);
 
   return (
     <OnboardingLayout onNext={() => navigate("/survey/8")}>

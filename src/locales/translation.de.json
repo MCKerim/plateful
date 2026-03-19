@@ -97,17 +97,6 @@
     "subtitle": "smarte Essensplanung beginnt jetzt!",
     "nextButton": "Jetzt Loslegen!"
   },
-  "beta": {
-    "title": "Plateful Beta",
-    "thankYou": "Danke, dass du dabei bist!",
-    "description": "Deine Erfahrungen werden uns dabei helfen, die beste Kochapp zu entwickeln.",
-    "benefits": {
-      "newFeatures": "Du bekommst alle neuen Features zuerst",
-      "directInput": "Deine Meinung fließt direkt in die Entwicklung ein",
-      "helpImprove": "Du hilfst dabei, Plateful noch besser zu machen"
-    },
-    "nextButton": "Los geht's!"
-  },
   "valueScreens": {
     "emotionalHook": {
       "title": "Was koche ich heute?",
@@ -292,7 +281,8 @@
     "planningSuccessful": "Rezept erfolgreich geplant!",
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
     "askChatbot": "KI-Koch fragen",
-    "instructions": "Zubereitung"
+    "instructions": "Zubereitung",
+    "printPdf": "Rezept drucken"
   },
   "addRecipeDrawer": {
     "importFromUrl": {
@@ -353,9 +343,6 @@
   },
   "home": {
     "title": "Startseite",
-    "goodMorning": "Guten Morgen,",
-    "goodAfternoon": "Guten Nachmittag,",
-    "goodEvening": "Guten Abend,",
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
     "goToPlanner": "Plane deine Woche"
@@ -374,6 +361,8 @@
     "appearance": "Darstellung",
     "household": "Haushalt",
     "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
+    "notifications": "Benachrichtigungen",
+    "manageNotifications": "Benachrichtigungen verwalten",
     "manageYourHousehold": "Verwalte dein Haushalt",
 
     "supportFeedback": "Support & Feedback",
@@ -420,9 +409,9 @@
     "usernameLengthInvalid": "Benutzername muss zwischen 3 und 20 Zeichen lang sein",
     "subscription": {
       "title": "Abonnement",
-      "proDescription": "Du hast Plateful Pro. Vielen Dank für deine Unterstützung!",
       "manageSubscription": "Abonnement verwalten",
-      "restorePurchases": "Käufe wiederherstellen"
+      "restorePurchases": "Käufe wiederherstellen",
+      "managedBy": "Abonnement verwaltet von {{name}}"
     }
   },
   "householdSettings": {
@@ -597,14 +586,14 @@
     "chatbot": {
       "title": "Dein KI-Koch",
       "bullet1": "Frag nach Rezeptideen oder Kochtipps",
-      "bullet2": "Importiere & bearbeite Rezepte von jedem Link",
+      "bullet2": "Frage nach Änderungen",
       "bullet3": "Speichere Rezepte direkt in dein Kochbuch"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
       "bullet1": "Scanne Rezepte mit deiner Kamera",
       "bullet2": "Importiere Rezepte von TikTok",
-      "bullet3": "Bewerte, skaliere & teile mit deinem Haushalt"
+      "bullet3": "Bewerte & Koche mit deinem Haushalt"
     },
     "mealPlanner": {
       "title": "Dein Wochenplaner",
@@ -715,13 +704,61 @@
     "restoreSuccess": "Käufe erfolgreich wiederhergestellt!",
     "restoreNoPurchases": "Keine Käufe zum Wiederherstellen gefunden",
     "restoreError": "Wiederherstellen fehlgeschlagen. Bitte versuche es erneut.",
-    "purchaseSuccess": "Willkommen bei Plateful Pro!",
+    "purchaseSuccess": "Willkommen bei Plateful Premium!",
     "paywallError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
     "customerCenterError": "Abonnement-Verwaltung konnte nicht geöffnet werden.",
     "notAvailableOnWeb": "Abonnements sind nur in der mobilen App verfügbar"
   },
   "subscribe": {
     "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "web": {
+      "title": "In der Plateful App abonnieren",
+      "description": "Abonnements sind auf iOS und Android verfügbar. Lade die App herunter, um loszulegen."
+    }
+  },
+  "share": {
+    "shareRecipe": "Rezept teilen",
+    "shareMessage": "Schau dir dieses Rezept in Plateful an: {{recipeName}}",
+    "sharedRecipeBadge": "Geteiltes Rezept",
+    "saveToMyRecipes": "Zu meinen Rezepten hinzufügen",
+    "importing": "Speichern...",
+    "importSuccess": "Rezept wurde deinem Kochbuch hinzugefügt!",
+    "importError": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
+    "loginToSave": "Anmelden, um dieses Rezept zu speichern",
+    "downloadApp": "Plateful App herunterladen",
+    "notFound": "Dieses Rezept ist verschwunden",
+    "notFoundDescription": "Dieser Link ist leider nicht mehr gültig. Lass dir das Rezept einfach nochmal schicken.",
+    "linkCopied": "Link in Zwischenablage kopiert",
+    "copyError": "Link konnte nicht kopiert werden"
+  },
+  "notificationSettings": {
+    "title": "Benachrichtigungen",
+    "mobileOnly": "Push-Benachrichtigungen sind nur in der mobilen App verfügbar. Lade Plateful auf iOS oder Android herunter, um Erinnerungen zu aktivieren.",
+    "permissionDenied": "Benachrichtigungsberechtigung abgelehnt. Aktiviere sie in den Geräteeinstellungen.",
+    "permissionRequired": "Erlaube Benachrichtigungen, um Erinnerungen zu aktivieren.",
+    "grantPermission": "Erlauben",
+    "weeklyReminder": {
+      "title": "Wöchentliche Planungserinnerung",
+      "label": "Wöchentliche Essensplanungserinnerung",
+      "description": "Werde daran erinnert, deine Mahlzeiten jede Woche zu planen",
+      "dayOfWeek": "Wochentag",
+      "time": "Uhrzeit"
+    },
+    "days": {
+      "sunday": "Sonntag",
+      "monday": "Montag",
+      "tuesday": "Dienstag",
+      "wednesday": "Mittwoch",
+      "thursday": "Donnerstag",
+      "friday": "Freitag",
+      "saturday": "Samstag"
+    },
+    "dailyMealReminder": {
+      "title": "Tägliche Essenserinnerung",
+      "label": "Tägliche Essenserinnerung",
+      "description": "Lass dich daran erinnert, was heute geplant ist",
+      "time": "Uhrzeit"
+    }
   }
 }

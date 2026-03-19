@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router";
 import { useSupabase } from "@/utils/supabase";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function Login() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("login");
+  }, []);
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);

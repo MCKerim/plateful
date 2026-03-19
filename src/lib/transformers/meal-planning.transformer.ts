@@ -5,6 +5,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
     id: item.id,
     recipeId: item.recipes?.id ?? "",
     recipeName: item.recipes?.name ?? "-",
+    recipeCategory: item.recipes?.category ?? null,
     planned_date: item.planned_date ? new Date(item.planned_date) : null,
     eaten: item.eaten,
   }));

@@ -13,8 +13,9 @@ import InvitePage from "./page/InvitePage";
 import { useAppSelector } from "./redux/hooks";
 import { selectUser } from "./redux/slices/userSlice";
 import { selectHouseholdId } from "./redux/slices/householdSlice";
-import { selectIsPro } from "./redux/slices/subscriptionSlice";
 import Subscribe from "./page/onboarding/subscribe/Subscribe";
+import SubscribeWeb from "./page/onboarding/subscribe/SubscribeWeb";
+import { useHouseholdSubscription } from "./hooks/subscription/useHouseholdSubscription";
 import Welcome from "./page/onboarding/welcome/Welcome";
 import Survey from "./page/onboarding/survey/Survey";
 import CreateHousehold from "./page/onboarding/createHousehold/CreateHousehold";
@@ -34,7 +35,6 @@ import ChatbotValue from "./page/onboarding/valueScreen/chatbotValue/ChatbotValu
 import Privacy from "./page/Privacy";
 import TermsOfService from "./page/TermsOfService";
 import Impressum from "./page/Impressum";
-import BetaScreen from "./page/onboarding/betaScreen/BetaScreen";
 import SocialProof from "./page/onboarding/socialProof/SocialProof";
 import HowItWorks from "./page/onboarding/howItWorks/HowItWorks";
 import TrialOffer from "./page/onboarding/trialOffer/TrialOffer";
@@ -42,13 +42,16 @@ import TrialReminder from "./page/onboarding/trialReminder/TrialReminder";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
-import { SendIntent } from "@supernotes/capacitor-send-intent";
+import { CapacitorShareTarget } from "@capgo/capacitor-share-target";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
 import { AppUpdate, AppUpdateAvailability } from "@capawesome/capacitor-app-update";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
+import SharedRecipe from "./page/SharedRecipe";
+import NotificationSettings from "./page/NotificationSettings";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useSafeArea } from "./hooks/useSafeArea";
@@ -58,7 +61,8 @@ function App() {
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
-  const subscriptionIsPro = useAppSelector(selectIsPro);
+  const { isActive: householdIsActive, isLoading: subLoading } = useHouseholdSubscription();
+  const isSubLoading = !!householdId && subLoading;
   const [loading, setLoading] = useState(true);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
@@ -90,63 +94,115 @@ function App() {
     setShowUpdateDialog(false);
     try {
       const platform = Capacitor.getPlatform();
+
+      const reloadOnReturn = async () => {
+        // Only reload after the app has actually gone to the background first,
+        // to avoid reloading immediately if the store redirect bounces back instantly.
+        let wentToBackground = false;
+        const listener = await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+          if (!isActive) {
+            wentToBackground = true;
+          } else if (wentToBackground) {
+            listener.remove();
+            window.location.reload();
+          }
+        });
+      };
+
       if (platform === "android") {
         const result = await AppUpdate.getAppUpdateInfo();
         if (result.immediateUpdateAllowed) {
+          // performImmediateUpdate blocks until complete; the OS restarts the app
+          // on success, so no listener needed here.
           await AppUpdate.performImmediateUpdate();
         } else {
           await AppUpdate.openAppStore();
+          await reloadOnReturn();
         }
       } else if (platform === "ios") {
-        // TODO: iOS App Store update flow
-        // await AppUpdate.openAppStore({ appId: "..."});
+        await AppUpdate.openAppStore();
+        await reloadOnReturn();
       } else {
         await AppUpdate.openAppStore();
       }
-
-      // Reload the webview when the user returns from the store
-      const listener = await CapacitorApp.addListener("appStateChange", ({ isActive }) => {
-        if (isActive) {
-          listener.remove();
-          window.location.reload();
-        }
-      });
     } catch (error) {
       console.error("Error performing app update:", error);
     }
   };
 
   useEffect(() => {
-    const handleIntentReceived = (result: unknown) => {
-      if (!result || typeof result !== "object") return;
+    let listenerHandle: { remove: () => Promise<void> } | null = null;
+    let cancelled = false;
 
-      const { url, title, text } = result as { url?: string; title?: string; text?: string };
-      if (url || title || text) {
+    CapacitorShareTarget.addListener("shareReceived", (event) => {
+      // Handle shared images
+      const imageFiles = event.files?.filter((f) => f.mimeType?.startsWith("image/")) ?? [];
+      if (imageFiles.length > 0) {
         const params = new URLSearchParams();
-        if (url) params.set("url", url);
-        if (title) params.set("title", title);
-        if (text) params.set("text", text);
-
-        navigate(`/urlImport?${params.toString()}`);
+        imageFiles.forEach((f) => params.append("fileUri", f.uri));
+        navigate(`/imageImport?${params.toString()}`);
+        return;
       }
-    };
 
-    // Check on app startup
-    SendIntent.checkSendIntentReceived()
-      .then(handleIntentReceived)
-      .catch((err) => {
-        if (err?.message !== "No processing needed") {
-          console.error("SendIntent error", err);
-        }
-      });
-
-    // Listen for new share intents while app is running
-    globalThis.addEventListener("sendIntentReceived", handleIntentReceived);
+      // Handle shared text/URL
+      const rawText = event.texts?.[0];
+      const urlRegex = /(https?:\/\/[^\s]+)/i;
+      const urlMatch = rawText ? urlRegex.exec(rawText) : null;
+      const url = urlMatch ? urlMatch[1] : undefined;
+      if (url) {
+        navigate(`/urlImport?url=${encodeURIComponent(url)}`);
+      }
+    }).then((handle) => {
+      if (cancelled) {
+        handle.remove();
+      } else {
+        listenerHandle = handle;
+      }
+    });
 
     return () => {
-      globalThis.removeEventListener("sendIntentReceived", handleIntentReceived);
+      cancelled = true;
+      listenerHandle?.remove();
     };
-  }, [navigate]);
+  }, []);
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    const listener = LocalNotifications.addListener(
+      "localNotificationActionPerformed",
+      async (event) => {
+        const notificationType = event.notification.extra?.type as string | undefined;
+
+        if (notificationType === "daily_meal_reminder") {
+          try {
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
+
+            const { data } = await supabase
+              .from("meal_planning")
+              .select("recipe_id")
+              .eq("planned_date", todayStr);
+
+            const meals = data ?? [];
+            if (meals.length === 1 && meals[0].recipe_id) {
+              navigate(`/recipe/${meals[0].recipe_id}`);
+            } else {
+              navigate("/home");
+            }
+          } catch {
+            navigate("/home");
+          }
+        } else {
+          navigate("/planner");
+        }
+      }
+    );
+
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [navigate, supabase]);
 
   async function updateUser(userId: string | null): Promise<void> {
     setLoading(true);
@@ -212,23 +268,14 @@ function App() {
   }
 
   function isPro(): boolean {
-    return !Capacitor.isNativePlatform() || subscriptionIsPro;
+    return isSubLoading || householdIsActive;
   }
 
   function routeToCorrectPage(page: React.JSX.Element) {
-    return routeToCorrectPagePure(
-      page,
-      isLoggedIn,
-      hasCompletedSurvey,
-      isPro,
-      hasHousehold
-    );
+    return routeToCorrectPagePure(page, isLoggedIn, hasCompletedSurvey, isPro, hasHousehold);
   }
 
-  function guardOnboardingRoute(
-    page: React.JSX.Element,
-    requiredStep: "survey" | "socialproof"
-  ) {
+  function guardOnboardingRoute(page: React.JSX.Element, requiredStep: "survey" | "socialproof") {
     if (!isLoggedIn()) {
       return <Navigate to="/signup" />;
     }
@@ -238,7 +285,7 @@ function App() {
     return page;
   }
 
-  if (loading && !user) {
+  if ((loading && !user) || isSubLoading) {
     return <LoadingScreen />;
   }
 
@@ -276,8 +323,6 @@ function App() {
 
         <Route path="/login" element={isLoggedIn() ? <Navigate to="/home" /> : <Login />} />
 
-        <Route path="/beta" element={isLoggedIn() ? <BetaScreen /> : <Navigate to="/signup" />} />
-
         <Route path="/values" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/1" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/2" element={guardOnboardingRoute(<ImportRecipes />, "survey")} />
@@ -290,11 +335,24 @@ function App() {
         <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
         <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
         <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "socialproof")} />
-        <Route path="/trialreminder" element={guardOnboardingRoute(<TrialReminder />, "socialproof")} />
+        <Route
+          path="/trialreminder"
+          element={guardOnboardingRoute(<TrialReminder />, "socialproof")}
+        />
 
         <Route
           path="/subscribe"
-          element={isLoggedIn() ? <Subscribe /> : <Navigate to="/signup" />}
+          element={
+            isLoggedIn() ? (
+              Capacitor.isNativePlatform() ? (
+                <Subscribe />
+              ) : (
+                <SubscribeWeb />
+              )
+            ) : (
+              <Navigate to="/signup" />
+            )
+          }
         />
 
         <Route path="/choosename" element={<ChooseUsername />} />
@@ -314,6 +372,10 @@ function App() {
         {/* Main Routes */}
         <Route path="/settings" element={routeToCorrectPage(<Settings />)} />
         <Route path="/householdSettings" element={routeToCorrectPage(<HouseholdSettings />)} />
+        <Route
+          path="/notificationSettings"
+          element={routeToCorrectPage(<NotificationSettings />)}
+        />
         <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
@@ -327,6 +389,9 @@ function App() {
 
         <Route path="/urlImport" element={routeToCorrectPage(<URLImport />)} />
         <Route path="/imageImport" element={routeToCorrectPage(<ImageImport />)} />
+
+        {/* Public share route — no auth required */}
+        <Route path="/share/:token" element={<SharedRecipe />} />
 
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />

@@ -7,12 +7,18 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { SURVEY_QUESTIONS } from "@/page/onboarding/survey/SurveyQuestions";
+import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function SurveyStart() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const { supabase } = useSupabase();
+  const { trackScreenViewed } = useOnboardingTracking();
+
+  useEffect(() => {
+    trackScreenViewed("survey_start");
+  }, []);
 
   const [resumeQuestion, setResumeQuestion] = useState<number | null>(null);
 
@@ -34,11 +40,9 @@ export default function SurveyStart() {
       }
     }
     checkResume();
-  }, [user?.id]);
+  }, [user, supabase]);
 
-  const progressValue = resumeQuestion
-    ? ((resumeQuestion - 1) / SURVEY_QUESTIONS.length) * 100
-    : 0;
+  const progressValue = resumeQuestion ? ((resumeQuestion - 1) / SURVEY_QUESTIONS.length) * 100 : 0;
 
   return (
     <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs mx-auto" style={{ paddingTop: "calc(2.5rem + var(--safe-area-top, 0px))", paddingBottom: "calc(2.5rem + var(--safe-area-bottom, 0px))" }}>

@@ -23,7 +23,12 @@
       "Read(//home/kerim/programming/plateful/**)",
       "Bash(npm ls:*)",
       "mcp__plugin_context7_context7__resolve-library-id",
-      "mcp__plugin_context7_context7__query-docs"
+      "mcp__plugin_context7_context7__query-docs",
+      "Bash(ls:*)",
+      "Bash(grep:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx cap sync:*)",
+      "Bash(npm run generate-supabase-types:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
