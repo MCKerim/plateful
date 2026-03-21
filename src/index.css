@@ -3,6 +3,11 @@
 @tailwind utilities;
 
 :root {
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -113,6 +118,11 @@ body {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Offset Sonner toasts below the status bar / notch */
+[data-sonner-toaster][data-y-position='top'] {
+  --offset: calc(1rem + var(--safe-area-top, 0px)) !important;
 }
 
 @layer utilities {

@@ -19,13 +19,13 @@ dependencies {
     implementation project(':capacitor-share')
     implementation project(':capacitor-status-bar')
     implementation project(':capawesome-team-capacitor-datetime-picker')
-    implementation project(':capawesome-capacitor-android-edge-to-edge-support')
     implementation project(':capawesome-capacitor-app-review')
     implementation project(':capawesome-capacitor-app-update')
     implementation project(':capgo-capacitor-share-target')
     implementation project(':capgo-capacitor-social-login')
     implementation project(':revenuecat-purchases-capacitor')
     implementation project(':revenuecat-purchases-capacitor-ui')
+    implementation project(':capacitor-plugin-safe-area')
 
 }
 

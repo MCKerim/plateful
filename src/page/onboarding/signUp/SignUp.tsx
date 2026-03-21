@@ -112,7 +112,7 @@ export default function SignUp() {
         duration={1.2}
       />
 
-      <div className="flex flex-col items-center h-screen px-4 py-10">
+      <div className="flex flex-col items-center h-screen px-4" style={{ paddingTop: "calc(2.5rem + var(--safe-area-top, 0px))", paddingBottom: "calc(2.5rem + var(--safe-area-bottom, 0px))" }}>
         <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
           <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
 

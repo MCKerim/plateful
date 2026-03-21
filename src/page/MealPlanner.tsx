@@ -278,7 +278,10 @@ export default function MealPlanner() {
         />
 
         {/* Week Navigation */}
-        <div className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10">
+        <div
+          className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10"
+          style={{ top: "var(--safe-area-top, 0px)" }}
+        >
           <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
             <ChevronLeft size={20} />
           </Button>
@@ -377,7 +380,10 @@ export default function MealPlanner() {
         </div>
 
         {/* Bottom Drawer */}
-        <div className="fixed bottom-16 left-0 right-0 z-30 bg-background border-t max-w-lg mx-auto">
+        <div
+          className="fixed left-0 right-0 z-30 bg-background border-t max-w-lg mx-auto"
+          style={{ bottom: "calc(4rem + var(--safe-area-bottom, 0px))" }}
+        >
           {/* Show drop zone when dragging from calendar */}
           {activeItem && !isDraggingFromDrawer && (
             <DroppableNoDateZone>

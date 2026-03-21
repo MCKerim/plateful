@@ -13,7 +13,13 @@ export default function Welcome() {
   }, []);
 
   return (
-    <div className="flex flex-col items-center h-screen px-4 py-10 bg-accent">
+    <div
+      className="flex flex-col items-center h-screen px-4 bg-accent"
+      style={{
+        paddingTop: "calc(2.5rem + var(--safe-area-top, 0px))",
+        paddingBottom: "calc(2.5rem + var(--safe-area-bottom, 0px))",
+      }}
+    >
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-primary-foreground overflow-hidden">
         <h1 className="text-4xl md:text-5xl first-font">{t("welcome.title")}</h1>
 

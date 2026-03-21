@@ -1,4 +1,3 @@
-import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { StatusBar, Style } from "@capacitor/status-bar";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Capacitor } from "@capacitor/core";
@@ -23,8 +22,11 @@ const initialState: ThemeProviderState = {
 
 const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
-const DARK_BG_COLOR = "#151410";
-const LIGHT_BG_COLOR = "#EDECE8";
+async function updateStatusBar(isDark: boolean) {
+  if (Capacitor.isNativePlatform()) {
+    await StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light });
+  }
+}
 
 export function ThemeProvider({
   children,
@@ -35,15 +37,6 @@ export function ThemeProvider({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme
   );
-
-  const setEdgeToEdgeBackgroundColor = async (color: string) => {
-    if (Capacitor.isNativePlatform()) {
-      await EdgeToEdge.setBackgroundColor({ color });
-      await StatusBar.setStyle({
-        style: color === DARK_BG_COLOR ? Style.Dark : Style.Light,
-      });
-    }
-  };
 
   useEffect(() => {
     const root = globalThis.document.documentElement;
@@ -60,7 +53,7 @@ export function ThemeProvider({
       }
 
       root.classList.add(effectiveTheme);
-      setEdgeToEdgeBackgroundColor(effectiveTheme === "dark" ? DARK_BG_COLOR : LIGHT_BG_COLOR);
+      updateStatusBar(effectiveTheme === "dark");
     };
 
     updateTheme(); // Initial update

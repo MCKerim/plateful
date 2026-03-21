@@ -42,7 +42,6 @@ import TrialReminder from "./page/onboarding/trialReminder/TrialReminder";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
 import { closeBrowser } from "./utils/nativeBrowser";
-import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { CapacitorShareTarget } from "@capgo/capacitor-share-target";
 import { Capacitor } from "@capacitor/core";
 import { App as CapacitorApp } from "@capacitor/app";
@@ -55,8 +54,10 @@ import SharedRecipe from "./page/SharedRecipe";
 import NotificationSettings from "./page/NotificationSettings";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
+import { useSafeArea } from "./hooks/useSafeArea";
 
 function App() {
+  useSafeArea(); // populates --safe-area-top/bottom/left/right CSS vars globally
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
@@ -163,14 +164,6 @@ function App() {
       cancelled = true;
       listenerHandle?.remove();
     };
-  }, []);
-
-  useEffect(() => {
-    if (Capacitor.isNativePlatform()) {
-      EdgeToEdge.enable().catch((e) => {
-        console.error("Error enabling edge to edge:", e);
-      });
-    }
   }, []);
 
   useEffect(() => {

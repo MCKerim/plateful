@@ -122,7 +122,7 @@ export default function Cookbook() {
 
   return (
     <Layout showHeader={false}>
-      <div className="sticky z-40 flex items-center w-full gap-1 my-1 top-5">
+      <div className="sticky z-40 flex items-center w-full gap-1 my-1" style={{ top: "var(--safe-area-top, 0px)" }}>
         <Input
           className="rounded-full"
           type="text"
