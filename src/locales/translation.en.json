@@ -350,7 +350,8 @@
     "title": "Home",
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
-    "goToPlanner": "Plan your week"
+    "goToPlanner": "Plan your week",
+    "markComplete": "Mark complete"
   },
   "explore": {
     "title": "Explore"

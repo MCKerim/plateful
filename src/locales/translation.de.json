@@ -345,7 +345,8 @@
     "title": "Startseite",
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
-    "goToPlanner": "Plane deine Woche"
+    "goToPlanner": "Plane deine Woche",
+    "markComplete": "Als erledigt markieren"
   },
   "explore": {
     "title": "Erkunden"

@@ -8,6 +8,7 @@ import { isSameDay } from "date-fns";
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import RecipeCard from "@/components/general/RecipeCard";
+import TodaysMealCard from "@/components/home/TodaysMealCard";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 
 export default function Home() {
@@ -23,7 +24,9 @@ export default function Home() {
 
   const todaysMeals = useMemo(
     () =>
-      currentWeekItems.filter((item) => item.planned_date && isSameDay(item.planned_date, today)),
+      currentWeekItems
+        .filter((item) => item.planned_date && isSameDay(item.planned_date, today))
+        .sort((a, b) => (a.recipeCategory ?? 999) - (b.recipeCategory ?? 999)),
     [currentWeekItems, today]
   );
 
@@ -65,15 +68,14 @@ export default function Home() {
             <h2 className="second-font text-lg font-semibold">{t("home.todayYouPlanned")}</h2>
 
             <div className="flex flex-col gap-2">
-              {todaysMeals.map((recipe) => (
-                <RecipeCard
-                  key={recipe.id}
-                  id={recipe.recipeId}
-                  name={recipe.recipeName}
-                  averageRating={null}
-                  showRating={false}
-                  showMealPlanStatus={false}
-                  status={"ready"}
+              {todaysMeals.map((item) => (
+                <TodaysMealCard
+                  key={item.id}
+                  id={item.id}
+                  recipeId={item.recipeId}
+                  recipeName={item.recipeName}
+                  recipeCategory={item.recipeCategory}
+                  eaten={item.eaten}
                 />
               ))}
             </div>
