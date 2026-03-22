@@ -345,7 +345,15 @@
     "title": "Startseite",
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
-    "goToPlanner": "Plane deine Woche"
+    "goToPlanner": "Plane deine Woche",
+    "gettingStarted": {
+      "title": "Erste Schritte",
+      "subtitle": "Schließe Missionen ab und erhalte eine Belohnung",
+      "importRecipes": "Importiere deine ersten 3 Rezepte",
+      "chatWithChef": "Chatte mit dem KI-Koch",
+      "planMeals": "Plane deine ersten 3 Mahlzeiten",
+      "claimReward": "Belohnung einlösen"
+    }
   },
   "explore": {
     "title": "Erkunden"

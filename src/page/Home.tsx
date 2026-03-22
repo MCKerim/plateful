@@ -9,6 +9,7 @@ import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import RecipeCard from "@/components/general/RecipeCard";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
+import GettingStartedCard from "@/components/home/GettingStartedCard";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -58,8 +59,13 @@ export default function Home() {
         </NavLink>
       }
     >
+      {/* Getting started */}
+      <div className="mt-4">
+        <GettingStartedCard />
+      </div>
+
       {/* Today's planned meals */}
-      <div className="mt-4 mb-36">
+      <div className="mb-36">
         {todaysMeals.length > 0 ? (
           <>
             <h2 className="second-font text-lg font-semibold">{t("home.todayYouPlanned")}</h2>

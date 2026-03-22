@@ -350,7 +350,15 @@
     "title": "Home",
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
-    "goToPlanner": "Plan your week"
+    "goToPlanner": "Plan your week",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "subtitle": "Complete missions to get a reward",
+      "importRecipes": "Import your first 3 recipes",
+      "chatWithChef": "Chat with the AI-Chef",
+      "planMeals": "Plan your first 3 meals",
+      "claimReward": "Claim Reward"
+    }
   },
   "explore": {
     "title": "Explore"
