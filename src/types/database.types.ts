@@ -74,6 +74,90 @@ export type Database = {
         }
         Relationships: []
       }
+      household_missions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          household_id: string
+          id: string
+          mission_id: string
+          progress: number
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          household_id: string
+          id?: string
+          mission_id: string
+          progress?: number
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          household_id?: string
+          id?: string
+          mission_id?: string
+          progress?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_missions_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_definitions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      household_rewards: {
+        Row: {
+          badge_id: string
+          claimed_at: string
+          claimed_by: string
+          household_id: string
+          id: string
+          mission_set: string
+        }
+        Insert: {
+          badge_id: string
+          claimed_at?: string
+          claimed_by: string
+          household_id: string
+          id?: string
+          mission_set: string
+        }
+        Update: {
+          badge_id?: string
+          claimed_at?: string
+          claimed_by?: string
+          household_id?: string
+          id?: string
+          mission_set?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "household_rewards_claimed_by_fkey"
+            columns: ["claimed_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "household_rewards_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       household_subscriptions: {
         Row: {
           created_at: string
@@ -222,6 +306,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mission_definitions: {
+        Row: {
+          created_at: string
+          id: string
+          mission_set: string
+          required_count: number
+          scope: string
+        }
+        Insert: {
+          created_at?: string
+          id: string
+          mission_set: string
+          required_count?: number
+          scope: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          mission_set?: string
+          required_count?: number
+          scope?: string
+        }
+        Relationships: []
       }
       recipe_ingredients: {
         Row: {
@@ -459,6 +567,77 @@ export type Database = {
           },
         ]
       }
+      user_missions: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          mission_id: string
+          progress: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mission_id: string
+          progress?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mission_id?: string
+          progress?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_missions_mission_id_fkey"
+            columns: ["mission_id"]
+            isOneToOne: false
+            referencedRelation: "mission_definitions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_missions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_rewards: {
+        Row: {
+          badge_id: string
+          claimed_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          claimed_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          claimed_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string
@@ -508,7 +687,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_household_mission: {
+        Args: { p_household_id: string; p_mission_id: string }
+        Returns: {
+          completed_at: string | null
+          created_at: string
+          household_id: string
+          id: string
+          mission_id: string
+          progress: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "household_missions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
     }
     Enums: {
       [_ in never]: never

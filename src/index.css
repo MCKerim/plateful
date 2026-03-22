@@ -126,3 +126,26 @@ body {
     scrollbar-width: none; /* Firefox */
   }
 }
+
+@keyframes starburst-spin-in {
+  0%   { transform: rotate(0deg) scale(0); opacity: 0; }
+  60%  { transform: rotate(25deg) scale(1.15); opacity: 1; }
+  80%  { transform: rotate(-8deg) scale(0.95); }
+  100% { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes badge-pop {
+  0%   { transform: scale(0) rotate(-20deg); }
+  55%  { transform: scale(1.45) rotate(10deg); }
+  72%  { transform: scale(0.88) rotate(-6deg); }
+  88%  { transform: scale(1.12) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.animate-starburst {
+  animation: starburst-spin-in 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.animate-badge-pop {
+  animation: badge-pop 0.65s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+}

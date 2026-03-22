@@ -25,4 +25,8 @@ export const queryKeys = {
   subscription: {
     byHousehold: (householdId: string) => ["subscription", "household", householdId] as const,
   },
+  missions: {
+    householdMissions: (householdId: string) => ["missions", "household", householdId] as const,
+    householdRewards: (householdId: string) => ["missions", "rewards", householdId] as const,
+  },
 } as const;

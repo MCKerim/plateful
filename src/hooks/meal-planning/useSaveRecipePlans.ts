@@ -16,7 +16,7 @@ export type SaveRecipePlansResult = {
   removed: number;
 };
 
-export function useSaveRecipePlans() {
+export function useSaveRecipePlans(options?: { onSuccess?: (result: SaveRecipePlansResult) => void }) {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
 
@@ -55,7 +55,8 @@ export function useSaveRecipePlans() {
         removed: params.planIdsToRemove.length,
       };
     },
-    onSuccess: async () => {
+    onSuccess: async (result) => {
+      options?.onSuccess?.(result);
       await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
     },
   });

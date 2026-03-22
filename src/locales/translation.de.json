@@ -349,10 +349,19 @@
     "gettingStarted": {
       "title": "Erste Schritte",
       "subtitle": "Schließe Missionen ab und erhalte eine Belohnung",
-      "importRecipes": "Importiere deine ersten 3 Rezepte",
-      "chatWithChef": "Chatte mit dem KI-Koch",
-      "planMeals": "Plane deine ersten 3 Mahlzeiten",
-      "claimReward": "Belohnung einlösen"
+      "claimReward": "Belohnung einlösen",
+      "claimingReward": "Wird eingelöst...",
+      "rewardDialog": {
+        "title": "Du hast eine Belohnung erhalten!",
+        "description": "Ihr habt alle Onboarding-Missionen abgeschlossen. Euer Haushalt hat ein Abzeichen erhalten.",
+        "cta": "Vielleicht später",
+        "viewRewards": "Meine Belohnungen ansehen"
+      },
+      "missions": {
+        "import_recipes": "Importiere deine ersten 3 Rezepte",
+        "chat_with_chef": "Chatte mit dem KI-Koch",
+        "plan_meals": "Plane deine ersten 3 Mahlzeiten"
+      }
     }
   },
   "explore": {
@@ -422,7 +431,11 @@
       "managedBy": "Abonnement verwaltet von {{name}}"
     }
   },
+  "badges": {
+    "onboarding_complete": "Onboarding abgeschlossen"
+  },
   "householdSettings": {
+    "achievements": "Errungenschaften",
     "member": "Mitglied",
     "members": "Mitglieder",
     "you": "Du",

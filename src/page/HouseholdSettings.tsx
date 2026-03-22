@@ -39,6 +39,7 @@ import { useDeleteHousehold } from "@/hooks/household/useDeleteHousehold";
 import { toast } from "sonner";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { HouseholdMember } from "@/api/user.api";
+import { useHouseholdRewards } from "@/hooks/missions/useHouseholdRewards";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -52,6 +53,8 @@ export default function HouseholdSettings() {
   const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
   const [isDeleteHouseholdDialogOpen, setIsDeleteHouseholdDialogOpen] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+
+  const { data: rewards = [] } = useHouseholdRewards();
 
   const updateHouseholdName = useUpdateHouseholdName();
   const removeMemberMutation = useRemoveMember();
@@ -295,6 +298,30 @@ export default function HouseholdSettings() {
           </DialogDescription>
         </DialogContent>
       </Dialog>
+
+      {rewards.length > 0 && (
+        <>
+          <Separator className="my-2" />
+
+          <div>
+            <h2 className="second-font text-base font-semibold mb-3">
+              {t("householdSettings.achievements")}
+            </h2>
+
+            <div className="flex flex-wrap gap-2">
+              {rewards.map((reward) => (
+                <div
+                  key={reward.id}
+                  className="flex items-center gap-2 bg-accent text-accent-foreground rounded-full px-3 py-1.5 text-sm font-medium"
+                >
+                  <span>🏅</span>
+                  <span>{t(`badges.${reward.badgeId}`)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <Separator className="my-2" />
 

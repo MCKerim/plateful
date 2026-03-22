@@ -15,6 +15,7 @@ import RecipeCard from "@/components/general/RecipeCard";
 import imageCompression from "browser-image-compression";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
 let lastAutoImportedFileUris: string | null = null;
 
@@ -29,6 +30,7 @@ export default function ImageImport() {
   const [isLoadingImage, setIsLoadingImage] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
   const [searchParams] = useSearchParams();
+  const incrementMission = useIncrementMission();
 
   // Cleanup on unmount - abort any pending API calls
   useEffect(() => {
@@ -136,6 +138,7 @@ export default function ImageImport() {
         toast.error(t("urlImport.errors.importFailed"));
       } else {
         setData(data[0]);
+        incrementMission.mutate({ missionId: "import_recipes" });
         await queryClient.invalidateQueries({
           queryKey: queryKeys.recipes.all,
         });

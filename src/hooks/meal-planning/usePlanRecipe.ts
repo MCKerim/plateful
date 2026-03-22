@@ -9,7 +9,7 @@ export type PlanRecipeParams = {
   plannedDate: Date | null;
 };
 
-export function usePlanRecipe() {
+export function usePlanRecipe(options?: { onSuccess?: () => void }) {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
 
@@ -22,6 +22,9 @@ export function usePlanRecipe() {
         params.householdId,
         dateString
       );
+    },
+    onSuccess: () => {
+      options?.onSuccess?.();
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
