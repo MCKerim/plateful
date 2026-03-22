@@ -7,6 +7,13 @@ CREATE TABLE mission_definitions (
   created_at timestamptz NOT NULL DEFAULT now()
 );
 
+ALTER TABLE mission_definitions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Authenticated users can read mission definitions"
+  ON mission_definitions FOR SELECT
+  TO authenticated
+  USING (true);
+
 -- Household-level mission progress
 CREATE TABLE household_missions (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
