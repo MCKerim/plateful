@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
 import { useEffect, useState } from "react";
 import CircleTransition from "@/components/general/CircleTransition";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
@@ -122,8 +122,16 @@ export default function SignUp() {
         <RiveComponent onClick={replayAnimation} />
 
         <div className="flex flex-col w-full max-w-sm gap-2">
-          <div className="text-balance text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-            {t("signup.termsAndConditions")}
+          <div className="text-balance text-center text-xs text-muted-foreground">
+            {t("login.termsPrefix")}{" "}
+            <Link to="/terms" className="underline underline-offset-4 hover:text-primary">
+              {t("login.termsOfService")}
+            </Link>{" "}
+            {t("login.termsAnd")}{" "}
+            <Link to="/privacy" className="underline underline-offset-4 hover:text-primary">
+              {t("login.privacyPolicy")}
+            </Link>
+            {t("login.termsSuffix")}
           </div>
 
           <OnboardingButton
