@@ -16,7 +16,6 @@ export default function Home() {
   const { t } = useTranslation();
   const navigate = useNavigate();
 
-
   const today = useMemo(() => new Date(), []);
   const { data: currentWeekItems = [] } = useMealPlannerItems(today);
 
@@ -63,9 +62,7 @@ export default function Home() {
       }
     >
       {/* Getting started */}
-      <div className="mt-4">
-        <GettingStartedCard />
-      </div>
+      <GettingStartedCard />
 
       {/* Today's planned meals */}
       <div className="mb-36">
