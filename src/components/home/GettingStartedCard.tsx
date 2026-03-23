@@ -1,9 +1,7 @@
-import { useEffect, useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronUp, ChevronRight, Check } from "lucide-react";
 import { useNavigate } from "react-router";
-import { motion, AnimatePresence } from "motion/react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -51,63 +49,6 @@ function Starburst() {
         />
       ))}
     </svg>
-  );
-}
-
-const STAR_COLORS = ["#ff9d00", "#ffb733", "#ffd980", "#faf9f5"];
-const STAR_COUNT = 14;
-
-function StarParticles({ active }: { active: boolean }) {
-  const stars = useMemo(
-    () =>
-      Array.from({ length: STAR_COUNT }, (_, i) => {
-        const angle = (i / STAR_COUNT) * 360 + Math.random() * 24 - 12;
-        const rad = (angle * Math.PI) / 180;
-        const dist = 90 + Math.random() * 60;
-        return {
-          id: i,
-          x: Math.cos(rad) * dist,
-          y: Math.sin(rad) * dist,
-          rotate: Math.random() * 720 - 360,
-          scale: 0.8 + Math.random() * 0.9,
-          delay: Math.random() * 0.15,
-          color: STAR_COLORS[i % STAR_COLORS.length],
-          emoji: i % 3 === 0 ? "✦" : "★",
-        };
-      }),
-    []
-  );
-
-  // Portal into body — zero clipping, works regardless of dialog overflow rules
-  return createPortal(
-    <AnimatePresence>
-      {active &&
-        stars.map((star) => (
-          <motion.span
-            key={star.id}
-            aria-hidden="true"
-            className="pointer-events-none fixed select-none text-xl"
-            style={{ left: "50vw", top: "42vh", color: star.color, zIndex: 9999 }}
-            initial={{ x: 0, y: 0, scale: 0, rotate: 0, opacity: 1 }}
-            animate={{
-              x: star.x,
-              y: star.y,
-              scale: star.scale,
-              rotate: star.rotate,
-              opacity: [1, 1, 0],
-            }}
-            transition={{
-              duration: 0.9,
-              delay: star.delay,
-              ease: [0.22, 1, 0.36, 1],
-              opacity: { times: [0, 0.55, 1], duration: 0.9 },
-            }}
-          >
-            {star.emoji}
-          </motion.span>
-        ))}
-    </AnimatePresence>,
-    document.body
   );
 }
 
@@ -231,45 +172,40 @@ export default function GettingStartedCard() {
 
       <Dialog open={rewardDialogOpen} onOpenChange={setRewardDialogOpen}>
         <DialogContent className="text-center">
-          <StarParticles active={rewardDialogOpen} />
-
-          {/* Cartoon badge reveal */}
-          <div className="relative mx-auto mb-2 flex h-32 w-32 items-center justify-center">
-            {rewardDialogOpen && <Starburst />}
-            <span className="animate-badge-pop relative z-10 text-7xl leading-none">🏅</span>
-          </div>
-
           <DialogHeader>
+            {/* Cartoon badge reveal */}
+            <div className="relative mx-auto flex h-32 w-32 items-center justify-center">
+              {rewardDialogOpen && <Starburst />}
+              <span className="animate-badge-pop relative z-10 text-7xl leading-none">⭐</span>
+            </div>
+
             <DialogTitle className="second-font text-xl text-center">
               {t("home.gettingStarted.rewardDialog.title")}
             </DialogTitle>
+
             <DialogDescription className="text-center">
               {t("home.gettingStarted.rewardDialog.description")}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex items-center justify-center gap-2 bg-accent text-accent-foreground rounded-xl px-4 py-3 mx-auto w-full">
-            <span className="text-2xl">🏅</span>
-            <span className="second-font text-base font-semibold">
-              {t(`badges.${BADGE_ID}`)}
-            </span>
+          <div className="mx-auto w-fit rotate-[-2deg] rounded-2xl border-2 border-dashed bg-card px-5 py-2 text-center shadow-md mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">🏅</span>
+              <p className="second-font text-base font-semibold text-foreground leading-tight">
+                {t(`badges.${BADGE_ID}`)}
+              </p>
+            </div>
           </div>
 
-          <div className="flex flex-col gap-2 mt-1">
-            <Button
-              className="w-full"
-              variant="accent"
-              onClick={() => {
-                setRewardDialogOpen(false);
-                navigate("/householdSettings");
-              }}
-            >
-              {t("home.gettingStarted.rewardDialog.viewRewards")}
-            </Button>
-            <Button className="w-full" variant="secondary" onClick={() => setRewardDialogOpen(false)}>
-              {t("home.gettingStarted.rewardDialog.cta")}
-            </Button>
-          </div>
+          <Button
+            className="w-full"
+            onClick={() => {
+              setRewardDialogOpen(false);
+              navigate("/householdSettings");
+            }}
+          >
+            {t("home.gettingStarted.rewardDialog.viewRewards")}
+          </Button>
         </DialogContent>
       </Dialog>
     </>

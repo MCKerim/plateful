@@ -358,10 +358,9 @@
       "claimReward": "Claim Reward",
       "claimingReward": "Claiming...",
       "rewardDialog": {
-        "title": "You earned a reward!",
-        "description": "You completed all onboarding missions. Your household has been awarded a badge.",
-        "cta": "Maybe later",
-        "viewRewards": "View my rewards"
+        "title": "Missions completed!",
+        "description": "Your household earned a reward:",
+        "viewRewards": "View rewards"
       },
       "missions": {
         "import_recipes": "Import your first 3 recipes",
@@ -434,10 +433,10 @@
     }
   },
   "badges": {
-    "onboarding_complete": "Onboarding Complete"
+    "onboarding_complete": "Now we cooking!"
   },
   "householdSettings": {
-    "achievements": "Achievements",
+    "achievements": "Achievements:",
     "member": "Member",
     "members": "Members",
     "you": "You",

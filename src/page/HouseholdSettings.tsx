@@ -308,14 +308,19 @@ export default function HouseholdSettings() {
               {t("householdSettings.achievements")}
             </h2>
 
-            <div className="flex flex-wrap gap-2">
-              {rewards.map((reward) => (
+            <div className="flex flex-wrap gap-3 mb-4">
+              {rewards.map((reward, i) => (
                 <div
                   key={reward.id}
-                  className="flex items-center gap-2 bg-accent text-accent-foreground rounded-full px-3 py-1.5 text-sm font-medium"
+                  className="w-fit rounded-2xl border-2 border-dashed bg-card px-5 py-2 text-center shadow-md"
+                  style={{ rotate: `${i % 2 === 0 ? -2 : 2}deg` }}
                 >
-                  <span>🏅</span>
-                  <span>{t(`badges.${reward.badgeId}`)}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🏅</span>
+                    <p className="second-font text-base font-semibold text-foreground leading-tight">
+                      {t(`badges.${reward.badgeId}`)}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
