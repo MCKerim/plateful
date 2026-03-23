@@ -2,7 +2,6 @@ import { useNavigate } from "react-router";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Check } from "lucide-react";
-import HotelClassIcon from "@mui/icons-material/HotelClass";
 import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
@@ -33,23 +32,17 @@ export default function TodaysMealCard({
 
   return (
     <>
-      <Card className={`overflow-hidden ${eaten ? "opacity-60" : ""}`}>
-        <button
-          onClick={() => navigate(`/recipe/${recipeId}`)}
-          className="w-full text-left"
-        >
+      <Card className={`relative bg-transparent ${eaten ? "opacity-60" : ""}`}>
+        <button onClick={() => navigate(`/recipe/${recipeId}`)} className="w-full text-left">
           <img
             src={imageUrl || "/no-img.jpg"}
             alt="Recipe"
-            className="object-cover w-full h-32 dark:brightness-75"
+            className="object-cover w-full h-32 border-background dark:brightness-75"
           />
         </button>
 
-        <div className="flex flex-col gap-2 p-2 border-t-0">
-          <button
-            onClick={() => navigate(`/recipe/${recipeId}`)}
-            className="text-left"
-          >
+        <div className="flex flex-col gap-2 p-2 border-b-2 border-l-2 border-r-2 rounded-b-lg">
+          <button onClick={() => navigate(`/recipe/${recipeId}`)} className="text-left">
             <h3 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
               {recipeName}
             </h3>
@@ -63,23 +56,16 @@ export default function TodaysMealCard({
 
           <div className="flex gap-2">
             <Button
-              variant="outline"
+              variant="default"
               size="sm"
-              className={`flex-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
-              onClick={() => setEaten.mutate({ id, eaten: !eaten })}
+              className="flex-1"
+              onClick={() => {
+                setEaten.mutate({ id, eaten: !eaten });
+                if (!eaten) ratingModalRef.current?.open();
+              }}
             >
               <Check className="!size-4" />
               {t("home.markComplete")}
-            </Button>
-
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex-1"
-              onClick={() => ratingModalRef.current?.open()}
-            >
-              <HotelClassIcon style={{ fontSize: "16px" }} />
-              {t("rating.rate")}
             </Button>
           </div>
         </div>

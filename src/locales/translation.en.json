@@ -351,7 +351,7 @@
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
     "goToPlanner": "Plan your week",
-    "markComplete": "Mark complete",
+    "markComplete": "Cooked it",
     "gettingStarted": {
       "title": "Getting Started",
       "subtitle": "Complete missions to get a reward",
@@ -540,7 +540,7 @@
     "list": "List"
   },
   "rating": {
-    "rate": "Rate  this recipe",
+    "rate": "Rate",
     "title": "How did you like it?",
     "editTitle": "Edit your rating",
     "commentLabel": "Comments",

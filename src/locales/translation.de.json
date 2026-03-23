@@ -346,7 +346,7 @@
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
     "goToPlanner": "Plane deine Woche",
-    "markComplete": "Als erledigt markieren",
+    "markComplete": "Gekocht",
     "gettingStarted": {
       "title": "Erste Schritte",
       "subtitle": "Schließe Missionen ab und erhalte eine Belohnung",
@@ -539,7 +539,7 @@
     "recipeUpdated": "Rezept aktualisiert!"
   },
   "rating": {
-    "rate": "Bewerte dieses Rezept",
+    "rate": "Bewerten",
     "title": "Wie hat es dir geschmeckt?",
     "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",
