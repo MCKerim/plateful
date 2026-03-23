@@ -58,7 +58,7 @@ export default function TodaysMealCard({
             <Button
               variant="default"
               size="sm"
-              className="flex-1"
+              className={`flex-1 ${eaten ? "bg-accent text-accent-foreground hover:bg-accent/90" : ""}`}
               onClick={() => {
                 setEaten.mutate({ id, eaten: !eaten });
                 if (!eaten) ratingModalRef.current?.open();
