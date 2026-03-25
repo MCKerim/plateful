@@ -646,7 +646,7 @@ export type Database = {
           has_seen_value_screens: boolean
           household_id: string | null
           id: string
-          language: string
+          language: string | null
           notification_preferences: Json | null
           username: string
         }
@@ -657,7 +657,7 @@ export type Database = {
           has_seen_value_screens?: boolean
           household_id?: string | null
           id?: string
-          language: string
+          language?: string | null
           notification_preferences?: Json | null
           username?: string
         }

@@ -26,7 +26,7 @@ export function useUpdateNotificationPreferences() {
           await scheduleWeeklyReminder(
             preferences.weekly_planning_reminder.day_of_week,
             preferences.weekly_planning_reminder.time,
-            user.language
+            user.language ?? "en"
           );
         } else {
           await cancelWeeklyReminder();
@@ -35,7 +35,7 @@ export function useUpdateNotificationPreferences() {
         if (preferences.daily_meal_reminder.enabled) {
           await scheduleDailyMealReminder(
             preferences.daily_meal_reminder.time,
-            user.language
+            user.language ?? "en"
           );
         } else {
           await cancelDailyMealReminder();
