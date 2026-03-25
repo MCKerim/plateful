@@ -56,14 +56,17 @@ export function useUserData() {
         const detectedLanguage = i18n.language.split("-")[0]; // 'en-US' -> 'en'
         const supportedLanguages = ["en", "de"];
 
-        if (storedLanguage && supportedLanguages.includes(storedLanguage)) {
-          // Apply stored language from Supabase
+        const accountAgeMs = Date.now() - new Date(userData.created_at).getTime();
+        const isNewAccount = accountAgeMs < 2 * 60 * 1000; // within 2 minutes of sign-up
+
+        if (!isNewAccount && storedLanguage && supportedLanguages.includes(storedLanguage)) {
+          // Existing user: apply their stored language preference
           if (i18n.language !== storedLanguage) {
             i18n.changeLanguage(storedLanguage);
           }
           localStorage.setItem("language", storedLanguage);
         } else {
-          // First-time user: save detected language to Supabase
+          // New account or no valid language stored: detect from browser and save
           const languageToSave = supportedLanguages.includes(detectedLanguage)
             ? detectedLanguage
             : "en";
