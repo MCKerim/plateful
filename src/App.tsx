@@ -282,12 +282,23 @@ function App() {
     return routeToCorrectPagePure(page, isLoggedIn, hasCompletedSurvey, isPro, hasHousehold);
   }
 
-  function guardOnboardingRoute(page: React.JSX.Element, requiredStep: "survey" | "socialproof") {
+  function guardOnboardingRoute(
+    page: React.JSX.Element,
+    requiredStep: "survey" | "post-household"
+  ) {
     if (!isLoggedIn()) {
       return <Navigate to="/signup" />;
     }
     if (requiredStep === "survey" && hasCompletedSurvey()) {
       return <Navigate to="/home" />;
+    }
+    if (requiredStep === "post-household") {
+      if (!hasCompletedSurvey() || !hasHousehold()) {
+        return <Navigate to="/home" />;
+      }
+      if (isPro()) {
+        return <Navigate to="/home" />;
+      }
     }
     return page;
   }
@@ -339,12 +350,12 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
-        <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "socialproof")} />
-        <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "socialproof")} />
-        <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "socialproof")} />
+        <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "post-household")} />
+        <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "post-household")} />
+        <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "post-household")} />
         <Route
           path="/trialreminder"
-          element={guardOnboardingRoute(<TrialReminder />, "socialproof")}
+          element={guardOnboardingRoute(<TrialReminder />, "post-household")}
         />
 
         <Route
@@ -362,7 +373,7 @@ function App() {
           }
         />
 
-        <Route path="/choosename" element={<ChooseUsername />} />
+        <Route path="/choosename" element={guardOnboardingRoute(<ChooseUsername />, "survey")} />
 
         <Route
           path="/createhousehold"

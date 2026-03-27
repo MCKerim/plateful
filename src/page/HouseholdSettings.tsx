@@ -39,6 +39,7 @@ import { useDeleteHousehold } from "@/hooks/household/useDeleteHousehold";
 import { toast } from "sonner";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { HouseholdMember } from "@/api/user.api";
+import { useHouseholdRewards } from "@/hooks/missions/useHouseholdRewards";
 
 export default function HouseholdSettings() {
   const { t } = useTranslation();
@@ -52,6 +53,8 @@ export default function HouseholdSettings() {
   const [selectedMember, setSelectedMember] = useState<HouseholdMember | null>(null);
   const [isDeleteHouseholdDialogOpen, setIsDeleteHouseholdDialogOpen] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+
+  const { data: rewards = [] } = useHouseholdRewards();
 
   const updateHouseholdName = useUpdateHouseholdName();
   const removeMemberMutation = useRemoveMember();
@@ -295,6 +298,35 @@ export default function HouseholdSettings() {
           </DialogDescription>
         </DialogContent>
       </Dialog>
+
+      {rewards.length > 0 && (
+        <>
+          <Separator className="my-2" />
+
+          <div>
+            <h2 className="second-font text-base font-semibold mb-3">
+              {t("householdSettings.achievements")}
+            </h2>
+
+            <div className="flex flex-wrap gap-3 mb-4">
+              {rewards.map((reward, i) => (
+                <div
+                  key={reward.id}
+                  className="w-fit rounded-2xl border-2 border-dashed bg-card px-5 py-2 text-center shadow-md"
+                  style={{ rotate: `${i % 2 === 0 ? -2 : 2}deg` }}
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-2xl">🏅</span>
+                    <p className="second-font text-base font-semibold text-foreground leading-tight">
+                      {t(`badges.${reward.badgeId}`)}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <Separator className="my-2" />
 

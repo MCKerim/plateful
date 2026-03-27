@@ -12,6 +12,7 @@ import RecipeCard from "@/components/general/RecipeCard";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { readClipboardText } from "@/utils/nativeClipboard";
+import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
 let lastAutoImportedUrl: string | null = null;
 
@@ -23,6 +24,7 @@ export default function URLImport() {
   const [isSaving, setIsSaving] = useState(false);
   const [data, setData] = useState<{ id: string; name: string } | null>(null);
   const queryClient = useQueryClient();
+  const incrementMission = useIncrementMission();
 
   const [searchParams] = useSearchParams();
 
@@ -50,6 +52,7 @@ export default function URLImport() {
           toast.error(t("urlImport.errors.importFailed"));
         } else {
           setData(data[0]);
+          incrementMission.mutate({ missionId: "import_recipes" });
           await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
           window.history.replaceState(null, "", "/cookbook");
           toast.success(t("urlImport.success"), {

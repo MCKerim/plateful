@@ -43,6 +43,7 @@ import { toast } from "sonner";
 import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIllustration";
+import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -55,6 +56,7 @@ export default function Chatbot() {
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const createRecipe = useCreateRecipe();
+  const incrementMission = useIncrementMission();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const messages = useAppSelector(selectMessages);
@@ -133,6 +135,8 @@ export default function Chatbot() {
       dispatch(setRecipeId(recipeId));
     }
     dispatch(setIsTyping(true));
+
+    incrementMission.mutate({ missionId: "chat_with_chef" });
 
     try {
       // Build the text content - prepend context if this is first message and we have context

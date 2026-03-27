@@ -201,7 +201,6 @@
     "subtitle": "Never stare blankly at your fridge again!",
     "continueWithGoogle": "Continue with Google",
     "continueWithEMail": "Continue with E-Mail",
-    "termsAndConditions": "By signing up, you agree to our Terms of Service and Privacy Policy.",
     "alreadyHaveAccount": "Already have an account? Sign in"
   },
   "emailSignup": {
@@ -239,6 +238,11 @@
     "loginButton": "Send Magic Link",
     "loading": "Sending magic link...",
     "dontHaveAccount": "Don't have an account? Sign up",
+    "termsPrefix": "By signing up, you agree to our",
+    "termsOfService": "Terms of Service",
+    "termsAnd": "and",
+    "privacyPolicy": "Privacy Policy",
+    "termsSuffix": "",
     "errors": {
       "invalidEmail": "Please enter a valid email address",
       "loginFailed": "Failed to send magic link. Please try again."
@@ -350,7 +354,24 @@
     "title": "Home",
     "todayYouPlanned": "Planned for today",
     "nothingPlannedToday": "Nothing planned for today",
-    "goToPlanner": "Plan your week"
+    "goToPlanner": "Plan your week",
+    "markComplete": "Cooked it",
+    "gettingStarted": {
+      "title": "Getting Started",
+      "subtitle": "Complete missions to get a reward",
+      "claimReward": "Claim Reward",
+      "claimingReward": "Claiming...",
+      "rewardDialog": {
+        "title": "Missions completed!",
+        "description": "Your household earned a reward:",
+        "viewRewards": "View rewards"
+      },
+      "missions": {
+        "import_recipes": "Import your first 3 recipes",
+        "chat_with_chef": "Chat with the AI-Chef",
+        "plan_meals": "Plan your first 3 meals"
+      }
+    }
   },
   "explore": {
     "title": "Explore"
@@ -415,7 +436,11 @@
       "managedBy": "Subscription managed by {{name}}"
     }
   },
+  "badges": {
+    "onboarding_complete": "Now we cooking!"
+  },
   "householdSettings": {
+    "achievements": "Achievements:",
     "member": "Member",
     "members": "Members",
     "you": "You",
@@ -519,7 +544,7 @@
     "list": "List"
   },
   "rating": {
-    "rate": "Rate  this recipe",
+    "rate": "Rate",
     "title": "How did you like it?",
     "editTitle": "Edit your rating",
     "commentLabel": "Comments",

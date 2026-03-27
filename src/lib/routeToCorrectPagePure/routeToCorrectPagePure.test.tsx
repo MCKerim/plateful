@@ -3,11 +3,6 @@ import { render, screen } from "@testing-library/react";
 import { BrowserRouter } from "react-router";
 import { routeToCorrectPagePure } from "./routeToCorrectPagePure";
 
-// Mock the SignUp component
-vi.mock("@/page/onboarding/signUp/SignUp", () => ({
-  default: () => <div data-testid="signup-page">SignUp</div>,
-}));
-
 // Mock Navigate component to be testable
 vi.mock("react-router", async () => {
   const actual = await vi.importActual("react-router");
@@ -28,7 +23,7 @@ describe("routeToCorrectPagePure", () => {
     return render(<BrowserRouter>{element}</BrowserRouter>);
   };
 
-  it("should show SignUp when not logged in", () => {
+  it("should redirect to / (Welcome) when not logged in", () => {
     const result = routeToCorrectPagePure(
       <TestPage />,
       () => false, // not logged in
@@ -38,7 +33,7 @@ describe("routeToCorrectPagePure", () => {
     );
 
     renderWithRouter(result);
-    expect(screen.getByTestId("signup-page")).toBeInTheDocument();
+    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/");
   });
 
   it("should redirect to /values/1 when logged in but has not completed survey", () => {
@@ -67,7 +62,7 @@ describe("routeToCorrectPagePure", () => {
     expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/createhousehold");
   });
 
-  it("should redirect to /subscribe when logged in, completed survey, has household, but not pro", () => {
+  it("should redirect to /howitworks when logged in, completed survey, has household, but not pro", () => {
     const result = routeToCorrectPagePure(
       <TestPage />,
       () => true, // logged in
@@ -77,7 +72,7 @@ describe("routeToCorrectPagePure", () => {
     );
 
     renderWithRouter(result);
-    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/subscribe");
+    expect(screen.getByTestId("navigate")).toHaveAttribute("data-to", "/howitworks");
   });
 
   it("should render the page when all conditions are met", () => {

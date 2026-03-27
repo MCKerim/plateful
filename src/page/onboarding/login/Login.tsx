@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
 import { useSupabase } from "@/utils/supabase";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { Input } from "@/components/ui/input";
@@ -108,8 +108,16 @@ export default function Login() {
         </button>
       </div>
 
-      <div className="mt-auto mb-8 text-center text-xs text-muted-foreground [&_a]:underline [&_a]:underline-offset-4 [&_a]:hover:text-primary">
-        {t("signup.termsAndConditions")}
+      <div className="mt-auto mb-8 text-center text-xs text-muted-foreground">
+        {t("login.termsPrefix")}{" "}
+        <Link to="/terms" className="underline underline-offset-4 hover:text-primary">
+          {t("login.termsOfService")}
+        </Link>{" "}
+        {t("login.termsAnd")}{" "}
+        <Link to="/privacy" className="underline underline-offset-4 hover:text-primary">
+          {t("login.privacyPolicy")}
+        </Link>
+        {t("login.termsSuffix")}
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import { setCurrentWeek as setMealPlannerWeek } from "@/redux/slices/mealPlanner
 import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
 import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
 import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
+import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
 type Props = {
   recipeId: string;
@@ -88,7 +89,14 @@ export default function WeeklyPlanDialog({
   );
 
   // Mutation for saving
-  const saveMutation = useSaveRecipePlans();
+  const incrementMission = useIncrementMission();
+  const saveMutation = useSaveRecipePlans({
+    onSuccess: (result) => {
+      if (result.added > 0) {
+        incrementMission.mutate({ missionId: "plan_meals", count: result.added });
+      }
+    },
+  });
 
   // Check if a date has THIS recipe planned (using the always-fresh plannedItems data)
   const isDatePlannedForThisRecipe = useCallback(

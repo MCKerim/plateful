@@ -49,7 +49,6 @@
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
     "continueWithGoogle": "Mit Google fortfahren",
     "continueWithEMail": "Mit E-Mail fortfahren",
-    "termsAndConditions": "Indem Sie sich anmelden, stimmen Sie unseren Nutzungsbedingungen und Datenschutzrichtlinien zu.",
     "alreadyHaveAccount": "Bereits registriert? Anmelden"
   },
   "emailSignup": {
@@ -87,6 +86,11 @@
     "loginButton": "Magic Link senden",
     "loading": "Magic Link wird gesendet...",
     "dontHaveAccount": "Noch nicht registriert? Jetzt anmelden",
+    "termsPrefix": "Indem du dich anmeldest, stimmst du unseren",
+    "termsOfService": "Nutzungsbedingungen",
+    "termsAnd": "und",
+    "privacyPolicy": "Datenschutzrichtlinien",
+    "termsSuffix": " zu",
     "errors": {
       "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
       "loginFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
@@ -345,7 +349,24 @@
     "title": "Startseite",
     "todayYouPlanned": "Geplant für heute",
     "nothingPlannedToday": "Heute ist noch nichts geplant",
-    "goToPlanner": "Plane deine Woche"
+    "goToPlanner": "Plane deine Woche",
+    "markComplete": "Gekocht",
+    "gettingStarted": {
+      "title": "Erste Schritte",
+      "subtitle": "Schließe Missionen ab und erhalte eine Belohnung",
+      "claimReward": "Belohnung einlösen",
+      "claimingReward": "Wird eingelöst...",
+      "rewardDialog": {
+        "title": "Missionen abgeschlossen!",
+        "description": "Euer Haushalt hat eine Belohnung erhalten:",
+        "viewRewards": "Belohnungen ansehen"
+      },
+      "missions": {
+        "import_recipes": "Importiere deine ersten 3 Rezepte",
+        "chat_with_chef": "Chatte mit dem KI-Koch",
+        "plan_meals": "Plane deine ersten 3 Mahlzeiten"
+      }
+    }
   },
   "explore": {
     "title": "Erkunden"
@@ -363,12 +384,12 @@
     "householdDescription": "Nutze Plateful mit deinen Freunden oder deiner Familie!",
     "notifications": "Benachrichtigungen",
     "manageNotifications": "Benachrichtigungen verwalten",
-    "manageYourHousehold": "Verwalte dein Haushalt",
+    "manageYourHousehold": "Verwalte deinen Haushalt",
 
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "Wir freuen uns auf Ihr Feedback! Teilen Sie Ihre Ideen, melden Sie Fehler oder schlagen Sie neue Funktionen vor.",
     "suggestFeatureOrReportBug": "Feature vorschlagen oder Fehler melden",
-    "whatsNew": "Neuigkeiten Entdecken",
+    "whatsNew": "Neuigkeiten entdecken",
     "viewRoadmap": "Roadmap ansehen",
 
     "aboutDescription": "👋Hey, ich bin Kerim Ismail und habe Plateful designt und entwickelt.\nDu hast Feedback oder willst in Kontakt kommen? Dann schreib mir gerne!👇",
@@ -414,7 +435,11 @@
       "managedBy": "Abonnement verwaltet von {{name}}"
     }
   },
+  "badges": {
+    "onboarding_complete": "Jetzt wird gekocht!"
+  },
   "householdSettings": {
+    "achievements": "Errungenschaften:",
     "member": "Mitglied",
     "members": "Mitglieder",
     "you": "Du",
@@ -518,7 +543,7 @@
     "recipeUpdated": "Rezept aktualisiert!"
   },
   "rating": {
-    "rate": "Bewerte dieses Rezept",
+    "rate": "Bewerten",
     "title": "Wie hat es dir geschmeckt?",
     "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",

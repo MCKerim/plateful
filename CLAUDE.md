@@ -74,9 +74,11 @@ Do not create `index.ts` barrel files for re-exporting. Import directly from sou
 - **React Query**: Server data (recipes, meal plans, ratings) with 5-minute stale time
 - **Supabase Realtime**: Live updates for user/household changes
 
+> When updating DB flags (e.g. `has_completed_survey`), dispatch Redux update locally before navigating — Realtime sync has a delay and the routing guard will redirect if state hasn't updated yet.
+
 ### Authentication & Routing
 
-The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/lib/routeToCorrectPagePure.tsx` controls access based on:
+The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/lib/routeToCorrectPagePure/` controls access based on:
 
 1. Login status
 2. Value screens completion
@@ -86,6 +88,12 @@ The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/li
 ### Supabase Access
 
 Use the `useSupabase()` hook to get the typed Supabase client. Types are generated from the schema in `src/types/database.types.ts`.
+
+### RLS Policy Mental Model
+
+- **Household-scoped**: recipes, recipe_ingredients, cookbooks, meal_planning
+- **Owner-scoped** (write): recipe_ratings, survey_answers
+- **Intentionally open SELECT**: household, users, invites (needed for invite flow and member lookup)
 
 ### Subscription & Paywall
 

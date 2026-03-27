@@ -27,7 +27,7 @@ export default function Subscribe() {
 
     // Household already has an active subscription — skip paywall
     if (isActive) {
-      navigate("/choosename", { replace: true });
+      navigate("/home", { replace: true });
       return;
     }
 
@@ -44,7 +44,7 @@ export default function Subscribe() {
       const result = await presentPaywall({ displayCloseButton: false });
 
       if (result === PAYWALL_RESULT.PURCHASED || result === PAYWALL_RESULT.RESTORED) {
-        navigate("/choosename", { replace: true });
+        navigate("/home", { replace: true });
       } else if (result === PAYWALL_RESULT.CANCELLED) {
         // Cannot skip — re-present
         presenting.current = false;

@@ -15,7 +15,7 @@ export default function InviteMembers() {
   }, []);
 
   async function completeScreen() {
-    navigate("/");
+    navigate("/howitworks");
   }
 
   return (

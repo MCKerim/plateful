@@ -42,3 +42,5 @@ export const selectSubscriptionLoading = (state: RootState) =>
   state.subscription.isLoading;
 export const selectCustomerInfo = (state: RootState) =>
   state.subscription.customerInfo;
+export const selectHasUsedTrial = (state: RootState) =>
+  state.subscription.customerInfo?.entitlements.all[ENTITLEMENT_ID] !== undefined;
