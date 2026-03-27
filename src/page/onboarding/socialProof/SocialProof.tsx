@@ -5,41 +5,27 @@ import { AppReview } from "@capawesome/capacitor-app-review";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import TestimonialCard from "@/components/onboarding/testimonialCard/TestimonialCard";
-import { useAppSelector, useAppDispatch } from "@/redux/hooks";
-import { selectUser, setUser } from "@/redux/slices/userSlice";
-import { useSupabase } from "@/utils/supabase";
-import { toast } from "sonner";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHasUsedTrial } from "@/redux/slices/subscriptionSlice";
 import { useEffect } from "react";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function SocialProof() {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { supabase } = useSupabase();
-  const user = useAppSelector(selectUser);
-  const dispatch = useAppDispatch();
+  const hasUsedTrial = useAppSelector(selectHasUsedTrial);
   const { trackScreenViewed } = useOnboardingTracking();
 
   useEffect(() => {
     trackScreenViewed("social_proof");
   }, []);
 
-  async function completeSurveyAndNavigate() {
-    if (!user) return;
-
-    const { error } = await supabase
-      .from("users")
-      .update({ has_completed_survey: true })
-      .eq("id", user.id);
-
-    if (error) {
-      console.error("Error updating user:", error);
-      toast.error(t("survey.errors.completeFailed"));
-      return;
+  function navigateToPaywall() {
+    if (hasUsedTrial) {
+      navigate("/subscribe");
+    } else {
+      navigate("/trial");
     }
-
-    dispatch(setUser({ ...user, has_completed_survey: true }));
-    navigate("/trial");
   }
 
   async function requestInAppReview() {
@@ -48,7 +34,7 @@ export default function SocialProof() {
     } catch {
       // In-app review not available (beta/web/simulator) — continue silently
     }
-    await completeSurveyAndNavigate();
+    navigateToPaywall();
   }
 
   return (
@@ -108,7 +94,7 @@ export default function SocialProof() {
         <OnboardingButton
           label={t("socialProof.skipButton")}
           variant="ghost"
-          onClick={completeSurveyAndNavigate}
+          onClick={navigateToPaywall}
         />
 
         <OnboardingButton label={t("socialProof.reviewButton")} onClick={requestInAppReview} />

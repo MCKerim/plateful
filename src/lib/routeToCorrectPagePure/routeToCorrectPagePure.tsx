@@ -1,5 +1,4 @@
 import React from "react";
-import SignUp from "@/page/onboarding/signUp/SignUp";
 import { Navigate } from "react-router";
 
 export function routeToCorrectPagePure(
@@ -9,21 +8,17 @@ export function routeToCorrectPagePure(
   isPro: () => boolean,
   hasHousehold: () => boolean
 ) {
-  if (isLoggedIn()) {
-    if (hasCompletedSurvey()) {
-      if (hasHousehold()) {
-        if (isPro()) {
-          return page;
-        } else {
-          return <Navigate to="/subscribe" />;
-        }
-      } else {
-        return <Navigate to="/createhousehold" />;
-      }
-    } else {
-      return <Navigate to="/values/1" />;
-    }
-  } else {
-    return <SignUp />;
+  if (!isLoggedIn()) {
+    return <Navigate to="/" />;
   }
+  if (!hasCompletedSurvey()) {
+    return <Navigate to="/values/1" />;
+  }
+  if (!hasHousehold()) {
+    return <Navigate to="/createhousehold" />;
+  }
+  if (!isPro()) {
+    return <Navigate to="/howitworks" />;
+  }
+  return page;
 }

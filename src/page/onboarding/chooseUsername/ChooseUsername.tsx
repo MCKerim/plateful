@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { toast } from "sonner";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectUser, setUser } from "@/redux/slices/userSlice";
-import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
+import { useCompleteOnboarding } from "@/hooks/user/useCompleteOnboarding";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,7 +16,7 @@ export default function ChooseUsername() {
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
   const dispatch = useAppDispatch();
-  const updateUsernameMutation = useUpdateUsername();
+  const completeOnboardingMutation = useCompleteOnboarding();
   const { trackScreenViewed } = useOnboardingTracking();
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function ChooseUsername() {
 
   function handleNext() {
     if (!user) return;
-    if (updateUsernameMutation.isPending) return;
+    if (completeOnboardingMutation.isPending) return;
 
     const trimmed = username.trim();
     if (trimmed === "") {
@@ -39,20 +39,15 @@ export default function ChooseUsername() {
       return;
     }
 
-    if (trimmed === user.username) {
-      navigate("/createhousehold");
-      return;
-    }
-
-    updateUsernameMutation.mutate(
+    completeOnboardingMutation.mutate(
       { userId: user.id, username: trimmed },
       {
         onSuccess: () => {
-          dispatch(setUser({ ...user, username: trimmed }));
+          dispatch(setUser({ ...user, username: trimmed, has_completed_survey: true }));
           navigate("/createhousehold");
         },
         onError: (error) => {
-          console.error("Error updating username:", error);
+          console.error("Error completing onboarding:", error);
           toast.error(t("chooseUsername.errors.updateFailed"));
         },
       }

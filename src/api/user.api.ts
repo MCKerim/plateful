@@ -61,6 +61,20 @@ export const userApi = {
     }
   },
 
+  async completeOnboarding(
+    supabase: SupabaseClient<Database>,
+    params: { userId: string; username: string }
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("users")
+      .update({ username: params.username, has_completed_survey: true })
+      .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
   async updateLanguage(
     supabase: SupabaseClient<Database>,
     params: { userId: string; language: string }

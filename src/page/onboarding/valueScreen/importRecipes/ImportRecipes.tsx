@@ -41,7 +41,7 @@ export default function ImportRecipes() {
   }, []);
 
   return (
-    <OnboardingLayout onNext={() => navigate("/howitworks")}>
+    <OnboardingLayout onNext={() => navigate("/choosename")}>
       <motion.div
         className="text-center"
         initial={{ opacity: 0, y: -15 }}
