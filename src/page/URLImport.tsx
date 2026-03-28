@@ -2,7 +2,7 @@ import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Field, FieldDescription, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import LoadingDots from "@/components/general/LoadingDots";
@@ -25,6 +25,14 @@ export default function URLImport() {
   const incrementMission = useIncrementMission();
 
   const [searchParams, setSearchParams] = useSearchParams();
+  const importAbortRef = useRef<AbortController | null>(null);
+
+  // Abort any in-progress import when the component unmounts
+  useEffect(() => {
+    return () => {
+      importAbortRef.current?.abort();
+    };
+  }, []);
 
   const handleSave = useCallback(
     async (url: string, signal?: AbortSignal) => {
@@ -85,14 +93,22 @@ export default function URLImport() {
   );
 
   useEffect(() => {
-    const abortController = new AbortController();
-
     const urlFromParams = searchParams.get("url");
     if (urlFromParams) {
+      // Store the controller in a ref so its lifetime is not tied to this effect's
+      // cleanup — setSearchParams will cause the effect to re-run and the cleanup
+      // would otherwise abort the still-running import.
+      importAbortRef.current = new AbortController();
       setSearchParams({}, { replace: true });
       setUrlInput(urlFromParams);
-      handleSave(urlFromParams, abortController.signal);
-    } else if (!urlFromParams) {
+      handleSave(urlFromParams, importAbortRef.current.signal);
+      return;
+    }
+
+    // Only paste from clipboard when no auto-import was just triggered
+    if (!importAbortRef.current) {
+      const abortController = new AbortController();
+
       async function autoPasteFromClipboard() {
         try {
           const text = await readClipboardText();
@@ -107,11 +123,10 @@ export default function URLImport() {
       }
 
       autoPasteFromClipboard();
+      return () => {
+        abortController.abort();
+      };
     }
-
-    return () => {
-      abortController.abort();
-    };
   }, [searchParams, setSearchParams, handleSave, t]);
 
   const saveFooter = (
