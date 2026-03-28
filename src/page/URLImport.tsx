@@ -14,7 +14,23 @@ import { queryKeys } from "@/lib/query-keys";
 import { readClipboardText } from "@/utils/nativeClipboard";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
-let lastAutoImportedUrl: string | null = null;
+const IMPORTED_URL_KEY = "lastAutoImportedUrl";
+
+function wasUrlAlreadyAutoImported(url: string): boolean {
+  try {
+    return localStorage.getItem(IMPORTED_URL_KEY) === url;
+  } catch {
+    return false;
+  }
+}
+
+function markUrlAsAutoImported(url: string): void {
+  try {
+    localStorage.setItem(IMPORTED_URL_KEY, url);
+  } catch {
+    // ignore storage errors
+  }
+}
 
 export default function URLImport() {
   const { t } = useTranslation();
@@ -91,8 +107,8 @@ export default function URLImport() {
     const abortController = new AbortController();
 
     const urlFromParams = searchParams.get("url");
-    if (urlFromParams && lastAutoImportedUrl !== urlFromParams) {
-      lastAutoImportedUrl = urlFromParams;
+    if (urlFromParams && !wasUrlAlreadyAutoImported(urlFromParams)) {
+      markUrlAsAutoImported(urlFromParams);
       setUrlInput(urlFromParams);
       handleSave(urlFromParams, abortController.signal);
     } else if (!urlFromParams) {
