@@ -60,6 +60,7 @@ export default function URLImport() {
           setData(data[0]);
           incrementMission.mutate({ missionId: "import_recipes" });
           await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
+          window.history.replaceState(null, "", "/cookbook");
           toast.success(t("urlImport.success"), {
             action: {
               label: t("urlImport.viewRecipe"),
