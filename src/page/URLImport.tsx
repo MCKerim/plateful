@@ -14,8 +14,6 @@ import { queryKeys } from "@/lib/query-keys";
 import { readClipboardText } from "@/utils/nativeClipboard";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
-let lastAutoImportedUrl: string | null = null;
-
 export default function URLImport() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -26,7 +24,7 @@ export default function URLImport() {
   const queryClient = useQueryClient();
   const incrementMission = useIncrementMission();
 
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const handleSave = useCallback(
     async (url: string, signal?: AbortSignal) => {
@@ -54,7 +52,6 @@ export default function URLImport() {
           setData(data[0]);
           incrementMission.mutate({ missionId: "import_recipes" });
           await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-          window.history.replaceState(null, "", "/cookbook");
           toast.success(t("urlImport.success"), {
             action: {
               label: t("urlImport.viewRecipe"),
@@ -91,8 +88,8 @@ export default function URLImport() {
     const abortController = new AbortController();
 
     const urlFromParams = searchParams.get("url");
-    if (urlFromParams && lastAutoImportedUrl !== urlFromParams) {
-      lastAutoImportedUrl = urlFromParams;
+    if (urlFromParams) {
+      setSearchParams({}, { replace: true });
       setUrlInput(urlFromParams);
       handleSave(urlFromParams, abortController.signal);
     } else if (!urlFromParams) {
@@ -115,7 +112,7 @@ export default function URLImport() {
     return () => {
       abortController.abort();
     };
-  }, [searchParams, handleSave, t]);
+  }, [searchParams, setSearchParams, handleSave, t]);
 
   const saveFooter = (
     <>
