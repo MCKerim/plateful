@@ -142,7 +142,7 @@ export default function ImageImport() {
         await queryClient.invalidateQueries({
           queryKey: queryKeys.recipes.all,
         });
-        navigate("/cookbook", { replace: true });
+        window.history.replaceState(null, "", "/cookbook");
         toast.success(t("urlImport.success"), {
           action: {
             label: t("urlImport.viewRecipe"),
