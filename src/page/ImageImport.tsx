@@ -17,23 +17,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
-const IMPORTED_FILE_URIS_KEY = "lastAutoImportedFileUris";
-
-function wereFileUrisAlreadyAutoImported(key: string): boolean {
-  try {
-    return localStorage.getItem(IMPORTED_FILE_URIS_KEY) === key;
-  } catch {
-    return false;
-  }
-}
-
-function markFileUrisAsAutoImported(key: string): void {
-  try {
-    localStorage.setItem(IMPORTED_FILE_URIS_KEY, key);
-  } catch {
-    // ignore storage errors
-  }
-}
+let lastAutoImportedFileUris: string | null = null;
 
 export default function ImageImport() {
   const { t } = useTranslation();
@@ -82,8 +66,8 @@ export default function ImageImport() {
   useEffect(() => {
     const fileUris = searchParams.getAll("fileUri");
     const fileUrisKey = fileUris.join(",");
-    if (fileUris.length === 0 || wereFileUrisAlreadyAutoImported(fileUrisKey)) return;
-    markFileUrisAsAutoImported(fileUrisKey);
+    if (fileUris.length === 0 || lastAutoImportedFileUris === fileUrisKey) return;
+    lastAutoImportedFileUris = fileUrisKey;
 
     const loadSharedFiles = async () => {
       for (const uri of fileUris) {
