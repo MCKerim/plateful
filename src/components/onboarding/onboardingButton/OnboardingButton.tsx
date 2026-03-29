@@ -6,6 +6,7 @@ type Props = {
   icon?: React.ReactNode;
   isStart?: boolean;
   variant?: "default" | "accent" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  disabled?: boolean;
 };
 
 export default function OnboardingButton({
@@ -14,6 +15,7 @@ export default function OnboardingButton({
   icon,
   isStart,
   variant = "default",
+  disabled,
 }: Readonly<Props>) {
   return (
     <Button
@@ -24,6 +26,7 @@ export default function OnboardingButton({
       }
       onClick={onClick}
       variant={variant}
+      disabled={disabled}
     >
       {icon}
 
