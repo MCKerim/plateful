@@ -643,7 +643,6 @@ export type Database = {
           created_at: string
           email: string
           has_completed_survey: boolean
-          has_seen_value_screens: boolean
           household_id: string | null
           id: string
           language: string | null
@@ -654,7 +653,6 @@ export type Database = {
           created_at?: string
           email: string
           has_completed_survey?: boolean
-          has_seen_value_screens?: boolean
           household_id?: string | null
           id?: string
           language?: string | null
@@ -665,10 +663,9 @@ export type Database = {
           created_at?: string
           email?: string
           has_completed_survey?: boolean
-          has_seen_value_screens?: boolean
           household_id?: string | null
           id?: string
-          language?: string
+          language?: string | null
           notification_preferences?: Json | null
           username?: string
         }

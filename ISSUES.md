@@ -12,4 +12,5 @@
 ## Other Issues
 
 - `src/hooks/user/useUserData.ts:51,66` — language saved to both localStorage and Supabase with no conflict resolution
-- `src/App.tsx` — Several useEffects missing dependencies (`supabase`, `fetchUserData`) but require careful restructuring to avoid infinite loops
+- `src/App.tsx` — `onAuthStateChange` effect (line 220, `[]` deps) and realtime subscription effect (line 238, `[user?.id]` deps) both call `updateUser` via stale closure. Fix: wrap `updateUser` in `useCallback([fetchUserData])` and add it to both effect dep arrays. Check `fetchUserData` in `useUserData` is already stable before doing this. Low practical risk since both effects fire infrequently.
+- `src/utils/` — `supabase.tsx` (React provider) belongs in `src/providers/`; `nativeBrowser.ts`/`nativeClipboard.ts` belong in `src/lib/`. Blocked by 62 import sites — pure cosmetic cleanup, no functional benefit.
