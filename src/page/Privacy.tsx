@@ -6,7 +6,7 @@ export default function Privacy() {
       <div className="space-y-2 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Privacy Policy</h1>
-          <p className="text-sm text-muted-foreground">Last updated: February 27, 2026</p>
+          <p className="text-sm text-muted-foreground">Last updated: March 29, 2026</p>
         </div>
 
         <Separator />
@@ -183,8 +183,9 @@ export default function Privacy() {
               <div className="space-y-1">
                 <h3 className="font-medium">RevenueCat</h3>
                 <p>
-                  Your user ID and subscription/purchase information are processed by RevenueCat
-                  to manage your subscription.{" "}
+                  Your user ID, subscription/purchase information, and on Android the Google
+                  Advertising ID (GAID) are processed by RevenueCat to manage your subscription
+                  and measure subscription analytics.{" "}
                   <a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
                 </p>
               </div>
