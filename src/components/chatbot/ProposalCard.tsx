@@ -142,7 +142,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
                   {args.instructions && (
                     <div>
                       <p className="text-xs font-semibold mb-1">{t("recipe.instructions")}</p>
-                      <MarkdownRenderer content={args.instructions} className="text-xs font-medium" />
+                      <MarkdownRenderer content={args.instructions} />
                     </div>
                   )}
                 </div>
@@ -202,7 +202,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
                 {args.instructions && (
                   <div>
                     <p className="text-xs font-semibold mb-1">{t("recipe.instructions")}</p>
-                    <MarkdownRenderer content={args.instructions} className="text-xs font-medium" />
+                    <MarkdownRenderer content={args.instructions} />
                   </div>
                 )}
               </div>
