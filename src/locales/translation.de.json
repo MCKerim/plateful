@@ -540,7 +540,14 @@
     "updateRecipePrompt": "Aktualisiere das Rezept oder frage nach anderen Änderungen",
     "updateRecipeError": "Fehler beim Aktualisieren des Rezepts. Bitte versuche es später erneut.",
     "recipeSaved": "Rezept gespeichert!",
-    "recipeUpdated": "Rezept aktualisiert!"
+    "recipeUpdated": "Rezept aktualisiert!",
+    "saveToCookbook": "In Kochbuch speichern",
+    "notForMe": "Nicht für mich",
+    "applyChanges": "Änderungen übernehmen",
+    "keepOriginal": "Original behalten",
+    "proposalSkipped": "Übersprungen",
+    "proposalEditLabel": "Bearbeitung:",
+    "errorMessage": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut."
   },
   "rating": {
     "rate": "Bewerten",

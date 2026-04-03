@@ -177,6 +177,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
         {
           proposalId: "p_1",
           toolName: "propose_recipe_edit",
+          status: "pending" as const,
           args: {
             recipeId: recipeId,
             title: "Updated Recipe Name",
@@ -265,6 +266,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
         {
           proposalId: "p_1",
           toolName: "propose_recipe",
+          status: "pending" as const,
           args: {
             title: "Banana Pancakes",
             description: "## Ingredients\n- 2 bananas\n- 2 eggs",
@@ -352,6 +354,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
               {
                 proposalId: "p_1",
                 toolName: "propose_recipe",
+                status: "pending" as const,
                 args: {
                   title: "Test Recipe",
                   description: "Test description",
