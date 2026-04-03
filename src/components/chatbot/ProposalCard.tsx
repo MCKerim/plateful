@@ -1,7 +1,10 @@
-import { Check } from "lucide-react";
+import { useState } from "react";
+import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { getCategoryIdByTranslatedEnglishName, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { ToolOutputForUI } from "@/redux/slices/chatbotSlice";
+import { ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface ProposalCardProps {
   toolOutput: ToolOutputForUI;
@@ -21,7 +24,37 @@ const CHANGED_FIELD_LABELS: Record<string, string> = {
   instructions: "Instructions",
 };
 
+function IngredientList({ ingredients }: { ingredients: ChatbotIngredient[] }) {
+  const sections = ingredients.reduce<{ section: string | null; items: string[] }[]>((acc, ing) => {
+    const last = acc[acc.length - 1];
+    if (last && last.section === ing.section) {
+      last.items.push(ing.item);
+    } else {
+      acc.push({ section: ing.section, items: [ing.item] });
+    }
+    return acc;
+  }, []);
+
+  return (
+    <>
+      {sections.map((group, i) => (
+        <div key={i}>
+          {group.section && (
+            <p className="text-xs font-semibold mt-2 mb-0.5">{group.section}</p>
+          )}
+          <ul className="list-disc list-inside text-xs space-y-0.5">
+            {group.items.map((item, j) => (
+              <li key={j}>{item}</li>
+            ))}
+          </ul>
+        </div>
+      ))}
+    </>
+  );
+}
+
 export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: ProposalCardProps) {
+  const [expanded, setExpanded] = useState(false);
   const isEdit = toolOutput.toolName === "propose_recipe_edit";
   const { status, args, savedRecipeId } = toolOutput;
 
@@ -60,17 +93,20 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
     );
   }
 
-  // ── Pending state ─────────────────────────────────────────────────────────────
+  // ── Pending — edit proposal ───────────────────────────────────────────────────
   if (isEdit) {
     const changedFields = Object.keys(args).filter(
       (k) => k !== "recipeId" && CHANGED_FIELD_LABELS[k]
     );
+    const hasExpandableContent =
+      (args.ingredients && args.ingredients.length > 0) || !!args.instructions;
 
     return (
       <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground">
         <p className="second-font font-medium text-center text-sm mb-1">
           {t("chatbot.proposalEditLabel")} {title}
         </p>
+
         {changedFields.length > 0 && (
           <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
             {changedFields.map((field) => (
@@ -78,23 +114,56 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
                 <span className="w-1 h-1 rounded-full bg-muted-foreground shrink-0" />
                 {CHANGED_FIELD_LABELS[field]}
                 {field === "ingredients" && args.ingredients
-                  ? ` (${args.ingredients.length} items)`
+                  ? ` (${args.ingredients.length})`
                   : ""}
               </li>
             ))}
           </ul>
         )}
+
+        {hasExpandableContent && (
+          <>
+            <button
+              className="flex items-center gap-1 text-xs text-muted-foreground mt-2 w-full justify-center"
+              onClick={() => setExpanded((v) => !v)}
+            >
+              {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+              {expanded ? t("chatbot.hideDetails") : t("chatbot.showDetails")}
+            </button>
+
+            {expanded && (
+              <ScrollArea className="max-h-52 mt-2">
+                <div className="space-y-3 pr-2">
+                  {args.ingredients && args.ingredients.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold mb-1">{t("ingredients.title")}</p>
+                      <IngredientList ingredients={args.ingredients} />
+                    </div>
+                  )}
+                  {args.instructions && (
+                    <div>
+                      <p className="text-xs font-semibold mb-1">{t("recipe.instructions")}</p>
+                      <MarkdownRenderer content={args.instructions} className="text-xs font-medium" />
+                    </div>
+                  )}
+                </div>
+              </ScrollArea>
+            )}
+          </>
+        )}
       </div>
     );
   }
 
-  // New recipe pending
+  // ── Pending — new recipe ──────────────────────────────────────────────────────
   const categoryId = args.category
     ? getCategoryIdByTranslatedEnglishName(args.category)
     : null;
   const displayCategory =
     categoryId !== null ? getTranslatedCategory(t, categoryId) : (args.category ?? "");
   const ingredientCount = args.ingredients?.length ?? 0;
+  const hasExpandableContent =
+    (args.ingredients && args.ingredients.length > 0) || !!args.instructions;
 
   return (
     <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground">
@@ -108,6 +177,40 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
           .filter(Boolean)
           .join(" · ")}
       </p>
+
+      {hasExpandableContent && (
+        <>
+          <button
+            className="flex items-center gap-1 text-xs text-muted-foreground mt-2 w-full justify-center"
+            onClick={() => setExpanded((v) => !v)}
+          >
+            {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
+            {expanded ? t("chatbot.hideDetails") : t("chatbot.showDetails")}
+          </button>
+
+          {expanded && (
+            <ScrollArea className="max-h-52 mt-2">
+              <div className="space-y-3 pr-2">
+                {args.description && (
+                  <p className="text-xs text-muted-foreground">{args.description}</p>
+                )}
+                {args.ingredients && args.ingredients.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold mb-1">{t("ingredients.title")}</p>
+                    <IngredientList ingredients={args.ingredients} />
+                  </div>
+                )}
+                {args.instructions && (
+                  <div>
+                    <p className="text-xs font-semibold mb-1">{t("recipe.instructions")}</p>
+                    <MarkdownRenderer content={args.instructions} className="text-xs font-medium" />
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          )}
+        </>
+      )}
     </div>
   );
 }

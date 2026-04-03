@@ -540,6 +540,8 @@
     "keepOriginal": "Keep Original",
     "proposalSkipped": "Skipped",
     "proposalEditLabel": "Edit:",
+    "showDetails": "Show full recipe",
+    "hideDetails": "Hide details",
     "errorMessage": "Sorry, I'm having trouble connecting right now. Please try again later."
   },
   "bottomNav": {

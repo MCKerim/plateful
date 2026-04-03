@@ -547,6 +547,8 @@
     "keepOriginal": "Original behalten",
     "proposalSkipped": "Übersprungen",
     "proposalEditLabel": "Bearbeitung:",
+    "showDetails": "Vollständiges Rezept anzeigen",
+    "hideDetails": "Details ausblenden",
     "errorMessage": "Entschuldige, ich habe Probleme beim Verarbeiten deiner Anfrage. Bitte versuche es später erneut."
   },
   "rating": {
