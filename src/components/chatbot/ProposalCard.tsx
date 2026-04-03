@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { getCategoryIdByTranslatedEnglishName, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
@@ -132,7 +131,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
             </button>
 
             {expanded && (
-              <ScrollArea className="max-h-52 mt-2">
+              <div className="max-h-52 overflow-y-auto mt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
                 <div className="space-y-3 pr-2">
                   {args.ingredients && args.ingredients.length > 0 && (
                     <div>
@@ -147,7 +146,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
                     </div>
                   )}
                 </div>
-              </ScrollArea>
+              </div>
             )}
           </>
         )}
@@ -189,7 +188,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
           </button>
 
           {expanded && (
-            <ScrollArea className="max-h-52 mt-2">
+            <div className="max-h-52 overflow-y-auto mt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <div className="space-y-3 pr-2">
                 {args.description && (
                   <p className="text-xs text-muted-foreground">{args.description}</p>
@@ -207,7 +206,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
                   </div>
                 )}
               </div>
-            </ScrollArea>
+            </div>
           )}
         </>
       )}
