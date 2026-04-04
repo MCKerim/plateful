@@ -75,8 +75,8 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t, isActive
         onClick={() => setExpanded((v) => !v)}
       >
         {status === "saved" && <Check className="size-3.5 shrink-0 text-green-500" />}
-        {status === "dismissed" && <X className="size-3.5 shrink-0 text-muted-foreground" />}
-        <p className={`second-font font-medium text-sm truncate flex-1${status === "dismissed" ? " text-muted-foreground" : ""}`}>
+        {status === "dismissed" && <X className="size-3.5 shrink-0 text-red-500" />}
+        <p className={"second-font font-medium text-sm truncate flex-1"}>
           {isEdit ? `${t("chatbot.proposalEditLabel")} ` : ""}
           {title}
         </p>
@@ -112,10 +112,10 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t, isActive
           )}
 
           {hasDetailContent && (
-            <div className="max-h-52 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              <div className="space-y-3 pr-2">
+            <div>
+              <div className="space-y-3">
                 {args.description && !isEdit && (
-                  <p className="text-xs text-muted-foreground">{args.description}</p>
+                  <p className="text-xs">{args.description}</p>
                 )}
                 {args.ingredients && args.ingredients.length > 0 && (
                   <div>
