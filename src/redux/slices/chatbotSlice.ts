@@ -1,6 +1,9 @@
 import type { PayloadAction } from "@reduxjs/toolkit";
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../store";
+
+export const TOOL_PROPOSE_RECIPE = "propose_recipe" as const;
+export const TOOL_PROPOSE_EDIT = "propose_recipe_edit" as const;
 
 export interface ChatbotIngredient {
   item: string;
@@ -100,6 +103,7 @@ export const chatbotSlice = createSlice({
     finalizeLastMessage: (state, action: PayloadAction<ToolOutputForUI[]>) => {
       const last = state.messages[state.messages.length - 1];
       if (last && action.payload.length > 0) {
+        // Client owns proposal lifecycle — always initialise to "pending" regardless of server value
         const withStatus = action.payload.map((o) => ({ ...o, status: "pending" as const }));
         last.toolOutputsForUI = withStatus;
         state.activeProposal = withStatus[0];
@@ -151,8 +155,10 @@ export default chatbotSlice.reducer;
 
 export const selectMessages = (state: RootState) => state.chatbot.messages;
 export const selectIsTyping = (state: RootState) => state.chatbot.isTyping;
-export const selectVisibleMessages = (state: RootState) =>
-  state.chatbot.messages.filter((message: ChatMessage) => message.role !== "tool");
+export const selectVisibleMessages = createSelector(
+  (state: RootState) => state.chatbot.messages,
+  (messages) => messages.filter((m: ChatMessage) => m.role !== "tool")
+);
 export const selectPreviousResponseId = (state: RootState) => state.chatbot.previous_response_id;
 export const selectRecipeId = (state: RootState) => state.chatbot.recipeId;
 export const selectPendingFeedback = (state: RootState) => state.chatbot.pendingFeedback;

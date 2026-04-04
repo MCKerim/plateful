@@ -1,27 +1,17 @@
-import { useState } from "react";
-import { Check, ChevronDown, ChevronUp } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Check, ChevronDown, ChevronUp, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { getCategoryIdByTranslatedEnglishName, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
+import { TOOL_PROPOSE_EDIT, ToolOutputForUI, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface ProposalCardProps {
   toolOutput: ToolOutputForUI;
-  // For edit proposals the title may not be in args (only changed fields are sent).
-  // Pass the original recipe title so the card always has something to show.
   displayTitle?: string;
   onNavigate?: (recipeId: string) => void;
   t: (key: string) => string;
+  isActive?: boolean;
 }
-
-const CHANGED_FIELD_LABELS: Record<string, string> = {
-  title: "Title",
-  description: "Description",
-  servings: "Servings",
-  category: "Category",
-  ingredients: "Ingredients",
-  instructions: "Instructions",
-};
 
 function IngredientList({ ingredients }: { ingredients: ChatbotIngredient[] }) {
   const sections = ingredients.reduce<{ section: string | null; items: string[] }[]>((acc, ing) => {
@@ -52,145 +42,79 @@ function IngredientList({ ingredients }: { ingredients: ChatbotIngredient[] }) {
   );
 }
 
-export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: ProposalCardProps) {
-  const [expanded, setExpanded] = useState(false);
-  const isEdit = toolOutput.toolName === "propose_recipe_edit";
+export function ProposalCard({ toolOutput, displayTitle, onNavigate, t, isActive }: ProposalCardProps) {
+  const isEdit = toolOutput.toolName === TOOL_PROPOSE_EDIT;
   const { status, args, savedRecipeId } = toolOutput;
-
   const title = args.title ?? displayTitle ?? "";
+  const [expanded, setExpanded] = useState(false);
 
-  // ── Saved state ──────────────────────────────────────────────────────────────
-  if (status === "saved") {
-    return (
-      <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground flex items-center justify-between gap-2">
-        <div className="flex items-center gap-1.5 text-sm font-medium min-w-0">
-          <Check className="size-4 shrink-0 text-green-500" />
-          <span className="truncate">{title}</span>
-        </div>
-        {savedRecipeId && onNavigate && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="shrink-0 h-7 px-2 text-xs"
-            onClick={() => onNavigate(savedRecipeId)}
-          >
-            {t("common.open")} →
-          </Button>
-        )}
-      </div>
-    );
-  }
+  // Auto-expand when this becomes the active proposal
+  useEffect(() => {
+    if (isActive && status === "pending") setExpanded(true);
+  }, [isActive, status]);
 
-  // ── Dismissed state ───────────────────────────────────────────────────────────
-  if (status === "dismissed") {
-    return (
-      <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground">
-        <p className="text-xs text-muted-foreground">
-          {t("chatbot.proposalSkipped")} · {title}
-        </p>
-      </div>
-    );
-  }
+  // Auto-collapse when the user acts on the proposal
+  useEffect(() => {
+    if (status !== "pending") setExpanded(false);
+  }, [status]);
 
-  // ── Pending — edit proposal ───────────────────────────────────────────────────
-  if (isEdit) {
-    const changedFields = Object.keys(args).filter(
-      (k) => k !== "recipeId" && CHANGED_FIELD_LABELS[k]
-    );
-    const hasExpandableContent =
-      (args.ingredients && args.ingredients.length > 0) || !!args.instructions;
-
-    return (
-      <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground">
-        <p className="second-font font-medium text-center text-sm mb-1">
-          {t("chatbot.proposalEditLabel")} {title}
-        </p>
-
-        {changedFields.length > 0 && (
-          <ul className="text-xs text-muted-foreground space-y-0.5 mt-1">
-            {changedFields.map((field) => (
-              <li key={field} className="flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-muted-foreground shrink-0" />
-                {CHANGED_FIELD_LABELS[field]}
-                {field === "ingredients" && args.ingredients
-                  ? ` (${args.ingredients.length})`
-                  : ""}
-              </li>
-            ))}
-          </ul>
-        )}
-
-        {hasExpandableContent && (
-          <>
-            <button
-              className="flex items-center gap-1 text-xs text-muted-foreground mt-2 w-full justify-center"
-              onClick={() => setExpanded((v) => !v)}
-            >
-              {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-              {expanded ? t("chatbot.hideDetails") : t("chatbot.showDetails")}
-            </button>
-
-            {expanded && (
-              <div className="max-h-52 overflow-y-auto mt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <div className="space-y-3 pr-2">
-                  {args.ingredients && args.ingredients.length > 0 && (
-                    <div>
-                      <p className="text-xs font-semibold mb-1">{t("ingredients.title")}</p>
-                      <IngredientList ingredients={args.ingredients} />
-                    </div>
-                  )}
-                  {args.instructions && (
-                    <div>
-                      <p className="text-xs font-semibold mb-1">{t("recipe.instructions")}</p>
-                      <MarkdownRenderer content={args.instructions} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
-    );
-  }
-
-  // ── Pending — new recipe ──────────────────────────────────────────────────────
-  const categoryId = args.category
+  const categoryId = !isEdit && args.category
     ? getCategoryIdByTranslatedEnglishName(args.category)
     : null;
   const displayCategory =
     categoryId !== null ? getTranslatedCategory(t, categoryId) : (args.category ?? "");
-  const ingredientCount = args.ingredients?.length ?? 0;
-  const hasExpandableContent =
+
+  const hasDetailContent =
     (args.ingredients && args.ingredients.length > 0) || !!args.instructions;
 
   return (
     <div className="mt-2 pt-2 border-t border-dashed border-secondary-foreground">
-      <p className="second-font font-medium text-center">{title}</p>
-      <p className="text-xs text-muted-foreground text-center mt-0.5">
-        {[
-          displayCategory,
-          args.servings ? `${args.servings} ${t("addRecipe.servings").toLowerCase()}` : null,
-          ingredientCount > 0 ? `${ingredientCount} ${t("ingredients.title").toLowerCase()}` : null,
-        ]
-          .filter(Boolean)
-          .join(" · ")}
-      </p>
-
-      {hasExpandableContent && (
-        <>
-          <button
-            className="flex items-center gap-1 text-xs text-muted-foreground mt-2 w-full justify-center"
-            onClick={() => setExpanded((v) => !v)}
+      {/* Header row — entire row toggles expand/collapse */}
+      <div
+        className="flex items-center gap-2 cursor-pointer"
+        onClick={() => setExpanded((v) => !v)}
+      >
+        {status === "saved" && <Check className="size-3.5 shrink-0 text-green-500" />}
+        {status === "dismissed" && <X className="size-3.5 shrink-0 text-muted-foreground" />}
+        <p className={`second-font font-medium text-sm truncate flex-1${status === "dismissed" ? " text-muted-foreground" : ""}`}>
+          {isEdit ? `${t("chatbot.proposalEditLabel")} ` : ""}
+          {title}
+        </p>
+        {status === "saved" && savedRecipeId && onNavigate && (
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-6 px-2 text-xs shrink-0"
+            onClick={(e) => { e.stopPropagation(); onNavigate(savedRecipeId); }}
           >
-            {expanded ? <ChevronUp className="size-3" /> : <ChevronDown className="size-3" />}
-            {expanded ? t("chatbot.hideDetails") : t("chatbot.showDetails")}
-          </button>
+            {t("common.open")}
+          </Button>
+        )}
+        {expanded ? (
+          <ChevronUp className="size-3.5 shrink-0 text-muted-foreground" />
+        ) : (
+          <ChevronDown className="size-3.5 shrink-0 text-muted-foreground" />
+        )}
+      </div>
 
-          {expanded && (
-            <div className="max-h-52 overflow-y-auto mt-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+      {/* Expanded content */}
+      {expanded && (
+        <div className="mt-2 space-y-2">
+          {!isEdit && (
+            <p className="text-xs text-muted-foreground">
+              {[
+                displayCategory,
+                args.servings ? `${args.servings} ${t("addRecipe.servings").toLowerCase()}` : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          )}
+
+          {hasDetailContent && (
+            <div className="max-h-52 overflow-y-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
               <div className="space-y-3 pr-2">
-                {args.description && (
+                {args.description && !isEdit && (
                   <p className="text-xs text-muted-foreground">{args.description}</p>
                 )}
                 {args.ingredients && args.ingredients.length > 0 && (
@@ -208,7 +132,7 @@ export function ProposalCard({ toolOutput, displayTitle, onNavigate, t }: Propos
               </div>
             </div>
           )}
-        </>
+        </div>
       )}
     </div>
   );

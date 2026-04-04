@@ -16,6 +16,8 @@ import {
   resetChat,
   ChatMessage,
   ToolOutputForUI,
+  ChatbotIngredient,
+  TOOL_PROPOSE_EDIT,
   setPreviousResponseId,
   selectPreviousResponseId,
   appendToLastMessage,
@@ -52,6 +54,14 @@ type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; 
 
 const DEFAULT_CATEGORY_ID = 5;
 
+function toIngredientInputs(ingredients: ChatbotIngredient[]): RecipeIngredientInput[] {
+  return ingredients.map((ing, i) => ({
+    rawText: ing.item,
+    groupName: ing.section,
+    sortOrder: i,
+  }));
+}
+
 export default function Chatbot() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
@@ -75,11 +85,18 @@ export default function Chatbot() {
   const { data: recipeContext } = useRecipe(recipeId);
   const { data: recipeContextIngredients = [] } = useRecipeIngredients(recipeId);
 
-  // Fetch original recipe data for the active edit proposal so we can merge changes on save
-  const activeEditRecipeId =
-    activeProposal?.toolName === "propose_recipe_edit"
-      ? (activeProposal.args.recipeId ?? null)
-      : null;
+  // Fetch original recipe data for any edit proposal in the conversation.
+  // Derived from messages (not activeProposal) so the title persists after save.
+  const activeEditRecipeId = (() => {
+    for (const msg of messages) {
+      for (const output of msg.toolOutputsForUI ?? []) {
+        if (output.toolName === TOOL_PROPOSE_EDIT && output.args.recipeId) {
+          return output.args.recipeId;
+        }
+      }
+    }
+    return null;
+  })();
   const { data: activeEditOriginalRecipe } = useRecipe(activeEditRecipeId);
   const { data: activeEditOriginalIngredients = [] } = useRecipeIngredients(activeEditRecipeId);
 
@@ -266,7 +283,7 @@ export default function Chatbot() {
   async function handleSaveActiveProposal() {
     if (!activeProposal) return;
 
-    if (activeProposal.toolName === "propose_recipe_edit") {
+    if (activeProposal.toolName === TOOL_PROPOSE_EDIT) {
       await saveEditedRecipe(activeProposal);
     } else {
       await saveNewRecipe(activeProposal);
@@ -300,12 +317,10 @@ export default function Chatbot() {
       });
 
       if (ingredients && ingredients.length > 0) {
-        const inputs: RecipeIngredientInput[] = ingredients.map((ing, i) => ({
-          rawText: ing.item,
-          groupName: ing.section,
-          sortOrder: i,
-        }));
-        await replaceIngredientsMutation.mutateAsync({ recipeId: newRecipe.id, inputs });
+        await replaceIngredientsMutation.mutateAsync({
+          recipeId: newRecipe.id,
+          inputs: toIngredientInputs(ingredients),
+        });
       }
 
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
@@ -367,12 +382,10 @@ export default function Chatbot() {
       });
 
       if (finalIngredients && finalIngredients.length > 0) {
-        const inputs: RecipeIngredientInput[] = finalIngredients.map((ing, i) => ({
-          rawText: ing.item,
-          groupName: ing.section,
-          sortOrder: i,
-        }));
-        await replaceIngredientsMutation.mutateAsync({ recipeId: editRecipeId, inputs });
+        await replaceIngredientsMutation.mutateAsync({
+          recipeId: editRecipeId,
+          inputs: toIngredientInputs(finalIngredients),
+        });
       }
 
       dispatch(
@@ -393,7 +406,7 @@ export default function Chatbot() {
     }
   }
 
-  const isEditProposal = activeProposal?.toolName === "propose_recipe_edit";
+  const isEditProposal = activeProposal?.toolName === TOOL_PROPOSE_EDIT;
 
   return (
     <Layout
@@ -456,87 +469,68 @@ export default function Chatbot() {
       {/* Messages */}
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mb-60">
         {visibleMessages.map((message, index) => (
-          <div
-            key={`${message.role}-${index}`}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`flex items-start gap-2 ${
-                message.role === "user" ? "flex-row-reverse max-w-[80%]" : "flex-row w-full"
-              }`}
-            >
-              <div
-                className={`rounded-lg max-w-full px-4 py-2 ${
-                  message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                }`}
-              >
-                {message.role === "user" && (
-                  <>
-                    {"recipeName" in message &&
-                      (message as ChatMessage & { recipeName?: string }).recipeName && (
-                        <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
-                          {(message as ChatMessage & { recipeName?: string }).recipeName}
-                        </div>
-                      )}
+          <div key={`${message.role}-${index}`}>
+            {message.role === "user" ? (
+              <div className="flex justify-end">
+                <div className="rounded-2xl bg-primary text-primary-foreground px-4 py-2 max-w-[80%]">
+                  {"recipeName" in message &&
+                    (message as ChatMessage & { recipeName?: string }).recipeName && (
+                      <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
+                        {(message as ChatMessage & { recipeName?: string }).recipeName}
+                      </div>
+                    )}
 
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                    {"images" in message &&
-                      Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
-                      ((message as ChatMessage & { images?: string[] }).images ?? []).length > 0 && (
-                        <div className="flex gap-2 mt-2 flex-wrap">
-                          {((message as ChatMessage & { images?: string[] }).images ?? []).map(
-                            (src: string, i: number) => (
-                              <img
-                                key={i}
-                                src={`data:image/jpeg;base64,${src}`}
-                                srcSet={`data:image/jpeg;base64,${src}`}
-                                alt={`upload-${i}`}
-                                className="rounded-md border w-16 h-16 object-cover"
-                              />
-                            )
-                          )}
-                        </div>
-                      )}
-                  </>
-                )}
+                  {"images" in message &&
+                    Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
+                    ((message as ChatMessage & { images?: string[] }).images ?? []).length > 0 && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {((message as ChatMessage & { images?: string[] }).images ?? []).map(
+                          (src: string, i: number) => (
+                            <img
+                              key={i}
+                              src={`data:image/jpeg;base64,${src}`}
+                              srcSet={`data:image/jpeg;base64,${src}`}
+                              alt={`upload-${i}`}
+                              className="rounded-md border w-16 h-16 object-cover"
+                            />
+                          )
+                        )}
+                      </div>
+                    )}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full">
+                <MarkdownRenderer content={message.content} className="text-sm" />
 
-                {message.role === "assistant" && (
-                  <MarkdownRenderer content={message.content} className="text-sm" />
-                )}
-
-                {message.role === "assistant" &&
-                  message.toolOutputsForUI &&
+                {message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 &&
                   message.toolOutputsForUI.map((toolOutput: ToolOutputForUI, i: number) => (
                     <ProposalCard
                       key={toolOutput.proposalId ?? i}
                       toolOutput={toolOutput}
                       displayTitle={
-                        toolOutput.toolName === "propose_recipe_edit"
+                        toolOutput.toolName === TOOL_PROPOSE_EDIT
                           ? (toolOutput.args.title ?? activeEditOriginalRecipe?.name)
                           : undefined
                       }
                       onNavigate={(id) => navigate(`/recipe/${id}`)}
                       t={t}
+                      isActive={toolOutput.proposalId === activeProposal?.proposalId}
                     />
                   ))}
               </div>
-            </div>
+            )}
           </div>
         ))}
 
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="flex items-start gap-2 max-w-[80%]">
-              <div className="px-4 py-2 rounded-lg bg-muted">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" />
-                  <div className="w-2 h-2 delay-100 rounded-full bg-muted-foreground animate-bounce" />
-                  <div className="w-2 h-2 delay-200 rounded-full bg-muted-foreground animate-bounce" />
-                </div>
-              </div>
-            </div>
+          <div className="flex space-x-1 py-2">
+            <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" />
+            <div className="w-2 h-2 delay-100 rounded-full bg-muted-foreground animate-bounce" />
+            <div className="w-2 h-2 delay-200 rounded-full bg-muted-foreground animate-bounce" />
           </div>
         )}
 

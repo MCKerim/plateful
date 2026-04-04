@@ -350,8 +350,14 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
-        <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "post-household")} />
-        <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "post-household")} />
+        <Route
+          path="/howitworks"
+          element={guardOnboardingRoute(<HowItWorks />, "post-household")}
+        />
+        <Route
+          path="/socialproof"
+          element={guardOnboardingRoute(<SocialProof />, "post-household")}
+        />
         <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "post-household")} />
         <Route
           path="/trialreminder"
