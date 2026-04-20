@@ -1,6 +1,24 @@
+import { useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router";
+import { App } from "@capacitor/app";
 
 export default function Privacy() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const listener = App.addListener("backButton", () => {
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate("/");
+      }
+    });
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [navigate]);
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 min-h-screen bg-background">
       <div className="space-y-2 pb-8">
@@ -21,9 +39,7 @@ export default function Privacy() {
               German law. This privacy policy explains how we collect, use, and safeguard your
               information when you use our recipe and meal planning application.
             </p>
-            <p>
-              The controller responsible for your data is:
-            </p>
+            <p>The controller responsible for your data is:</p>
             <div className="bg-muted p-4 rounded-lg space-y-1">
               <p className="font-medium">KBlanks (Einzelunternehmen)</p>
               <p>Im Kassemänneken 5</p>
@@ -57,11 +73,11 @@ export default function Privacy() {
             <div className="space-y-2">
               <h3 className="font-medium">Camera and Photos</h3>
               <p>
-                When you use features that involve images (such as adding a recipe photo or importing
-                a recipe from an image), the app requests access to your device's camera and photo
-                library. Images are compressed on your device before being uploaded to our servers.
-                Depending on the feature used, images may also be transmitted to OpenAI or our
-                recipe extraction service. You can revoke camera and photo access at any time in
+                When you use features that involve images (such as adding a recipe photo or
+                importing a recipe from an image), the app requests access to your device's camera
+                and photo library. Images are compressed on your device before being uploaded to our
+                servers. Depending on the feature used, images may also be transmitted to OpenAI or
+                our recipe extraction service. You can revoke camera and photo access at any time in
                 your device settings.
               </p>
             </div>
@@ -70,9 +86,9 @@ export default function Privacy() {
               <h3 className="font-medium">Onboarding Survey</h3>
               <p>
                 During onboarding, we collect dietary preferences, cooking habits, and other
-                personal preferences through a survey. This data is stored in your account and
-                used to tailor your experience. You can withdraw consent for this data at any
-                time by contacting us.
+                personal preferences through a survey. This data is stored in your account and used
+                to tailor your experience. You can withdraw consent for this data at any time by
+                contacting us.
               </p>
             </div>
 
@@ -106,14 +122,13 @@ export default function Privacy() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">AI-Powered Features</h2>
             <p>
-              Plateful includes an AI chatbot powered by OpenAI's API (GPT-4.1-mini). When you
-              use the chatbot:
+              Plateful includes an AI chatbot powered by OpenAI's API (GPT-4.1-mini). When you use
+              the chatbot:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
-                Your chat messages are transmitted to OpenAI's servers for processing. This
-                includes any recipe context (name, ingredients, instructions) provided to the
-                chatbot.
+                Your chat messages are transmitted to OpenAI's servers for processing. This includes
+                any recipe context (name, ingredients, instructions) provided to the chatbot.
               </li>
               <li>
                 Images you upload in the chat are transmitted to OpenAI's servers in base64 format.
@@ -152,15 +167,30 @@ export default function Privacy() {
                   All app data (recipes, meal plans, user accounts, images, chat history) is stored
                   on Supabase servers located in the European Union. Data does not leave the EU via
                   Supabase.{" "}
-                  <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  <a
+                    href="https://supabase.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
                 <h3 className="font-medium">OpenAI (United States)</h3>
                 <p>
                   Chat messages, recipe context, and uploaded images are sent to OpenAI for AI
-                  chatbot functionality. Transfer is governed by Standard Contractual Clauses (SCCs).{" "}
-                  <a href="https://openai.com/policies/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  chatbot functionality. Transfer is governed by Standard Contractual Clauses
+                  (SCCs).{" "}
+                  <a
+                    href="https://openai.com/policies/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
@@ -169,7 +199,14 @@ export default function Privacy() {
                   Usage patterns, app errors, device information, and anonymized session data are
                   sent to PostHog for product analytics and error monitoring. Data is hosted in the
                   EU.{" "}
-                  <a href="https://posthog.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  <a
+                    href="https://posthog.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
@@ -177,16 +214,30 @@ export default function Privacy() {
                 <p>
                   If you submit feedback or feature requests, your user ID, email address, full
                   name, avatar URL, and account creation date are shared with Canny.{" "}
-                  <a href="https://canny.io/privacy-policy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  <a
+                    href="https://canny.io/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
                 <h3 className="font-medium">RevenueCat</h3>
                 <p>
                   Your user ID, subscription/purchase information, and on Android the Google
-                  Advertising ID (GAID) are processed by RevenueCat to manage your subscription
-                  and measure subscription analytics.{" "}
-                  <a href="https://www.revenuecat.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  Advertising ID (GAID) are processed by RevenueCat to manage your subscription and
+                  measure subscription analytics.{" "}
+                  <a
+                    href="https://www.revenuecat.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
@@ -194,26 +245,48 @@ export default function Privacy() {
                 <p>
                   If you choose to sign in with Google, your email address, name, and avatar are
                   shared with Google for authentication.{" "}
-                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
                 <h3 className="font-medium">Google Fonts</h3>
                 <p>
-                  The web version of the app loads fonts from Google's servers (fonts.googleapis.com),
-                  which may transmit your IP address and browser user agent to Google.{" "}
-                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Privacy Policy</a>
+                  The web version of the app loads fonts from Google's servers
+                  (fonts.googleapis.com), which may transmit your IP address and browser user agent
+                  to Google.{" "}
+                  <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
                 </p>
               </div>
               <div className="space-y-1">
                 <h3 className="font-medium">Recipe Extraction Service + Google Gemini</h3>
                 <p>
-                  When importing recipes from URLs or images, the URL, image data, and your
-                  language preference are sent to our recipe extraction service for processing.
-                  This service is operated by us and uses Google Gemini API to extract recipe
-                  data from the provided content. This means your URL or image is also transmitted
-                  to Google's servers for processing.{" "}
-                  <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" className="underline text-primary">Google Privacy Policy</a>
+                  When importing recipes from URLs or images, the URL, image data, and your language
+                  preference are sent to our recipe extraction service for processing. This service
+                  is operated by us and uses Google Gemini API to extract recipe data from the
+                  provided content. This means your URL or image is also transmitted to Google's
+                  servers for processing.{" "}
+                  <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Google Privacy Policy
+                  </a>
                 </p>
               </div>
             </div>
@@ -254,18 +327,19 @@ export default function Privacy() {
             <p>We retain your data only as long as necessary for the purposes described above:</p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
-                <span className="font-medium">Account data, recipes, meal plans, cookbooks,
-                chat history, images, and survey responses:</span> Deleted immediately upon account
-                deletion.
+                <span className="font-medium">
+                  Account data, recipes, meal plans, cookbooks, chat history, images, and survey
+                  responses:
+                </span>{" "}
+                Deleted immediately upon account deletion.
               </li>
               <li>
-                <span className="font-medium">Analytics data (PostHog):</span> Retained for up to
-                12 months.
+                <span className="font-medium">Analytics data (PostHog):</span> Retained for up to 12
+                months.
               </li>
               <li>
-                <span className="font-medium">Encrypted database backups:</span> May be retained
-                for up to 30 days after deletion before being permanently purged from backup
-                systems.
+                <span className="font-medium">Encrypted database backups:</span> May be retained for
+                up to 30 days after deletion before being permanently purged from backup systems.
               </li>
             </ul>
           </section>
@@ -304,8 +378,8 @@ export default function Privacy() {
               <p>
                 If you join a household within the app, your recipes, meal plans, and cookbooks
                 become visible to all members of that household. This is a deliberate sharing
-                feature — joining a household means your content is shared with its members.
-                You can leave a household at any time in your account settings.
+                feature — joining a household means your content is shared with its members. You can
+                leave a household at any time in your account settings.
               </p>
             </div>
           </section>
@@ -313,8 +387,8 @@ export default function Privacy() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Your Rights (GDPR)</h2>
             <p>
-              As a user in the EU, you have the following rights under the GDPR. To exercise
-              any of these rights, contact us at MCKerim@gmx.de:
+              As a user in the EU, you have the following rights under the GDPR. To exercise any of
+              these rights, contact us at MCKerim@gmx.de:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
@@ -322,8 +396,8 @@ export default function Privacy() {
                 personal data we hold about you
               </li>
               <li>
-                <span className="font-medium">Rectification (Art. 16):</span> Correct inaccurate
-                or incomplete data
+                <span className="font-medium">Rectification (Art. 16):</span> Correct inaccurate or
+                incomplete data
               </li>
               <li>
                 <span className="font-medium">Erasure (Art. 17):</span> Request deletion of your
@@ -343,10 +417,9 @@ export default function Privacy() {
                 based on legitimate interests
               </li>
               <li>
-                <span className="font-medium">Lodge a complaint:</span> You have the right to
-                lodge a complaint with the supervisory authority in your EU member state. In
-                Germany, this is the relevant state data protection authority (Landesbeauftragte
-                für Datenschutz).
+                <span className="font-medium">Lodge a complaint:</span> You have the right to lodge
+                a complaint with the supervisory authority in your EU member state. In Germany, this
+                is the relevant state data protection authority (Landesbeauftragte für Datenschutz).
               </li>
             </ul>
           </section>
@@ -363,8 +436,8 @@ export default function Privacy() {
                 (light/dark mode)
               </li>
               <li>
-                <span className="font-medium">Session storage:</span> Temporarily storing your
-                email address during the sign-up flow
+                <span className="font-medium">Session storage:</span> Temporarily storing your email
+                address during the sign-up flow
               </li>
             </ul>
             <p>
@@ -377,10 +450,10 @@ export default function Privacy() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Children's Privacy</h2>
             <p>
-              Plateful is not intended for children under 16 years of age. In accordance with
-              German law (BDSG §8) and GDPR Art. 8, we do not knowingly collect personal data
-              from children under 16. If you believe a child under 16 has provided us with
-              personal data, please contact us immediately.
+              Plateful is not intended for children under 16 years of age. In accordance with German
+              law (BDSG §8) and GDPR Art. 8, we do not knowingly collect personal data from children
+              under 16. If you believe a child under 16 has provided us with personal data, please
+              contact us immediately.
             </p>
           </section>
 
