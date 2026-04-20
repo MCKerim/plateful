@@ -1,6 +1,24 @@
+import { useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
+import { useNavigate } from "react-router";
+import { App } from "@capacitor/app";
 
 export default function TermsOfService() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const listener = App.addListener("backButton", () => {
+      if (window.history.length > 1) {
+        navigate(-1);
+      } else {
+        navigate("/");
+      }
+    });
+    return () => {
+      listener.then((l) => l.remove());
+    };
+  }, [navigate]);
+
   return (
     <div className="w-full max-w-4xl mx-auto p-6 min-h-screen bg-background">
       <div className="space-y-6 pb-8">
@@ -19,9 +37,7 @@ export default function TermsOfService() {
               to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms,
               please do not use our App.
             </p>
-            <p>
-              The App is operated by:
-            </p>
+            <p>The App is operated by:</p>
             <div className="bg-muted p-4 rounded-lg space-y-1">
               <p className="font-medium">KBlanks (Einzelunternehmen)</p>
               <p>Im Kassemänneken 5</p>
@@ -89,7 +105,8 @@ export default function TermsOfService() {
               </li>
               <li>
                 You can cancel your subscription at any time through your App Store or Google Play
-                account settings. Cancellation takes effect at the end of the current billing period.
+                account settings. Cancellation takes effect at the end of the current billing
+                period.
               </li>
               <li>
                 Refunds are handled by Apple or Google in accordance with their respective refund
@@ -124,8 +141,8 @@ export default function TermsOfService() {
                 particular caution.
               </li>
               <li>
-                Your chat messages and uploaded images are transmitted to OpenAI for processing.
-                See our Privacy Policy for details.
+                Your chat messages and uploaded images are transmitted to OpenAI for processing. See
+                our Privacy Policy for details.
               </li>
             </ul>
           </section>
@@ -142,10 +159,9 @@ export default function TermsOfService() {
               <li>Use the App for commercial purposes without permission</li>
               <li>Share recipes that you do not have the right to share</li>
               <li>
-                Import recipes from external sources without having the right to use and store
-                that content. When importing recipes from URLs or other external sources, you are
-                solely responsible for ensuring you have the legal right to use and store that
-                content.
+                Import recipes from external sources without having the right to use and store that
+                content. When importing recipes from URLs or other external sources, you are solely
+                responsible for ensuring you have the legal right to use and store that content.
               </li>
               <li>Harass or abuse other users</li>
             </ul>
@@ -201,9 +217,7 @@ export default function TermsOfService() {
                 You may leave a household at any time through your account settings. Upon leaving,
                 your content will no longer be visible to other household members.
               </li>
-              <li>
-                The household owner may remove members at any time
-              </li>
+              <li>The household owner may remove members at any time</li>
               <li>
                 We are not responsible for disputes between household members regarding shared
                 content
@@ -287,10 +301,10 @@ export default function TermsOfService() {
             <div className="space-y-2">
               <h3 className="font-medium">Termination by You</h3>
               <p>
-                You may terminate your account at any time using the "Delete Account" option in
-                the app's Settings, or by contacting our support team. Upon termination, your
-                access to the App will cease and your data will be deleted in accordance with our
-                Privacy Policy. Note: uninstalling the app does not delete your account or data.
+                You may terminate your account at any time using the "Delete Account" option in the
+                app's Settings, or by contacting our support team. Upon termination, your access to
+                the App will cease and your data will be deleted in accordance with our Privacy
+                Policy. Note: uninstalling the app does not delete your account or data.
               </p>
             </div>
 
@@ -324,13 +338,13 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Dispute Resolution</h2>
             <p>
-              Any disputes arising from these Terms or your use of the App shall be subject to
-              the exclusive jurisdiction of the competent courts in Weseke, Germany, unless
-              applicable EU law requires otherwise.
+              Any disputes arising from these Terms or your use of the App shall be subject to the
+              exclusive jurisdiction of the competent courts in Weseke, Germany, unless applicable
+              EU law requires otherwise.
             </p>
             <p>
-              In accordance with EU Regulation No. 524/2013, we are required to inform you of
-              the EU Online Dispute Resolution platform, which is available at{" "}
+              In accordance with EU Regulation No. 524/2013, we are required to inform you of the EU
+              Online Dispute Resolution platform, which is available at{" "}
               <a
                 href="https://ec.europa.eu/consumers/odr"
                 target="_blank"

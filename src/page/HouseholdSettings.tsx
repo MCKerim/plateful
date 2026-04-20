@@ -220,10 +220,10 @@ export default function HouseholdSettings() {
             className="flex items-center justify-between w-full"
             onClick={() => !isCurrentUser && setSelectedMember(member)}
           >
-            <span>
+            <span className="truncate min-w-0">
               {member.username} - {member.email}
             </span>
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-1.5 shrink-0 ml-2">
               {memberIsOwner && (
                 <span className="text-xs font-medium text-accent-foreground bg-accent px-2 py-0.5 rounded-full">
                   {t("householdSettings.owner")}

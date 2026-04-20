@@ -193,6 +193,7 @@ function App() {
 
             const meals = data ?? [];
             if (meals.length === 1 && meals[0].recipe_id) {
+              navigate("/home", { replace: true });
               navigate(`/recipe/${meals[0].recipe_id}`);
             } else {
               navigate("/home");

@@ -87,16 +87,16 @@
     "title": "Home cooks love Plateful",
     "subtitle": "Help us grow",
     "testimonial1": {
-      "quote": "No more flipping through cookbooks and scrolling TikTok for hours. We plan our whole week in minutes now!",
-      "name": "My Girlfriend"
+      "quote": "No more scrolling TikTok for an hour just to figure out dinner. We plan our whole week in minutes now!",
+      "name": "Celine"
     },
     "testimonial2": {
-      "quote": "Best app I've ever seen! (She says that about everything I build, but we'll take it.)",
-      "name": "My Mom"
+      "quote": "I love that the AI can tweak imported recipes to fit my diet! No other app does that.",
+      "name": "Jale"
     },
     "testimonial3": {
       "quote": "Now I finally cook all my TikTok recipes instead of just saving them!",
-      "name": "Hopefully you soon?"
+      "name": "Kerim"
     },
     "reviewButton": "Leave a Review",
     "skipButton": "Skip for now"
@@ -175,8 +175,8 @@
     "nextButton": "Done"
   },
   "inviteLink": {
-    "shareTitle": "Plateful - Cook Together! 🏡",
-    "shareText": "Hey! Let's plan meals and share recipes together. Join my Plateful household:",
+    "shareTitle": "Join my Plateful household",
+    "shareText": "Join my household on Plateful:",
     "shareDialogTitle": "Share with Friends",
     "copyButton": "Copy Link",
     "shareButton": "Share Link",

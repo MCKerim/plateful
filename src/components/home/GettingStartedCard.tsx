@@ -73,8 +73,9 @@ export default function GettingStartedCard() {
     if (claimReward.isSuccess) setRewardDialogOpen(true);
   }, [claimReward.isSuccess]);
 
-  // Hide card once reward is claimed and dialog is closed
-  if (!missionsLoading && !rewardsLoading && alreadyClaimed && !rewardDialogOpen) return null;
+  // Hide while loading or once reward is claimed and dialog is closed
+  if (missionsLoading || rewardsLoading) return null;
+  if (alreadyClaimed && !rewardDialogOpen) return null;
 
   function handleToggle() {
     if (isExpanded) {

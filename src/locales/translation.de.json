@@ -139,16 +139,16 @@
     "title": "Hobbyköche lieben Plateful",
     "subtitle": "Hilf uns zu wachsen",
     "testimonial1": {
-      "quote": "Wir brauchen nicht mehr stundenlang in mehrere Kochbücher und TikTok Videos zu schauen. Jetzt planen wir unsere ganze Woche in Minuten!",
-      "name": "Meine Freundin"
+      "quote": "Kein stundenlages TikTok-Scrollen mehr, nur um rauszufinden, was wir kochen. Jetzt planen wir unsere ganze Woche in Minuten!",
+      "name": "Celine"
     },
     "testimonial2": {
-      "quote": "Beste App, die ich je gesehen habe! (Das sagt sie zu allem, was ich mache)",
-      "name": "Meine Mutter"
+      "quote": "Ich liebe, dass die KI importierte Rezepte an meine Ernährung anpassen kann! Keine andere App macht das.",
+      "name": "Jale"
     },
     "testimonial3": {
-      "quote": "Jetzt koche ich endlich alle meine TikTok-Rezepte, statt sie nur zu speichern!",
-      "name": "Hoffentlich bald du?"
+      "quote": "Jetzt koche ich auch endlich mal alle meine TikTok-Rezepte, statt sie nur zu speichern!",
+      "name": "Kerim"
     },
     "reviewButton": "App bewerten",
     "skipButton": "Überspringen"
@@ -227,8 +227,8 @@
     "nextButton": "Fertig!"
   },
   "inviteLink": {
-    "shareTitle": "Plateful - Gemeinsam kochen! 🏡",
-    "shareText": "Hey! Lass uns gemeinsam Mahlzeiten planen und Rezepte teilen. Tritt meinem Plateful-Haushalt bei:",
+    "shareTitle": "Tritt meinem Plateful-Haushalt bei",
+    "shareText": "Tritt meinem Haushalt auf Plateful bei:",
     "shareDialogTitle": "Teile mit Freunden",
     "copyButton": "Link kopieren",
     "shareButton": "Link teilen",

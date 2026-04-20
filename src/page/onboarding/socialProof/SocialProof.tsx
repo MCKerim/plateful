@@ -6,7 +6,7 @@ import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLay
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import TestimonialCard from "@/components/onboarding/testimonialCard/TestimonialCard";
 import { useAppSelector } from "@/redux/hooks";
-import { selectHasUsedTrial } from "@/redux/slices/subscriptionSlice";
+import { selectHasUsedTrial, selectSubscriptionLoading } from "@/redux/slices/subscriptionSlice";
 import { useEffect } from "react";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
@@ -14,6 +14,7 @@ export default function SocialProof() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const hasUsedTrial = useAppSelector(selectHasUsedTrial);
+  const subscriptionLoading = useAppSelector(selectSubscriptionLoading);
   const { trackScreenViewed } = useOnboardingTracking();
 
   useEffect(() => {
@@ -95,6 +96,7 @@ export default function SocialProof() {
           label={t("socialProof.skipButton")}
           variant="ghost"
           onClick={navigateToPaywall}
+          disabled={subscriptionLoading}
         />
 
         <OnboardingButton label={t("socialProof.reviewButton")} onClick={requestInAppReview} />
