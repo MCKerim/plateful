@@ -119,16 +119,6 @@ export default function Recipe() {
     });
   }
 
-  useEffect(() => {
-    const handlePopState = (event: PopStateEvent) => {
-      event.preventDefault();
-      if (globalThis.location.pathname.startsWith("/recipe/")) {
-        globalThis.history.back();
-      }
-    };
-    globalThis.addEventListener("popstate", handlePopState);
-    return () => globalThis.removeEventListener("popstate", handlePopState);
-  }, []);
 
   function handleDeleteRating(ratingId: string) {
     if (!recipeId) return;
@@ -289,7 +279,7 @@ export default function Recipe() {
                 size="lg"
                 onClick={() => {
                   setActionsDrawerOpen(false);
-                  navigate(`/recipe/edit/${recipe?.id}`);
+                  navigate(`/recipe/edit/${recipe?.id}`, { replace: true });
                 }}
               >
                 <div className="flex justify-start gap-4 w-full h-full items-center">
