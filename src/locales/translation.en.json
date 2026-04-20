@@ -73,7 +73,7 @@
     "back": "Back",
     "errors": {
       "saveFailed": "Failed to save your answer. Please try again.",
-      "selectOption": "Please select at least one option before proceeding.",
+      "selectOption": "Please select at least one option.",
       "completeFailed": "An error occurred while saving your progress. Please try again."
     }
   },

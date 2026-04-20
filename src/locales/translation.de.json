@@ -125,7 +125,7 @@
     "back": "Zurück",
     "errors": {
       "saveFailed": "Deine Antwort konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      "selectOption": "Bitte wähle mindestens eine Option aus, bevor du fortfährst.",
+      "selectOption": "Bitte wähle mindestens eine Option aus.",
       "completeFailed": "Beim Speichern deines Fortschritts ist ein Fehler aufgetreten. Bitte versuche es erneut."
     }
   },
