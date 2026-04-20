@@ -10,8 +10,10 @@ import { SupabaseProvider } from "./utils/supabase.tsx";
 import { RevenueCatProvider } from "./providers/RevenueCatProvider.tsx";
 import AppUrlListener from "./components/AppUrlListener.tsx";
 import { PostHogProvider } from "posthog-js/react";
+import posthog from "posthog-js";
 import { Toaster } from "./components/ui/sonner.tsx";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
+import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // React Query configuration
@@ -19,6 +21,13 @@ const QUERY_STALE_TIME = 1000 * 30; // 30 seconds - responsive to household chan
 const QUERY_GC_TIME = 1000 * 60 * 10; // 10 minutes - keep unused cache for navigation
 
 const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error, query) => {
+      posthog.captureException(error as Error, {
+        query_key: JSON.stringify(query.queryKey),
+      });
+    },
+  }),
   defaultOptions: {
     queries: {
       staleTime: QUERY_STALE_TIME,
@@ -36,7 +45,7 @@ const isDevelopment = import.meta.env.MODE === "development";
 function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
   // Skip PostHog in development
   if (isDevelopment) {
-    return <>{children}</>;
+    return <ErrorBoundary>{children}</ErrorBoundary>;
   }
 
   return (
@@ -48,7 +57,7 @@ function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
         capture_exceptions: true,
       }}
     >
-      {children}
+      <ErrorBoundary>{children}</ErrorBoundary>
     </PostHogProvider>
   );
 }

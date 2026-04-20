@@ -84,6 +84,42 @@ Before building the insights, walk through the onboarding flow on staging and co
 
 ---
 
+---
+
+## 5. Error Tracking
+
+PostHog captures exceptions as `$exception` events. Three layers report errors:
+
+| Source | How | Extra Properties |
+|--------|-----|-----------------|
+| Unhandled JS errors | `capture_exceptions: true` (automatic) | stack trace |
+| React render errors | `ErrorBoundary` (`src/components/ErrorBoundary.tsx`) | `component_stack` |
+| React Query failures | `QueryCache.onError` in `main.tsx` | `query_key` |
+| Manual (catch blocks) | `useErrorTracking().captureError()` | any custom context |
+
+**Where to view:** PostHog → **Error Tracking** tab (not Insights — PostHog has a dedicated UI for exceptions).
+
+**Using `useErrorTracking` in catch blocks:**
+
+```typescript
+import { useErrorTracking } from "@/hooks/analytics/useErrorTracking";
+
+function MyComponent() {
+  const { captureError } = useErrorTracking();
+
+  async function handleSubmit() {
+    try {
+      await someApi.call();
+    } catch (err) {
+      captureError(err as Error, { context: "MyComponent.handleSubmit" });
+      toast.error(t("errors.generic"));
+    }
+  }
+}
+```
+
+---
+
 ## Notes
 
 - Events fire in **production only** — PostHog provider is skipped in dev, so no test data will pollute your dashboard
