@@ -33,7 +33,7 @@ export default function TodaysMealCard({
   return (
     <>
       <Card className={`relative bg-transparent ${eaten ? "opacity-60" : ""}`}>
-        <button onClick={() => navigate(`/recipe/${recipeId}`)} className="w-full text-left">
+        <button onClick={() => navigate(`/recipe/${recipeId}`)} className="block w-full text-left">
           <img
             src={imageUrl || "/no-img.jpg"}
             alt="Recipe"
