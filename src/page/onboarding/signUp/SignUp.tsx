@@ -2,7 +2,7 @@ import OnboardingButton from "@/components/onboarding/onboardingButton/Onboardin
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { useRive } from "@rive-app/react-canvas";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import CircleTransition from "@/components/general/CircleTransition";
 import { useNavigate, Link } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
@@ -33,9 +33,26 @@ export default function SignUp() {
   const [showTransition, setShowTransition] = useState(true);
   const { trackScreenViewed } = useOnboardingTracking();
 
+  // Safari blocks the window.open inside SocialLogin.login once the click
+  // handler has awaited real async work (crypto.subtle.digest), so the nonce
+  // digest must already be computed when the user clicks.
+  const nonceRef = useRef<{ raw: string; digest: string } | null>(null);
+
+  const generateNonce = useCallback(() => {
+    nonceRef.current = null;
+    const raw = getUrlSafeNonce();
+    sha256(raw).then((digest) => {
+      nonceRef.current = { raw, digest };
+    });
+  }, []);
+
   useEffect(() => {
     trackScreenViewed("signup");
   }, []);
+
+  useEffect(() => {
+    generateNonce();
+  }, [generateNonce]);
 
   useEffect(() => {
     SocialLogin.initialize({
@@ -80,12 +97,18 @@ export default function SignUp() {
 
   const signUp = async () => {
     try {
-      const rawNonce = getUrlSafeNonce();
-      const nonceDigest = await sha256(rawNonce);
+      let nonce = nonceRef.current;
+      if (!nonce) {
+        // Fallback if the precomputed nonce isn't ready yet; the await here
+        // can trip Safari's popup blocker, but this path is practically
+        // unreachable since the digest finishes during the intro transition.
+        const raw = getUrlSafeNonce();
+        nonce = { raw, digest: await sha256(raw) };
+      }
 
       const result = await SocialLogin.login({
         provider: "google",
-        options: { nonce: nonceDigest },
+        options: { nonce: nonce.digest },
       });
 
       const idToken = "idToken" in result.result ? result.result.idToken : null;
@@ -94,13 +117,15 @@ export default function SignUp() {
       const { error } = await supabase.auth.signInWithIdToken({
         provider: "google",
         token: idToken,
-        nonce: rawNonce,
+        nonce: nonce.raw,
       });
 
       if (error) throw error;
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
       toast.error("Authentication failed. Please try again.");
+    } finally {
+      generateNonce();
     }
   };
 
