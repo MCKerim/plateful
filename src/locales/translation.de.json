@@ -385,19 +385,15 @@
     "notifications": "Benachrichtigungen",
     "manageNotifications": "Benachrichtigungen verwalten",
     "manageYourHousehold": "Verwalte deinen Haushalt",
-
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "Wir freuen uns auf Ihr Feedback! Teilen Sie Ihre Ideen, melden Sie Fehler oder schlagen Sie neue Funktionen vor.",
     "suggestFeatureOrReportBug": "Feature vorschlagen oder Fehler melden",
     "whatsNew": "Neuigkeiten entdecken",
     "viewRoadmap": "Roadmap ansehen",
-
     "aboutDescription": "👋Hey, ich bin Kerim Ismail und habe Plateful designt und entwickelt.\nDu hast Feedback oder willst in Kontakt kommen? Dann schreib mir gerne!👇",
-
     "privacyPolicy": "Datenschutz",
     "termsOfService": "AGB",
     "impressum": "Impressum",
-
     "account": "Konto",
     "signOut": "Abmelden",
     "deleteAccount": "Konto löschen",
@@ -578,7 +574,6 @@
     "amountPlaceholder": "5",
     "editButton": "Artikel bearbeiten"
   },
-
   "ingredients": {
     "title": "Zutaten",
     "ingredient": "Zutat",
@@ -596,13 +591,10 @@
       "pieces": "Stück"
     }
   },
-
   "dayWithCount_one": "{{count}} Tag",
   "dayWithCount_other": "{{count}} Tage",
-
   "recipeWithCount_one": "{{count}} Rezept",
   "recipeWithCount_other": "{{count}} Rezepte",
-
   "onboarding": {
     "gotIt": "Verstanden",
     "errors": {
@@ -785,5 +777,10 @@
       "description": "Lass dich daran erinnert, was heute geplant ist",
       "time": "Uhrzeit"
     }
+  },
+  "instructions": {
+    "stepPlaceholder": "Schritt beschreiben…",
+    "sectionPlaceholder": "Abschnittsname (z.B. Soße, Teig)",
+    "step": "Schritt"
   }
 }

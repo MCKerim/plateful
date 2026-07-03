@@ -37,6 +37,8 @@ import { InputGroup, InputGroupAddon, InputGroupTextarea } from "@/components/ui
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useUpdateRecipe } from "@/hooks/recipe/useUpdateRecipe";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
+import { useReplaceAllInstructions } from "@/hooks/instructions/useInstructionMutations";
+import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import type { RecipeIngredientInput } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -71,6 +73,7 @@ export default function Chatbot() {
 
   const updateRecipeMutation = useUpdateRecipe();
   const replaceIngredientsMutation = useReplaceAllIngredients();
+  const replaceInstructionsMutation = useReplaceAllInstructions();
   const { data: recipeContextIngredients = [] } = useRecipeIngredients(recipeId);
 
   const [inputValue, setInputValue] = useState("");
@@ -323,6 +326,15 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         });
       }
 
+      // The proposal's instructions are markdown; step rows are the source of
+      // truth, so persist the parsed steps alongside the markdown column.
+      if (instructions) {
+        await replaceInstructionsMutation.mutateAsync({
+          recipeId: newRecipe.id,
+          inputs: parseInstructionsMarkdown(instructions),
+        });
+      }
+
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
       setPendingFeedback((prev) => [
         ...prev,
@@ -380,6 +392,14 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         await replaceIngredientsMutation.mutateAsync({
           recipeId,
           inputs,
+        });
+      }
+
+      // Keep the step rows in sync with the updated markdown instructions.
+      if (instructions) {
+        await replaceInstructionsMutation.mutateAsync({
+          recipeId,
+          inputs: parseInstructionsMarkdown(instructions),
         });
       }
 
@@ -555,7 +575,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       </div>
 
       {/* Input Area */}
-      <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
+      <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-safe-20`}>
         {/* Recipe context and image previews before sending */}
         {(recipeContext || selectedImagesAsbase64.length > 0) && (
           <div className="flex gap-2 flex-wrap mb-2 items-center">

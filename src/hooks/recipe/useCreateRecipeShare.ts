@@ -3,9 +3,10 @@ import { useSupabase } from "@/utils/supabase";
 import { recipeShareApi } from "@/api/recipeShare.api";
 import { recipeApi } from "@/api/recipe.api";
 import { ingredientsApi } from "@/api/ingredients.api";
+import { instructionsApi } from "@/api/instructions.api";
 import { Share } from "@capacitor/share";
 import { useTranslation } from "react-i18next";
-import type { SnapshotIngredient } from "@/types/recipeShare.types";
+import type { SnapshotIngredient, SnapshotInstructionStep } from "@/types/recipeShare.types";
 import { writeClipboardText } from "@/utils/nativeClipboard";
 import { toast } from "sonner";
 
@@ -22,8 +23,9 @@ export function useCreateRecipeShare() {
       if (!recipe) throw new Error("Recipe not found");
 
       // 2+3. Fetch ingredients and image paths in parallel
-      const [ingredientRows, imagePaths] = await Promise.all([
+      const [ingredientRows, instructionRows, imagePaths] = await Promise.all([
         ingredientsApi.getByRecipeId(supabase, recipeId),
+        instructionsApi.getByRecipeId(supabase, recipeId),
         recipeShareApi.getImagePaths(supabase, recipeId),
       ]);
       const ingredients: SnapshotIngredient[] = ingredientRows.map((row) => ({
@@ -39,11 +41,18 @@ export function useCreateRecipeShare() {
         preparation_note: row.preparation_note,
       }));
 
+      const instructionSteps: SnapshotInstructionStep[] = instructionRows.map((row) => ({
+        step_text: row.step_text,
+        group_name: row.group_name,
+        sort_order: row.sort_order,
+      }));
+
       // 4. Create the share record (signs images server-side with ~10y TTL)
       const token = await recipeShareApi.create(supabase, {
         name: recipe.name,
         description: recipe.description,
         instructions: recipe.instructions,
+        instruction_steps: instructionSteps,
         category: recipe.category,
         base_servings: recipe.base_servings,
         servings_unit: recipe.servings_unit,

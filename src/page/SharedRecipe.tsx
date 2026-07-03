@@ -16,6 +16,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
+import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -98,7 +99,7 @@ export default function SharedRecipe() {
 
   if (isError || !share) {
     const notFoundFooter = !isNative ? (
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 border-border border-t-[1px]">
         <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
           <Download size={18} />
           {t("share.downloadApp")}
@@ -131,6 +132,15 @@ export default function SharedRecipe() {
 
   const { snapshot } = share;
   const displayIngredients = snapshot.ingredients.map(toDisplayIngredient);
+  const instructionsMarkdown =
+    snapshot.instruction_steps && snapshot.instruction_steps.length > 0
+      ? instructionsToMarkdown(
+          snapshot.instruction_steps.map((step) => ({
+            stepText: step.step_text,
+            groupName: step.group_name,
+          }))
+        )
+      : snapshot.instructions;
   const groupedIngredients = groupIngredients(displayIngredients);
 
   const saveButton = isLoggedIn && householdId ? (
@@ -159,8 +169,8 @@ export default function SharedRecipe() {
 
   const footer = (
     <>
-      <div className="h-[80px]" />
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex flex-col gap-2 border-border border-t-[1px]">
+      <div className="h-safe-b-[80px]" />
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex flex-col gap-2 border-border border-t-[1px]">
         {saveButton}
         {loginButton}
         {downloadButton}
@@ -248,11 +258,11 @@ export default function SharedRecipe() {
         </div>
       )}
 
-      {/* Instructions */}
-      {snapshot.instructions && (
+      {/* Instructions — structured steps when present, legacy markdown otherwise */}
+      {instructionsMarkdown && (
         <div>
           <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
-          <MarkdownRenderer content={snapshot.instructions} className="font-medium" />
+          <MarkdownRenderer content={instructionsMarkdown} className="font-medium" />
         </div>
       )}
     </Layout>

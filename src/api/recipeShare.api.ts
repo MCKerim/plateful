@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { SharedRecipeSnapshot, SharedRecipeRow } from "@/types/recipeShare.types";
+import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
 
 // 10 years in seconds — effectively permanent for share snapshots
 const SHARE_IMAGE_EXPIRY_SECONDS = 315_360_000;
@@ -174,6 +175,27 @@ export const recipeShareApi = {
         ).then(({ error }) => { if (error) throw error; })
       : Promise.resolve();
 
+    // Structured steps when the snapshot carries them; otherwise parse the
+    // legacy markdown so even an old share imports as step rows.
+    const steps =
+      snapshot.instruction_steps && snapshot.instruction_steps.length > 0
+        ? snapshot.instruction_steps.map((step, index) => ({
+            stepText: step.step_text,
+            groupName: step.group_name,
+            sortOrder: index,
+          }))
+        : parseInstructionsMarkdown(snapshot.instructions ?? "");
+    const instructionInsert = steps.length > 0
+      ? supabase.from("recipe_instructions").insert(
+          steps.map((step, index) => ({
+            recipe_id: newRecipeId,
+            step_text: step.stepText,
+            group_name: step.groupName ?? null,
+            sort_order: step.sortOrder ?? index,
+          }))
+        ).then(({ error }) => { if (error) throw error; })
+      : Promise.resolve();
+
     const imageCopy = Promise.allSettled(
       snapshot.image_urls.map(async (url, index) => {
         try {
@@ -195,7 +217,7 @@ export const recipeShareApi = {
       })
     );
 
-    await Promise.all([ingredientInsert, imageCopy]);
+    await Promise.all([ingredientInsert, instructionInsert, imageCopy]);
 
     return newRecipeId;
   },

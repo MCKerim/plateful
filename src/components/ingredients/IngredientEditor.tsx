@@ -364,9 +364,17 @@ export function IngredientEditor({ recipeId, onSave }: Props) {
 type SimpleEditorProps = {
   items: EditorItem[];
   onChange: (items: EditorItem[]) => void;
+  /** Overrides for reusing the editor beyond ingredients (e.g. instruction
+   *  steps) — defaults to the ingredient strings. */
+  labels?: {
+    placeholder: string;
+    sectionPlaceholder: string;
+    addLine: string;
+    addSection: string;
+  };
 };
 
-export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
+export function SimpleIngredientEditor({ items, onChange, labels }: SimpleEditorProps) {
   const { t } = useTranslation();
   const sensors = useEditorSensors();
 
@@ -443,8 +451,8 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
               onUpdate={handleUpdate}
               onDelete={handleDelete}
               onPaste={handlePaste}
-              placeholder={t("ingredients.placeholder")}
-              sectionPlaceholder={t("ingredients.sectionPlaceholder")}
+              placeholder={labels?.placeholder ?? t("ingredients.placeholder")}
+              sectionPlaceholder={labels?.sectionPlaceholder ?? t("ingredients.sectionPlaceholder")}
             />
           ))}
         </SortableContext>
@@ -454,13 +462,13 @@ export function SimpleIngredientEditor({ items, onChange }: SimpleEditorProps) {
         <Button variant="secondary" onClick={handleAddIngredient} className="flex-1">
           <Plus />
 
-          {t("ingredients.ingredient")}
+          {labels?.addLine ?? t("ingredients.ingredient")}
         </Button>
 
         <Button variant="secondary" onClick={handleAddSection} className="flex-1">
           <LayoutList />
 
-          {t("ingredients.section")}
+          {labels?.addSection ?? t("ingredients.section")}
         </Button>
       </div>
     </div>
