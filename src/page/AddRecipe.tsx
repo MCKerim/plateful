@@ -36,6 +36,17 @@ import {
 import type { EditorItem } from "@/components/ingredients/IngredientEditor";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutations";
+import { useRecipeInstructions } from "@/hooks/instructions/useRecipeInstructions";
+import { useReplaceAllInstructions } from "@/hooks/instructions/useInstructionMutations";
+import {
+  SimpleInstructionEditor,
+  instructionsToEditorItems,
+  editorItemsToStepInputs,
+} from "@/components/instructions/InstructionEditor";
+import {
+  instructionsToMarkdown,
+  parseInstructionsMarkdown,
+} from "@/lib/transformers/instruction.transformer";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -51,7 +62,7 @@ export default function AddRecipe() {
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [instructions, setInstructions] = useState("");
+  const [instructionItems, setInstructionItems] = useState<EditorItem[]>([]);
   const [link, setLink] = useState("");
   const [ingredients, setIngredients] = useState<EditorItem[]>([]);
   const [baseServings, setBaseServings] = useState<number | null>(null);
@@ -71,10 +82,13 @@ export default function AddRecipe() {
   // React Query hooks
   const { recipe, imageInfo } = useRecipeForEdit(recipeId);
   const { data: existingIngredients = [] } = useRecipeIngredients(recipeId);
+  const { data: existingInstructions = [], isSuccess: instructionsLoaded } =
+    useRecipeInstructions(recipeId);
   const createRecipeMutation = useCreateRecipe();
   const updateRecipeMutation = useUpdateRecipe();
   const deleteRecipeMutation = useDeleteRecipe();
   const replaceIngredientsMutation = useReplaceAllIngredients();
+  const replaceInstructionsMutation = useReplaceAllInstructions();
 
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
@@ -163,7 +177,6 @@ export default function AddRecipe() {
     if (recipe) {
       setTitle(recipe.name);
       setDescription(recipe.description ?? "");
-      setInstructions(recipe.instructions ?? "");
       setLink(recipe.link ?? "");
       setCategory(recipe.category);
       setBaseServings(recipe.base_servings);
@@ -176,6 +189,25 @@ export default function AddRecipe() {
       setIngredients(ingredientsToEditorItems(existingIngredients));
     }
   }, [existingIngredients]);
+
+  // Populate instruction steps when loaded (edit mode). Recipes created by
+  // older app versions have no step rows yet — parse their legacy markdown so
+  // saving converts them to structured steps.
+  useEffect(() => {
+    if (!instructionsLoaded || !recipe) return;
+    if (existingInstructions.length > 0) {
+      setInstructionItems(instructionsToEditorItems(existingInstructions));
+    } else if (recipe.instructions) {
+      setInstructionItems(
+        instructionsToEditorItems(
+          parseInstructionsMarkdown(recipe.instructions).map((input) => ({
+            stepText: input.stepText,
+            groupName: input.groupName ?? null,
+          }))
+        )
+      );
+    }
+  }, [instructionsLoaded, existingInstructions, recipe]);
 
   // Populate image when image info is loaded (edit mode)
   useEffect(() => {
@@ -250,7 +282,12 @@ export default function AddRecipe() {
       return;
     }
 
-    // Helper to save ingredients
+    // Step rows are the source of truth; the markdown column stays
+    // dual-written from them for older app versions.
+    const stepInputs = editorItemsToStepInputs(instructionItems);
+    const instructionsMarkdown = instructionsToMarkdown(stepInputs) || null;
+
+    // Helper to save ingredients + instruction steps
     const saveIngredients = async (targetRecipeId: string) => {
       const inputs = editorItemsToInputs(ingredients);
 
@@ -260,6 +297,11 @@ export default function AddRecipe() {
           inputs,
         });
       }
+
+      await replaceInstructionsMutation.mutateAsync({
+        recipeId: targetRecipeId,
+        inputs: stepInputs,
+      });
     };
 
     if (recipeId) {
@@ -269,7 +311,7 @@ export default function AddRecipe() {
           recipeId,
           name: title,
           description: description || null,
-          instructions: instructions || null,
+          instructions: instructionsMarkdown,
           link,
           category,
           baseServings,
@@ -298,7 +340,7 @@ export default function AddRecipe() {
         {
           name: title,
           description: description || null,
-          instructions: instructions || null,
+          instructions: instructionsMarkdown,
           link,
           category,
           householdId: householdId!,
@@ -342,9 +384,9 @@ export default function AddRecipe() {
 
   const saveFooter = (
     <>
-      <div className="h-[100px]"></div>
+      <div className="h-safe-b-[100px]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
         <Button className="w-full" variant="secondary" onClick={() => navigate(-1)}>
           {t("common.cancel")}
         </Button>
@@ -468,15 +510,9 @@ export default function AddRecipe() {
 
         {/* Instructions Section */}
         <div className="grid w-full gap-2">
-          <Label htmlFor="instructions">{t("recipe.instructions")}</Label>
+          <Label>{t("recipe.instructions")}</Label>
 
-          <Textarea
-            id="instructions"
-            placeholder={t("addRecipe.instructionsPlaceholder")}
-            value={instructions}
-            onChange={(e) => setInstructions(e.target.value)}
-            enterKeyHint="enter"
-          />
+          <SimpleInstructionEditor items={instructionItems} onChange={setInstructionItems} />
         </div>
       </div>
     </Layout>

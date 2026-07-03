@@ -382,23 +382,18 @@
     "appearance": "Appearance",
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",
-
     "notifications": "Notifications",
     "manageNotifications": "Manage notifications",
     "manageYourHousehold": "Manage your household",
-
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "We value your input! Use the links below to share your thoughts, report bugs, or suggest features.",
     "suggestFeatureOrReportBug": "Suggest a feature or report a bug",
     "whatsNew": "Discover what's new",
     "viewRoadmap": "View our roadmap",
-
     "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
-
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms",
     "impressum": "Impressum",
-
     "account": "Account",
     "signOut": "Sign out",
     "deleteAccount": "Delete Account",
@@ -579,7 +574,6 @@
     "amountPlaceholder": "5",
     "editButton": "Edit Item"
   },
-
   "ingredients": {
     "title": "Ingredients",
     "ingredient": "Ingredient",
@@ -599,10 +593,8 @@
   },
   "dayWithCount_one": "{{count}} day",
   "dayWithCount_other": "{{count}} days",
-
   "recipeWithCount_one": "{{count}} recipe",
   "recipeWithCount_other": "{{count}} recipes",
-
   "onboarding": {
     "gotIt": "Got it",
     "errors": {
@@ -785,5 +777,10 @@
       "description": "Get reminded to check what's planned for today",
       "time": "Time"
     }
+  },
+  "instructions": {
+    "stepPlaceholder": "Describe the step…",
+    "sectionPlaceholder": "Section name (e.g. Sauce, Dough)",
+    "step": "Step"
   }
 }
