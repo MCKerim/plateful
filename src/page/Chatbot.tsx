@@ -9,18 +9,23 @@ import {
   selectMessages,
   selectIsTyping,
   selectVisibleMessages,
+  selectPendingFeedback,
+  selectActiveProposal,
   addMessage,
   setIsTyping,
   resetChat,
   ChatMessage,
   ToolOutputForUI,
+  ChatbotIngredient,
+  TOOL_PROPOSE_EDIT,
   setPreviousResponseId,
   selectPreviousResponseId,
   appendToLastMessage,
   finalizeLastMessage,
   setRecipeId,
-  NewRecipeProposal,
-  EditRecipeProposal,
+  addPendingFeedback,
+  clearPendingFeedback,
+  updateProposalStatus,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
@@ -40,7 +45,7 @@ import { useReplaceAllIngredients } from "@/hooks/ingredients/useIngredientMutat
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
 import type { RecipeIngredientInput } from "@/types/ingredient.types";
 import { toast } from "sonner";
-import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog";
+import { ProposalCard } from "@/components/chatbot/ProposalCard";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIllustration";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
@@ -48,6 +53,14 @@ import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
 const DEFAULT_CATEGORY_ID = 5;
+
+function toIngredientInputs(ingredients: ChatbotIngredient[]): RecipeIngredientInput[] {
+  return ingredients.map((ing, i) => ({
+    rawText: ing.item,
+    groupName: ing.section,
+    sortOrder: i,
+  }));
+}
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -63,19 +76,35 @@ export default function Chatbot() {
   const previousResponseId = useAppSelector(selectPreviousResponseId);
   const isTyping = useAppSelector(selectIsTyping);
   const visibleMessages = useAppSelector(selectVisibleMessages);
+  const pendingFeedback = useAppSelector(selectPendingFeedback);
+  const activeProposal = useAppSelector(selectActiveProposal);
 
   // Get recipe context from URL param
   const recipeIdParam = searchParams.get("recipeId");
   const recipeId = recipeIdParam ?? null;
   const { data: recipeContext } = useRecipe(recipeId);
+  const { data: recipeContextIngredients = [] } = useRecipeIngredients(recipeId);
+
+  // Fetch original recipe data for any edit proposal in the conversation.
+  // Derived from messages (not activeProposal) so the title persists after save.
+  const activeEditRecipeId = (() => {
+    for (const msg of messages) {
+      for (const output of msg.toolOutputsForUI ?? []) {
+        if (output.toolName === TOOL_PROPOSE_EDIT && output.args.recipeId) {
+          return output.args.recipeId;
+        }
+      }
+    }
+    return null;
+  })();
+  const { data: activeEditOriginalRecipe } = useRecipe(activeEditRecipeId);
+  const { data: activeEditOriginalIngredients = [] } = useRecipeIngredients(activeEditRecipeId);
 
   const updateRecipeMutation = useUpdateRecipe();
   const replaceIngredientsMutation = useReplaceAllIngredients();
-  const { data: recipeContextIngredients = [] } = useRecipeIngredients(recipeId);
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
-  const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
   const [knownRecipeIds, setKnownRecipeIds] = useState<string[]>(() =>
     recipeId ? [recipeId] : []
   );
@@ -97,11 +126,7 @@ export default function Chatbot() {
 
   const handlePickImagesClick = async () => {
     const results = await pickMultipleImages();
-
-    if (!results || results.length === 0) {
-      return;
-    }
-
+    if (!results || results.length === 0) return;
     setSelectedImagesAsbase64((prev) => [...prev, ...results.map((r) => r.base64String)]);
   };
 
@@ -112,14 +137,9 @@ export default function Chatbot() {
   const handleSendMessage = async () => {
     if (!inputValue.trim() && selectedImagesAsbase64.length === 0) return;
 
-    // Check if this is the first message with recipe context
     const isFirstMessageWithContext = messages.length === 0 && recipeContext;
 
-    // Show the user message in the UI right away
-    const userMessage: ChatMessage & {
-      images?: string[];
-      recipeName?: string;
-    } = {
+    const userMessage: ChatMessage & { images?: string[]; recipeName?: string } = {
       role: "user",
       content: inputValue.trim(),
       images: selectedImagesAsbase64,
@@ -129,7 +149,7 @@ export default function Chatbot() {
     dispatch(addMessage(userMessage));
     setInputValue("");
     setSelectedImagesAsbase64([]);
-    // Clear recipe context from URL after first message (like images)
+
     if (isFirstMessageWithContext) {
       setSearchParams({}, { replace: true });
       dispatch(setRecipeId(recipeId));
@@ -139,8 +159,8 @@ export default function Chatbot() {
     incrementMission.mutate({ missionId: "chat_with_chef" });
 
     try {
-      // Build the text content - prepend context if this is first message and we have context
       let textContent = inputValue.trim();
+
       if (isFirstMessageWithContext) {
         const categoryName = getEnglishCategoryNameById(recipeContext.category);
         let currentGroup: string | null = null;
@@ -149,48 +169,30 @@ export default function Chatbot() {
             let prefix = "";
             if (ing.groupName !== currentGroup) {
               currentGroup = ing.groupName;
-              if (currentGroup) {
-                prefix = `### ${currentGroup}\n`;
-              }
+              if (currentGroup) prefix = `### ${currentGroup}\n`;
             }
             return `${prefix}- ${ing.rawText}`;
           })
           .join("\n");
-        const contextPrefix = `[Recipe Context]
-recipeId: ${recipeContext.id}
-title: ${recipeContext.name}
-category: ${categoryName}
-description: ${recipeContext.description ?? "No description"}
-servings: ${recipeContext.base_servings ?? "unknown"}
-ingredients:
-${ingredientLines || "No ingredients"}
-instructions: ${recipeContext.instructions ?? "No instructions"}
-[End Recipe Context]
-
-`;
-        textContent = contextPrefix + textContent;
+        textContent =
+          `[Recipe Context]\nrecipeId: ${recipeContext.id}\ntitle: ${recipeContext.name}\ncategory: ${categoryName}\ndescription: ${recipeContext.description ?? "No description"}\nservings: ${recipeContext.base_servings ?? "unknown"}\ningredients:\n${ingredientLines || "No ingredients"}\ninstructions: ${recipeContext.instructions ?? "No instructions"}\n[End Recipe Context]\n\n` +
+          textContent;
       }
 
-      // Prepend pending feedback if any
+      // Prepend pending feedback (saved from Redux, cleared after use)
       if (pendingFeedback.length > 0) {
-        const feedbackBlock = `[Proposal Outcomes]\n${pendingFeedback.join("\n")}\n[End Proposal Outcomes]\n\n`;
-        textContent = feedbackBlock + textContent;
-        setPendingFeedback([]);
+        textContent =
+          `[Proposal Outcomes]\n${pendingFeedback.join("\n")}\n[End Proposal Outcomes]\n\n` +
+          textContent;
+        dispatch(clearPendingFeedback());
       }
 
-      // Build vision content parts for the server
       const parts: VisionPart[] = [];
-      if (textContent) {
-        parts.push({ type: "input_text", text: textContent });
-      }
+      if (textContent) parts.push({ type: "input_text", text: textContent });
       for (const url of userMessage.images || []) {
-        parts.push({
-          type: "input_image",
-          image_url: `data:image/jpeg;base64,${url}`,
-        });
+        parts.push({ type: "input_image", image_url: `data:image/jpeg;base64,${url}` });
       }
 
-      // Call the edge function with streaming
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
       const session = (await supabase.auth.getSession()).data.session;
@@ -206,18 +208,11 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
           previous_response_id: previousResponseId,
           known_recipe_ids: knownRecipeIds,
           proposal_counter: proposalCounterRef.current,
-          messages: [
-            {
-              role: "user",
-              content: parts,
-            },
-          ],
+          messages: [{ role: "user", content: parts }],
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const reader = response.body?.getReader();
       if (!reader) throw new Error("No response body");
@@ -231,8 +226,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-
-        // Process complete SSE lines
         const lines = buffer.split("\n");
         buffer = lines.pop() ?? "";
 
@@ -267,7 +260,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       }
     } catch (error) {
       console.error("Error calling chatbot function:", error);
-
       dispatch(addMessage({ role: "assistant", content: t("chatbot.errorMessage") }));
     } finally {
       dispatch(setIsTyping(false));
@@ -276,7 +268,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
 
   const handleResetChat = () => {
     dispatch(resetChat());
-    setPendingFeedback([]);
     setKnownRecipeIds(recipeId ? [recipeId] : []);
   };
 
@@ -284,11 +275,26 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     setInputValue(suggestion);
   }
 
-  async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
-    const { proposalId, title, description, servings, ingredients, instructions, category } =
-      proposal;
-    let categoryId = getCategoryIdByTranslatedEnglishName(category);
+  function handleDismissProposal(proposalId: string) {
+    dispatch(addPendingFeedback(`Proposal ${proposalId} declined by user.`));
+    dispatch(updateProposalStatus({ proposalId, status: "dismissed" }));
+  }
 
+  async function handleSaveActiveProposal() {
+    if (!activeProposal) return;
+
+    if (activeProposal.toolName === TOOL_PROPOSE_EDIT) {
+      await saveEditedRecipe(activeProposal);
+    } else {
+      await saveNewRecipe(activeProposal);
+    }
+  }
+
+  async function saveNewRecipe(toolOutput: ToolOutputForUI) {
+    const { proposalId, args } = toolOutput;
+    const { title = "", description, servings, ingredients, instructions = "", category = "" } = args;
+
+    let categoryId = getCategoryIdByTranslatedEnglishName(category);
     if (categoryId === null) {
       console.error("Invalid category:", category);
       categoryId = DEFAULT_CATEGORY_ID;
@@ -310,29 +316,22 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         baseServings: servings ?? null,
       });
 
-      // Save ingredients if provided
       if (ingredients && ingredients.length > 0) {
-        const inputs: RecipeIngredientInput[] = ingredients.map((ing, i) => ({
-          rawText: ing.item,
-          groupName: ing.section,
-          sortOrder: i,
-        }));
         await replaceIngredientsMutation.mutateAsync({
           recipeId: newRecipe.id,
-          inputs,
+          inputs: toIngredientInputs(ingredients),
         });
       }
 
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
-      setPendingFeedback((prev) => [
-        ...prev,
-        `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`,
-      ]);
+      dispatch(
+        addPendingFeedback(
+          `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`
+        )
+      );
+      dispatch(updateProposalStatus({ proposalId, status: "saved", savedRecipeId: newRecipe.id }));
       toast.success(t("chatbot.recipeSaved"), {
-        action: {
-          label: t("common.open"),
-          onClick: () => navigate(`/recipe/${newRecipe.id}`),
-        },
+        action: { label: t("common.open"), onClick: () => navigate(`/recipe/${newRecipe.id}`) },
       });
     } catch (error) {
       console.error(error);
@@ -340,57 +339,65 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     }
   }
 
-  async function saveEditedRecipe(proposal: EditRecipeProposal) {
-    const {
-      proposalId,
-      recipeId,
-      title,
-      description,
-      servings,
-      ingredients,
-      instructions,
-      category,
-      link,
-    } = proposal;
-    let categoryId = getCategoryIdByTranslatedEnglishName(category);
+  async function saveEditedRecipe(toolOutput: ToolOutputForUI) {
+    const { proposalId, args } = toolOutput;
+    const editRecipeId = args.recipeId;
 
+    if (!editRecipeId || !activeEditOriginalRecipe) {
+      toast.error(t("chatbot.saveRecipeError"));
+      return;
+    }
+
+    // Merge AI partial update with original recipe data
+    const finalTitle = args.title ?? activeEditOriginalRecipe.name;
+    const finalDescription = args.description ?? activeEditOriginalRecipe.description ?? "";
+    const finalInstructions = args.instructions ?? activeEditOriginalRecipe.instructions ?? "";
+    const finalServings = args.servings ?? activeEditOriginalRecipe.base_servings ?? undefined;
+    const finalCategory =
+      args.category ?? getEnglishCategoryNameById(activeEditOriginalRecipe.category);
+    const finalIngredients =
+      args.ingredients ??
+      (activeEditOriginalIngredients.length > 0
+        ? activeEditOriginalIngredients.map((ing) => ({
+            item: ing.rawText,
+            section: ing.groupName,
+          }))
+        : undefined);
+
+    let categoryId = getCategoryIdByTranslatedEnglishName(finalCategory);
     if (categoryId === null) {
-      console.error("Invalid category:", category);
+      console.error("Invalid category:", finalCategory);
       categoryId = DEFAULT_CATEGORY_ID;
     }
 
     try {
       await updateRecipeMutation.mutateAsync({
-        recipeId,
-        name: title,
-        description,
-        instructions,
-        link,
+        recipeId: editRecipeId,
+        name: finalTitle,
+        description: finalDescription,
+        instructions: finalInstructions,
+        link: activeEditOriginalRecipe.link ?? "",
         category: categoryId,
-        baseServings: servings,
+        baseServings: finalServings,
       });
 
-      // Replace ingredients if provided
-      if (ingredients && ingredients.length > 0) {
-        const inputs: RecipeIngredientInput[] = ingredients.map((ing, i) => ({
-          rawText: ing.item,
-          groupName: ing.section,
-          sortOrder: i,
-        }));
+      if (finalIngredients && finalIngredients.length > 0) {
         await replaceIngredientsMutation.mutateAsync({
-          recipeId,
-          inputs,
+          recipeId: editRecipeId,
+          inputs: toIngredientInputs(finalIngredients),
         });
       }
 
-      setPendingFeedback((prev) => [
-        ...prev,
-        `Proposal ${proposalId} accepted. Recipe ${recipeId} ("${title}") updated.`,
-      ]);
+      dispatch(
+        addPendingFeedback(
+          `Proposal ${proposalId} accepted. Recipe ${editRecipeId} ("${finalTitle}") updated.`
+        )
+      );
+      dispatch(updateProposalStatus({ proposalId, status: "saved", savedRecipeId: editRecipeId }));
       toast.success(t("chatbot.recipeUpdated"), {
         action: {
           label: t("common.open"),
-          onClick: () => navigate(`/recipe/${recipeId}`),
+          onClick: () => navigate(`/recipe/${editRecipeId}`),
         },
       });
     } catch (error) {
@@ -398,6 +405,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       toast.error(t("chatbot.updateRecipeError"));
     }
   }
+
+  const isEditProposal = activeProposal?.toolName === TOOL_PROPOSE_EDIT;
 
   return (
     <Layout
@@ -413,7 +422,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         </Button>
       }
     >
-      {/* Chat BG */}
+      {/* Empty state */}
       {visibleMessages.length === 0 && (
         <div className="absolute flex-col items-center justify-center w-full gap-2 -translate-x-1/2 left-1/2">
           <div className="w-full h-[200px] mx-auto">
@@ -429,9 +438,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
               className="rounded-full"
               variant="secondary"
               size="sm"
-              onClick={() =>
-                handleMessageSuggestionButton(t("chatbot.suggestions.suggestion1.text"))
-              }
+              onClick={() => handleMessageSuggestionButton(t("chatbot.suggestions.suggestion1.text"))}
             >
               {t("chatbot.suggestions.suggestion1.label")}
             </Button>
@@ -441,9 +448,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
                 className="rounded-full"
                 variant="secondary"
                 size="sm"
-                onClick={() =>
-                  handleMessageSuggestionButton(t("chatbot.suggestions.suggestion2.text"))
-                }
+                onClick={() => handleMessageSuggestionButton(t("chatbot.suggestions.suggestion2.text"))}
               >
                 {t("chatbot.suggestions.suggestion2.label")}
               </Button>
@@ -452,9 +457,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
                 className="rounded-full"
                 variant="secondary"
                 size="sm"
-                onClick={() =>
-                  handleMessageSuggestionButton(t("chatbot.suggestions.suggestion3.text"))
-                }
+                onClick={() => handleMessageSuggestionButton(t("chatbot.suggestions.suggestion3.text"))}
               >
                 {t("chatbot.suggestions.suggestion3.label")}
               </Button>
@@ -463,178 +466,179 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         </div>
       )}
 
-      {/* Messages Container */}
+      {/* Messages */}
       <div className="overflow-y-auto space-y-4 pb-4 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] mb-60">
         {visibleMessages.map((message, index) => (
-          <div
-            key={`${message.role}-${index}`}
-            className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
-          >
-            <div
-              className={`flex items-start gap-2 ${
-                message.role === "user" ? "flex-row-reverse max-w-[80%]" : "flex-row w-full"
-              }`}
-            >
-              {/* Message Bubble */}
-              <div
-                className={`rounded-lg max-w-full px-4 py-2 ${
-                  message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted"
-                }`}
-              >
-                {message.role === "user" && (
-                  <>
-                    {/* Recipe context chip if present */}
-                    {"recipeName" in message &&
-                      (message as ChatMessage & { recipeName?: string }).recipeName && (
-                        <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
-                          {(message as ChatMessage & { recipeName?: string }).recipeName}
-                        </div>
-                      )}
+          <div key={`${message.role}-${index}`}>
+            {message.role === "user" ? (
+              <div className="flex justify-end">
+                <div className="rounded-2xl bg-primary text-primary-foreground px-4 py-2 max-w-[80%]">
+                  {"recipeName" in message &&
+                    (message as ChatMessage & { recipeName?: string }).recipeName && (
+                      <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
+                        {(message as ChatMessage & { recipeName?: string }).recipeName}
+                      </div>
+                    )}
 
-                    <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
 
-                    {/* optional images if present */}
-                    {"images" in message &&
-                      Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
-                      ((message as ChatMessage & { images?: string[] }).images ?? []).length >
-                        0 && (
-                        <div className="flex gap-2 mt-2 flex-wrap">
-                          {((message as ChatMessage & { images?: string[] }).images ?? []).map(
-                            (src: string, i: number) => (
-                              <img
-                                key={i}
-                                src={`data:image/jpeg;base64,${src}`}
-                                srcSet={`data:image/jpeg;base64,${src}`}
-                                alt={`upload-${i}`}
-                                className="rounded-md border w-16 h-16 object-cover"
-                              />
-                            )
-                          )}
-                        </div>
-                      )}
-                  </>
-                )}
+                  {"images" in message &&
+                    Array.isArray((message as ChatMessage & { images?: string[] }).images) &&
+                    ((message as ChatMessage & { images?: string[] }).images ?? []).length > 0 && (
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        {((message as ChatMessage & { images?: string[] }).images ?? []).map(
+                          (src: string, i: number) => (
+                            <img
+                              key={i}
+                              src={`data:image/jpeg;base64,${src}`}
+                              srcSet={`data:image/jpeg;base64,${src}`}
+                              alt={`upload-${i}`}
+                              className="rounded-md border w-16 h-16 object-cover"
+                            />
+                          )
+                        )}
+                      </div>
+                    )}
+                </div>
+              </div>
+            ) : (
+              <div className="w-full">
+                <MarkdownRenderer content={message.content} className="text-sm" />
 
-                {message.role === "assistant" && (
-                  <MarkdownRenderer content={message.content} className="text-sm" />
-                )}
-
-                {message.role === "assistant" &&
-                  message.toolOutputsForUI &&
+                {message.toolOutputsForUI &&
                   message.toolOutputsForUI.length > 0 &&
                   message.toolOutputsForUI.map((toolOutput: ToolOutputForUI, i: number) => (
-                    <RecipeProposalDialog
+                    <ProposalCard
                       key={toolOutput.proposalId ?? i}
                       toolOutput={toolOutput}
-                      onSaveNew={saveSuggestedRecipe}
-                      onSaveEdit={saveEditedRecipe}
+                      displayTitle={
+                        toolOutput.toolName === TOOL_PROPOSE_EDIT
+                          ? (toolOutput.args.title ?? activeEditOriginalRecipe?.name)
+                          : undefined
+                      }
+                      onNavigate={(id) => navigate(`/recipe/${id}`)}
                       t={t}
+                      isActive={toolOutput.proposalId === activeProposal?.proposalId}
                     />
                   ))}
               </div>
-            </div>
+            )}
           </div>
         ))}
 
-        {/* Typing Indicator */}
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="flex items-start gap-2 max-w-[80%]">
-              <div className="px-4 py-2 rounded-lg bg-muted">
-                <div className="flex space-x-1">
-                  <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce"></div>
-                  <div className="w-2 h-2 delay-100 rounded-full bg-muted-foreground animate-bounce"></div>
-                  <div className="w-2 h-2 delay-200 rounded-full bg-muted-foreground animate-bounce"></div>
-                </div>
-              </div>
-            </div>
+          <div className="flex space-x-1 py-2">
+            <div className="w-2 h-2 rounded-full bg-muted-foreground animate-bounce" />
+            <div className="w-2 h-2 delay-100 rounded-full bg-muted-foreground animate-bounce" />
+            <div className="w-2 h-2 delay-200 rounded-full bg-muted-foreground animate-bounce" />
           </div>
         )}
 
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Input Area */}
-      <div className={`w-full max-w-lg fixed z-10 pr-8 bottom-20`}>
-        {/* Recipe context and image previews before sending */}
-        {(recipeContext || selectedImagesAsbase64.length > 0) && (
-          <div className="flex gap-2 flex-wrap mb-2 items-center">
-            {/* Recipe context chip */}
-            {recipeContext && (
-              <div className="bg-accent text-accent-foreground second-font font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
-                <span className="truncate">{recipeContext.name}</span>
+      {/* Input / Action bar area */}
+      <div className="w-full max-w-lg fixed z-10 pr-8 bottom-20">
+        {activeProposal ? (
+          // Blocking action bar — replaces text input while a proposal is pending
+          <div className="flex gap-2">
+            <Button
+              variant="secondary"
+              className="w-full"
+              onClick={() => handleDismissProposal(activeProposal.proposalId)}
+              disabled={isTyping}
+            >
+              {isEditProposal ? t("chatbot.keepOriginal") : t("chatbot.notForMe")}
+            </Button>
+            <Button
+              variant="accent"
+              className="w-full"
+              onClick={handleSaveActiveProposal}
+              disabled={isTyping || (isEditProposal && !activeEditOriginalRecipe)}
+            >
+              {isEditProposal ? t("chatbot.applyChanges") : t("chatbot.saveToCookbook")}
+            </Button>
+          </div>
+        ) : (
+          // Normal text input
+          <>
+            {(recipeContext || selectedImagesAsbase64.length > 0) && (
+              <div className="flex gap-2 flex-wrap mb-2 items-center">
+                {recipeContext && (
+                  <div className="bg-accent text-accent-foreground second-font font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
+                    <span className="truncate">{recipeContext.name}</span>
+                  </div>
+                )}
+
+                {selectedImagesAsbase64.map((imageAsBase64, i) => (
+                  <button
+                    key={i}
+                    className="relative"
+                    onClick={() => handleRemoveImage(i)}
+                    aria-label={t("common.remove")}
+                    title={t("common.remove")}
+                  >
+                    <img
+                      src={`data:image/jpeg;base64,${imageAsBase64}`}
+                      srcSet={`data:image/jpeg;base64,${imageAsBase64}`}
+                      loading="lazy"
+                      alt={`preview-${i}`}
+                      className="rounded-md border w-12 h-12 object-cover"
+                    />
+                    <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-black/70 text-white border border-white">
+                      <X className="w-3 h-3" />
+                    </div>
+                  </button>
+                ))}
               </div>
             )}
 
-            {/* Image previews */}
-            {selectedImagesAsbase64.map((imageAsBase64, i) => (
-              <button
-                key={i}
-                className="relative"
-                onClick={() => handleRemoveImage(i)}
-                aria-label={t("common.remove")}
-                title={t("common.remove")}
-              >
-                <img
-                  src={`data:image/jpeg;base64,${imageAsBase64}`}
-                  srcSet={`data:image/jpeg;base64,${imageAsBase64}`}
-                  loading="lazy"
-                  alt={`preview-${i}`}
-                  className="rounded-md border w-12 h-12 object-cover"
+            <Field>
+              <InputGroup className="rounded-2xl bg-background dark:bg-background">
+                <InputGroupTextarea
+                  placeholder={t("chatbot.inputPlaceholder")}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
+                  maxLength={3000}
+                  maxHeight={200}
+                  rows={1}
+                  enterKeyHint="enter"
                 />
 
-                <div className="absolute -top-2 -right-2 inline-flex items-center justify-center w-5 h-5 rounded-full bg-black/70 text-white border border-white">
-                  <X className="w-3 h-3" />
-                </div>
-              </button>
-            ))}
-          </div>
+                <InputGroupAddon align="block-end" className="px-2 pb-2">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    size="icon"
+                    onClick={handlePickImagesClick}
+                    title={t("common.uploadImage")}
+                    className="rounded-full"
+                  >
+                    <ImagePlus />
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="accent"
+                    size="icon"
+                    onClick={handleSendMessage}
+                    disabled={isTyping}
+                    title={t("common.send")}
+                    className="ml-auto rounded-full"
+                  >
+                    <ArrowUp className="!size-5" />
+                  </Button>
+                </InputGroupAddon>
+              </InputGroup>
+            </Field>
+          </>
         )}
-
-        <Field>
-          <InputGroup className="rounded-2xl bg-background dark:bg-background">
-            <InputGroupTextarea
-              placeholder={t("chatbot.inputPlaceholder")}
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && e.shiftKey) {
-                  e.preventDefault();
-                  handleSendMessage();
-                }
-              }}
-              maxLength={3000}
-              maxHeight={200}
-              rows={1}
-              enterKeyHint="enter"
-            />
-
-            <InputGroupAddon align="block-end" className="px-2 pb-2">
-              <Button
-                type="button"
-                variant="secondary"
-                size="icon"
-                onClick={handlePickImagesClick}
-                title={t("common.uploadImage")}
-                className="rounded-full"
-              >
-                <ImagePlus />
-              </Button>
-
-              <Button
-                type="button"
-                variant="accent"
-                size="icon"
-                onClick={handleSendMessage}
-                disabled={isTyping}
-                title={t("common.send")}
-                className="ml-auto rounded-full"
-              >
-                <ArrowUp className="!size-5" />
-              </Button>
-            </InputGroupAddon>
-          </InputGroup>
-        </Field>
       </div>
 
       {ImageSourceDrawerComponent}

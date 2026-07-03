@@ -533,7 +533,16 @@
     "updateRecipePrompt": "Update this recipe or ask for different edits",
     "updateRecipeError": "Error updating recipe. Please try again later.",
     "recipeSaved": "Recipe saved!",
-    "recipeUpdated": "Recipe updated!"
+    "recipeUpdated": "Recipe updated!",
+    "saveToCookbook": "Save to Cookbook",
+    "notForMe": "Not for me",
+    "applyChanges": "Apply Changes",
+    "keepOriginal": "Keep Current",
+    "proposalSkipped": "Skipped",
+    "proposalEditLabel": "Edit:",
+    "showDetails": "Show full recipe",
+    "hideDetails": "Hide details",
+    "errorMessage": "Sorry, I'm having trouble connecting right now. Please try again later."
   },
   "bottomNav": {
     "home": "Home",
