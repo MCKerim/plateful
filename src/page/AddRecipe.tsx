@@ -319,10 +319,14 @@ export default function AddRecipe() {
         {
           onSuccess: async () => {
             // If a new image was uploaded, move it to the correct folder if needed
+            let finalImagePath: string | null = imageSupabaseUrl || null;
             if (imageFile && imageSupabaseUrl?.includes("temp")) {
               const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+              finalImagePath = newPath;
             }
+            // The recipe owns its cover path.
+            await supabase.from("recipes").update({ image_path: finalImagePath }).eq("id", recipeId);
             // Save ingredients
             await saveIngredients(recipeId);
             toast.success(t("addRecipe.recipeSaved"));
@@ -352,6 +356,8 @@ export default function AddRecipe() {
             if (imageFile && imageSupabaseUrl) {
               const newPath = `recipe_${data.id}/${imageSupabaseUrl.split("/").pop()}`;
               await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+              // The recipe owns its cover path.
+              await supabase.from("recipes").update({ image_path: newPath }).eq("id", data.id);
             }
             // Save ingredients
             await saveIngredients(data.id);
