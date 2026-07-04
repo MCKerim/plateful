@@ -232,6 +232,14 @@ Deno.serve(async (req: Request) => {
           console.error("Image upload error:", imageError);
         } else {
           console.log("Image uploaded successfully:", uploadData);
+          // The recipe owns its cover path.
+          const { error: imagePathError } = await supabase
+            .from("recipes")
+            .update({ image_path: imageFilePath })
+            .eq("id", recipeId);
+          if (imagePathError) {
+            console.error("Failed to set image_path:", imagePathError);
+          }
         }
       } catch (imgErr) {
         console.error("Image processing error:", imgErr);
