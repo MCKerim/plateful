@@ -22,11 +22,10 @@ export type UpdateRecipeParams = {
 };
 
 export type RecipeImageInfo = {
+  /** Public URL of the recipe's cover image (the bucket is public). */
   signedUrl: string;
   path: string;
 };
-
-const SIGNED_URL_EXPIRY_SECONDS = 3600; // 1 hour
 
 export const recipeApi = {
   async getById(supabase: SupabaseClient, recipeId: string): Promise<Recipes | null> {
@@ -37,48 +36,37 @@ export const recipeApi = {
   },
 
   async getFirstImage(supabase: SupabaseClient, recipeId: string): Promise<string | null> {
-    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("image_path")
+      .eq("id", recipeId)
+      .single();
 
-    if (error || !data || data.length === 0) return null;
+    if (error || !data?.image_path) return null;
 
-    const { data: signedUrlData } = await supabase.storage
-      .from("recipeimages")
-      .createSignedUrl(`recipe_${recipeId}/${data[0].name}`, SIGNED_URL_EXPIRY_SECONDS);
-
-    return signedUrlData?.signedUrl ?? null;
+    return supabase.storage.from("recipeimages").getPublicUrl(data.image_path).data.publicUrl;
   },
 
+  // One cover image per recipe now, so this returns the cover (or nothing).
   async getImages(supabase: SupabaseClient, recipeId: string): Promise<string[]> {
-    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
-
-    if (error || !data) return [];
-
-    const urls = await Promise.all(
-      data.map(async (file) => {
-        const { data: signedUrlData } = await supabase.storage
-          .from("recipeimages")
-          .createSignedUrl(`recipe_${recipeId}/${file.name}`, SIGNED_URL_EXPIRY_SECONDS);
-        return signedUrlData?.signedUrl ?? null;
-      })
-    );
-
-    return urls.filter((url): url is string => url !== null);
+    const url = await recipeApi.getFirstImage(supabase, recipeId);
+    return url ? [url] : [];
   },
 
   async getImageWithPath(
     supabase: SupabaseClient,
     recipeId: string
   ): Promise<RecipeImageInfo | null> {
-    const { data, error } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("image_path")
+      .eq("id", recipeId)
+      .single();
 
-    if (error || !data || data.length === 0) return null;
+    if (error || !data?.image_path) return null;
 
-    const path = `recipe_${recipeId}/${data[0].name}`;
-    const { data: signedUrlData } = await supabase.storage
-      .from("recipeimages")
-      .createSignedUrl(path, SIGNED_URL_EXPIRY_SECONDS);
-
-    return signedUrlData?.signedUrl ? { signedUrl: signedUrlData.signedUrl, path } : null;
+    const url = supabase.storage.from("recipeimages").getPublicUrl(data.image_path).data.publicUrl;
+    return { signedUrl: url, path: data.image_path };
   },
 
   async create(supabase: SupabaseClient, params: CreateRecipeParams): Promise<Recipes> {
