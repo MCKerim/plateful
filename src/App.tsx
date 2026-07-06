@@ -55,9 +55,12 @@ import SharedRecipe from "./page/SharedRecipe";
 import NotificationSettings from "./page/NotificationSettings";
 import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { queryKeys } from "@/lib/query-keys";
 
 function App() {
   const { supabase } = useSupabase();
+  const queryClient = useQueryClient();
   const householdId = useAppSelector(selectHouseholdId);
   const user = useAppSelector(selectUser);
   const { isActive: householdIsActive, isLoading: subLoading } = useHouseholdSubscription();
@@ -262,6 +265,36 @@ function App() {
       supabase.removeChannel(userSubscription);
     };
   }, [user?.id]);
+
+  // Live cookbook: refetch recipes + import placeholders whenever the household's
+  // recipes or imports change (RLS scopes the stream to the household). This is
+  // the primary signal that a background import has resolved — the web analog of
+  // the iOS RecipesStore.observeChanges(). Events are coalesced because a
+  // finishing import fires several at once.
+  useEffect(() => {
+    if (!householdId) return;
+
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleRefresh = () => {
+      if (refreshTimer) return;
+      refreshTimer = setTimeout(() => {
+        refreshTimer = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
+      }, 300);
+    };
+
+    const channel = supabase
+      .channel("recipes-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "recipe_imports" }, scheduleRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "recipes" }, scheduleRefresh)
+      .subscribe();
+
+    return () => {
+      if (refreshTimer) clearTimeout(refreshTimer);
+      supabase.removeChannel(channel);
+    };
+  }, [householdId, queryClient, supabase]);
 
   function isLoggedIn(): boolean {
     return user !== null;

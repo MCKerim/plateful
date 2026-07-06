@@ -274,7 +274,10 @@
     "enterRecipeName": "Rezept suchen...",
     "nothingFound": "Keine Rezepte gefunden...",
     "importing": "Importiere...",
-    "recentlyAdded": "Zuletzt hinzugefügt"
+    "recentlyAdded": "Zuletzt hinzugefügt",
+    "importFailed": "Import fehlgeschlagen",
+    "retry": "Erneut versuchen",
+    "dismiss": "Verwerfen"
   },
   "recipe": {
     "editRecipe": "Rezept bearbeiten",
@@ -339,11 +342,44 @@
     "success": "Rezept erfolgreich importiert!",
     "importedRecipe": "Rezept erfolgreich importiert",
     "viewRecipe": "Ansehen",
-    "backToCookbook": "Zurück zum Kochbuch"
+    "backToCookbook": "Zurück zum Kochbuch",
+    "importStarted": "Import gestartet",
+    "startedTitle": "Import gestartet",
+    "startedDescription": "Dein Rezept wird importiert und erscheint gleich in deinem Kochbuch."
   },
   "imageImport": {
     "title": "Rezept Importieren",
-    "importButton": "Rezept importieren"
+    "importButton": "Rezept importieren",
+    "errors": {
+      "noImages": "Füge mindestens ein Foto hinzu.",
+      "tooMany": "Du kannst bis zu {{count}} Fotos hinzufügen."
+    }
+  },
+  "nutrition": {
+    "title": "Nährwerte",
+    "perServing": "pro Portion",
+    "perServingNote": "Nährwerte pro Portion",
+    "calories": "Kalorien",
+    "kcal": "kcal",
+    "protein": "Eiweiß",
+    "carbs": "Kohlenhydrate",
+    "fat": "Fett",
+    "sugar": "Zucker",
+    "fiber": "Ballaststoffe",
+    "sodium": "Natrium",
+    "letters": {
+      "carbs": "K",
+      "protein": "P",
+      "fat": "F"
+    },
+    "calculate": "Nährwerte berechnen",
+    "recalculate": "Neu berechnen",
+    "calculating": "Berechne...",
+    "errors": {
+      "titleRequired": "Gib zuerst einen Rezeptnamen ein.",
+      "ingredientsRequired": "Füge zuerst Zutaten hinzu.",
+      "calculateFailed": "Nährwerte konnten gerade nicht berechnet werden. Bitte versuche es erneut."
+    }
   },
   "home": {
     "title": "Startseite",

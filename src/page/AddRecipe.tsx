@@ -47,6 +47,8 @@ import {
   instructionsToMarkdown,
   parseInstructionsMarkdown,
 } from "@/lib/transformers/instruction.transformer";
+import NutritionEditor from "@/components/recipe/NutritionEditor";
+import { NutritionValues } from "@/api/nutrition.api";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -66,6 +68,9 @@ export default function AddRecipe() {
   const [link, setLink] = useState("");
   const [ingredients, setIngredients] = useState<EditorItem[]>([]);
   const [baseServings, setBaseServings] = useState<number | null>(null);
+  // `undefined` until the editor reports values (loaded recipe or user action),
+  // so saving before an edited recipe loads never wipes its saved nutrition.
+  const [nutrition, setNutrition] = useState<NutritionValues | undefined>(undefined);
 
   const filterCategoryId = useAppSelector(selectCategoryId);
   const [category, setCategory] = useState(filterCategoryId === 0 ? null : filterCategoryId);
@@ -315,6 +320,7 @@ export default function AddRecipe() {
           link,
           category,
           baseServings,
+          nutrition,
         },
         {
           onSuccess: async () => {
@@ -349,6 +355,7 @@ export default function AddRecipe() {
           category,
           householdId: householdId!,
           baseServings,
+          nutrition,
         },
         {
           onSuccess: async (data) => {
@@ -387,6 +394,25 @@ export default function AddRecipe() {
       },
     });
   }
+
+  // Current ingredient lines (raw text, no section headers) for the nutrition estimate.
+  const ingredientLines = ingredients
+    .filter((item) => item.type === "ingredient")
+    .map((item) => item.rawText.trim())
+    .filter((text) => text !== "");
+
+  // The loaded recipe's saved nutrition (edit mode), or null when adding / before load.
+  const initialNutrition: NutritionValues | null = recipe
+    ? {
+        calories_kcal: recipe.calories_kcal,
+        carbs_g: recipe.carbs_g,
+        protein_g: recipe.protein_g,
+        fat_g: recipe.fat_g,
+        sugar_g: recipe.sugar_g,
+        fiber_g: recipe.fiber_g,
+        sodium_mg: recipe.sodium_mg,
+      }
+    : null;
 
   const saveFooter = (
     <>
@@ -520,6 +546,15 @@ export default function AddRecipe() {
 
           <SimpleInstructionEditor items={instructionItems} onChange={setInstructionItems} />
         </div>
+
+        {/* Nutrition Section */}
+        <NutritionEditor
+          initial={initialNutrition}
+          onChange={setNutrition}
+          title={title}
+          servings={baseServings}
+          ingredientLines={ingredientLines}
+        />
       </div>
     </Layout>
   );

@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Recipes } from "@/types/exportedDatabaseTypes.types";
+import { NutritionValues } from "@/api/nutrition.api";
 
 export type CreateRecipeParams = {
   name: string;
@@ -9,6 +10,8 @@ export type CreateRecipeParams = {
   category: number;
   householdId: string;
   baseServings?: number | null;
+  /** When provided, writes all 7 metrics (a null value clears that column). */
+  nutrition?: NutritionValues | null;
 };
 
 export type UpdateRecipeParams = {
@@ -19,12 +22,25 @@ export type UpdateRecipeParams = {
   link: string;
   category: number;
   baseServings?: number | null;
+  /** When provided, writes all 7 metrics (a null value clears that column). */
+  nutrition?: NutritionValues | null;
 };
 
 export type RecipeImageInfo = {
   /** Public URL of the recipe's cover image (the bucket is public). */
   signedUrl: string;
   path: string;
+};
+
+/** All-null nutrition, used to explicitly clear every column on update. */
+const emptyNutrition: NutritionValues = {
+  calories_kcal: null,
+  carbs_g: null,
+  protein_g: null,
+  fat_g: null,
+  sugar_g: null,
+  fiber_g: null,
+  sodium_mg: null,
 };
 
 export const recipeApi = {
@@ -81,6 +97,7 @@ export const recipeApi = {
           category: params.category,
           household_id: params.householdId,
           base_servings: params.baseServings,
+          ...(params.nutrition ? params.nutrition : {}),
         },
       ])
       .select()
@@ -100,6 +117,9 @@ export const recipeApi = {
         link: params.link,
         category: params.category,
         base_servings: params.baseServings,
+        // Only touch nutrition columns when the editor supplied them, so other
+        // update paths never accidentally wipe a saved estimate.
+        ...(params.nutrition !== undefined ? (params.nutrition ?? emptyNutrition) : {}),
       })
       .eq("id", params.recipeId)
       .select()

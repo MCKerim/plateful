@@ -5,37 +5,44 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
 import { useTranslation } from "react-i18next";
 import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
-import { Trash2, Camera, ImageIcon } from "lucide-react";
+import { Trash2, Camera, ImageIcon, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useSupabase } from "@/utils/supabase";
 import { useNavigate, useSearchParams } from "react-router";
 import { Capacitor } from "@capacitor/core";
 import LoadingDots from "@/components/general/LoadingDots";
-import RecipeCard from "@/components/general/RecipeCard";
 import imageCompression from "browser-image-compression";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { recipeImportApi } from "@/api/recipeImport.api";
+
+// The backend extractor is unreliable with large photo batches, so cap the
+// import at 4 — same limit the iOS app and share extension enforce.
+const MAX_IMPORT_IMAGES = 4;
 
 let lastAutoImportedFileUris: string | null = null;
 
 export default function ImageImport() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
+  const householdId = useAppSelector(selectHouseholdId);
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<{ id: string; name: string } | null>(null);
-  const [images, setImages] = useState<{ file: File; preview: string; base64: string }[]>([]);
+  // The placeholder was created; we show a brief confirmation then leave.
+  const [submitted, setSubmitted] = useState(false);
+  const [images, setImages] = useState<{ file: File; preview: string }[]>([]);
   const [isLoadingImage, setIsLoadingImage] = useState(false);
-  const abortControllerRef = useRef<AbortController | null>(null);
   const [searchParams] = useSearchParams();
   const incrementMission = useIncrementMission();
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Cleanup on unmount - abort any pending API calls
   useEffect(() => {
     return () => {
-      abortControllerRef.current?.abort();
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
   }, []);
 
@@ -49,18 +56,35 @@ export default function ImageImport() {
 
   const processImage = useCallback(async (file: File, dataUrl: string) => {
     setIsLoadingImage(true);
-    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (reader.result) {
-        const base64 = reader.result.toString();
-        setImages((prev) => [...prev, { file: compressedFile, preview: dataUrl, base64 }]);
-        setIsLoadingImage(false);
-      }
-    };
-    reader.readAsDataURL(compressedFile);
+    try {
+      const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
+      setImages((prev) =>
+        prev.length >= MAX_IMPORT_IMAGES
+          ? prev
+          : [...prev, { file: compressedFile, preview: dataUrl }]
+      );
+    } finally {
+      setIsLoadingImage(false);
+    }
   }, []);
+
+  // Add up to the remaining capacity; warn if the selection was truncated.
+  const addImages = useCallback(
+    async (items: { file: File; dataUrl: string }[]) => {
+      const remaining = MAX_IMPORT_IMAGES - images.length;
+      if (remaining <= 0) {
+        toast.error(t("imageImport.errors.tooMany", { count: MAX_IMPORT_IMAGES }));
+        return;
+      }
+      if (items.length > remaining) {
+        toast.error(t("imageImport.errors.tooMany", { count: MAX_IMPORT_IMAGES }));
+      }
+      for (const item of items.slice(0, remaining)) {
+        await processImage(item.file, item.dataUrl);
+      }
+    },
+    [images.length, processImage, t]
+  );
 
   // Load images shared via the Android share intent
   useEffect(() => {
@@ -70,6 +94,7 @@ export default function ImageImport() {
     lastAutoImportedFileUris = fileUrisKey;
 
     const loadSharedFiles = async () => {
+      const loaded: { file: File; dataUrl: string }[] = [];
       for (const uri of fileUris) {
         try {
           const webUri = Capacitor.convertFileSrc(uri);
@@ -77,29 +102,30 @@ export default function ImageImport() {
           const blob = await response.blob();
           const file = new File([blob], "shared-image", { type: blob.type || "image/jpeg" });
           const dataUrl = URL.createObjectURL(blob);
-          await processImage(file, dataUrl);
+          loaded.push({ file, dataUrl });
         } catch (err) {
           console.error("Failed to load shared image:", err);
         }
       }
+      await addImages(loaded);
     };
 
     loadSharedFiles();
-  }, [searchParams, processImage]);
+    // addImages depends on images.length, but this should only run per share.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const handleCameraClick = async () => {
     const result = await selectFromCamera();
     if (result) {
-      await processImage(result.file, result.dataUrl);
+      await addImages([result]);
     }
   };
 
   const handleGalleryClick = async () => {
     const results = await selectMultipleFromGallery();
     if (results) {
-      for (const result of results) {
-        await processImage(result.file, result.dataUrl);
-      }
+      await addImages(results);
     }
   };
 
@@ -112,73 +138,45 @@ export default function ImageImport() {
       toast.error(t("imageImport.errors.noImages"));
       return;
     }
-
-    // Abort any previous request and create new controller
-    abortControllerRef.current?.abort();
-    abortControllerRef.current = new AbortController();
-    const signal = abortControllerRef.current.signal;
+    if (!householdId) {
+      toast.error(t("urlImport.errors.importFailed"));
+      return;
+    }
 
     setIsSaving(true);
-
-    // Invalidate cache immediately so Cookbook shows the importing card
-    await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-
     try {
-      const { data, error } = await supabase.functions.invoke("recipe-from-image", {
-        body: {
-          images: images.map((img) => img.base64),
-        },
+      await recipeImportApi.createImageImport(supabase, {
+        files: images.map((img) => img.file),
+        householdId,
+        language: i18n.language.split("-")[0],
       });
 
-      // Check if component unmounted during the async operation
-      if (signal.aborted) return;
+      incrementMission.mutate({ missionId: "import_recipes" });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
+      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
 
-      if (error) {
-        console.error("Edge function returned error:", error);
-        toast.error(t("urlImport.errors.importFailed"));
-      } else {
-        setData(data[0]);
-        incrementMission.mutate({ missionId: "import_recipes" });
-        await queryClient.invalidateQueries({
-          queryKey: queryKeys.recipes.all,
-        });
-        window.history.replaceState(null, "", "/cookbook");
-        toast.success(t("urlImport.success"), {
-          action: {
-            label: t("urlImport.viewRecipe"),
-            onClick: () => {
-              navigate(`/recipe/${data[0].id}`);
-            },
-          },
-        });
-      }
-    } catch (err: unknown) {
-      if (signal.aborted) return;
-      console.error("Unexpected error calling recipe-from-image:", err);
+      setSubmitted(true);
+      toast.success(t("urlImport.importStarted"));
+
+      // Fire-and-forget: the worker extracts in the background. Confirm briefly,
+      // then land in the cookbook where the placeholder card is waiting.
+      redirectTimerRef.current = setTimeout(() => navigate("/cookbook"), 1600);
+    } catch (err) {
+      console.error("Failed to start image import:", err);
       toast.error(t("urlImport.errors.importFailed"));
-
-      try {
-        const errWithResponse = err as { response?: { text?: () => Promise<string> } };
-        if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
-          const text = await errWithResponse.response.text();
-          console.error("Edge function returned (raw text):", text);
-        }
-      } catch (error_) {
-        console.debug("Could not retrieve raw response from error.", error_);
-      }
     } finally {
-      if (!signal.aborted) {
-        setIsSaving(false);
-      }
+      setIsSaving(false);
     }
   }
 
+  const busy = isSaving || submitted;
+
   const saveFooter = (
     <>
-      <div className="h-[100px]"></div>
+      <div className="h-safe-b-[100px]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        {isSaving || data !== null ? (
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
+        {busy ? (
           <Button className="w-full" variant="secondary" onClick={() => navigate("/cookbook")}>
             {t("urlImport.backToCookbook")}
           </Button>
@@ -205,13 +203,15 @@ export default function ImageImport() {
     </>
   );
 
+  const atCapacity = images.length >= MAX_IMPORT_IMAGES;
+
   return (
     <Layout showHeader={false} footer={saveFooter}>
       <div className="flex justify-between w-full items-center">
         <h1 className="text-2xl font-bold first-font">{t("imageImport.title")}</h1>
       </div>
 
-      {!isSaving && !data && (
+      {!busy && (
         <div className="flex flex-col gap-4 flex-1 justify-between">
           <div className="grid grid-cols-2 gap-4">
             {images.map((image, index) => (
@@ -250,7 +250,7 @@ export default function ImageImport() {
               variant="secondary"
               className="w-full h-26 rounded-2xl pt-4"
               onClick={handleCameraClick}
-              disabled={!isNative || isLoadingImage}
+              disabled={!isNative || isLoadingImage || atCapacity}
             >
               <div className="flex flex-col gap-1 items-center">
                 <Camera className="!size-8" />
@@ -262,7 +262,7 @@ export default function ImageImport() {
               variant="secondary"
               className="w-full h-26 rounded-2xl pt-4"
               onClick={handleGalleryClick}
-              disabled={isLoadingImage}
+              disabled={isLoadingImage || atCapacity}
             >
               <div className="flex flex-col gap-1 items-center">
                 <ImageIcon className="!size-8" />
@@ -273,27 +273,18 @@ export default function ImageImport() {
         </div>
       )}
 
-      {(isSaving || data) && (
+      {busy && (
         <div className="flex items-center flex-1">
-          {isSaving && (
-            <div className="flex flex-col items-center justify-center w-full gap-8">
-              <LoadingDots />
+          <div className="flex flex-col items-center justify-center w-full gap-6 text-center">
+            <CheckCircle2 className="text-primary size-16" />
 
-              <p className="second-font text-center">
-                {t("urlImport.importingMessage")}
-                <br />
-                {t("urlImport.importingDescription")}
+            <div className="flex flex-col gap-1">
+              <h2 className="text-lg font-bold second-font">{t("urlImport.startedTitle")}</h2>
+              <p className="second-font text-muted-foreground">
+                {t("urlImport.startedDescription")}
               </p>
             </div>
-          )}
-
-          {data && (
-            <div className="flex flex-col w-full gap-4">
-              <h2 className="text-lg font-bold second-font">{t("urlImport.importedRecipe")}</h2>
-
-              <RecipeCard key={data.id} id={data.id} name={data.name} averageRating={null} />
-            </div>
-          )}
+          </div>
         </div>
       )}
     </Layout>
