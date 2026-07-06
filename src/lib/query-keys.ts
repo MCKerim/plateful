@@ -16,6 +16,10 @@ export const queryKeys = {
     instructions: (id: string) => ["recipes", id, "instructions"] as const,
     images: (id: string) => ["recipes", id, "images"] as const,
   },
+  recipeImports: {
+    all: ["recipe-imports"] as const,
+    active: ["recipe-imports", "active"] as const,
+  },
   ratings: {
     all: ["ratings"] as const,
     byRecipe: (recipeId: string) => ["ratings", "recipe", recipeId] as const,

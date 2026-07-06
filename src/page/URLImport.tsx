@@ -5,137 +5,139 @@ import { Input } from "@/components/ui/input";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
-import LoadingDots from "@/components/general/LoadingDots";
+import { CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { useNavigate, useSearchParams } from "react-router";
-import RecipeCard from "@/components/general/RecipeCard";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { readClipboardText } from "@/utils/nativeClipboard";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { recipeImportApi } from "@/api/recipeImport.api";
+
+/**
+ * Cleans a user-typed link into an absolute URL, or returns null if it isn't a
+ * plausible one yet. Prepends `https://` when the scheme is missing and requires
+ * a dotted host. Mirrors the iOS URL import's `normalizedURL`.
+ */
+function normalizeUrl(raw: string): string | null {
+  let text = raw.trim();
+  if (text === "") return null;
+  const lower = text.toLowerCase();
+  if (!lower.startsWith("http://") && !lower.startsWith("https://")) {
+    text = "https://" + text;
+  }
+  try {
+    const url = new URL(text);
+    if (!url.hostname.includes(".")) return null;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
 
 export default function URLImport() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
+  const householdId = useAppSelector(selectHouseholdId);
   const [isSaving, setIsSaving] = useState(false);
-  const [data, setData] = useState<{ id: string; name: string } | null>(null);
+  // The placeholder was created; we show a brief confirmation then leave.
+  const [submitted, setSubmitted] = useState(false);
   const queryClient = useQueryClient();
   const incrementMission = useIncrementMission();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const importAbortRef = useRef<AbortController | null>(null);
+  const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Abort any in-progress import when the component unmounts
   useEffect(() => {
     return () => {
-      importAbortRef.current?.abort();
+      if (redirectTimerRef.current) clearTimeout(redirectTimerRef.current);
     };
   }, []);
 
   const handleSave = useCallback(
-    async (url: string, signal?: AbortSignal) => {
-      if (!url?.trim()) return;
+    async (rawUrl: string) => {
+      const url = normalizeUrl(rawUrl);
+      if (!url) {
+        toast.error(t("urlImport.errors.invalidUrl"));
+        return;
+      }
+      if (!householdId) {
+        toast.error(t("urlImport.errors.importFailed"));
+        return;
+      }
 
       setIsSaving(true);
-
-      // Invalidate cache immediately so Cookbook shows the importing card
-      await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-
       try {
-        const { data, error } = await supabase.functions.invoke("recipe-from-url", {
-          body: {
-            url: url.trim(),
-          },
+        await recipeImportApi.createUrlImport(supabase, {
+          url,
+          householdId,
+          language: i18n.language.split("-")[0],
         });
 
-        // Check if component unmounted during the async operation
-        if (signal?.aborted) return;
+        incrementMission.mutate({ missionId: "import_recipes" });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
+        await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
 
-        if (error) {
-          console.error("Edge function returned error:", error);
-          toast.error(t("urlImport.errors.importFailed"));
-        } else {
-          setData(data[0]);
-          incrementMission.mutate({ missionId: "import_recipes" });
-          await queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
-          window.history.replaceState(null, "", "/cookbook");
-          toast.success(t("urlImport.success"), {
-            action: {
-              label: t("urlImport.viewRecipe"),
-              onClick: () => {
-                navigate(`/recipe/${data[0].id}`);
-              },
-            },
-          });
-        }
-      } catch (err: unknown) {
-        if (signal?.aborted) return;
-        console.error("Unexpected error calling recipe-from-url:", err);
+        setSubmitted(true);
+        toast.success(t("urlImport.importStarted"));
+
+        // Fire-and-forget: the worker extracts in the background. Show the
+        // confirmation briefly, then drop the user into their cookbook where the
+        // placeholder card is already waiting.
+        redirectTimerRef.current = setTimeout(() => navigate("/cookbook"), 1600);
+      } catch (err) {
+        console.error("Failed to start URL import:", err);
         toast.error(t("urlImport.errors.importFailed"));
-
-        try {
-          const errWithResponse = err as { response?: { text?: () => Promise<string> } };
-          if (errWithResponse?.response && typeof errWithResponse.response.text === "function") {
-            const text = await errWithResponse.response.text();
-            console.error("Edge function returned (raw text):", text);
-          }
-        } catch (error_) {
-          console.debug("Could not retrieve raw response from error.", error_);
-        }
       } finally {
-        if (!signal?.aborted) {
-          setIsSaving(false);
-        }
+        setIsSaving(false);
       }
     },
-    [supabase, t, queryClient, navigate]
+    [supabase, householdId, i18n.language, incrementMission, queryClient, navigate, t]
   );
 
   useEffect(() => {
     const urlFromParams = searchParams.get("url");
     if (urlFromParams) {
-      // Store the controller in a ref so its lifetime is not tied to this effect's
-      // cleanup — setSearchParams will cause the effect to re-run and the cleanup
-      // would otherwise abort the still-running import.
-      importAbortRef.current = new AbortController();
       setSearchParams({}, { replace: true });
       setUrlInput(urlFromParams);
-      handleSave(urlFromParams, importAbortRef.current.signal);
+      handleSave(urlFromParams);
       return;
     }
 
     // Only paste from clipboard when no auto-import was just triggered
-    if (!importAbortRef.current) {
-      const abortController = new AbortController();
+    const abortController = new AbortController();
 
-      async function autoPasteFromClipboard() {
-        try {
-          const text = await readClipboardText();
-          if (abortController.signal.aborted) return;
-          if (text.startsWith("http://") || text.startsWith("https://")) {
-            setUrlInput(text);
-            toast.success(t("urlImport.linkPastedFromClipboard"));
-          }
-        } catch (err) {
-          console.debug("Could not access clipboard or invalid content.", err);
+    async function autoPasteFromClipboard() {
+      try {
+        const text = await readClipboardText();
+        if (abortController.signal.aborted) return;
+        if (text.startsWith("http://") || text.startsWith("https://")) {
+          setUrlInput(text);
+          toast.success(t("urlImport.linkPastedFromClipboard"));
         }
+      } catch (err) {
+        console.debug("Could not access clipboard or invalid content.", err);
       }
-
-      autoPasteFromClipboard();
-      return () => {
-        abortController.abort();
-      };
     }
+
+    autoPasteFromClipboard();
+    return () => {
+      abortController.abort();
+    };
   }, [searchParams, setSearchParams, handleSave, t]);
+
+  const busy = isSaving || submitted;
 
   const saveFooter = (
     <>
-      <div className="h-[100px]"></div>
+      <div className="h-safe-b-[100px]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
-        {isSaving || data !== null ? (
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
+        {busy ? (
           <Button className="w-full" variant="secondary" onClick={() => navigate("/cookbook")}>
             {t("urlImport.backToCookbook")}
           </Button>
@@ -155,7 +157,7 @@ export default function URLImport() {
       </div>
 
       <div className="flex items-center flex-1">
-        {!isSaving && !data && (
+        {!busy && (
           <Field>
             <FieldLabel htmlFor="url">{t("urlImport.urlFieldLabel")}</FieldLabel>
 
@@ -168,7 +170,6 @@ export default function URLImport() {
               value={urlInput}
               onChange={(e) => setUrlInput(e.target.value)}
               autoComplete="off"
-              disabled={isSaving}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
                   handleSave(urlInput);
@@ -178,23 +179,16 @@ export default function URLImport() {
           </Field>
         )}
 
-        {isSaving && (
-          <div className="flex flex-col items-center justify-center w-full gap-8">
-            <LoadingDots />
+        {busy && (
+          <div className="flex flex-col items-center justify-center w-full gap-6 text-center">
+            <CheckCircle2 className="text-primary size-16" />
 
-            <p className="second-font text-center">
-              {t("urlImport.importingMessage")}
-              <br />
-              {t("urlImport.importingDescription")}
-            </p>
-          </div>
-        )}
-
-        {data && (
-          <div className="flex flex-col w-full gap-4">
-            <h2 className="text-lg font-bold second-font">{t("urlImport.importedRecipe")}</h2>
-
-            <RecipeCard key={data.id} id={data.id} name={data.name} averageRating={null} />
+            <div className="flex flex-col gap-1">
+              <h2 className="text-lg font-bold second-font">{t("urlImport.startedTitle")}</h2>
+              <p className="second-font text-muted-foreground">
+                {t("urlImport.startedDescription")}
+              </p>
+            </div>
           </div>
         )}
       </div>

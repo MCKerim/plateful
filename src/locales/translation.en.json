@@ -274,7 +274,10 @@
     "enterRecipeName": "Search recipe...",
     "nothingFound": "No recipes found...",
     "importing": "Importing...",
-    "recentlyAdded": "Recently Added"
+    "recentlyAdded": "Recently Added",
+    "importFailed": "Import failed",
+    "retry": "Retry",
+    "dismiss": "Dismiss"
   },
   "recipe": {
     "editRecipe": "Edit recipe",
@@ -344,11 +347,44 @@
     "success": "Recipe imported successfully!",
     "importedRecipe": "Recipe imported successfully:",
     "viewRecipe": "View",
-    "backToCookbook": "Back to Cookbook"
+    "backToCookbook": "Back to Cookbook",
+    "importStarted": "Import started",
+    "startedTitle": "Import started",
+    "startedDescription": "Your recipe is being imported and will appear in your cookbook shortly."
   },
   "imageImport": {
     "title": "Import Recipe",
-    "importButton": "Import Recipe"
+    "importButton": "Import Recipe",
+    "errors": {
+      "noImages": "Add at least one photo.",
+      "tooMany": "You can add up to {{count}} photos."
+    }
+  },
+  "nutrition": {
+    "title": "Nutrition",
+    "perServing": "per serving",
+    "perServingNote": "Nutrition per serving",
+    "calories": "Calories",
+    "kcal": "kcal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "sugar": "Sugar",
+    "fiber": "Fiber",
+    "sodium": "Sodium",
+    "letters": {
+      "carbs": "C",
+      "protein": "P",
+      "fat": "F"
+    },
+    "calculate": "Calculate nutrition",
+    "recalculate": "Recalculate",
+    "calculating": "Calculating...",
+    "errors": {
+      "titleRequired": "Add a recipe name first.",
+      "ingredientsRequired": "Add ingredients first.",
+      "calculateFailed": "Couldn't calculate nutrition right now. Please try again."
+    }
   },
   "home": {
     "title": "Home",
