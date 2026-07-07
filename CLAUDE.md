@@ -159,6 +159,22 @@ useRecipeIngredients (hook)
 
 **Sections/Groups**: Ingredients support `group_name` for organizing into sections (e.g. "Sauce", "Dough"). The editor uses a flat list of `EditorItem` (union of ingredient and section header). Section headers are positioned in the list; all ingredients after a header inherit that section name until the next header. `ingredientsToEditorItems()` and `editorItemsToInputs()` handle conversion. Both editors support drag-and-drop reordering via `@dnd-kit/sortable`.
 
+### Instructions System
+
+Instructions are structured step rows in the `recipe_instructions` table (`step_text`, `group_name`, `sort_order` — mirroring `recipe_ingredients`), and the step rows are the source of truth. Every write **dual-writes** a legacy markdown string into `recipes.instructions` (serialization in `src/lib/transformers/instruction.transformer.ts`: continuous numbering + `### Section` headings) so released old app versions keep working. Hooks in `src/hooks/instructions/`; the step editor reuses the ingredient editor with label overrides.
+
+### Recipe Imports (async pipeline)
+
+Importing from a URL or photos is **insert-based** — the same pipeline the native iOS app uses. `src/api/recipeImport.api.ts` inserts a `recipe_imports` row (photos are first uploaded to the private `import-staging` bucket); the backend worker (separate repo: `~/programming/recipe-extractor`, deployed at `https://extractor.plateful.cloud`) extracts in the background and one source can yield **several** recipes. The cookbook shows placeholder cards (`src/components/general/ImportCard.tsx` + `src/hooks/cookbook/useRecipeImports.ts`) that resolve live via Supabase Realtime; retries go through the `retry_import` RPC. The old blocking `recipe-from-url` / `recipe-from-image` edge functions (`supabase/functions/`) exist only for released old builds — never add new callers.
+
+### Nutrition
+
+Seven nullable per-serving columns on `recipes` (`calories_kcal`, `carbs_g`, `protein_g`, `fat_g`, `sugar_g`, `fiber_g`, `sodium_mg`; NULL = not calculated; the card hides when all are null). `src/api/nutrition.api.ts` calls the recipe-extractor's `POST /api/nutrition/estimate` with the user's JWT — the route returns camelCase estimates (mapped to the snake_case columns client-side) and persists nothing; values save through the normal recipe update under RLS. Imports auto-estimate server-side. UI: `NutritionSection` / `NutritionEditor` in `src/components/recipe/`.
+
+### Recipe Images
+
+Recipe covers live in the **public** `recipeimages` bucket at `recipe_<id>/<file>`, referenced by the `recipes.image_path` column; render via the public URL (`getPublicUrl`), no signing or storage listing. Producers set `image_path` explicitly after upload/remove (AddRecipe, the import worker, the legacy edge functions) — it is not derived or trigger-maintained.
+
 ## E2E Testing
 
 ### Running E2E Tests
