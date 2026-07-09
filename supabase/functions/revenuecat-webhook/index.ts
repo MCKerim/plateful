@@ -1,6 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
-import { createClient } from "npm:@supabase/supabase-js@2";
+import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { CORS, ANSWEAR_HEADER } from "../_shared/headers.ts";
+
+// This function is the ONLY writer of `household_subscriptions` (clients have
+// no INSERT/UPDATE policies — a client-writable row would let anyone
+// self-grant premium). Events reference the store customer; we map them to a
+// Supabase user, then to their household.
 
 const ACTIVE_EVENTS = new Set([
   "INITIAL_PURCHASE",
@@ -11,14 +16,61 @@ const ACTIVE_EVENTS = new Set([
   "TRIAL_CONVERTED",
 ]);
 
-// CANCELLATION is deliberately NOT here: it fires the moment auto-renew is
-// switched off, while the customer keeps their paid access until the period
-// ends — EXPIRATION is what actually revokes.
-const INACTIVE_EVENTS = new Set([
-  "EXPIRATION",
-  "BILLING_ISSUE",
-  "SUBSCRIPTION_PAUSED",
-]);
+// What actually revokes access:
+// - EXPIRATION: the paid period (incl. any billing grace period) ended.
+// - SUBSCRIPTION_PAUSED: Google Play pause took effect (no EXPIRATION follows).
+// Deliberately NOT here:
+// - CANCELLATION: fires when auto-renew is switched off; paid access continues
+//   until EXPIRATION. The one exception is a refund (cancel_reason
+//   CUSTOMER_SUPPORT), which revokes immediately — handled below.
+// - BILLING_ISSUE: informational; during a billing grace period access should
+//   continue, and EXPIRATION still fires when access really ends.
+const REVOKE_EVENTS = new Set(["EXPIRATION", "SUBSCRIPTION_PAUSED"]);
+
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The Supabase user id among a customer's known ids. Events attributed to an
+ * anonymous customer ("$RCAnonymousID:…") still carry the uuid in `aliases`. */
+function supabaseUserId(...ids: unknown[]): string | undefined {
+  return ids
+    .flat()
+    .find((id): id is string => typeof id === "string" && UUID_RE.test(id));
+}
+
+/** Points the user's household row at `isActive`. No-op when the user is
+ * unknown or not in a household. */
+async function setHouseholdSubscription(
+  supabase: SupabaseClient,
+  userId: string | undefined,
+  isActive: boolean
+): Promise<{ error?: string }> {
+  if (!userId) return {};
+
+  const { data: userData } = await supabase
+    .from("users")
+    .select("id, household_id")
+    .eq("id", userId)
+    .single();
+
+  if (!userData?.household_id) return {};
+
+  const { error } = await supabase.from("household_subscriptions").upsert(
+    {
+      household_id: userData.household_id,
+      payer_user_id: userData.id,
+      is_active: isActive,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "household_id" }
+  );
+
+  if (error) {
+    console.error("Error upserting household subscription:", error);
+    return { error: error.message };
+  }
+  return {};
+}
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -55,68 +107,54 @@ Deno.serve(async (req: Request) => {
   }
 
   const eventType: string = event.type;
-
-  const isActive = ACTIVE_EVENTS.has(eventType);
-  const isInactive = INACTIVE_EVENTS.has(eventType);
-
-  if (!isActive && !isInactive) {
-    return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
-  }
-
-  // The event's app_user_id can be an anonymous alias ("$RCAnonymousID:…")
-  // when the store attributed the purchase before/outside a logIn — the
-  // Supabase user id is then still present among the aliases. Pick the
-  // first id that is a UUID; without one we can't map to a user.
-  const UUID_RE =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-  const candidates: string[] = [
-    event.app_user_id,
-    event.original_app_user_id,
-    ...(Array.isArray(event.aliases) ? event.aliases : []),
-  ];
-  const rcUserId = candidates.find((id) => typeof id === "string" && UUID_RE.test(id));
-
-  console.log(
-    `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"}`
-  );
-
-  if (!rcUserId) {
-    // No mappable user (e.g. a purely anonymous customer) — nothing to do.
-    return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
-  }
-
   const supabase = createClient(
     Deno.env.get("SUPABASE_URL") ?? "",
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
   );
 
-  // Look up the user's household
-  const { data: userData } = await supabase
-    .from("users")
-    .select("id, household_id")
-    .eq("id", rcUserId)
-    .single();
-
-  if (!userData?.household_id) {
-    // User has no household — nothing to update
+  // TRANSFER moves the store subscription between customers (the same
+  // Apple/Google account used while signed into different app accounts): the
+  // losing side's household locks, the gaining side's unlocks.
+  if (eventType === "TRANSFER") {
+    const from = supabaseUserId(event.transferred_from);
+    const to = supabaseUserId(event.transferred_to);
+    console.log(`event=TRANSFER from=${from ?? "none"} to=${to ?? "none"}`);
+    const results = [
+      await setHouseholdSubscription(supabase, from, false),
+      await setHouseholdSubscription(supabase, to, true),
+    ];
+    const failed = results.find((r) => r.error);
+    if (failed) {
+      return new Response(JSON.stringify({ error: failed.error }), {
+        status: 500,
+        headers: ANSWEAR_HEADER,
+      });
+    }
     return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
   }
 
-  const { error } = await supabase
-    .from("household_subscriptions")
-    .upsert(
-      {
-        household_id: userData.household_id,
-        payer_user_id: userData.id,
-        is_active: isActive,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "household_id" }
-    );
+  const isRefund =
+    eventType === "CANCELLATION" && event.cancel_reason === "CUSTOMER_SUPPORT";
+  const isActive = ACTIVE_EVENTS.has(eventType);
+  const isInactive = REVOKE_EVENTS.has(eventType) || isRefund;
 
+  if (!isActive && !isInactive) {
+    return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
+  }
+
+  const rcUserId = supabaseUserId(
+    event.app_user_id,
+    event.original_app_user_id,
+    event.aliases
+  );
+
+  console.log(
+    `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"} is_active=${isActive}`
+  );
+
+  const { error } = await setHouseholdSubscription(supabase, rcUserId, isActive);
   if (error) {
-    console.error("Error upserting household subscription:", error);
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error }), {
       status: 500,
       headers: ANSWEAR_HEADER,
     });
