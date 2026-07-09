@@ -11,10 +11,13 @@ const ACTIVE_EVENTS = new Set([
   "TRIAL_CONVERTED",
 ]);
 
+// CANCELLATION is deliberately NOT here: it fires the moment auto-renew is
+// switched off, while the customer keeps their paid access until the period
+// ends — EXPIRATION is what actually revokes.
 const INACTIVE_EVENTS = new Set([
-  "CANCELLATION",
   "EXPIRATION",
   "BILLING_ISSUE",
+  "SUBSCRIPTION_PAUSED",
 ]);
 
 Deno.serve(async (req: Request) => {
