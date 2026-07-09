@@ -38,12 +38,15 @@ function supabaseUserId(...ids: unknown[]): string | undefined {
     .find((id): id is string => typeof id === "string" && UUID_RE.test(id));
 }
 
-/** Points the user's household row at `isActive`. No-op when the user is
- * unknown or not in a household. */
+/** Points the user's household row at `isActive`, carrying the event's
+ * expiry/store/environment for support visibility. No-op when the user is
+ * unknown, not in a household, or the event is older than the last applied
+ * one (a retried/stale delivery must not overwrite newer state). */
 async function setHouseholdSubscription(
   supabase: SupabaseClient,
   userId: string | undefined,
-  isActive: boolean
+  isActive: boolean,
+  event: Record<string, unknown>
 ): Promise<{ error?: string }> {
   if (!userId) return {};
 
@@ -55,11 +58,37 @@ async function setHouseholdSubscription(
 
   if (!userData?.household_id) return {};
 
+  const eventAt =
+    typeof event.event_timestamp_ms === "number"
+      ? new Date(event.event_timestamp_ms)
+      : new Date();
+
+  const { data: existing } = await supabase
+    .from("household_subscriptions")
+    .select("last_event_at")
+    .eq("household_id", userData.household_id)
+    .maybeSingle();
+
+  if (existing?.last_event_at && eventAt < new Date(existing.last_event_at)) {
+    console.log(
+      `skipping stale event (${eventAt.toISOString()} < ${existing.last_event_at})`
+    );
+    return {};
+  }
+
   const { error } = await supabase.from("household_subscriptions").upsert(
     {
       household_id: userData.household_id,
       payer_user_id: userData.id,
       is_active: isActive,
+      expires_at:
+        typeof event.expiration_at_ms === "number"
+          ? new Date(event.expiration_at_ms).toISOString()
+          : null,
+      store: typeof event.store === "string" ? event.store : null,
+      environment:
+        typeof event.environment === "string" ? event.environment : null,
+      last_event_at: eventAt.toISOString(),
       updated_at: new Date().toISOString(),
     },
     { onConflict: "household_id" }
@@ -120,8 +149,8 @@ Deno.serve(async (req: Request) => {
     const to = supabaseUserId(event.transferred_to);
     console.log(`event=TRANSFER from=${from ?? "none"} to=${to ?? "none"}`);
     const results = [
-      await setHouseholdSubscription(supabase, from, false),
-      await setHouseholdSubscription(supabase, to, true),
+      await setHouseholdSubscription(supabase, from, false, event),
+      await setHouseholdSubscription(supabase, to, true, event),
     ];
     const failed = results.find((r) => r.error);
     if (failed) {
@@ -152,7 +181,7 @@ Deno.serve(async (req: Request) => {
     `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"} is_active=${isActive}`
   );
 
-  const { error } = await setHouseholdSubscription(supabase, rcUserId, isActive);
+  const { error } = await setHouseholdSubscription(supabase, rcUserId, isActive, event);
   if (error) {
     return new Response(JSON.stringify({ error }), {
       status: 500,

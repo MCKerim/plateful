@@ -5,7 +5,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCustomerInfo } from "@/redux/slices/subscriptionSlice";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import { selectUser } from "@/redux/slices/userSlice";
 import { getCustomerInfo, isNativePlatform } from "@/lib/revenuecat";
 import { scheduleTrialEndingReminder } from "@/lib/notifications";
 import { ENTITLEMENT_ID } from "@/types/subscription.types";
@@ -21,7 +20,6 @@ export function usePresentPaywall() {
   const queryClient = useQueryClient();
   const { supabase } = useSupabase();
   const householdId = useAppSelector(selectHouseholdId);
-  const user = useAppSelector(selectUser);
 
   const presentPaywall = useCallback(
     async (options?: { displayCloseButton?: boolean }) => {
@@ -42,12 +40,11 @@ export function usePresentPaywall() {
           const customerInfo = await getCustomerInfo();
           dispatch(setCustomerInfo(customerInfo));
 
-          if (householdId && user?.id) {
-            await subscriptionApi.upsert(supabase, {
-              householdId,
-              payerUserId: user.id,
-              isActive: true,
-            });
+          if (householdId) {
+            // The household row is written by the RevenueCat webhook (the
+            // client has no write access); wait briefly for it so the gate
+            // is open by the time the query refetches.
+            await subscriptionApi.waitUntilActive(supabase, householdId);
             queryClient.invalidateQueries({
               queryKey: queryKeys.subscription.byHousehold(householdId),
             });
@@ -74,7 +71,7 @@ export function usePresentPaywall() {
         return null;
       }
     },
-    [dispatch, t, i18n.language, householdId, user, supabase, queryClient]
+    [dispatch, t, i18n.language, householdId, supabase, queryClient]
   );
 
   return { presentPaywall };
