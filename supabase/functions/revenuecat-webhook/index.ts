@@ -54,13 +54,34 @@ Deno.serve(async (req: Request) => {
     return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
   }
 
-  const rcUserId: string = event.app_user_id;
   const eventType: string = event.type;
 
   const isActive = ACTIVE_EVENTS.has(eventType);
   const isInactive = INACTIVE_EVENTS.has(eventType);
 
   if (!isActive && !isInactive) {
+    return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
+  }
+
+  // The event's app_user_id can be an anonymous alias ("$RCAnonymousID:…")
+  // when the store attributed the purchase before/outside a logIn — the
+  // Supabase user id is then still present among the aliases. Pick the
+  // first id that is a UUID; without one we can't map to a user.
+  const UUID_RE =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  const candidates: string[] = [
+    event.app_user_id,
+    event.original_app_user_id,
+    ...(Array.isArray(event.aliases) ? event.aliases : []),
+  ];
+  const rcUserId = candidates.find((id) => typeof id === "string" && UUID_RE.test(id));
+
+  console.log(
+    `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"}`
+  );
+
+  if (!rcUserId) {
+    // No mappable user (e.g. a purely anonymous customer) — nothing to do.
     return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
   }
 
