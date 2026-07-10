@@ -1,0 +1,13 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["S6U52A6JS6.com.kblanks.plateful"],
+        "components": [
+          { "/": "/invite/*" },
+          { "/": "/share/*" }
+        ]
+      }
+    ]
+  }
+}

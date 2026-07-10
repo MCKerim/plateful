@@ -5,12 +5,6 @@ export type HouseholdSubscriptionWithPayer = Tables<"household_subscriptions"> &
   payer: { username: string | null } | null;
 };
 
-export type UpsertSubscriptionParams = {
-  householdId: string;
-  payerUserId: string;
-  isActive: boolean;
-};
-
 export const subscriptionApi = {
   async getByHouseholdId(
     supabase: SupabaseClient<Database>,
@@ -29,24 +23,30 @@ export const subscriptionApi = {
     return data as HouseholdSubscriptionWithPayer | null;
   },
 
-  async upsert(
+  /**
+   * Waits for the RevenueCat webhook to activate the household's row after a
+   * purchase. The client has no write access to `household_subscriptions`
+   * (a client-writable row would let anyone self-grant premium), so the
+   * webhook is the only writer — it typically lands within a few seconds.
+   * Resolves `true` once active, `false` on timeout; the caller should
+   * invalidate the subscription query either way.
+   */
+  async waitUntilActive(
     supabase: SupabaseClient<Database>,
-    params: UpsertSubscriptionParams
-  ): Promise<void> {
-    const { error } = await supabase
-      .from("household_subscriptions")
-      .upsert(
-        {
-          household_id: params.householdId,
-          payer_user_id: params.payerUserId,
-          is_active: params.isActive,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: "household_id" }
-      );
-
-    if (error) {
-      throw error;
+    householdId: string,
+    { attempts = 10, intervalMs = 1000 } = {}
+  ): Promise<boolean> {
+    for (let attempt = 0; attempt < attempts; attempt++) {
+      try {
+        const row = await subscriptionApi.getByHouseholdId(supabase, householdId);
+        if (row?.is_active) {
+          return true;
+        }
+      } catch {
+        // Transient fetch error — keep polling until the attempts run out.
+      }
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
     }
+    return false;
   },
 };
