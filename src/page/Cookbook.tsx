@@ -22,6 +22,8 @@ import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import CookbookIllustration from "@/components/onboarding/illustrations/CookbookIllustration";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
+import { useRecipeImports } from "@/hooks/cookbook/useRecipeImports";
+import ImportCard from "@/components/general/ImportCard";
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
@@ -31,6 +33,7 @@ export default function Cookbook() {
   useScrollRestoration("cookbook-scroll");
 
   const { data: recipes = [], isLoading } = useRecipes();
+  const { data: imports = [] } = useRecipeImports();
 
   const categoryId = useAppSelector(selectCategoryId);
   const sorting = useAppSelector(selectSorting);
@@ -122,7 +125,7 @@ export default function Cookbook() {
 
   return (
     <Layout showHeader={false}>
-      <div className="sticky z-40 flex items-center w-full gap-1 my-1 top-5">
+      <div className="sticky z-40 flex items-center w-full gap-1 my-1 top-safe-5">
         <Input
           className="rounded-full"
           type="text"
@@ -162,11 +165,14 @@ export default function Cookbook() {
             <CategoryButton key={0} id={0} name={t("categorys.allRecipes")} />
           </div>
 
-          {recentlyAddedRecipes.length > 0 && (
+          {(recentlyAddedRecipes.length > 0 || imports.length > 0) && (
             <div className="mt-6">
               <h2 className="second-font text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
 
               <div className="grid grid-cols-2 gap-2">
+                {imports.map((recipeImport) => (
+                  <ImportCard key={recipeImport.id} recipeImport={recipeImport} />
+                ))}
                 {recentlyAddedRecipes.map((recipe) => (
                   <RecipeCard
                     key={recipe.id}

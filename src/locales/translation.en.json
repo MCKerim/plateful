@@ -274,7 +274,10 @@
     "enterRecipeName": "Search recipe...",
     "nothingFound": "No recipes found...",
     "importing": "Importing...",
-    "recentlyAdded": "Recently Added"
+    "recentlyAdded": "Recently Added",
+    "importFailed": "Import failed",
+    "retry": "Retry",
+    "dismiss": "Dismiss"
   },
   "recipe": {
     "editRecipe": "Edit recipe",
@@ -344,11 +347,44 @@
     "success": "Recipe imported successfully!",
     "importedRecipe": "Recipe imported successfully:",
     "viewRecipe": "View",
-    "backToCookbook": "Back to Cookbook"
+    "backToCookbook": "Back to Cookbook",
+    "importStarted": "Import started",
+    "startedTitle": "Import started",
+    "startedDescription": "Your recipe is being imported and will appear in your cookbook shortly."
   },
   "imageImport": {
     "title": "Import Recipe",
-    "importButton": "Import Recipe"
+    "importButton": "Import Recipe",
+    "errors": {
+      "noImages": "Add at least one photo.",
+      "tooMany": "You can add up to {{count}} photos."
+    }
+  },
+  "nutrition": {
+    "title": "Nutrition",
+    "perServing": "per serving",
+    "perServingNote": "Nutrition per serving",
+    "calories": "Calories",
+    "kcal": "kcal",
+    "protein": "Protein",
+    "carbs": "Carbs",
+    "fat": "Fat",
+    "sugar": "Sugar",
+    "fiber": "Fiber",
+    "sodium": "Sodium",
+    "letters": {
+      "carbs": "C",
+      "protein": "P",
+      "fat": "F"
+    },
+    "calculate": "Calculate nutrition",
+    "recalculate": "Recalculate",
+    "calculating": "Calculating...",
+    "errors": {
+      "titleRequired": "Add a recipe name first.",
+      "ingredientsRequired": "Add ingredients first.",
+      "calculateFailed": "Couldn't calculate nutrition right now. Please try again."
+    }
   },
   "home": {
     "title": "Home",
@@ -382,23 +418,18 @@
     "appearance": "Appearance",
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",
-
     "notifications": "Notifications",
     "manageNotifications": "Manage notifications",
     "manageYourHousehold": "Manage your household",
-
     "supportFeedback": "Support & Feedback",
     "supportFeedbackDescription": "We value your input! Use the links below to share your thoughts, report bugs, or suggest features.",
     "suggestFeatureOrReportBug": "Suggest a feature or report a bug",
     "whatsNew": "Discover what's new",
     "viewRoadmap": "View our roadmap",
-
     "aboutDescription": "👋Hey, I'm Kerim Ismail, and I designed and built Plateful.\nHave feedback or want to connect? Reach out below!👇",
-
     "privacyPolicy": "Privacy Policy",
     "termsOfService": "Terms",
     "impressum": "Impressum",
-
     "account": "Account",
     "signOut": "Sign out",
     "deleteAccount": "Delete Account",
@@ -579,7 +610,6 @@
     "amountPlaceholder": "5",
     "editButton": "Edit Item"
   },
-
   "ingredients": {
     "title": "Ingredients",
     "ingredient": "Ingredient",
@@ -599,10 +629,8 @@
   },
   "dayWithCount_one": "{{count}} day",
   "dayWithCount_other": "{{count}} days",
-
   "recipeWithCount_one": "{{count}} recipe",
   "recipeWithCount_other": "{{count}} recipes",
-
   "onboarding": {
     "gotIt": "Got it",
     "errors": {
@@ -785,5 +813,10 @@
       "description": "Get reminded to check what's planned for today",
       "time": "Time"
     }
+  },
+  "instructions": {
+    "stepPlaceholder": "Describe the step…",
+    "sectionPlaceholder": "Section name (e.g. Sauce, Dough)",
+    "step": "Step"
   }
 }

@@ -39,6 +39,8 @@ import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
 import RatingListItem from "@/components/general/RatingListItem";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
+import { useRecipeInstructions } from "@/hooks/instructions/useRecipeInstructions";
+import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import { useRecipeImages } from "@/hooks/recipe/useRecipeImages";
 import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
 import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
@@ -46,6 +48,7 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
+import NutritionSection from "@/components/recipe/NutritionSection";
 import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
@@ -78,6 +81,13 @@ export default function Recipe() {
 
   // Queries
   const { data: recipe, isLoading } = useRecipe(recipeId);
+  const { data: instructionSteps = [] } = useRecipeInstructions(recipeId);
+  // Structured step rows are the source of truth; recipes from older app
+  // versions may only carry the legacy markdown column.
+  const instructionsMarkdown =
+    instructionSteps.length > 0
+      ? instructionsToMarkdown(instructionSteps)
+      : (recipe?.instructions ?? null);
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
@@ -202,9 +212,9 @@ export default function Recipe() {
 
   const saveFooter = (
     <>
-      <div className="h-[100px]"></div>
+      <div className="h-safe-b-[100px]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 flex gap-2 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
         <Button variant="secondary" className="w-full" onClick={handleAskChatbot}>
           <ChefHat style={{ transform: "rotate(16deg) translateY(-1px)" }} />
           {t("recipe.askChatbot")}
@@ -359,8 +369,21 @@ export default function Recipe() {
       <Separator />
 
       {recipe.description && (
-        <p className="text-md font-medium mb-4 mt-2 whitespace-pre-wrap">{recipe.description}</p>
+        <p className="text-md font-medium mt-2 whitespace-pre-wrap">{recipe.description}</p>
       )}
+
+      {/* Nutrition Section (per serving; hidden when nothing calculated) */}
+      <NutritionSection
+        nutrition={{
+          calories_kcal: recipe.calories_kcal,
+          carbs_g: recipe.carbs_g,
+          protein_g: recipe.protein_g,
+          fat_g: recipe.fat_g,
+          sugar_g: recipe.sugar_g,
+          fiber_g: recipe.fiber_g,
+          sodium_mg: recipe.sodium_mg,
+        }}
+      />
 
       {/* Ingredients Section */}
       {scaledIngredients.length > 0 && (
@@ -373,11 +396,11 @@ export default function Recipe() {
       )}
 
       {/* Instructions Section */}
-      {recipe.instructions && (
+      {instructionsMarkdown && (
         <div>
           <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
 
-          <MarkdownRenderer content={recipe.instructions} className="font-medium" />
+          <MarkdownRenderer content={instructionsMarkdown} className="font-medium" />
         </div>
       )}
 

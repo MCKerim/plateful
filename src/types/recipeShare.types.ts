@@ -11,10 +11,19 @@ export type SnapshotIngredient = {
   preparation_note: string | null;
 };
 
+export type SnapshotInstructionStep = {
+  step_text: string;
+  group_name: string | null;
+  sort_order: number;
+};
+
 export type SharedRecipeSnapshot = {
   name: string;
   description: string | null;
+  /** Legacy markdown mirror of the steps — kept for older readers. */
   instructions: string | null;
+  /** Structured steps (additive key — absent in old snapshots). */
+  instruction_steps?: SnapshotInstructionStep[] | null;
   category: number | null;
   base_servings: number | null;
   servings_unit: string | null;

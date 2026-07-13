@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "12.2.3 (519615d)"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -305,6 +305,13 @@ export type Database = {
             referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "meal_planning_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
         ]
       }
       mission_definitions: {
@@ -330,6 +337,69 @@ export type Database = {
           scope?: string
         }
         Relationships: []
+      }
+      recipe_imports: {
+        Row: {
+          attempts: number
+          created_at: string
+          created_by: string
+          error: string | null
+          household_id: string
+          id: string
+          language: string | null
+          result_count: number
+          source_refs: Json | null
+          source_type: string
+          source_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          created_by?: string
+          error?: string | null
+          household_id: string
+          id?: string
+          language?: string | null
+          result_count?: number
+          source_refs?: Json | null
+          source_type: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          created_by?: string
+          error?: string | null
+          household_id?: string
+          id?: string
+          language?: string | null
+          result_count?: number
+          source_refs?: Json | null
+          source_type?: string
+          source_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_imports_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_imports_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       recipe_ingredients: {
         Row: {
@@ -394,6 +464,58 @@ export type Database = {
             referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "recipe_ingredients_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recipe_instructions: {
+        Row: {
+          created_at: string | null
+          group_name: string | null
+          id: string
+          recipe_id: string
+          sort_order: number
+          step_text: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          group_name?: string | null
+          id?: string
+          recipe_id: string
+          sort_order?: number
+          step_text: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          group_name?: string | null
+          id?: string
+          recipe_id?: string
+          sort_order?: number
+          step_text?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_instructions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_instructions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
         ]
       }
       recipe_ratings: {
@@ -436,53 +558,87 @@ export type Database = {
             referencedRelation: "recipes"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "recipe_ratings_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
         ]
       }
       recipes: {
         Row: {
           base_servings: number | null
+          calories_kcal: number | null
+          carbs_g: number | null
           category: number | null
           cookbook_id: string | null
           created_at: string
           description: string | null
+          fat_g: number | null
+          fiber_g: number | null
           household_id: string | null
           id: string
+          image_path: string | null
+          import_id: string | null
           instructions: string | null
           link: string | null
           name: string
           owner_id: string | null
+          protein_g: number | null
           servings_unit: string | null
+          sodium_mg: number | null
           status: string
+          sugar_g: number | null
         }
         Insert: {
           base_servings?: number | null
+          calories_kcal?: number | null
+          carbs_g?: number | null
           category?: number | null
           cookbook_id?: string | null
           created_at?: string
           description?: string | null
+          fat_g?: number | null
+          fiber_g?: number | null
           household_id?: string | null
           id?: string
+          image_path?: string | null
+          import_id?: string | null
           instructions?: string | null
           link?: string | null
           name: string
           owner_id?: string | null
+          protein_g?: number | null
           servings_unit?: string | null
+          sodium_mg?: number | null
           status?: string
+          sugar_g?: number | null
         }
         Update: {
           base_servings?: number | null
+          calories_kcal?: number | null
+          carbs_g?: number | null
           category?: number | null
           cookbook_id?: string | null
           created_at?: string
           description?: string | null
+          fat_g?: number | null
+          fiber_g?: number | null
           household_id?: string | null
           id?: string
+          image_path?: string | null
+          import_id?: string | null
           instructions?: string | null
           link?: string | null
           name?: string
           owner_id?: string | null
+          protein_g?: number | null
           servings_unit?: string | null
+          sodium_mg?: number | null
           status?: string
+          sugar_g?: number | null
         }
         Relationships: [
           {
@@ -497,6 +653,13 @@ export type Database = {
             columns: ["household_id"]
             isOneToOne: false
             referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_imports"
             referencedColumns: ["id"]
           },
           {
@@ -681,7 +844,45 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      recipes_with_rating: {
+        Row: {
+          avg_rating: number | null
+          base_servings: number | null
+          category: number | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          image_path: string | null
+          name: string | null
+          servings_unit: string | null
+          status: string | null
+        }
+        Insert: {
+          avg_rating?: never
+          base_servings?: number | null
+          category?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_path?: string | null
+          name?: string | null
+          servings_unit?: string | null
+          status?: string | null
+        }
+        Update: {
+          avg_rating?: never
+          base_servings?: number | null
+          category?: number | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          image_path?: string | null
+          name?: string | null
+          servings_unit?: string | null
+          status?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       increment_household_mission: {
@@ -700,6 +901,11 @@ export type Database = {
           isOneToOne: true
           isSetofReturn: false
         }
+      }
+      retry_import: { Args: { p_import_id: string }; Returns: undefined }
+      scale_recipe_servings: {
+        Args: { p_new_base: number; p_recipe_id: string }
+        Returns: undefined
       }
     }
     Enums: {

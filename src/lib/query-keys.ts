@@ -13,7 +13,12 @@ export const queryKeys = {
     detail: (id: string) => ["recipes", id] as const,
     items: (id: string) => ["recipes", id, "items"] as const,
     ingredients: (id: string) => ["recipes", id, "ingredients"] as const,
+    instructions: (id: string) => ["recipes", id, "instructions"] as const,
     images: (id: string) => ["recipes", id, "images"] as const,
+  },
+  recipeImports: {
+    all: ["recipe-imports"] as const,
+    active: ["recipe-imports", "active"] as const,
   },
   ratings: {
     all: ["ratings"] as const,
