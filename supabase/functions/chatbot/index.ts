@@ -75,8 +75,8 @@ serve(async (req) => {
         const proposalId = `p_${proposalCounter}`;
         switch (item.name) {
           case "propose_recipe": {
-            const { title, description, servings, ingredients, instructions, category } = JSON.parse(item.arguments);
-            const toolOutputForUI = proposeRecipe(proposalId, title, description, servings, ingredients, instructions, category);
+            const { title, description, servings, ingredients, instructions } = JSON.parse(item.arguments);
+            const toolOutputForUI = proposeRecipe(proposalId, title, description, servings, ingredients, instructions);
             toolOutputs.push({
               type: "function_call_output",
               call_id: item.call_id,
@@ -93,7 +93,6 @@ serve(async (req) => {
               servings: editServings,
               ingredients: editIngredients,
               instructions: editInstructions,
-              category: editCategory,
             } = JSON.parse(item.arguments);
 
             if (!validRecipeIds.has(editRecipeId)) {
@@ -115,7 +114,6 @@ serve(async (req) => {
               editServings,
               editIngredients,
               editInstructions,
-              editCategory
             );
             toolOutputs.push({
               type: "function_call_output",

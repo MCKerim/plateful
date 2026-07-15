@@ -8,13 +8,11 @@ import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
-import { getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 
 type Props = {
   id: string;
   recipeId: string;
   recipeName: string;
-  recipeCategory: number | null;
   eaten: boolean;
   onToggleEaten: () => void;
   onRecipeDelete: (id: string) => void;
@@ -27,7 +25,6 @@ export default function MealPlannerItem({
   id,
   recipeId,
   recipeName,
-  recipeCategory,
   eaten,
   onToggleEaten,
   onRecipeDelete,
@@ -173,11 +170,6 @@ export default function MealPlannerItem({
           <p className="second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full">
             {recipeName}
           </p>
-          {recipeCategory !== null && (
-            <p className="text-xs text-muted-foreground leading-none">
-              {getTranslatedCategory(t, recipeCategory)}
-            </p>
-          )}
         </button>
       </div>
 

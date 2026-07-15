@@ -27,10 +27,6 @@ import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
 import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
-import {
-  getCategoryIdByTranslatedEnglishName,
-  getEnglishCategoryNameById,
-} from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
 import { InputGroup, InputGroupAddon, InputGroupTextarea } from "@/components/ui/input-group";
@@ -48,8 +44,6 @@ import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIl
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
-
-const DEFAULT_CATEGORY_ID = 5;
 
 export default function Chatbot() {
   const { supabase } = useSupabase();
@@ -145,7 +139,6 @@ export default function Chatbot() {
       // Build the text content - prepend context if this is first message and we have context
       let textContent = inputValue.trim();
       if (isFirstMessageWithContext) {
-        const categoryName = getEnglishCategoryNameById(recipeContext.category);
         let currentGroup: string | null = null;
         const ingredientLines = recipeContextIngredients
           .map((ing) => {
@@ -162,7 +155,6 @@ export default function Chatbot() {
         const contextPrefix = `[Recipe Context]
 recipeId: ${recipeContext.id}
 title: ${recipeContext.name}
-category: ${categoryName}
 description: ${recipeContext.description ?? "No description"}
 servings: ${recipeContext.base_servings ?? "unknown"}
 ingredients:
@@ -288,15 +280,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
-    const { proposalId, title, description, servings, ingredients, instructions, category } =
+    const { proposalId, title, description, servings, ingredients, instructions } =
       proposal;
-    let categoryId = getCategoryIdByTranslatedEnglishName(category);
-
-    if (categoryId === null) {
-      console.error("Invalid category:", category);
-      categoryId = DEFAULT_CATEGORY_ID;
-    }
-
     if (!householdId) {
       toast.error(t("chatbot.saveRecipeError"));
       return;
@@ -309,7 +294,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         instructions: instructions || null,
         link: "",
         householdId,
-        category: categoryId,
         baseServings: servings ?? null,
       });
 
@@ -361,16 +345,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       servings,
       ingredients,
       instructions,
-      category,
       link,
     } = proposal;
-    let categoryId = getCategoryIdByTranslatedEnglishName(category);
-
-    if (categoryId === null) {
-      console.error("Invalid category:", category);
-      categoryId = DEFAULT_CATEGORY_ID;
-    }
-
     try {
       await updateRecipeMutation.mutateAsync({
         recipeId,
@@ -378,7 +354,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         description,
         instructions,
         link,
-        category: categoryId,
         baseServings: servings,
       });
 

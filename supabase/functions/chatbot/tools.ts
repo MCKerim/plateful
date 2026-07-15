@@ -45,13 +45,8 @@ export const TOOLS = [
           description:
             "Numbered steps in markdown (1. step). Do not include a top-level heading.",
         },
-        category: {
-          type: "string",
-          description: "Category for the recipe",
-          enum: ["Breakfast", "Main Course", "Dessert", "Drinks", "Other"],
-        },
       },
-      required: ["title", "description", "servings", "ingredients", "instructions", "category"],
+      required: ["title", "description", "servings", "ingredients", "instructions"],
       additionalProperties: false,
     },
   },
@@ -108,12 +103,6 @@ export const TOOLS = [
           description:
             "New instructions as numbered steps. OMIT if instructions should stay the same.",
         },
-        category: {
-          type: "string",
-          enum: ["Breakfast", "Main Course", "Dessert", "Drinks", "Other"],
-          description:
-            "New category for the recipe. OMIT this field if the category should stay the same.",
-        },
       },
       required: ["recipeId"],
       additionalProperties: false,
@@ -133,7 +122,6 @@ export function proposeRecipe(
   servings: number,
   ingredients: ChatbotIngredient[],
   instructions: string,
-  category: string
 ) {
   const toolOutputForUI = {
     status: `Recipe proposal ${proposalId} shown to user.`,
@@ -145,7 +133,6 @@ export function proposeRecipe(
       servings,
       ingredients,
       instructions,
-      category,
     },
   };
   return toolOutputForUI;
@@ -159,7 +146,6 @@ export function proposeRecipeEdit(
   servings: number | undefined,
   ingredients: ChatbotIngredient[] | undefined,
   instructions: string | undefined,
-  category: string | undefined
 ) {
   const toolOutputForUI = {
     status: `Edit proposal ${proposalId} shown to user.`,
@@ -173,7 +159,6 @@ export function proposeRecipeEdit(
       ...(servings !== undefined && { servings }),
       ...(ingredients !== undefined && { ingredients }),
       ...(instructions !== undefined && { instructions }),
-      ...(category !== undefined && { category }),
     },
   };
   return toolOutputForUI;

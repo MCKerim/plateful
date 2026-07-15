@@ -14,7 +14,6 @@ export type NewRecipeProposal = {
   servings: number | undefined;
   ingredients: ChatbotIngredient[] | undefined;
   instructions: string;
-  category: string;
 };
 
 export type EditRecipeProposal = NewRecipeProposal & {
@@ -32,7 +31,6 @@ export interface ToolOutputForUI {
     servings?: number;
     ingredients?: ChatbotIngredient[];
     instructions?: string;
-    category?: string;
   };
 }
 

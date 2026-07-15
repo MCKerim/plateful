@@ -322,9 +322,6 @@ export default function AddRecipe() {
           description: description || null,
           instructions: instructionsMarkdown,
           link,
-          // Existing recipes retain the compatibility value; a newly created
-          // recipe stays unassigned in the legacy model.
-          category: recipeId ? recipe?.category : null,
           baseServings,
           nutrition,
         });
@@ -334,7 +331,6 @@ export default function AddRecipe() {
           description: description || null,
           instructions: instructionsMarkdown,
           link,
-          category: null,
           householdId: householdId!,
           baseServings,
           nutrition,

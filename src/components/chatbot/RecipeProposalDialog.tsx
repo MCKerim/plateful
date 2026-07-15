@@ -12,7 +12,6 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
-import { getEnglishCategoryNameById, getCategoryIdByTranslatedEnglishName, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
@@ -48,19 +47,12 @@ export function RecipeProposalDialog({
 
   const finalTitle = getMergedString(toolOutput.args.title, originalRecipe?.name);
   const finalDescription = getMergedString(toolOutput.args.description, originalRecipe?.description);
-  const finalCategory = getMergedString(
-    toolOutput.args.category,
-    originalRecipe ? getEnglishCategoryNameById(originalRecipe.category) : undefined
-  );
   const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings ?? undefined;
   const finalIngredients: ChatbotIngredient[] | undefined =
     toolOutput.args.ingredients ??
     (isEditProposal && originalIngredients?.length
       ? originalIngredients.map((ing) => ({ item: ing.rawText, section: ing.groupName }))
       : undefined);
-  const categoryId = getCategoryIdByTranslatedEnglishName(finalCategory);
-  const displayCategory = categoryId !== null ? getTranslatedCategory(t, categoryId) : finalCategory;
-
   const finalInstructions = getMergedString(
     toolOutput.args.instructions,
     originalRecipe?.instructions
@@ -102,8 +94,8 @@ export function RecipeProposalDialog({
         <DialogHeader>
           <DialogTitle className="second-font text-lg font-bold mt-2">{finalTitle}</DialogTitle>
 
-          <DialogDescription className="text-sm font-medium text-muted-foreground">
-            {displayCategory}
+          <DialogDescription className="sr-only">
+            {isEditProposal ? t("chatbot.previewEditedRecipe") : t("chatbot.previewRecipe")}
           </DialogDescription>
         </DialogHeader>
 
@@ -168,7 +160,6 @@ export function RecipeProposalDialog({
                   servings: finalServings,
                   ingredients: finalIngredients,
                   instructions: finalInstructions,
-                  category: finalCategory,
                   link: originalRecipe?.link ?? "",
                 });
               } else {
@@ -179,7 +170,6 @@ export function RecipeProposalDialog({
                   servings: finalServings,
                   ingredients: finalIngredients,
                   instructions: finalInstructions,
-                  category: finalCategory,
                 });
               }
               setOpen(false);

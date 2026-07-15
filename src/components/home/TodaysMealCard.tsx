@@ -6,14 +6,12 @@ import { useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
-import { getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 
 type Props = {
   id: string;
   recipeId: string;
   recipeName: string;
-  recipeCategory: number | null;
   eaten: boolean;
 };
 
@@ -21,7 +19,6 @@ export default function TodaysMealCard({
   id,
   recipeId,
   recipeName,
-  recipeCategory,
   eaten,
 }: Readonly<Props>) {
   const { t } = useTranslation();
@@ -47,11 +44,6 @@ export default function TodaysMealCard({
               {recipeName}
             </h3>
 
-            {recipeCategory !== null && (
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {getTranslatedCategory(t, recipeCategory)}
-              </p>
-            )}
           </button>
 
           <div className="flex gap-2">

@@ -24,7 +24,8 @@ export type SharedRecipeSnapshot = {
   instructions: string | null;
   /** Structured steps (additive key — absent in old snapshots). */
   instruction_steps?: SnapshotInstructionStep[] | null;
-  category: number | null;
+  /** Decodes shares created by older clients; new shares omit this field. */
+  category?: number | null;
   base_servings: number | null;
   servings_unit: string | null;
   link: string | null;

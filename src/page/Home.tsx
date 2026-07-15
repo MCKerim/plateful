@@ -24,9 +24,7 @@ export default function Home() {
 
   const todaysMeals = useMemo(
     () =>
-      currentWeekItems
-        .filter((item) => item.planned_date && isSameDay(item.planned_date, today))
-        .sort((a, b) => (a.recipeCategory ?? 999) - (b.recipeCategory ?? 999)),
+      currentWeekItems.filter((item) => item.planned_date && isSameDay(item.planned_date, today)),
     [currentWeekItems, today]
   );
 
@@ -77,7 +75,6 @@ export default function Home() {
                   id={item.id}
                   recipeId={item.recipeId}
                   recipeName={item.recipeName}
-                  recipeCategory={item.recipeCategory}
                   eaten={item.eaten}
                 />
               ))}

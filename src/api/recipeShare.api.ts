@@ -143,7 +143,6 @@ export const recipeShareApi = {
         name: snapshot.name,
         description: snapshot.description ?? null,
         instructions: snapshot.instructions ?? null,
-        category: snapshot.category ?? null,
         base_servings: snapshot.base_servings ?? null,
         servings_unit: snapshot.servings_unit ?? null,
         household_id: householdId,

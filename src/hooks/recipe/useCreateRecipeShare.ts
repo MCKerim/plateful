@@ -53,7 +53,6 @@ export function useCreateRecipeShare() {
         description: recipe.description,
         instructions: recipe.instructions,
         instruction_steps: instructionSteps,
-        category: recipe.category,
         base_servings: recipe.base_servings,
         servings_unit: recipe.servings_unit,
         link: recipe.link ?? null,

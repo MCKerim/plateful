@@ -20,7 +20,7 @@ export const mealPlanningApi = {
         id,
         planned_date,
         eaten,
-        recipes (id, name, category)
+        recipes (id, name)
       `
       )
       .or(
