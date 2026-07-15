@@ -160,7 +160,7 @@ export default function ImageImport() {
 
       // Fire-and-forget: the worker extracts in the background. Confirm briefly,
       // then land in the cookbook where the placeholder card is waiting.
-      redirectTimerRef.current = setTimeout(() => navigate("/cookbook"), 1600);
+      redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
     } catch (err) {
       console.error("Failed to start image import:", err);
       toast.error(t("urlImport.errors.importFailed"));
@@ -173,11 +173,21 @@ export default function ImageImport() {
 
   const saveFooter = (
     <>
-      <div className="h-safe-b-[100px]"></div>
+      {/* Keep the image-source actions above the fixed CTA, including on devices
+          with a home indicator. The previous h-safe-b utility is not defined
+          in this Tailwind configuration. */}
+      <div
+        aria-hidden="true"
+        className="h-[calc(4.625rem+env(safe-area-inset-bottom))] shrink-0"
+      />
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 flex gap-2 border-border border-t-[1px] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         {busy ? (
-          <Button className="w-full" variant="secondary" onClick={() => navigate("/cookbook")}>
+          <Button
+            className="w-full"
+            variant="secondary"
+            onClick={() => navigate("/cookbook", { replace: true })}
+          >
             {t("urlImport.backToCookbook")}
           </Button>
         ) : (

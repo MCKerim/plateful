@@ -89,7 +89,7 @@ export default function URLImport() {
         // Fire-and-forget: the worker extracts in the background. Show the
         // confirmation briefly, then drop the user into their cookbook where the
         // placeholder card is already waiting.
-        redirectTimerRef.current = setTimeout(() => navigate("/cookbook"), 1600);
+        redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
       } catch (err) {
         console.error("Failed to start URL import:", err);
         toast.error(t("urlImport.errors.importFailed"));
@@ -144,7 +144,11 @@ export default function URLImport() {
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
         {busy ? (
-          <Button className="w-full" variant="secondary" onClick={() => navigate("/cookbook")}>
+          <Button
+            className="w-full"
+            variant="secondary"
+            onClick={() => navigate("/cookbook", { replace: true })}
+          >
             {t("urlImport.backToCookbook")}
           </Button>
         ) : (
