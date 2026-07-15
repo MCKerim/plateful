@@ -42,6 +42,7 @@ import { RecipeProposalDialog } from "@/components/chatbot/RecipeProposalDialog"
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIllustration";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
+import { useCollections, useReplaceRecipeCollections } from "@/hooks/collections/useCollections";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -52,6 +53,8 @@ export default function Chatbot() {
   const dispatch = useAppDispatch();
   const householdId = useAppSelector(selectHouseholdId);
   const createRecipe = useCreateRecipe();
+  const collectionsQuery = useCollections(householdId);
+  const replaceRecipeCollectionsMutation = useReplaceRecipeCollections();
   const incrementMission = useIncrementMission();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -189,6 +192,9 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
       const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
       const session = (await supabase.auth.getSession()).data.session;
+      const availableCollections = householdId
+        ? collectionsQuery.data ?? (await collectionsQuery.refetch()).data ?? []
+        : [];
 
       const response = await fetch(`${supabaseUrl}/functions/v1/chatbot`, {
         method: "POST",
@@ -201,6 +207,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
           previous_response_id: previousResponseId,
           known_recipe_ids: knownRecipeIds,
           proposal_counter: proposalCounterRef.current,
+          available_collections: availableCollections.map(({ id, name }) => ({ id, name })),
           messages: [
             {
               role: "user",
@@ -280,7 +287,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
-    const { proposalId, title, description, servings, ingredients, instructions } =
+    const { proposalId, title, description, servings, ingredients, instructions, collectionIds = [] } =
       proposal;
     if (!householdId) {
       toast.error(t("chatbot.saveRecipeError"));
@@ -296,6 +303,19 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         householdId,
         baseServings: servings ?? null,
       });
+
+      const availableCollectionIds = new Set(
+        (collectionsQuery.data ?? []).map((collection) => collection.id)
+      );
+      const selectedCollectionIds = [
+        ...new Set(collectionIds.filter((id) => availableCollectionIds.has(id))),
+      ];
+      if (selectedCollectionIds.length > 0) {
+        await replaceRecipeCollectionsMutation.mutateAsync({
+          recipeId: newRecipe.id,
+          collectionIds: selectedCollectionIds,
+        });
+      }
 
       // Save ingredients if provided
       if (ingredients && ingredients.length > 0) {
@@ -523,6 +543,12 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
                       toolOutput={toolOutput}
                       onSaveNew={saveSuggestedRecipe}
                       onSaveEdit={saveEditedRecipe}
+                      collectionNames={(toolOutput.args.collectionIds ?? [])
+                        .map((id) =>
+                          (collectionsQuery.data ?? []).find((collection) => collection.id === id)
+                            ?.name
+                        )
+                        .filter((name): name is string => Boolean(name))}
                       t={t}
                     />
                   ))}

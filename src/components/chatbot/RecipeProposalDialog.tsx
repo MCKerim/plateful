@@ -18,6 +18,7 @@ interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
   onSaveNew: (proposal: NewRecipeProposal) => void;
   onSaveEdit: (proposal: EditRecipeProposal) => void;
+  collectionNames: string[];
   t: (key: string) => string;
 }
 
@@ -25,6 +26,7 @@ export function RecipeProposalDialog({
   toolOutput,
   onSaveNew,
   onSaveEdit,
+  collectionNames,
   t,
 }: RecipeProposalDialogProps) {
   const [open, setOpen] = useState(false);
@@ -110,6 +112,13 @@ export function RecipeProposalDialog({
             </p>
           )}
 
+          {!isEditProposal && collectionNames.length > 0 && (
+            <div className="mb-3">
+              <h3 className="text-sm font-semibold mb-1">{t("collections.collections")}</h3>
+              <p className="text-sm">{collectionNames.join(", ")}</p>
+            </div>
+          )}
+
           {ingredientSections.length > 0 && (
             <div className="mb-3">
               <h3 className="text-sm font-semibold mb-1">{t("ingredients.title")}</h3>
@@ -170,6 +179,7 @@ export function RecipeProposalDialog({
                   servings: finalServings,
                   ingredients: finalIngredients,
                   instructions: finalInstructions,
+                  collectionIds: toolOutput.args.collectionIds ?? [],
                 });
               }
               setOpen(false);

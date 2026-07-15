@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.224.0/http/server.ts";
 import OpenAI from "npm:openai";
-import { TOOLS, proposeRecipe, proposeRecipeEdit } from "./tools.ts";
+import { createTools, proposeRecipe, proposeRecipeEdit } from "./tools.ts";
 import { CORS, ANSWEAR_HEADER, STREAM_HEADER } from "./headers.ts";
 import { DEFAULT_PROMPT } from "./prompts.ts";
 
@@ -41,6 +41,20 @@ serve(async (req) => {
   }
   const { messages, previous_response_id, known_recipe_ids, proposal_counter } = body ?? {};
   const validRecipeIds = new Set(Array.isArray(known_recipe_ids) ? known_recipe_ids : []);
+  const availableCollections = Array.isArray(body?.available_collections)
+    ? body.available_collections
+        .filter(
+          (collection) =>
+            collection &&
+            typeof collection.id === "string" &&
+            typeof collection.name === "string"
+        )
+        .slice(0, 100)
+    : [];
+  const availableCollectionIds = new Set(
+    availableCollections.map((collection) => collection.id)
+  );
+  const tools = createTools(availableCollections);
   if (!Array.isArray(messages)) {
     return new Response(
       JSON.stringify({
@@ -59,7 +73,7 @@ serve(async (req) => {
   let proposalCounter = typeof proposal_counter === "number" ? proposal_counter : 0;
   let answear = await client.responses.create({
     model: "gpt-4.1-mini",
-    tools: TOOLS,
+    tools,
     instructions: DEFAULT_PROMPT,
     previous_response_id: previous_response_id ?? null,
     input: messages,
@@ -75,8 +89,26 @@ serve(async (req) => {
         const proposalId = `p_${proposalCounter}`;
         switch (item.name) {
           case "propose_recipe": {
-            const { title, description, servings, ingredients, instructions } = JSON.parse(item.arguments);
-            const toolOutputForUI = proposeRecipe(proposalId, title, description, servings, ingredients, instructions);
+            const {
+              title,
+              description,
+              servings,
+              ingredients,
+              instructions,
+              collection_ids: collectionIds = [],
+            } = JSON.parse(item.arguments);
+            const selectedCollectionIds = Array.isArray(collectionIds)
+              ? collectionIds.filter((id) => availableCollectionIds.has(id))
+              : [];
+            const toolOutputForUI = proposeRecipe(
+              proposalId,
+              title,
+              description,
+              servings,
+              ingredients,
+              instructions,
+              selectedCollectionIds,
+            );
             toolOutputs.push({
               type: "function_call_output",
               call_id: item.call_id,
@@ -132,7 +164,7 @@ serve(async (req) => {
     if (toolOutputs.length !== 0) {
       answear = await client.responses.create({
         model: "gpt-4.1-mini",
-        tools: TOOLS,
+        tools,
         instructions: DEFAULT_PROMPT,
         previous_response_id: answear.id,
         input: toolOutputs,
