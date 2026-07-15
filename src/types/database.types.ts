@@ -906,7 +906,6 @@ export type Database = {
           base_servings: number | null
           calories_kcal: number | null
           carbs_g: number | null
-          category: number | null
           cookbook_id: string | null
           cover_pending: boolean
           created_at: string
@@ -931,7 +930,6 @@ export type Database = {
           base_servings?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
-          category?: number | null
           cookbook_id?: string | null
           cover_pending?: boolean
           created_at?: string
@@ -956,7 +954,6 @@ export type Database = {
           base_servings?: number | null
           calories_kcal?: number | null
           carbs_g?: number | null
-          category?: number | null
           cookbook_id?: string | null
           cover_pending?: boolean
           created_at?: string
@@ -1185,7 +1182,6 @@ export type Database = {
         Row: {
           avg_rating: number | null
           base_servings: number | null
-          category: number | null
           cover_pending: boolean | null
           created_at: string | null
           description: string | null
@@ -1198,7 +1194,6 @@ export type Database = {
         Insert: {
           avg_rating?: never
           base_servings?: number | null
-          category?: number | null
           cover_pending?: boolean | null
           created_at?: string | null
           description?: string | null
@@ -1211,7 +1206,6 @@ export type Database = {
         Update: {
           avg_rating?: never
           base_servings?: number | null
-          category?: number | null
           cover_pending?: boolean | null
           created_at?: string | null
           description?: string | null
