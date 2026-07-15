@@ -51,6 +51,7 @@ export default function URLImport() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const redirectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoImportUrlRef = useRef<string | null>(null);
 
   useEffect(() => {
     return () => {
@@ -102,6 +103,11 @@ export default function URLImport() {
   useEffect(() => {
     const urlFromParams = searchParams.get("url");
     if (urlFromParams) {
+      // A share can cold-start the app before the household is restored. Keep
+      // the URL in the route until that state is ready, then import it once.
+      if (!householdId || autoImportUrlRef.current === urlFromParams) return;
+
+      autoImportUrlRef.current = urlFromParams;
       setSearchParams({}, { replace: true });
       setUrlInput(urlFromParams);
       handleSave(urlFromParams);
@@ -128,7 +134,7 @@ export default function URLImport() {
     return () => {
       abortController.abort();
     };
-  }, [searchParams, setSearchParams, handleSave, t]);
+  }, [searchParams, setSearchParams, handleSave, householdId, t]);
 
   const busy = isSaving || submitted;
 

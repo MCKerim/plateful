@@ -13,16 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { categories, getTranslatedCategory } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
-import { selectCategoryId } from "@/redux/slices/filterAndSortingSlice";
+import { selectCollectionSelection } from "@/redux/slices/filterAndSortingSlice";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { useRecipeForEdit } from "@/hooks/recipe/useRecipeForEdit";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
@@ -49,6 +40,11 @@ import {
 } from "@/lib/transformers/instruction.transformer";
 import NutritionEditor from "@/components/recipe/NutritionEditor";
 import { NutritionValues } from "@/api/nutrition.api";
+import CollectionMultiSelect from "@/components/collections/CollectionMultiSelect";
+import {
+  useRecipeCollectionIds,
+  useReplaceRecipeCollections,
+} from "@/hooks/collections/useCollections";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -72,8 +68,14 @@ export default function AddRecipe() {
   // so saving before an edited recipe loads never wipes its saved nutrition.
   const [nutrition, setNutrition] = useState<NutritionValues | undefined>(undefined);
 
-  const filterCategoryId = useAppSelector(selectCategoryId);
-  const [category, setCategory] = useState(filterCategoryId === 0 ? null : filterCategoryId);
+  const filterCollectionSelection = useAppSelector(selectCollectionSelection);
+  const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[] | null>(() => {
+    if (params.recipeId) return null;
+    return filterCollectionSelection && filterCollectionSelection !== "all"
+      ? [filterCollectionSelection]
+      : [];
+  });
+  const [createdRecipeId, setCreatedRecipeId] = useState<string | null>(null);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -86,6 +88,7 @@ export default function AddRecipe() {
 
   // React Query hooks
   const { recipe, imageInfo } = useRecipeForEdit(recipeId);
+  const membershipsQuery = useRecipeCollectionIds(recipeId);
   const { data: existingIngredients = [] } = useRecipeIngredients(recipeId);
   const { data: existingInstructions = [], isSuccess: instructionsLoaded } =
     useRecipeInstructions(recipeId);
@@ -94,6 +97,7 @@ export default function AddRecipe() {
   const deleteRecipeMutation = useDeleteRecipe();
   const replaceIngredientsMutation = useReplaceAllIngredients();
   const replaceInstructionsMutation = useReplaceAllInstructions();
+  const replaceCollectionsMutation = useReplaceRecipeCollections();
 
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
@@ -183,7 +187,6 @@ export default function AddRecipe() {
       setTitle(recipe.name);
       setDescription(recipe.description ?? "");
       setLink(recipe.link ?? "");
-      setCategory(recipe.category);
       setBaseServings(recipe.base_servings);
     }
   }, [recipe]);
@@ -277,13 +280,13 @@ export default function AddRecipe() {
   }
 
   async function saveRecipe() {
-    if (title === "") {
+    if (title.trim() === "") {
       toast.error(t("addRecipe.errors.nameRequired"));
       return;
     }
 
-    if (category === null) {
-      toast.error(t("addRecipe.errors.categoryRequired"));
+    if (recipeId && !membershipsQuery.isSuccess) {
+      toast.error(t("collections.errors.membershipsUnavailable"));
       return;
     }
 
@@ -309,74 +312,63 @@ export default function AddRecipe() {
       });
     };
 
-    if (recipeId) {
-      // Update existing recipe
-      updateRecipeMutation.mutate(
-        {
-          recipeId,
-          name: title,
+    try {
+      let targetRecipeId = recipeId ?? createdRecipeId;
+
+      if (targetRecipeId) {
+        await updateRecipeMutation.mutateAsync({
+          recipeId: targetRecipeId,
+          name: title.trim(),
           description: description || null,
           instructions: instructionsMarkdown,
           link,
-          category,
+          // Existing recipes retain the compatibility value; a newly created
+          // recipe stays unassigned in the legacy model.
+          category: recipeId ? recipe?.category : null,
           baseServings,
           nutrition,
-        },
-        {
-          onSuccess: async () => {
-            // If a new image was uploaded, move it to the correct folder if needed
-            let finalImagePath: string | null = imageSupabaseUrl || null;
-            if (imageFile && imageSupabaseUrl?.includes("temp")) {
-              const newPath = `recipe_${recipeId}/${imageSupabaseUrl.split("/").pop()}`;
-              await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
-              finalImagePath = newPath;
-            }
-            // The recipe owns its cover path.
-            await supabase.from("recipes").update({ image_path: finalImagePath }).eq("id", recipeId);
-            // Save ingredients
-            await saveIngredients(recipeId);
-            toast.success(t("addRecipe.recipeSaved"));
-            navigate(`/recipe/${recipeId}`, { replace: true });
-          },
-          onError: (error) => {
-            console.error(error);
-            toast.error(t("common.error"));
-          },
-        }
-      );
-    } else {
-      // Insert new recipe
-      createRecipeMutation.mutate(
-        {
-          name: title,
+        });
+      } else {
+        const createdRecipe = await createRecipeMutation.mutateAsync({
+          name: title.trim(),
           description: description || null,
           instructions: instructionsMarkdown,
           link,
-          category,
+          category: null,
           householdId: householdId!,
           baseServings,
           nutrition,
-        },
-        {
-          onSuccess: async (data) => {
-            // If an image was uploaded, move it to the correct folder with the new recipe id
-            if (imageFile && imageSupabaseUrl) {
-              const newPath = `recipe_${data.id}/${imageSupabaseUrl.split("/").pop()}`;
-              await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
-              // The recipe owns its cover path.
-              await supabase.from("recipes").update({ image_path: newPath }).eq("id", data.id);
-            }
-            // Save ingredients
-            await saveIngredients(data.id);
-            toast.success(t("addRecipe.recipeSaved"));
-            navigate(`/recipe/${data.id}`, { replace: true });
-          },
-          onError: (error) => {
-            console.error(error);
-            toast.error(t("common.error"));
-          },
-        }
-      );
+        });
+        targetRecipeId = createdRecipe.id;
+        // Keep the ID before any secondary save. A retry after an image,
+        // ingredient, instruction, or membership error updates this recipe
+        // instead of inserting a duplicate.
+        setCreatedRecipeId(createdRecipe.id);
+      }
+
+      let finalImagePath: string | null = imageSupabaseUrl || null;
+      if (imageFile && imageSupabaseUrl?.includes("temp")) {
+        const newPath = `recipe_${targetRecipeId}/${imageSupabaseUrl.split("/").pop()}`;
+        await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
+        finalImagePath = newPath;
+        setImageSupabaseUrl(newPath);
+      }
+      await supabase
+        .from("recipes")
+        .update({ image_path: finalImagePath })
+        .eq("id", targetRecipeId);
+
+      await saveIngredients(targetRecipeId);
+      await replaceCollectionsMutation.mutateAsync({
+        recipeId: targetRecipeId,
+        collectionIds: selectedCollectionIds ?? membershipsQuery.data ?? [],
+      });
+
+      toast.success(t("addRecipe.recipeSaved"));
+      navigate(`/recipe/${targetRecipeId}`, { replace: true });
+    } catch (error) {
+      console.error(error);
+      toast.error(t("addRecipe.errors.saveFailed"));
     }
   }
 
@@ -419,7 +411,13 @@ export default function AddRecipe() {
       <div className="h-safe-b-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
-        <Button className="w-full" variant="secondary" onClick={() => navigate(-1)}>
+        <Button
+          className="w-full"
+          variant="secondary"
+          onClick={() =>
+            recipeId ? navigate(`/recipe/${recipeId}`, { replace: true }) : navigate(-1)
+          }
+        >
           {t("common.cancel")}
         </Button>
 
@@ -427,9 +425,15 @@ export default function AddRecipe() {
           className="w-full"
           variant="accent"
           onClick={saveRecipe}
-          disabled={createRecipeMutation.isPending || updateRecipeMutation.isPending}
+          disabled={
+            createRecipeMutation.isPending ||
+            updateRecipeMutation.isPending ||
+            replaceCollectionsMutation.isPending
+          }
         >
-          {createRecipeMutation.isPending || updateRecipeMutation.isPending
+          {createRecipeMutation.isPending ||
+          updateRecipeMutation.isPending ||
+          replaceCollectionsMutation.isPending
             ? t("common.saving")
             : t("common.save")}
         </Button>
@@ -470,28 +474,17 @@ export default function AddRecipe() {
           />
         </div>
 
-        <div className="grid items-center w-full gap-2">
-          <Label>{t("categorys.category")}</Label>
-
-          <Select
-            value={category?.toString() ?? ""}
-            onValueChange={(value) => setCategory(value ? parseInt(value) : null)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={t("categorys.chooseACategory")} />
-            </SelectTrigger>
-
-            <SelectContent>
-              <SelectGroup>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    {getTranslatedCategory(t, category.id)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </div>
+        {householdId && (
+          <div className="grid items-center w-full gap-2">
+            <Label>{t("collections.collections")}</Label>
+            <CollectionMultiSelect
+              householdId={householdId}
+              selectedIds={selectedCollectionIds ?? membershipsQuery.data ?? []}
+              onChange={setSelectedCollectionIds}
+              disabled={!!recipeId && !membershipsQuery.isSuccess}
+            />
+          </div>
+        )}
 
         <div className="grid items-center w-full gap-2">
           <Label htmlFor="description">{t("addRecipe.description")}</Label>

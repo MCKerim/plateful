@@ -165,7 +165,7 @@ Instructions are structured step rows in the `recipe_instructions` table (`step_
 
 ### Recipe Imports (async pipeline)
 
-Importing from a URL or photos is **insert-based** — the same pipeline the native iOS app uses. `src/api/recipeImport.api.ts` inserts a `recipe_imports` row (photos are first uploaded to the private `import-staging` bucket); the backend worker (separate repo: `~/programming/recipe-extractor`, deployed at `https://extractor.plateful.cloud`) extracts in the background and one source can yield **several** recipes. The cookbook shows placeholder cards (`src/components/general/ImportCard.tsx` + `src/hooks/cookbook/useRecipeImports.ts`) that resolve live via Supabase Realtime; retries go through the `retry_import` RPC. The old blocking `recipe-from-url` / `recipe-from-image` edge functions (`supabase/functions/`) exist only for released old builds — never add new callers.
+Importing from a URL or photos is **insert-based** — the same pipeline the native iOS app uses. `src/api/recipeImport.api.ts` inserts a `recipe_imports` row (photos are first uploaded to the private `import-staging` bucket); the backend worker (separate repo: `~/programming/recipe-extractor`, deployed at `https://extractor.plateful.cloud`) extracts in the background and one source can yield **several** recipes. The cookbook shows placeholder cards (`src/components/general/ImportCard.tsx` + `src/hooks/cookbook/useRecipeImports.ts`) that resolve live via Supabase Realtime; retries go through the `retry_import` RPC.
 
 ### Nutrition
 

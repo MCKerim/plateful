@@ -7,7 +7,7 @@ export type CreateRecipeParams = {
   description?: string | null;
   instructions?: string | null;
   link: string;
-  category: number;
+  category?: number | null;
   householdId: string;
   baseServings?: number | null;
   /** When provided, writes all 7 metrics (a null value clears that column). */
@@ -20,7 +20,7 @@ export type UpdateRecipeParams = {
   description?: string | null;
   instructions?: string | null;
   link: string;
-  category: number;
+  category?: number | null;
   baseServings?: number | null;
   /** When provided, writes all 7 metrics (a null value clears that column). */
   nutrition?: NutritionValues | null;
@@ -94,7 +94,7 @@ export const recipeApi = {
           description: params.description ?? null,
           instructions: params.instructions ?? null,
           link: params.link,
-          category: params.category,
+          category: params.category ?? null,
           household_id: params.householdId,
           base_servings: params.baseServings,
           ...(params.nutrition ? params.nutrition : {}),
@@ -115,7 +115,7 @@ export const recipeApi = {
         description: params.description ?? null,
         instructions: params.instructions ?? null,
         link: params.link,
-        category: params.category,
+        ...(params.category !== undefined ? { category: params.category } : {}),
         base_servings: params.baseServings,
         // Only touch nutrition columns when the editor supplied them, so other
         // update paths never accidentally wipe a saved estimate.

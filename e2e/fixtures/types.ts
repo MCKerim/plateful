@@ -27,6 +27,21 @@ export type MockRecipe = {
   owner_id: string;
   created_at: string;
   avg_rating: number | null;
+  collectionIds: string[];
+};
+
+export type MockCollection = {
+  id: string;
+  household_id: string;
+  name: string;
+  color_key: string;
+  color_hex: string;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+  sticker_key: string | null;
+  sticker_x: number;
+  sticker_y: number;
 };
 
 export type MockMealPlan = {
@@ -64,6 +79,7 @@ export type TestScenario = {
   user: MockUser;
   household: MockHousehold | null;
   recipes: MockRecipe[];
+  collections: MockCollection[];
   mealPlans: MockMealPlan[];
 };
 
@@ -72,6 +88,7 @@ export type AuthenticatedFixtureOptions = {
   user?: Partial<MockUser>;
   household?: Partial<MockHousehold> | null;
   recipes?: MockRecipe[];
+  collections?: MockCollection[];
   mealPlans?: MockMealPlan[];
 };
 

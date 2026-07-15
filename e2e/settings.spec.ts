@@ -252,7 +252,7 @@ test.describe("Settings Page", () => {
 
     // Should see Privacy Policy and Terms of Service buttons
     await expect(page.getByRole("button", { name: /privacy policy/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /terms of service/i })).toBeVisible();
+    await expect(page.getByRole("button", { name: /^terms/i })).toBeVisible();
   });
 
   test("should navigate to privacy policy page", async ({ page, setupAuth }) => {
@@ -301,11 +301,11 @@ test.describe("Household Settings Page", () => {
     await page.goto("/householdSettings");
     await page.waitForLoadState("networkidle");
 
-    // Should see the user in members list with "You" indicator
+    // Should see the current user's name and email in the members list
     await expect(page.getByText(/HouseholdMember/)).toBeVisible({
       timeout: 10000,
     });
-    await expect(page.getByText("You")).toBeVisible();
+    await expect(page.getByText(/member@example\.com/)).toBeVisible();
   });
 
   test("should have invite member button", async ({ page, setupAuth }) => {

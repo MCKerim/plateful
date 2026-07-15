@@ -23,7 +23,7 @@ test.describe("Recipe Detail Page", () => {
     });
 
     // Should display recipe description
-    await expect(page.getByText(/classic Italian pasta/i)).toBeVisible();
+    await expect(page.getByText(/classic Italian pasta/i).first()).toBeVisible();
 
     // Should have link to original recipe
     const recipeLink = page.getByRole("link", { name: /to the recipe/i });
@@ -69,6 +69,7 @@ test.describe("Recipe Detail Page", () => {
       timeout: 10000,
     });
 
+    await page.getByRole("button", { name: "More actions" }).click();
     // Find and click edit button
     const editButton = page.getByRole("button", { name: "Edit Recipe" });
     await expect(editButton).toBeVisible();
@@ -111,14 +112,13 @@ test.describe("Recipe Detail Page", () => {
 
     await setupAuth({ recipes: [recipe] });
 
-    // Start at cookbook, click on a category to see the recipe
+    // Start at the Collection landing page and open All Recipes
     await page.goto("/cookbook");
     await page.waitForLoadState("networkidle");
 
-    // Click on Main category
-    const mainButton = page.getByRole("button", { name: /main/i });
-    await expect(mainButton).toBeVisible({ timeout: 10000 });
-    await mainButton.click();
+    const allRecipesButton = page.getByRole("button", { name: /all recipes/i });
+    await expect(allRecipesButton).toBeVisible({ timeout: 10000 });
+    await allRecipesButton.click();
     await page.waitForLoadState("networkidle");
 
     // Click on the recipe to go to detail page

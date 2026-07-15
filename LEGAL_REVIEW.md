@@ -10,7 +10,6 @@
 
 ### 1. Recipe extraction service uses unencrypted HTTP
 
-- **File:** API calls to `http://91.99.166.5:3000` (recipe-from-url, recipe-from-image)
 - **Problem:** User data (recipe URLs, food images, language preference) is transmitted over plain HTTP — no TLS/encryption in transit
 - **Risk:** Man-in-the-middle attacks, data interception, violates GDPR Art. 32 (security of processing)
 - **Fix:** Migrate the service to HTTPS with a valid certificate. Also consider using a domain name instead of a bare IP.

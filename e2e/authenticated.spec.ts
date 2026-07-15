@@ -9,12 +9,10 @@ test.describe("Authenticated User Flows", () => {
     const searchInput = authenticatedPage.getByPlaceholder(/recipe/i);
     await expect(searchInput).toBeVisible({ timeout: 10000 });
 
-    // Should see category buttons
-    const categoryButtons = authenticatedPage.locator("button").filter({
-      hasText: /breakfast|main|dessert|drinks|other/i,
-    });
-    const count = await categoryButtons.count();
-    expect(count).toBeGreaterThan(0);
+    await expect(
+      authenticatedPage.getByRole("button", { name: "Favorites", exact: true })
+    ).toBeVisible();
+    await expect(authenticatedPage.getByRole("button", { name: /all recipes/i })).toBeVisible();
   });
 
   test("should access meal planner page when authenticated", async ({ authenticatedPage }) => {
@@ -66,7 +64,7 @@ test.describe("Authenticated User Flows", () => {
       timeout: 10000,
     });
 
-    // Click on "All Recipes" category to see recipes list
+    // Click on All Recipes to see the empty recipe list
     const allRecipesButton = authenticatedPage.getByRole("button", {
       name: /all/i,
     });

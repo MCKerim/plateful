@@ -14,6 +14,63 @@ export type Database = {
   }
   public: {
     Tables: {
+      collections: {
+        Row: {
+          color_hex: string
+          color_key: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          name: string
+          sticker_key: string | null
+          sticker_x: number
+          sticker_y: number
+          updated_at: string
+        }
+        Insert: {
+          color_hex: string
+          color_key: string
+          created_at?: string
+          created_by?: string | null
+          household_id: string
+          id?: string
+          name: string
+          sticker_key?: string | null
+          sticker_x?: number
+          sticker_y?: number
+          updated_at?: string
+        }
+        Update: {
+          color_hex?: string
+          color_key?: string
+          created_at?: string
+          created_by?: string | null
+          household_id?: string
+          id?: string
+          name?: string
+          sticker_key?: string | null
+          sticker_x?: number
+          sticker_y?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collections_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collections_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cookbooks: {
         Row: {
           created_at: string
@@ -47,6 +104,208 @@ export type Database = {
           {
             foreignKeyName: "cookbooks_owner_id_fkey"
             columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooking_session_checks: {
+        Row: {
+          checked_at: string
+          checked_by: string
+          kind: string
+          ref_id: string
+          session_id: string
+        }
+        Insert: {
+          checked_at?: string
+          checked_by: string
+          kind: string
+          ref_id: string
+          session_id: string
+        }
+        Update: {
+          checked_at?: string
+          checked_by?: string
+          kind?: string
+          ref_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooking_session_checks_checked_by_fkey"
+            columns: ["checked_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_session_checks_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "cooking_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooking_session_participants: {
+        Row: {
+          current_step_id: string | null
+          joined_at: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          current_step_id?: string | null
+          joined_at?: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          current_step_id?: string | null
+          joined_at?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooking_session_participants_current_step_id_fkey"
+            columns: ["current_step_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_instructions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_session_participants_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "cooking_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_session_participants_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooking_session_timers: {
+        Row: {
+          created_at: string
+          created_by: string
+          duration_seconds: number | null
+          ends_at: string | null
+          id: string
+          label: string
+          paused_remaining_seconds: number | null
+          session_id: string
+          step_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          duration_seconds?: number | null
+          ends_at?: string | null
+          id?: string
+          label: string
+          paused_remaining_seconds?: number | null
+          session_id: string
+          step_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          duration_seconds?: number | null
+          ends_at?: string | null
+          id?: string
+          label?: string
+          paused_remaining_seconds?: number | null
+          session_id?: string
+          step_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooking_session_timers_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_session_timers_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "cooking_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_session_timers_step_id_fkey"
+            columns: ["step_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_instructions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cooking_sessions: {
+        Row: {
+          ended_at: string | null
+          household_id: string
+          id: string
+          recipe_id: string
+          started_at: string
+          started_by: string
+          status: string
+          target_servings: number | null
+        }
+        Insert: {
+          ended_at?: string | null
+          household_id: string
+          id?: string
+          recipe_id: string
+          started_at?: string
+          started_by: string
+          status?: string
+          target_servings?: number | null
+        }
+        Update: {
+          ended_at?: string | null
+          household_id?: string
+          id?: string
+          recipe_id?: string
+          started_at?: string
+          started_by?: string
+          status?: string
+          target_servings?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cooking_sessions_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_sessions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_sessions_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cooking_sessions_started_by_fkey"
+            columns: ["started_by"]
             isOneToOne: false
             referencedRelation: "users"
             referencedColumns: ["id"]
@@ -161,26 +420,38 @@ export type Database = {
       household_subscriptions: {
         Row: {
           created_at: string
+          environment: string | null
+          expires_at: string | null
           household_id: string
           id: string
           is_active: boolean
+          last_event_at: string | null
           payer_user_id: string
+          store: string | null
           updated_at: string
         }
         Insert: {
           created_at?: string
+          environment?: string | null
+          expires_at?: string | null
           household_id: string
           id?: string
           is_active?: boolean
+          last_event_at?: string | null
           payer_user_id: string
+          store?: string | null
           updated_at?: string
         }
         Update: {
           created_at?: string
+          environment?: string | null
+          expires_at?: string | null
           household_id?: string
           id?: string
           is_active?: boolean
+          last_event_at?: string | null
           payer_user_id?: string
+          store?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -338,6 +609,66 @@ export type Database = {
         }
         Relationships: []
       }
+      push_tokens: {
+        Row: {
+          environment: string
+          platform: string
+          token: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          environment?: string
+          platform?: string
+          token: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          environment?: string
+          platform?: string
+          token?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      recipe_collections: {
+        Row: {
+          collection_id: string
+          created_at: string
+          household_id: string
+          recipe_id: string
+        }
+        Insert: {
+          collection_id: string
+          created_at?: string
+          household_id: string
+          recipe_id: string
+        }
+        Update: {
+          collection_id?: string
+          created_at?: string
+          household_id?: string
+          recipe_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_collections_collection_household_fkey"
+            columns: ["collection_id", "household_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id", "household_id"]
+          },
+          {
+            foreignKeyName: "recipe_collections_recipe_household_fkey"
+            columns: ["recipe_id", "household_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id", "household_id"]
+          },
+        ]
+      }
       recipe_imports: {
         Row: {
           attempts: number
@@ -349,6 +680,7 @@ export type Database = {
           language: string | null
           result_count: number
           source_refs: Json | null
+          source_text: string | null
           source_type: string
           source_url: string | null
           status: string
@@ -364,6 +696,7 @@ export type Database = {
           language?: string | null
           result_count?: number
           source_refs?: Json | null
+          source_text?: string | null
           source_type: string
           source_url?: string | null
           status?: string
@@ -379,6 +712,7 @@ export type Database = {
           language?: string | null
           result_count?: number
           source_refs?: Json | null
+          source_text?: string | null
           source_type?: string
           source_url?: string | null
           status?: string
@@ -574,11 +908,12 @@ export type Database = {
           carbs_g: number | null
           category: number | null
           cookbook_id: string | null
+          cover_pending: boolean
           created_at: string
           description: string | null
           fat_g: number | null
           fiber_g: number | null
-          household_id: string | null
+          household_id: string
           id: string
           image_path: string | null
           import_id: string | null
@@ -598,11 +933,12 @@ export type Database = {
           carbs_g?: number | null
           category?: number | null
           cookbook_id?: string | null
+          cover_pending?: boolean
           created_at?: string
           description?: string | null
           fat_g?: number | null
           fiber_g?: number | null
-          household_id?: string | null
+          household_id: string
           id?: string
           image_path?: string | null
           import_id?: string | null
@@ -622,11 +958,12 @@ export type Database = {
           carbs_g?: number | null
           category?: number | null
           cookbook_id?: string | null
+          cover_pending?: boolean
           created_at?: string
           description?: string | null
           fat_g?: number | null
           fiber_g?: number | null
-          household_id?: string | null
+          household_id?: string
           id?: string
           image_path?: string | null
           import_id?: string | null
@@ -849,6 +1186,7 @@ export type Database = {
           avg_rating: number | null
           base_servings: number | null
           category: number | null
+          cover_pending: boolean | null
           created_at: string | null
           description: string | null
           id: string | null
@@ -861,6 +1199,7 @@ export type Database = {
           avg_rating?: never
           base_servings?: number | null
           category?: number | null
+          cover_pending?: boolean | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -873,6 +1212,7 @@ export type Database = {
           avg_rating?: never
           base_servings?: number | null
           category?: number | null
+          cover_pending?: boolean | null
           created_at?: string | null
           description?: string | null
           id?: string | null
@@ -902,11 +1242,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      register_push_token: {
+        Args: { p_environment: string; p_platform: string; p_token: string }
+        Returns: undefined
+      }
+      replace_recipe_collections: {
+        Args: { p_collection_ids?: string[]; p_recipe_id: string }
+        Returns: undefined
+      }
       retry_import: { Args: { p_import_id: string }; Returns: undefined }
       scale_recipe_servings: {
         Args: { p_new_base: number; p_recipe_id: string }
         Returns: undefined
       }
+      unregister_push_token: { Args: { p_token: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never

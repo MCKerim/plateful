@@ -6,8 +6,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
  * photos, stages the images first). A Postgres webhook then nudges the backend
  * worker, which extracts the recipe(s) in the background and writes them back —
  * one source can yield several recipes. The library shows the placeholder and
- * fills it in live via Realtime. Replaces the old blocking `recipe-from-url` /
- * `recipe-from-image` edge functions (which only ever returned the first recipe).
+ * fills it in live via Realtime.
  */
 export const recipeImportApi = {
   /**

@@ -1,5 +1,5 @@
 import { test, expect } from "./fixtures";
-import { createRecipe } from "./factories";
+import { createCollection, createRecipe } from "./factories";
 
 test.describe("Recipe Edit Page", () => {
   test("should load recipe data into edit form", async ({ page, setupAuth }) => {
@@ -21,7 +21,7 @@ test.describe("Recipe Edit Page", () => {
     const nameInput = page.locator("#title");
     await expect(nameInput).toHaveValue("Original Recipe Name", { timeout: 10000 });
 
-    const descriptionInput = page.locator("#message");
+    const descriptionInput = page.locator("#description");
     await expect(descriptionInput).toHaveValue("Original description text");
 
     const linkInput = page.locator("#link");
@@ -46,6 +46,7 @@ test.describe("Recipe Edit Page", () => {
     });
 
     // Click edit button
+    await page.getByRole("button", { name: "More actions" }).click();
     await page.getByRole("button", { name: "Edit Recipe" }).click();
     await page.waitForURL(new RegExp(`/recipe/edit/${recipeId}`));
 
@@ -154,5 +155,51 @@ test.describe("Recipe Edit Page", () => {
     // Should NOT have delete button (only in edit mode)
     const deleteButton = page.getByRole("button", { name: /delete/i });
     await expect(deleteButton).not.toBeVisible();
+  });
+
+  test("replaces memberships with multiple selected Collection UUIDs", async ({
+    page,
+    setupAuth,
+  }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000006";
+    const firstId = "20000000-0000-0000-0000-000000000001";
+    const secondId = "20000000-0000-0000-0000-000000000002";
+    await setupAuth({
+      recipes: [createRecipe({ id: recipeId, name: "Flexible Recipe", collectionIds: [firstId] })],
+      collections: [
+        createCollection({ id: firstId, name: "Favorites" }),
+        createCollection({ id: secondId, name: "Weeknight" }),
+      ],
+    });
+    await page.goto(`/recipe/edit/${recipeId}`);
+
+    await expect(page.getByRole("checkbox", { name: "Favorites" })).toBeChecked();
+    await page.getByRole("checkbox", { name: "Weeknight" }).click();
+    const rpcRequest = page.waitForRequest("**/rest/v1/rpc/replace_recipe_collections");
+    await page.getByRole("button", { name: /save/i }).click();
+    const request = await rpcRequest;
+    expect(request.postDataJSON()).toEqual({
+      p_recipe_id: recipeId,
+      p_collection_ids: [firstId, secondId],
+    });
+  });
+
+  test("allows clearing every Collection membership", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000007";
+    const collectionId = "20000000-0000-0000-0000-000000000003";
+    await setupAuth({
+      recipes: [createRecipe({ id: recipeId, name: "Unassigned Recipe", collectionIds: [collectionId] })],
+      collections: [createCollection({ id: collectionId, name: "Temporary" })],
+    });
+    await page.goto(`/recipe/edit/${recipeId}`);
+
+    await page.getByRole("checkbox", { name: "Temporary" }).click();
+    const rpcRequest = page.waitForRequest("**/rest/v1/rpc/replace_recipe_collections");
+    await page.getByRole("button", { name: /save/i }).click();
+    const request = await rpcRequest;
+    expect(request.postDataJSON()).toEqual({
+      p_recipe_id: recipeId,
+      p_collection_ids: [],
+    });
   });
 });
