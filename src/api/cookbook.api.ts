@@ -7,10 +7,10 @@ export const cookbookApi = {
         id,
         name,
         description,
-        category,
         created_at,
         status,
-        recipe_ratings(stars)
+        recipe_ratings(stars),
+        recipe_collections(collection_id)
       `);
 
     if (error) throw error;

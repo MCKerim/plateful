@@ -1,113 +1,94 @@
 import { test, expect } from "./fixtures";
-import { createRecipe } from "./factories";
+import { createCollection, createRecipe } from "./factories";
 
-test.describe("Cookbook Page", () => {
-  test("should display recipes when clicking on a category", async ({ page, setupAuth }) => {
-    // Create recipes for different categories
+const breakfastId = "10000000-0000-0000-0000-000000000001";
+const dinnerId = "10000000-0000-0000-0000-000000000002";
+
+async function longPressCollection(page: import("@playwright/test").Page, name: string) {
+  const collection = page.getByRole("button", { name, exact: true });
+  await collection.dispatchEvent("pointerdown", {
+    pointerType: "touch",
+    button: 0,
+    clientX: 100,
+    clientY: 100,
+  });
+  await page.waitForTimeout(550);
+  await collection.dispatchEvent("pointerup", { pointerType: "touch" });
+}
+
+test.describe("Cookbook Collections", () => {
+  test("filters by membership while All Recipes includes unassigned recipes", async ({
+    page,
+    setupAuth,
+  }) => {
+    const collections = [
+      createCollection({ id: breakfastId, name: "Weekend Breakfast", color_key: "gold" }),
+      createCollection({ id: dinnerId, name: "Quick Dinners", color_key: "teal" }),
+    ];
     const recipes = [
-      createRecipe({ name: "Pancakes", category: 1 }), // Breakfast
-      createRecipe({ name: "Omelette", category: 1 }), // Breakfast
-      createRecipe({ name: "Spaghetti", category: 2 }), // Main
-      createRecipe({ name: "Chicken Curry", category: 2 }), // Main
-      createRecipe({ name: "Chocolate Cake", category: 3 }), // Dessert
+      createRecipe({ name: "Pancakes", category: 5, collectionIds: [breakfastId, dinnerId] }),
+      createRecipe({ name: "Legacy Breakfast", category: 1, collectionIds: [] }),
+      createRecipe({ name: "Soup", category: null, collectionIds: [dinnerId] }),
     ];
 
-    await setupAuth({ recipes });
-
+    await setupAuth({ recipes, collections });
     await page.goto("/cookbook");
-    await page.waitForLoadState("networkidle");
 
-    // Should see category buttons
-    const breakfastButton = page.getByRole("button", { name: /breakfast/i });
-    await expect(breakfastButton).toBeVisible({ timeout: 10000 });
+    await page.getByRole("button", { name: "Weekend Breakfast", exact: true }).click();
+    await expect(page.getByText("Pancakes")).toBeVisible();
+    await expect(page.getByText("Legacy Breakfast")).not.toBeVisible();
+    await expect(page.getByText("Soup")).not.toBeVisible();
 
-    // Click on Breakfast category
-    await breakfastButton.click();
-    await page.waitForLoadState("networkidle");
-
-    // Should see breakfast recipes
-    await expect(page.getByText("Pancakes")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Omelette")).toBeVisible();
-
-    // Should NOT see recipes from other categories
-    await expect(page.getByText("Spaghetti")).not.toBeVisible();
-    await expect(page.getByText("Chocolate Cake")).not.toBeVisible();
+    await page.getByRole("button", { name: /back to collections/i }).click();
+    await page.getByRole("button", { name: /all recipes/i }).click();
+    await expect(page.getByText("Pancakes")).toBeVisible();
+    await expect(page.getByText("Legacy Breakfast")).toBeVisible();
+    await expect(page.getByText("Soup")).toBeVisible();
   });
 
-  test("should display all recipes when clicking All Recipes", async ({ page, setupAuth }) => {
-    const recipes = [
-      createRecipe({ name: "Morning Smoothie", category: 1 }),
-      createRecipe({ name: "Pasta Carbonara", category: 2 }),
-      createRecipe({ name: "Apple Pie", category: 3 }),
-    ];
-
-    await setupAuth({ recipes });
-
+  test("creates, renames, recolors, and deletes a Collection without deleting recipes", async ({
+    page,
+    setupAuth,
+  }) => {
+    const unassignedRecipe = createRecipe({ name: "Always Available", collectionIds: [] });
+    await setupAuth({ recipes: [unassignedRecipe], collections: [] });
     await page.goto("/cookbook");
-    await page.waitForLoadState("networkidle");
 
-    // Click on "All Recipes" category
-    const allRecipesButton = page.getByRole("button", { name: /all/i });
-    await expect(allRecipesButton).toBeVisible({ timeout: 10000 });
-    await allRecipesButton.click();
-    await page.waitForLoadState("networkidle");
+    await page.getByRole("button", { name: /add recipe or collection/i }).click();
+    await page.getByRole("button", { name: /new collection/i }).click();
+    await page.locator("#collection-name").fill("Favorites");
+    await page.getByRole("button", { name: "Teal" }).click();
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Favorites", exact: true })).toBeVisible();
 
-    // Should see all recipes regardless of category
-    await expect(page.getByText("Morning Smoothie")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Pasta Carbonara")).toBeVisible();
-    await expect(page.getByText("Apple Pie")).toBeVisible();
+    await longPressCollection(page, "Favorites");
+    await page.getByRole("menuitem", { name: /edit/i }).click();
+    await page.locator("#collection-name").fill("Dinners");
+    await page.getByRole("button", { name: "Save", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Dinners", exact: true })).toBeVisible();
+
+    await longPressCollection(page, "Dinners");
+    await page.getByRole("menuitem", { name: /delete/i }).click();
+    await expect(page.getByText(/recipes will stay in all recipes/i)).toBeVisible();
+    await page.getByRole("dialog").getByRole("button", { name: "Delete", exact: true }).click();
+    await expect(page.getByRole("button", { name: "Dinners", exact: true })).not.toBeVisible();
+
+    await page.getByRole("button", { name: /all recipes/i }).click();
+    await expect(page.getByText("Always Available")).toBeVisible();
   });
 
-  test("should navigate to recipe detail when clicking a recipe", async ({ page, setupAuth }) => {
-    const recipeId = "00000000-0000-0000-0000-000000000042";
-    const recipes = [createRecipe({ id: recipeId, name: "Special Recipe", category: 2 })];
-
-    await setupAuth({ recipes });
-
+  test("searches across All Recipes from the landing page", async ({ page, setupAuth }) => {
+    await setupAuth({
+      recipes: [
+        createRecipe({ name: "Banana Bread", collectionIds: [breakfastId] }),
+        createRecipe({ name: "Chocolate Mousse", collectionIds: [] }),
+      ],
+      collections: [createCollection({ id: breakfastId, name: "Breakfast" })],
+    });
     await page.goto("/cookbook");
-    await page.waitForLoadState("networkidle");
 
-    // Click on Main category to see the recipe
-    const mainButton = page.getByRole("button", { name: /main/i });
-    await expect(mainButton).toBeVisible({ timeout: 10000 });
-    await mainButton.click();
-    await page.waitForLoadState("networkidle");
-
-    // Click on the recipe
-    const recipeCard = page.getByText("Special Recipe");
-    await expect(recipeCard).toBeVisible({ timeout: 10000 });
-    await recipeCard.click();
-
-    // Should navigate to recipe detail page
-    await page.waitForURL(new RegExp(`/recipe/${recipeId}`));
-    expect(page.url()).toContain(`/recipe/${recipeId}`);
-  });
-
-  test("should search for recipes", async ({ page, setupAuth }) => {
-    const recipes = [
-      createRecipe({ name: "Banana Bread", category: 1 }),
-      createRecipe({ name: "Banana Smoothie", category: 4 }),
-      createRecipe({ name: "Chocolate Mousse", category: 3 }),
-    ];
-
-    await setupAuth({ recipes });
-
-    await page.goto("/cookbook");
-    await page.waitForLoadState("networkidle");
-
-    // Find and use the search input
-    const searchInput = page.getByPlaceholder(/recipe/i);
-    await expect(searchInput).toBeVisible({ timeout: 10000 });
-
-    // Search for "banana"
-    await searchInput.fill("banana");
-    await page.waitForLoadState("networkidle");
-
-    // Should see banana recipes
-    await expect(page.getByText("Banana Bread")).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText("Banana Smoothie")).toBeVisible();
-
-    // Should NOT see non-matching recipes
+    await page.getByPlaceholder(/recipe/i).fill("banana");
+    await expect(page.getByText("Banana Bread")).toBeVisible();
     await expect(page.getByText("Chocolate Mousse")).not.toBeVisible();
   });
 });

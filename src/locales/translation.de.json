@@ -37,7 +37,8 @@
     "reset": "Zurücksetzen",
     "send": "Senden",
     "next": "Weiter",
-    "apply": "Anwenden"
+    "apply": "Anwenden",
+    "loading": "Laden..."
   },
   "update": {
     "title": "Neues Update verfügbar!",
@@ -279,6 +280,50 @@
     "retry": "Erneut versuchen",
     "dismiss": "Verwerfen"
   },
+  "collections": {
+    "title": "Sammlungen",
+    "collection": "Sammlung",
+    "collections": "Sammlungen",
+    "allRecipes": "Alle Rezepte",
+    "back": "Zurück zu den Sammlungen",
+    "new": "Neue Sammlung",
+    "create": "Erstellen",
+    "createTitle": "Neue Sammlung",
+    "edit": "Bearbeiten",
+    "editTitle": "Sammlung bearbeiten",
+    "manage": "{{name}} verwalten",
+    "name": "Name",
+    "color": "Farbe",
+    "noneYet": "Noch keine Sammlungen. Rezepte können unter Alle Rezepte bleiben.",
+    "created": "{{name}} erstellt",
+    "updated": "{{name}} aktualisiert",
+    "deleted": "{{name}} gelöscht",
+    "deleteTitle": "{{name}} löschen?",
+    "deleteDescription": "Die Sammlung wird gelöscht, aber ihre Rezepte bleiben unter Alle Rezepte erhalten.",
+    "colors": {
+      "orange": "Orange",
+      "coral": "Koralle",
+      "rose": "Rosa",
+      "plum": "Pflaume",
+      "indigo": "Indigo",
+      "blue": "Blau",
+      "teal": "Petrol",
+      "mint": "Minze",
+      "green": "Grün",
+      "olive": "Oliv",
+      "gold": "Gold",
+      "cocoa": "Kakao"
+    },
+    "errors": {
+      "nameRequired": "Gib einen Namen für die Sammlung ein.",
+      "nameTooLong": "Sammlungsnamen dürfen bis zu 20 Zeichen enthalten.",
+      "duplicateName": "Eine Sammlung mit diesem Namen existiert bereits.",
+      "saveFailed": "Die Sammlung konnte nicht gespeichert werden. Bitte versuche es erneut.",
+      "deleteFailed": "Die Sammlung konnte nicht gelöscht werden. Bitte versuche es erneut.",
+      "loadFailed": "Sammlungen konnten nicht geladen werden. Bitte versuche es erneut.",
+      "membershipsUnavailable": "Die Sammlungen dieses Rezepts konnten nicht geladen werden. Bitte versuche es vor dem Speichern erneut."
+    }
+  },
   "recipe": {
     "editRecipe": "Rezept bearbeiten",
     "toTheRecipe": "Zum Rezept",
@@ -292,6 +337,7 @@
     "printPdf": "Rezept drucken"
   },
   "addRecipeDrawer": {
+    "open": "Rezept oder Sammlung hinzufügen",
     "importFromUrl": {
       "label": "Rezept aus URL hinzufügen",
       "description": "TikTok, YouTube, Instagram, Webseite"
@@ -302,6 +348,9 @@
     },
     "createNewRecipe": {
       "label": "Neues Rezept erstellen"
+    },
+    "createNewCollection": {
+      "label": "Neue Sammlung"
     }
   },
   "addRecipe": {
@@ -317,12 +366,12 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomaten-suppe.de",
     "importRecipeData": "Rezeptdaten importieren (TikTok)",
-    "recipeSaved": "Rezept gespeichert!",
+    "recipeSaved": "Zu Plateful hinzugefügt",
     "recipeDeleted": "Rezept gelöscht!",
     "errors": {
       "uploadFailed": "Hochladen fehlgeschlagen",
       "nameRequired": "Bitte gib einen Namen für das Rezept ein.",
-      "categoryRequired": "Bitte wähle eine Kategorie.",
+      "saveFailed": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
       "deleteFailed": "Fehler beim Löschen des Rezepts"
     }
   },
@@ -339,13 +388,13 @@
       "invalidUrl": "Ungültige URL. Bitte überprüfe den Link.",
       "importFailed": "Fehler beim Importieren des Rezepts."
     },
-    "success": "Rezept erfolgreich importiert!",
-    "importedRecipe": "Rezept erfolgreich importiert",
+    "success": "Zu Plateful hinzugefügt",
+    "importedRecipe": "Zu Plateful hinzugefügt:",
     "viewRecipe": "Ansehen",
-    "backToCookbook": "Zurück zum Kochbuch",
+    "backToCookbook": "Zurück zu den Rezepten",
     "importStarted": "Import gestartet",
     "startedTitle": "Import gestartet",
-    "startedDescription": "Dein Rezept wird importiert und erscheint gleich in deinem Kochbuch."
+    "startedDescription": "Dein Rezept wird importiert und erscheint gleich in Plateful."
   },
   "imageImport": {
     "title": "Rezept Importieren",
@@ -571,7 +620,7 @@
     "previewEditedRecipe": "Änderungen ansehen",
     "updateRecipePrompt": "Aktualisiere das Rezept oder frage nach anderen Änderungen",
     "updateRecipeError": "Fehler beim Aktualisieren des Rezepts. Bitte versuche es später erneut.",
-    "recipeSaved": "Rezept gespeichert!",
+    "recipeSaved": "Zu Plateful hinzugefügt",
     "recipeUpdated": "Rezept aktualisiert!"
   },
   "rating": {
@@ -640,7 +689,7 @@
       "title": "Dein KI-Koch",
       "bullet1": "Frag nach Rezeptideen oder Kochtipps",
       "bullet2": "Frage nach Änderungen",
-      "bullet3": "Speichere Rezepte direkt in dein Kochbuch"
+      "bullet3": "Speichere Rezepte direkt in Plateful"
     },
     "recipes": {
       "title": "Deine Rezeptsammlung",
@@ -776,7 +825,7 @@
     "sharedRecipeBadge": "Geteiltes Rezept",
     "saveToMyRecipes": "Zu meinen Rezepten hinzufügen",
     "importing": "Speichern...",
-    "importSuccess": "Rezept wurde deinem Kochbuch hinzugefügt!",
+    "importSuccess": "Zu Plateful hinzugefügt",
     "importError": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
     "loginToSave": "Anmelden, um dieses Rezept zu speichern",
     "downloadApp": "Plateful App herunterladen",

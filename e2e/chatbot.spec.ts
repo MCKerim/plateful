@@ -305,7 +305,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     expect(page.url()).toContain("/chatbot");
 
     // Verify toast appears
-    await expect(page.getByText(/recipe saved/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/added to plateful/i)).toBeVisible({ timeout: 5000 });
   });
 
   test("should include proposal feedback in next message", async ({ page, setupAuth }) => {
@@ -391,7 +391,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await saveButton.click();
 
     // Wait for toast
-    await expect(page.getByText(/recipe saved/i)).toBeVisible({ timeout: 5000 });
+    await expect(page.getByText(/added to plateful/i)).toBeVisible({ timeout: 5000 });
 
     // Send follow-up message
     await inputField.fill("Can you edit that?");

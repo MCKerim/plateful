@@ -11,7 +11,7 @@ export function transformCookbookRecipes(
     id: recipe.id,
     recipeName: recipe.name,
     description: recipe.description ?? "",
-    category: recipe.category,
+    collectionIds: recipe.recipe_collections?.map((membership) => membership.collection_id) ?? [],
     created_at: recipe.created_at,
     status: (recipe.status as RecipeStatus) ?? "ready",
     avg_rating:

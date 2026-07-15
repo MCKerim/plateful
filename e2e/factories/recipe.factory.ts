@@ -20,6 +20,7 @@ export function createRecipe(overrides?: Partial<MockRecipe>): MockRecipe {
     owner_id: overrides?.owner_id ?? "test-user-id",
     created_at: overrides?.created_at ?? new Date().toISOString(),
     avg_rating: overrides?.avg_rating ?? null,
+    collectionIds: overrides?.collectionIds ?? [],
   };
 }
 

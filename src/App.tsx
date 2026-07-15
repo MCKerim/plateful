@@ -281,6 +281,7 @@ function App() {
         refreshTimer = null;
         queryClient.invalidateQueries({ queryKey: queryKeys.recipes.all });
         queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
+        queryClient.invalidateQueries({ queryKey: queryKeys.collections.all });
       }, 300);
     };
 
@@ -288,6 +289,12 @@ function App() {
       .channel("recipes-changes")
       .on("postgres_changes", { event: "*", schema: "public", table: "recipe_imports" }, scheduleRefresh)
       .on("postgres_changes", { event: "*", schema: "public", table: "recipes" }, scheduleRefresh)
+      .on("postgres_changes", { event: "*", schema: "public", table: "collections" }, scheduleRefresh)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "recipe_collections" },
+        scheduleRefresh
+      )
       .subscribe();
 
     return () => {

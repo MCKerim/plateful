@@ -49,6 +49,6 @@ test.describe("Sign Up Page", () => {
 
     // Check for terms and conditions text
     const termsText = page.locator("text=/terms|conditions|privacy/i");
-    await expect(termsText).toBeVisible();
+    await expect(termsText.first()).toBeVisible();
   });
 });

@@ -2,7 +2,7 @@ import { test as base, Page, BrowserContext } from "@playwright/test";
 import { CustomFixtures, TestScenario, AuthenticatedFixtureOptions } from "./types";
 import { createMockSession, setupAuthRoutes, getSupabaseStorageKey } from "./auth.fixture";
 import { setupApiMocks } from "./api-mocks.fixture";
-import { createUser, createHousehold } from "../factories";
+import { createUser, createHousehold, createCollection } from "../factories";
 
 // Extend Playwright's test with custom fixtures
 export const test = base.extend<CustomFixtures>({
@@ -29,11 +29,15 @@ export const test = base.extend<CustomFixtures>({
 function createDefaultScenario(): TestScenario {
   const household = createHousehold();
   const user = createUser({ household_id: household.id });
+  const collections = [
+    createCollection({ household_id: household.id, name: "Favorites", color_key: "orange" }),
+  ];
 
   return {
     user,
     household,
     recipes: [],
+    collections,
     mealPlans: [],
   };
 }
@@ -45,11 +49,17 @@ function createScenarioFromOptions(options?: AuthenticatedFixtureOptions): TestS
     household_id: household?.id ?? null,
     ...options?.user,
   });
+  const collections =
+    options?.collections ??
+    (household
+      ? [createCollection({ household_id: household.id, name: "Favorites", color_key: "orange" })]
+      : []);
 
   return {
     user,
     household,
     recipes: options?.recipes ?? [],
+    collections,
     mealPlans: options?.mealPlans ?? [],
   };
 }

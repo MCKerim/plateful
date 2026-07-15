@@ -37,7 +37,8 @@
     "reset": "Reset",
     "send": "Send",
     "next": "Next",
-    "apply": "Apply"
+    "apply": "Apply",
+    "loading": "Loading..."
   },
   "update": {
     "title": "New Update Available!",
@@ -279,6 +280,50 @@
     "retry": "Retry",
     "dismiss": "Dismiss"
   },
+  "collections": {
+    "title": "Collections",
+    "collection": "Collection",
+    "collections": "Collections",
+    "allRecipes": "All Recipes",
+    "back": "Back to Collections",
+    "new": "New Collection",
+    "create": "Create",
+    "createTitle": "New Collection",
+    "edit": "Edit",
+    "editTitle": "Edit Collection",
+    "manage": "Manage {{name}}",
+    "name": "Name",
+    "color": "Color",
+    "noneYet": "No Collections yet. Recipes can remain in All Recipes.",
+    "created": "{{name}} created",
+    "updated": "{{name}} updated",
+    "deleted": "{{name}} deleted",
+    "deleteTitle": "Delete {{name}}?",
+    "deleteDescription": "The Collection will be deleted, but its recipes will stay in All Recipes.",
+    "colors": {
+      "orange": "Orange",
+      "coral": "Coral",
+      "rose": "Rose",
+      "plum": "Plum",
+      "indigo": "Indigo",
+      "blue": "Blue",
+      "teal": "Teal",
+      "mint": "Mint",
+      "green": "Green",
+      "olive": "Olive",
+      "gold": "Gold",
+      "cocoa": "Cocoa"
+    },
+    "errors": {
+      "nameRequired": "Enter a name for the Collection.",
+      "nameTooLong": "Collection names can contain up to 20 characters.",
+      "duplicateName": "A Collection with this name already exists.",
+      "saveFailed": "The Collection could not be saved. Please try again.",
+      "deleteFailed": "The Collection could not be deleted. Please try again.",
+      "loadFailed": "Collections could not be loaded. Please try again.",
+      "membershipsUnavailable": "This recipe's Collections could not be loaded. Please try again before saving."
+    }
+  },
   "recipe": {
     "editRecipe": "Edit recipe",
     "toTheRecipe": "To the recipe",
@@ -297,6 +342,7 @@
     "remove": "Remove"
   },
   "addRecipeDrawer": {
+    "open": "Add recipe or Collection",
     "importFromUrl": {
       "label": "Import recipe from URL",
       "description": "TikTok, YouTube, Instagram, Website"
@@ -307,6 +353,9 @@
     },
     "createNewRecipe": {
       "label": "Create new recipe"
+    },
+    "createNewCollection": {
+      "label": "New Collection"
     }
   },
   "addRecipe": {
@@ -322,12 +371,12 @@
     "link": "Link",
     "linkPlaceholder": "https://www.tomato-soup.com",
     "importRecipeData": "Import recipe data (TikTok)",
-    "recipeSaved": "Recipe saved!",
+    "recipeSaved": "Added to Plateful",
     "recipeDeleted": "Recipe deleted!",
     "errors": {
       "uploadFailed": "Upload failed",
       "nameRequired": "Please enter a name for the recipe.",
-      "categoryRequired": "Please select a category.",
+      "saveFailed": "The recipe could not be saved. Please try again.",
       "deleteFailed": "Error while deleting recipe"
     }
   },
@@ -344,13 +393,13 @@
       "invalidUrl": "Invalid URL. Please check the link.",
       "importFailed": "Failed to import recipe."
     },
-    "success": "Recipe imported successfully!",
-    "importedRecipe": "Recipe imported successfully:",
+    "success": "Added to Plateful",
+    "importedRecipe": "Added to Plateful:",
     "viewRecipe": "View",
-    "backToCookbook": "Back to Cookbook",
+    "backToCookbook": "Back to Recipes",
     "importStarted": "Import started",
     "startedTitle": "Import started",
-    "startedDescription": "Your recipe is being imported and will appear in your cookbook shortly."
+    "startedDescription": "Your recipe is being imported and will appear in Plateful shortly."
   },
   "imageImport": {
     "title": "Import Recipe",
@@ -563,7 +612,7 @@
     "previewEditedRecipe": "Preview changes",
     "updateRecipePrompt": "Update this recipe or ask for different edits",
     "updateRecipeError": "Error updating recipe. Please try again later.",
-    "recipeSaved": "Recipe saved!",
+    "recipeSaved": "Added to Plateful",
     "recipeUpdated": "Recipe updated!"
   },
   "bottomNav": {
@@ -640,7 +689,7 @@
       "title": "Your AI-Chef",
       "bullet1": "Ask for recipe ideas or cooking tips",
       "bullet2": "Ask for changes",
-      "bullet3": "Save recipes directly to your cookbook"
+      "bullet3": "Save recipes directly to Plateful"
     },
     "recipes": {
       "title": "Your Recipe Collection",
@@ -776,7 +825,7 @@
     "sharedRecipeBadge": "Shared recipe",
     "saveToMyRecipes": "Save to my recipes",
     "importing": "Saving...",
-    "importSuccess": "Recipe saved to your cookbook!",
+    "importSuccess": "Added to Plateful",
     "importError": "Could not save the recipe. Please try again.",
     "loginToSave": "Log in to save this recipe",
     "downloadApp": "Get the Plateful app",

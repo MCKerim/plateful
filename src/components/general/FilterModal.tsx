@@ -10,47 +10,51 @@ import {
 } from "../ui/dialog";
 import { Label } from "../ui/label";
 import FilterAltIcon from "@mui/icons-material/FilterAlt";
-import { categories } from "@/lib/recipeCategoryHelper/recipeCategoryHelper";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
-  resetFilter,
   selectActiveFilterCount,
-  selectCategoryId,
-  setCategoryId,
+  selectCollectionSelection,
+  setCollectionSelection,
+  type CollectionSelection,
 } from "@/redux/slices/filterAndSortingSlice";
+import { selectHouseholdId } from "@/redux/slices/householdSlice";
+import { useCollections } from "@/hooks/collections/useCollections";
 
 export default function FilterModal() {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const activeFilterCount = useAppSelector(selectActiveFilterCount);
-  const categoryId = useAppSelector(selectCategoryId);
+  const collectionSelection = useAppSelector(selectCollectionSelection);
+  const householdId = useAppSelector(selectHouseholdId);
+  const { data: collections = [] } = useCollections(householdId);
 
-  const [selectedCategory, setSelectedCategory] = useState(categoryId);
+  const [selectedCollection, setSelectedCollection] =
+    useState<CollectionSelection>(collectionSelection);
   const [open, setOpen] = useState(false);
 
   const handleApply = () => {
-    dispatch(setCategoryId(selectedCategory));
+    dispatch(setCollectionSelection(selectedCollection ?? "all"));
     setOpen(false);
   };
 
-  const toggleCategory = (categoryId: number) => {
-    if (selectedCategory === categoryId) {
-      setSelectedCategory(0);
+  const toggleCollection = (collectionId: string) => {
+    if (selectedCollection === collectionId) {
+      setSelectedCollection("all");
     } else {
-      setSelectedCategory(categoryId);
+      setSelectedCollection(collectionId);
     }
   };
 
   const handleReset = () => {
-    setSelectedCategory(0);
-    dispatch(resetFilter());
+    setSelectedCollection("all");
+    dispatch(setCollectionSelection("all"));
     setOpen(false);
   };
 
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setSelectedCategory(categoryId);
+      setSelectedCollection(collectionSelection);
     }
 
     setOpen(isOpen);
@@ -77,20 +81,28 @@ export default function FilterModal() {
 
         <div className="flex flex-col py-4">
           <div>
-            <Label className="block mb-2">{t("categorys.category")}</Label>
+            <Label className="block mb-2">{t("collections.collection")}</Label>
 
             <div className="flex flex-wrap gap-2 pl-2">
-              {categories.map((category) => (
+              <Button
+                variant="secondary"
+                className={selectedCollection === "all" ? "bg-accent text-accent-foreground" : ""}
+                onClick={() => setSelectedCollection("all")}
+                size="sm"
+              >
+                {t("collections.allRecipes")}
+              </Button>
+              {collections.map((collection) => (
                 <Button
                   variant="secondary"
-                  key={category.id}
+                  key={collection.id}
                   className={`${
-                    selectedCategory === category.id ? "bg-accent text-accent-foreground" : ""
+                    selectedCollection === collection.id ? "bg-accent text-accent-foreground" : ""
                   }`}
-                  onClick={() => toggleCategory(category.id)}
+                  onClick={() => toggleCollection(collection.id)}
                   size="sm"
                 >
-                  {category.name}
+                  {collection.name}
                 </Button>
               ))}
             </div>
@@ -99,7 +111,7 @@ export default function FilterModal() {
 
         <DialogFooter>
           <div className="flex w-full gap-2">
-            {selectedCategory !== 0 && (
+            {selectedCollection !== "all" && (
               <Button onClick={handleReset} className="w-full" variant="secondary">
                 {t("common.reset")}
               </Button>
