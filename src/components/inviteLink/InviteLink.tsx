@@ -1,8 +1,7 @@
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
+import { useEffect, useRef, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "../ui/button";
@@ -11,6 +10,7 @@ import { useTranslation } from "react-i18next";
 import { Share } from "@capacitor/share";
 import { writeClipboardText } from "@/utils/nativeClipboard";
 import { toast } from "sonner";
+import { inviteApi } from "@/api/invite.api";
 
 export default function InviteLink() {
   const { supabase } = useSupabase();
@@ -18,36 +18,47 @@ export default function InviteLink() {
   const { t } = useTranslation();
 
   const [inviteLink, setInviteLink] = useState("");
-
-  async function createInvite() {
-    const token = uuidv4();
-
-    if (!user?.household_id) {
-      return;
-    }
-
-    const { error } = await supabase.from("invites").insert([
-      {
-        token: token,
-        household_id: user.household_id,
-        invited_by: user.id,
-        expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24).toISOString(), // Valid for 24 hours
-      },
-    ]);
-
-    if (error) {
-      toast.error(t("inviteLink.createError") + " " + error.message);
-      return;
-    }
-
-    setInviteLink(`https://app.plateful.cloud/invite/${token}`);
-  }
+  const inviteRequest = useRef<{
+    householdId: string;
+    promise: Promise<string>;
+  } | null>(null);
 
   useEffect(() => {
-    if (user?.household_id) {
-      createInvite();
+    const householdId = user?.household_id;
+    if (!householdId) {
+      return;
     }
-  }, [user?.household_id]);
+
+    if (inviteRequest.current?.householdId !== householdId) {
+      inviteRequest.current = {
+        householdId,
+        promise: inviteApi.create(supabase),
+      };
+    }
+
+    const request = inviteRequest.current;
+    let cancelled = false;
+
+    request.promise
+      .then((token) => {
+        if (!cancelled) {
+          setInviteLink(`https://app.plateful.cloud/invite/${token}`);
+        }
+      })
+      .catch((error) => {
+        if (!cancelled) {
+          console.error("Error creating invite:", error);
+          toast.error(t("inviteLink.createError"));
+        }
+        if (inviteRequest.current === request) {
+          inviteRequest.current = null;
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, t, user?.household_id]);
 
   async function shareInviteLink() {
     try {

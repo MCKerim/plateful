@@ -6,6 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { selectUser, setUser } from "@/redux/slices/userSlice";
 import { setHousehold } from "@/redux/slices/householdSlice";
+import { householdApi } from "@/api/household.api";
 import { useSupabase } from "@/utils/supabase";
 import { useState, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router";
@@ -46,32 +47,25 @@ export default function CreateHousehold() {
 
     setIsLoading(true);
 
-    const { data, error } = await supabase.from("household").insert({ name: trimmedName }).select();
+    try {
+      const householdId = await householdApi.create(supabase, { name: trimmedName });
 
-    if (error || !data) {
-      toast.error(t("createHousehold.errors.createFailed") + " " + error?.message);
-      setIsLoading(false);
-      return;
-    }
-
-    if (data) {
-      // set household id for user
-      const { error: updateError } = await supabase
-        .from("users")
-        .update({ household_id: data[0].id })
-        .eq("id", user.id);
-
-      if (updateError) {
-        toast.error(t("createHousehold.errors.updateFailed") + " " + updateError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      dispatch(setUser({ ...user, household_id: data[0].id }));
-      dispatch(setHousehold(data[0]));
+      dispatch(setUser({ ...user, household_id: householdId }));
+      dispatch(
+        setHousehold({
+          id: householdId,
+          name: trimmedName,
+          owner_id: user.id,
+          created_at: new Date().toISOString(),
+        })
+      );
       setHouseholdName("");
-      setIsLoading(false);
       navigate("/inviteMembers");
+    } catch (error) {
+      console.error("Error creating household:", error);
+      toast.error(t("createHousehold.errors.createFailed"));
+    } finally {
+      setIsLoading(false);
     }
   }
 

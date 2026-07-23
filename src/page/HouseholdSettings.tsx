@@ -87,15 +87,12 @@ export default function HouseholdSettings() {
       return;
     }
 
-    leaveHouseholdMutation.mutate(
-      { userId: user.id },
-      {
-        onError: (error) => {
-          console.error("Error leaving household:", error);
-          toast.error(t("householdSettings.errors.leaveHouseholdFailed"));
-        },
-      }
-    );
+    leaveHouseholdMutation.mutate(undefined, {
+      onError: (error) => {
+        console.error("Error leaving household:", error);
+        toast.error(t("householdSettings.errors.leaveHouseholdFailed"));
+      },
+    });
   }
 
   function handleDeleteHousehold() {
@@ -103,20 +100,17 @@ export default function HouseholdSettings() {
       return;
     }
 
-    deleteHouseholdMutation.mutate(
-      { householdId: household.id },
-      {
-        onSuccess: () => {
-          setIsDeleteHouseholdDialogOpen(false);
-          setDeleteConfirmationText("");
-          toast.success(t("householdSettings.success.householdDeleted"));
-        },
-        onError: (error) => {
-          console.error("Error deleting household:", error);
-          toast.error(t("householdSettings.errors.deleteHouseholdFailed"));
-        },
-      }
-    );
+    deleteHouseholdMutation.mutate(undefined, {
+      onSuccess: () => {
+        setIsDeleteHouseholdDialogOpen(false);
+        setDeleteConfirmationText("");
+        toast.success(t("householdSettings.success.householdDeleted"));
+      },
+      onError: (error) => {
+        console.error("Error deleting household:", error);
+        toast.error(t("householdSettings.errors.deleteHouseholdFailed"));
+      },
+    });
   }
 
   const getDeleteConfirmationWord = () => {
@@ -133,7 +127,7 @@ export default function HouseholdSettings() {
     }
 
     transferOwnershipMutation.mutate(
-      { householdId: household.id, newOwnerId: memberId },
+      { newOwnerId: memberId },
       {
         onSuccess: () => {
           setSelectedMember(null);

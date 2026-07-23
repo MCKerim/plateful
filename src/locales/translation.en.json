@@ -195,7 +195,13 @@
     "invalidOrExpiredLink": "Invalid or expired link",
     "joinSuccess": "You have successfully joined the household",
     "joinError": "Error joining household",
-    "joinLoading": "Joining..."
+    "joinLoading": "Joining...",
+    "alreadyMember": "You are already a member of this household",
+    "householdConflictTitle": "Already in a Household",
+    "householdConflictDescription": "You are currently in “{{currentHousehold}}”. To join “{{invitedHousehold}}”, leave your current household first, then open this invitation again.",
+    "householdConflictButton": "Got it",
+    "currentHouseholdFallback": "your current household",
+    "invitedHouseholdFallback": "the invited household"
   },
   "signup": {
     "title": "Plateful",

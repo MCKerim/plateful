@@ -247,7 +247,13 @@
     "invalidOrExpiredLink": "Ungültiger oder abgelaufener Link",
     "joinSuccess": "Du wurdest erfolgreich zum Haushalt beigetragen",
     "joinError": "Fehler beim Beitreten des Haushalts",
-    "joinLoading": "Beitreten..."
+    "joinLoading": "Beitreten...",
+    "alreadyMember": "Du bist bereits Mitglied dieses Haushalts",
+    "householdConflictTitle": "Bereits in einem Haushalt",
+    "householdConflictDescription": "Du bist aktuell im Haushalt „{{currentHousehold}}“. Um „{{invitedHousehold}}“ beizutreten, verlasse zuerst deinen aktuellen Haushalt und öffne diese Einladung danach erneut.",
+    "householdConflictButton": "Verstanden",
+    "currentHouseholdFallback": "dein aktueller Haushalt",
+    "invitedHouseholdFallback": "der eingeladene Haushalt"
   },
   "list": {
     "title": "Einkaufsliste"

@@ -6,24 +6,48 @@ export type UpdateHouseholdNameParams = {
   name: string;
 };
 
+export type CreateHouseholdParams = {
+  name: string;
+};
+
 export type RemoveMemberParams = {
   memberId: string;
 };
 
-export type LeaveHouseholdParams = {
-  userId: string;
-};
-
 export type TransferOwnershipParams = {
-  householdId: string;
   newOwnerId: string;
 };
 
-export type DeleteHouseholdParams = {
-  householdId: string;
-};
+export type LeaveHouseholdResult =
+  | "member_left"
+  | "ownership_transferred"
+  | "household_deleted"
+  | "not_member";
+
+const leaveHouseholdResults = new Set<LeaveHouseholdResult>([
+  "member_left",
+  "ownership_transferred",
+  "household_deleted",
+  "not_member",
+]);
 
 export const householdApi = {
+  async create(supabase: SupabaseClient<Database>, params: CreateHouseholdParams): Promise<string> {
+    const { data, error } = await supabase.rpc("create_household", {
+      p_name: params.name,
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    if (typeof data !== "string" || !data) {
+      throw new Error("The household service returned an invalid identifier.");
+    }
+
+    return data;
+  },
+
   async updateName(
     supabase: SupabaseClient<Database>,
     params: UpdateHouseholdNameParams
@@ -42,54 +66,44 @@ export const householdApi = {
     supabase: SupabaseClient<Database>,
     params: RemoveMemberParams
   ): Promise<void> {
-    const { error } = await supabase
-      .from("users")
-      .update({ household_id: null })
-      .eq("id", params.memberId);
+    const { error } = await supabase.rpc("remove_household_member", {
+      p_member_id: params.memberId,
+    });
 
     if (error) {
       throw error;
     }
   },
 
-  async leaveHousehold(
-    supabase: SupabaseClient<Database>,
-    params: LeaveHouseholdParams
-  ): Promise<void> {
-    const { error } = await supabase
-      .from("users")
-      .update({ household_id: null })
-      .eq("id", params.userId);
+  async leaveHousehold(supabase: SupabaseClient<Database>): Promise<LeaveHouseholdResult> {
+    const { data, error } = await supabase.rpc("leave_household");
 
     if (error) {
       throw error;
     }
+
+    if (typeof data !== "string" || !leaveHouseholdResults.has(data as LeaveHouseholdResult)) {
+      throw new Error("The household service returned an invalid leave result.");
+    }
+
+    return data as LeaveHouseholdResult;
   },
 
   async transferOwnership(
     supabase: SupabaseClient<Database>,
     params: TransferOwnershipParams
   ): Promise<void> {
-    const { error } = await supabase
-      .from("household")
-      .update({ owner_id: params.newOwnerId })
-      .eq("id", params.householdId);
+    const { error } = await supabase.rpc("transfer_household_ownership", {
+      p_member_id: params.newOwnerId,
+    });
 
     if (error) {
       throw error;
     }
   },
 
-  async deleteHousehold(
-    supabase: SupabaseClient<Database>,
-    params: DeleteHouseholdParams
-  ): Promise<void> {
-    // Cascade delete handles recipes, meal plans, cookbooks, invites.
-    // Users are unlinked (household_id set to null) automatically.
-    const { error } = await supabase
-      .from("household")
-      .delete()
-      .eq("id", params.householdId);
+  async deleteHousehold(supabase: SupabaseClient<Database>): Promise<void> {
+    const { error } = await supabase.rpc("delete_household");
 
     if (error) {
       throw error;

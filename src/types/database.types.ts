@@ -1219,6 +1219,22 @@ export type Database = {
       }
     }
     Functions: {
+      accept_household_invite: {
+        Args: { p_token: string }
+        Returns: Json
+      }
+      create_household: {
+        Args: { p_name: string }
+        Returns: string
+      }
+      create_household_invite: {
+        Args: never
+        Returns: string
+      }
+      delete_household: {
+        Args: never
+        Returns: undefined
+      }
       increment_household_mission: {
         Args: { p_household_id: string; p_mission_id: string }
         Returns: {
@@ -1236,8 +1252,20 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      leave_household: {
+        Args: never
+        Returns: string
+      }
+      preview_household_invite: {
+        Args: { p_token: string }
+        Returns: Json
+      }
       register_push_token: {
         Args: { p_environment: string; p_platform: string; p_token: string }
+        Returns: undefined
+      }
+      remove_household_member: {
+        Args: { p_member_id: string }
         Returns: undefined
       }
       replace_recipe_collections: {
@@ -1250,6 +1278,10 @@ export type Database = {
         Returns: undefined
       }
       unregister_push_token: { Args: { p_token: string }; Returns: undefined }
+      transfer_household_ownership: {
+        Args: { p_member_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
