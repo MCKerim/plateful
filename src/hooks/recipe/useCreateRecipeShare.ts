@@ -22,11 +22,11 @@ export function useCreateRecipeShare() {
       const recipe = await recipeApi.getById(supabase, recipeId);
       if (!recipe) throw new Error("Recipe not found");
 
-      // 2+3. Fetch ingredients and image paths in parallel
-      const [ingredientRows, instructionRows, imagePaths] = await Promise.all([
+      // 2+3. Fetch the structured snapshot content in parallel. The Edge
+      // Function reads and copies the authoritative cover itself.
+      const [ingredientRows, instructionRows] = await Promise.all([
         ingredientsApi.getByRecipeId(supabase, recipeId),
         instructionsApi.getByRecipeId(supabase, recipeId),
-        recipeShareApi.getImagePaths(supabase, recipeId),
       ]);
       const ingredients: SnapshotIngredient[] = ingredientRows.map((row) => ({
         raw_text: row.raw_text,
@@ -47,8 +47,8 @@ export function useCreateRecipeShare() {
         sort_order: row.sort_order,
       }));
 
-      // 4. Create the share record (signs images server-side with ~10y TTL)
-      const token = await recipeShareApi.create(supabase, {
+      // 4. Create the share record and immutable image copy server-side.
+      const token = await recipeShareApi.create(supabase, recipeId, {
         name: recipe.name,
         description: recipe.description,
         instructions: recipe.instructions,
@@ -56,7 +56,6 @@ export function useCreateRecipeShare() {
         base_servings: recipe.base_servings,
         servings_unit: recipe.servings_unit,
         link: recipe.link ?? null,
-        image_paths: imagePaths,
         ingredients,
       });
 

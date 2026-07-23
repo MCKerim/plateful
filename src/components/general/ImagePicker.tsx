@@ -39,8 +39,11 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
 
   const handleDeleteImage = () => {
     setError(null);
-    if (onDeleteImage) onDeleteImage();
-    onImageSelected(undefined, "");
+    if (onDeleteImage) {
+      onDeleteImage();
+    } else {
+      onImageSelected(undefined, "");
+    }
   };
 
   return (

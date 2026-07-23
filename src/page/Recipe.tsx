@@ -57,6 +57,7 @@ import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
 import DeleteDialog from "@/components/general/DeleteDialog";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Capacitor } from "@capacitor/core";
+import { recipeImageApi } from "@/api/recipeImage.api";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -129,7 +130,6 @@ export default function Recipe() {
     });
   }
 
-
   function handleDeleteRating(ratingId: string) {
     if (!recipeId) return;
 
@@ -190,19 +190,11 @@ export default function Recipe() {
     setIsUploadingImage(true);
     try {
       const compressedFile = await imageCompression(result.file, IMAGE_COMPRESSION_OPTIONS);
-      const fileExt = compressedFile.name.split(".").pop();
-      const filePath = `recipe_${recipeId}/${Date.now()}.${fileExt}`;
-
-      const { error } = await supabase.storage
-        .from("recipeimages")
-        .upload(filePath, compressedFile, { upsert: true });
-
-      if (error) {
-        toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
-        return;
-      }
-
-      queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) });
+      await recipeImageApi.uploadCover(supabase, recipeId, compressedFile);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) }),
+        queryClient.invalidateQueries({ queryKey: queryKeys.recipes.detail(recipeId) }),
+      ]);
     } catch {
       toast.error(t("addRecipe.errors.uploadFailed"));
     } finally {
@@ -315,11 +307,7 @@ export default function Recipe() {
               </Button>
 
               {!Capacitor.isNativePlatform() && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={handlePrint}
-                >
+                <Button variant="secondary" size="lg" onClick={handlePrint}>
                   <div className="flex justify-start gap-4 w-full h-full items-center">
                     <Printer />
                     <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
