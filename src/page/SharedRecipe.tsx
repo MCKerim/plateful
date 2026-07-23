@@ -17,6 +17,7 @@ import { selectUser } from "@/redux/slices/userSlice";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
+import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -131,6 +132,7 @@ export default function SharedRecipe() {
   }
 
   const { snapshot } = share;
+  const trustedImageUrls = snapshot.image_urls.filter((url) => isTrustedRecipeImageUrl(url));
   const displayIngredients = snapshot.ingredients.map(toDisplayIngredient);
   const instructionsMarkdown =
     snapshot.instruction_steps && snapshot.instruction_steps.length > 0
@@ -143,16 +145,13 @@ export default function SharedRecipe() {
       : snapshot.instructions;
   const groupedIngredients = groupIngredients(displayIngredients);
 
-  const saveButton = isLoggedIn && householdId ? (
-    <Button
-      className="w-full"
-      onClick={handleSave}
-      disabled={importMutation.isPending}
-    >
-      <BookmarkPlus size={18} />
-      {importMutation.isPending ? t("share.importing") : t("share.saveToMyRecipes")}
-    </Button>
-  ) : null;
+  const saveButton =
+    isLoggedIn && householdId ? (
+      <Button className="w-full" onClick={handleSave} disabled={importMutation.isPending}>
+        <BookmarkPlus size={18} />
+        {importMutation.isPending ? t("share.importing") : t("share.saveToMyRecipes")}
+      </Button>
+    ) : null;
 
   const downloadButton = !isNative ? (
     <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
@@ -181,7 +180,7 @@ export default function SharedRecipe() {
   return (
     <Layout showHeader={false} showFooter={false} footer={footer}>
       {/* Image gallery */}
-      {snapshot.image_urls.length === 0 ? (
+      {trustedImageUrls.length === 0 ? (
         <AspectRatio ratio={16 / 9}>
           <img
             src="/no-img.jpg"
@@ -192,7 +191,7 @@ export default function SharedRecipe() {
       ) : (
         <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
           <AspectRatio ratio={16 / 9}>
-            {snapshot.image_urls.map((url, index) => (
+            {trustedImageUrls.map((url, index) => (
               <PhotoView key={index} src={url}>
                 {index < 1 ? (
                   <img
@@ -235,9 +234,7 @@ export default function SharedRecipe() {
 
           {groupedIngredients.map((group, groupIndex) => (
             <div key={group.name ?? `group-${groupIndex}`}>
-              {group.name && (
-                <h4 className="font-bold text-sm mt-4">{group.name}</h4>
-              )}
+              {group.name && <h4 className="font-bold text-sm mt-4">{group.name}</h4>}
               <ul className="list-disc ml-4">
                 {group.ingredients.map((ingredient) => (
                   <li

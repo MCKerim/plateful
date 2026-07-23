@@ -45,6 +45,7 @@ import {
   useRecipeCollectionIds,
   useReplaceRecipeCollections,
 } from "@/hooks/collections/useCollections";
+import { recipeImageApi } from "@/api/recipeImage.api";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -80,6 +81,7 @@ export default function AddRecipe() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
   const [imageSupabaseUrl, setImageSupabaseUrl] = useState<string>("");
+  const [imageRemoved, setImageRemoved] = useState(false);
   const [imageUploading, setImageUploading] = useState(false);
 
   const navigate = useNavigate();
@@ -188,6 +190,8 @@ export default function AddRecipe() {
       setDescription(recipe.description ?? "");
       setLink(recipe.link ?? "");
       setBaseServings(recipe.base_servings);
+      setImageSupabaseUrl(recipe.image_path ?? "");
+      setImageRemoved(false);
     }
   }, [recipe]);
 
@@ -235,48 +239,33 @@ export default function AddRecipe() {
     }
   }, [recipeId, searchParams]);
 
-  async function uploadToSupabase(file: File) {
-    setImageUploading(true);
-    const fileExt = file.name.split(".").pop();
-    // Use recipe id if editing, otherwise use 'new' (will be replaced after insert)
-    const recipeIdForPath = params.recipeId ?? "temp";
-    const fileName = `${Date.now()}.${fileExt}`;
-    const filePath = `recipe_${recipeIdForPath}/${fileName}`;
-    const { error } = await supabase.storage
-      .from("recipeimages")
-      .upload(filePath, file, { upsert: true });
-    setImageUploading(false);
-    if (error) {
-      toast.error(t("addRecipe.errors.uploadFailed") + ": " + error.message);
-      return null;
-    }
-    return filePath;
-  }
-
   async function handleImageSelected(file: File | undefined, previewUrl: string) {
     if (!file) {
       setImageFile(null);
       setImagePreview("");
-      setImageSupabaseUrl("");
+      setImageRemoved(imageSupabaseUrl !== "");
       return;
     }
 
-    // Compress and resize the image before upload
-    const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
-    setImageFile(compressedFile);
-    setImagePreview(previewUrl);
-
-    const path = await uploadToSupabase(compressedFile);
-    setImageSupabaseUrl(path ?? "");
+    // Keep the compressed draft local. Upload only after the recipe row exists
+    // and Save is tapped, so cancelling cannot leave a temporary object behind.
+    setImageUploading(true);
+    try {
+      const compressedFile = await imageCompression(file, IMAGE_COMPRESSION_OPTIONS);
+      setImageFile(compressedFile);
+      setImagePreview(previewUrl);
+      setImageRemoved(false);
+    } catch {
+      toast.error(t("addRecipe.errors.uploadFailed"));
+    } finally {
+      setImageUploading(false);
+    }
   }
 
-  async function handleDeleteImage() {
-    if (imageSupabaseUrl) {
-      await supabase.storage.from("recipeimages").remove([imageSupabaseUrl]);
-    }
+  function handleDeleteImage() {
     setImageFile(null);
     setImagePreview("");
-    setImageSupabaseUrl("");
+    setImageRemoved(imageSupabaseUrl !== "");
   }
 
   async function saveRecipe() {
@@ -342,17 +331,21 @@ export default function AddRecipe() {
         setCreatedRecipeId(createdRecipe.id);
       }
 
-      let finalImagePath: string | null = imageSupabaseUrl || null;
-      if (imageFile && imageSupabaseUrl?.includes("temp")) {
-        const newPath = `recipe_${targetRecipeId}/${imageSupabaseUrl.split("/").pop()}`;
-        await supabase.storage.from("recipeimages").move(imageSupabaseUrl, newPath);
-        finalImagePath = newPath;
-        setImageSupabaseUrl(newPath);
+      if (imageFile) {
+        setImageUploading(true);
+        try {
+          const imagePath = await recipeImageApi.uploadCover(supabase, targetRecipeId, imageFile);
+          setImageSupabaseUrl(imagePath);
+          setImageFile(null);
+          setImageRemoved(false);
+        } finally {
+          setImageUploading(false);
+        }
+      } else if (imageRemoved) {
+        await recipeImageApi.clearCover(supabase, targetRecipeId);
+        setImageSupabaseUrl("");
+        setImageRemoved(false);
       }
-      await supabase
-        .from("recipes")
-        .update({ image_path: finalImagePath })
-        .eq("id", targetRecipeId);
 
       await saveIngredients(targetRecipeId);
       await replaceCollectionsMutation.mutateAsync({
@@ -424,12 +417,14 @@ export default function AddRecipe() {
           disabled={
             createRecipeMutation.isPending ||
             updateRecipeMutation.isPending ||
-            replaceCollectionsMutation.isPending
+            replaceCollectionsMutation.isPending ||
+            imageUploading
           }
         >
           {createRecipeMutation.isPending ||
           updateRecipeMutation.isPending ||
-          replaceCollectionsMutation.isPending
+          replaceCollectionsMutation.isPending ||
+          imageUploading
             ? t("common.saving")
             : t("common.save")}
         </Button>

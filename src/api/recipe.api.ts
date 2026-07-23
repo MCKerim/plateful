@@ -139,14 +139,7 @@ export const recipeApi = {
   },
 
   async delete(supabase: SupabaseClient, recipeId: string): Promise<void> {
-    // Delete all images from storage first
-    const { data: files } = await supabase.storage.from("recipeimages").list(`recipe_${recipeId}/`);
-
-    if (files && files.length > 0) {
-      const paths = files.map((file) => `recipe_${recipeId}/${file.name}`);
-      await supabase.storage.from("recipeimages").remove(paths);
-    }
-
+    // The database trigger queues the Storage folder after this delete commits.
     const { error } = await supabase.from("recipes").delete().eq("id", recipeId);
 
     if (error) throw error;

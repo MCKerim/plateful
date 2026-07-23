@@ -29,9 +29,9 @@ export type SharedRecipeSnapshot = {
   base_servings: number | null;
   servings_unit: string | null;
   link: string | null;
-  /** Long-lived signed URLs for the snapshot's private image copies */
+  /** Stable URLs for server-owned copies; legacy rows may contain signed URLs. */
   image_urls: string[];
-  /** Storage folder that owns the image copies (e.g. "shared_<uuid>"), used for cleanup on delete */
+  /** Storage folder owned by the share and queued for server cleanup on delete. */
   image_folder: string;
   ingredients: SnapshotIngredient[];
 };
