@@ -706,7 +706,7 @@
   },
   "questions": {
     "question1": {
-      "question": "Was ist dein Ziel?",
+      "question": "Was bringt dich zu Plateful?",
       "option1": "Zeit sparen",
       "option2": "Gesünder essen",
       "option3": "Neue Rezepte entdecken",
@@ -762,11 +762,11 @@
       "option4": "7 Mal oder mehr"
     },
     "question8": {
-      "question": "Für wie viele Personen kochst du?",
-      "option1": "Nur für mich",
+      "question": "Für wie viele Personen kochst du meistens?",
+      "option1": "Nur ich",
       "option2": "2 Personen",
-      "option3": "3-4 Personen",
-      "option4": "5 oder mehr Personen"
+      "option3": "3–4 Personen",
+      "option4": "5 oder mehr"
     },
     "question9": {
       "question": "Welche Ernährungsweise bevorzugst du?",
@@ -778,7 +778,7 @@
       "option6": "Keine"
     },
     "question10": {
-      "question": "Allergien & Intoleranzen?",
+      "question": "Allergien oder Unverträglichkeiten?",
       "option1": "Gluten",
       "option2": "Laktose",
       "option3": "Nüsse",
