@@ -712,7 +712,7 @@
   },
   "questions": {
     "question1": {
-      "question": "What is your goal?",
+      "question": "What brings you to Plateful?",
       "option1": "Save time",
       "option2": "Eat healthier",
       "option3": "Discover new recipes",
@@ -771,8 +771,8 @@
       "question": "How many people do you usually cook for?",
       "option1": "Just me",
       "option2": "2 people",
-      "option3": "3-4 people",
-      "option4": "5 or more people"
+      "option3": "3–4 people",
+      "option4": "5 or more"
     },
     "question9": {
       "question": "What dietary preference do you follow?",
@@ -784,7 +784,7 @@
       "option6": "None"
     },
     "question10": {
-      "question": "Allergies & Intolerances?",
+      "question": "Any allergies or intolerances?",
       "option1": "Gluten",
       "option2": "Lactose",
       "option3": "Nuts",
