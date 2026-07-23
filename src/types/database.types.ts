@@ -114,22 +114,19 @@ export type Database = {
         Row: {
           checked_at: string
           checked_by: string
-          kind: string
-          ref_id: string
+          ingredient_id: string
           session_id: string
         }
         Insert: {
           checked_at?: string
           checked_by: string
-          kind: string
-          ref_id: string
+          ingredient_id: string
           session_id: string
         }
         Update: {
           checked_at?: string
           checked_by?: string
-          kind?: string
-          ref_id?: string
+          ingredient_id?: string
           session_id?: string
         }
         Relationships: [
@@ -331,7 +328,15 @@ export type Database = {
           name?: string
           owner_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "household_owner_membership_fkey"
+            columns: ["id", "owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["household_id", "id"]
+          },
+        ]
       }
       household_missions: {
         Row: {
@@ -475,7 +480,7 @@ export type Database = {
         Row: {
           created_at: string
           expires_at: string
-          household_id: string | null
+          household_id: string
           id: string
           invited_by: string | null
           token: string
@@ -485,7 +490,7 @@ export type Database = {
         Insert: {
           created_at?: string
           expires_at: string
-          household_id?: string | null
+          household_id: string
           id?: string
           invited_by?: string | null
           token: string
@@ -495,7 +500,7 @@ export type Database = {
         Update: {
           created_at?: string
           expires_at?: string
-          household_id?: string | null
+          household_id?: string
           id?: string
           invited_by?: string | null
           token?: string
@@ -809,6 +814,7 @@ export type Database = {
       }
       recipe_instructions: {
         Row: {
+          annotation: Json | null
           created_at: string | null
           group_name: string | null
           id: string
@@ -818,6 +824,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          annotation?: Json | null
           created_at?: string | null
           group_name?: string | null
           id?: string
@@ -827,6 +834,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          annotation?: Json | null
           created_at?: string | null
           group_name?: string | null
           id?: string
@@ -1219,22 +1227,10 @@ export type Database = {
       }
     }
     Functions: {
-      accept_household_invite: {
-        Args: { p_token: string }
-        Returns: Json
-      }
-      create_household: {
-        Args: { p_name: string }
-        Returns: string
-      }
-      create_household_invite: {
-        Args: never
-        Returns: string
-      }
-      delete_household: {
-        Args: never
-        Returns: undefined
-      }
+      accept_household_invite: { Args: { p_token: string }; Returns: Json }
+      create_household: { Args: { p_name: string }; Returns: string }
+      create_household_invite: { Args: never; Returns: string }
+      delete_household: { Args: never; Returns: undefined }
       increment_household_mission: {
         Args: { p_household_id: string; p_mission_id: string }
         Returns: {
@@ -1252,14 +1248,8 @@ export type Database = {
           isSetofReturn: false
         }
       }
-      leave_household: {
-        Args: never
-        Returns: string
-      }
-      preview_household_invite: {
-        Args: { p_token: string }
-        Returns: Json
-      }
+      leave_household: { Args: never; Returns: string }
+      preview_household_invite: { Args: { p_token: string }; Returns: Json }
       register_push_token: {
         Args: { p_environment: string; p_platform: string; p_token: string }
         Returns: undefined
@@ -1277,11 +1267,15 @@ export type Database = {
         Args: { p_new_base: number; p_recipe_id: string }
         Returns: undefined
       }
-      unregister_push_token: { Args: { p_token: string }; Returns: undefined }
+      set_notification_preference: {
+        Args: { p_enabled: boolean; p_key: string }
+        Returns: undefined
+      }
       transfer_household_ownership: {
         Args: { p_member_id: string }
         Returns: undefined
       }
+      unregister_push_token: { Args: { p_token: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
