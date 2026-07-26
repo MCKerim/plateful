@@ -1,6 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setUser } from "@/redux/slices/userSlice";
+import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useUserData } from "./useUserData";
 
 const mocks = vi.hoisted(() => ({
@@ -113,13 +114,19 @@ describe("useUserData", () => {
     expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(null));
   });
 
-  it("keeps the authenticated user when household loading fails", async () => {
+  it("returns a retryable failure without publishing partial household state", async () => {
     mocks.getHousehold.mockRejectedValue(new Error("Temporary household failure"));
     const { result } = renderHook(() => useUserData());
 
-    await act(() => result.current.fetchUserData(authUser));
+    let loadResult;
+    await act(async () => {
+      loadResult = await result.current.fetchUserData(authUser);
+    });
 
-    expect(mocks.dispatch).toHaveBeenCalledWith(setUser(user));
+    expect(loadResult).toEqual({ status: "failed", stage: "household" });
+    expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(user));
+    expect(mocks.dispatch).not.toHaveBeenCalledWith(setHousehold(null));
+    expect(mocks.dispatch).not.toHaveBeenCalledWith(setHouseholdMembers(null));
     expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(null));
   });
 
@@ -127,9 +134,40 @@ describe("useUserData", () => {
     mocks.getCurrent.mockRejectedValue(new Error("Temporary profile failure"));
     const { result } = renderHook(() => useUserData());
 
-    await act(() => result.current.fetchUserData(authUser));
+    let loadResult;
+    await act(async () => {
+      loadResult = await result.current.fetchUserData(authUser);
+    });
 
+    expect(loadResult).toEqual({ status: "failed", stage: "profile" });
     expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(null));
+  });
+
+  it("does not publish a profile after its auth generation is superseded", async () => {
+    let resolveProfile: ((value: typeof user) => void) | undefined;
+    mocks.getCurrent.mockImplementation(
+      () =>
+        new Promise<typeof user>((resolve) => {
+          resolveProfile = resolve;
+        })
+    );
+    let isCurrent = true;
+    const { result } = renderHook(() => useUserData());
+
+    let loadPromise!: Promise<unknown>;
+    act(() => {
+      loadPromise = result.current.fetchUserData(authUser, () => isCurrent);
+    });
+    isCurrent = false;
+    resolveProfile?.(user);
+
+    let loadResult;
+    await act(async () => {
+      loadResult = await loadPromise;
+    });
+
+    expect(loadResult).toEqual({ status: "superseded" });
+    expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(user));
   });
 
   it("clears local user data when Supabase reports no authenticated user", async () => {

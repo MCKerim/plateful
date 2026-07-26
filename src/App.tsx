@@ -41,7 +41,6 @@ import TrialOffer from "./page/onboarding/trialOffer/TrialOffer";
 import TrialReminder from "./page/onboarding/trialReminder/TrialReminder";
 import ChooseUsername from "./page/onboarding/chooseUsername/ChooseUsername";
 import { useSupabase } from "./utils/supabase";
-import { closeBrowser } from "./utils/nativeBrowser";
 import { EdgeToEdge } from "@capawesome/capacitor-android-edge-to-edge-support";
 import { CapacitorShareTarget } from "@capgo/capacitor-share-target";
 import { Capacitor } from "@capacitor/core";
@@ -53,11 +52,11 @@ import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import SharedRecipe from "./page/SharedRecipe";
 import NotificationSettings from "./page/NotificationSettings";
-import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
-import type { CurrentAuthUser } from "@/api/user.api";
+import { useAuthBootstrap } from "@/hooks/user/useAuthBootstrap";
+import AccountLoadError from "@/components/general/AccountLoadError";
 
 function App() {
   const { supabase } = useSupabase();
@@ -66,10 +65,9 @@ function App() {
   const user = useAppSelector(selectUser);
   const { isActive: householdIsActive, isLoading: subLoading } = useHouseholdSubscription();
   const isSubLoading = !!householdId && subLoading;
-  const [loading, setLoading] = useState(true);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
-  const { fetchUserData } = useUserData();
+  const { state: authBootstrap, retry: retryAuthBootstrap, refreshUser } = useAuthBootstrap();
 
   useEffect(() => {
     const checkForUpdates = async () => {
@@ -216,29 +214,6 @@ function App() {
     };
   }, [navigate, supabase]);
 
-  async function updateUser(authUser: CurrentAuthUser | null): Promise<void> {
-    setLoading(true);
-    await fetchUserData(authUser);
-    setLoading(false);
-  }
-
-  useEffect(() => {
-    const { data: { subscription } = { subscription: undefined } } =
-      supabase.auth.onAuthStateChange((_event, session) => {
-        // Supabase holds its auth lock while this callback runs. Defer all
-        // asynchronous work and use the supplied session instead of calling
-        // auth.getSession(), which can deadlock the client after login.
-        globalThis.setTimeout(() => {
-          void updateUser(session?.user ?? null);
-          void closeBrowser().catch((error) => console.error(error));
-        }, 0);
-      });
-
-    return () => {
-      subscription?.unsubscribe();
-    };
-  }, []);
-
   // Subscribe to realtime changes for the current user in the users table
   useEffect(() => {
     if (!user?.id) return;
@@ -253,10 +228,16 @@ function App() {
           table: "users",
           filter: `id=eq.${user.id}`,
         },
-        () => {
+        (payload) => {
+          const nextHouseholdId =
+            "household_id" in payload.new ? payload.new.household_id : undefined;
+          const householdChanged =
+            (typeof nextHouseholdId === "string" || nextHouseholdId === null) &&
+            nextHouseholdId !== user.household_id;
+
           // Refetch user data and update Redux state
           supabase.auth.getSession().then(({ data: { session } }) => {
-            updateUser(session?.user ?? null);
+            void refreshUser(session?.user ?? null, householdChanged);
           });
         }
       )
@@ -265,7 +246,7 @@ function App() {
     return () => {
       supabase.removeChannel(userSubscription);
     };
-  }, [user?.id]);
+  }, [refreshUser, supabase, user?.household_id, user?.id]);
 
   // Live cookbook: refetch recipes + import placeholders whenever the household's
   // recipes or imports change (RLS scopes the stream to the household). This is
@@ -353,7 +334,15 @@ function App() {
     return page;
   }
 
-  if ((loading && !user) || isSubLoading) {
+  if (authBootstrap.status === "loading") {
+    return <LoadingScreen />;
+  }
+
+  if (authBootstrap.status === "error") {
+    return <AccountLoadError onRetry={retryAuthBootstrap} />;
+  }
+
+  if (isSubLoading) {
     return <LoadingScreen />;
   }
 
@@ -450,7 +439,10 @@ function App() {
           path="/notificationSettings"
           element={routeToCorrectPage(<NotificationSettings />)}
         />
-        <Route path="/invite/:token" element={isLoggedIn() ? <InvitePage /> : <SignUp />} />
+        <Route
+          path="/invite/:token"
+          element={isLoggedIn() ? <InvitePage refreshUser={refreshUser} /> : <SignUp />}
+        />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
         <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />

@@ -82,8 +82,13 @@ export const userApi = {
       throw new Error("The authenticated account has no email address.");
     }
 
+    const profile = parseCurrentProfile(data);
+    if (profile.id !== authUser.id) {
+      throw new Error("The current profile did not match the authenticated account.");
+    }
+
     return {
-      ...parseCurrentProfile(data),
+      ...profile,
       email,
       created_at: authUser.created_at,
     };

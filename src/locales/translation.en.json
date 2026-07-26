@@ -45,6 +45,11 @@
     "updateAvailable": "A tastier version of Plateful is ready for you!",
     "updateNow": "Update now"
   },
+  "accountLoadError": {
+    "title": "We couldn’t load your account",
+    "description": "You’re still signed in. Check your connection and try loading your Plateful data again.",
+    "retry": "Try again"
+  },
   "welcome": {
     "title": "Congratulations,",
     "subtitle": "smart food planning starts now!",
@@ -193,7 +198,8 @@
     "invalidLink": "Invalid link",
     "expiredLink": "This link has expired",
     "invalidOrExpiredLink": "Invalid or expired link",
-    "rateLimited": "Too many invite links were opened. Wait a few minutes, then try again.",
+    "rateLimited_one": "Too many invite links were opened. Try again in about {{count}} minute.",
+    "rateLimited_other": "Too many invite links were opened. Try again in about {{count}} minutes.",
     "joinSuccess": "You have successfully joined the household",
     "joinError": "Error joining household",
     "joinLoading": "Joining...",
@@ -637,7 +643,8 @@
     "editTitle": "Edit your rating",
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
-    "submit": "Save"
+    "submit": "Save",
+    "formerMember": "Former member"
   },
   "categorys": {
     "category": "Category",

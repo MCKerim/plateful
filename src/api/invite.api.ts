@@ -70,6 +70,10 @@ export function parseInvitePreview(value: Json): InvitePreview {
   };
 }
 
+export function inviteRetryMinutes(retryAfterSeconds: number): number {
+  return Math.max(1, Math.ceil(retryAfterSeconds / 60));
+}
+
 export function parseAcceptInviteResult(value: Json): AcceptInviteResult {
   if (!isJsonObject(value)) {
     throw new Error("The invite service returned an invalid join result.");

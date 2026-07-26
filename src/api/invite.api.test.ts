@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import {
   getInviteJoinRequirement,
+  inviteRetryMinutes,
   inviteApi,
   parseAcceptInviteResult,
   parseInvitePreview,
@@ -55,6 +56,13 @@ describe("inviteApi", () => {
         retry_after_seconds: 0,
       })
     ).toThrow();
+  });
+
+  it("rounds the server retry delay up to whole minutes", () => {
+    expect(inviteRetryMinutes(1)).toBe(1);
+    expect(inviteRetryMinutes(60)).toBe(1);
+    expect(inviteRetryMinutes(61)).toBe(2);
+    expect(inviteRetryMinutes(421)).toBe(8);
   });
 
   it("requires leaving before joining a different household", () => {

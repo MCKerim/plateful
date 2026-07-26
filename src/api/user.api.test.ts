@@ -72,4 +72,28 @@ describe("userApi", () => {
     });
     expect(rpc).toHaveBeenCalledWith("get_current_profile");
   });
+
+  it("rejects a profile returned for a different authenticated account", async () => {
+    const supabase = {
+      rpc: vi.fn().mockResolvedValue({
+        data: {
+          id: "different-user-id",
+          username: "Mara",
+          household_id: null,
+          language: "en",
+          has_completed_survey: true,
+          notification_preferences: null,
+        },
+        error: null,
+      }),
+    } as unknown as SupabaseClient<Database>;
+
+    await expect(
+      userApi.getCurrent(supabase, {
+        id: "auth-user-id",
+        email: "mara@example.com",
+        created_at: "2026-07-26T20:31:55Z",
+      })
+    ).rejects.toThrow("did not match");
+  });
 });

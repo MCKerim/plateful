@@ -45,6 +45,11 @@
     "updateAvailable": "Eine noch leckerere Version von Plateful wartet auf dich!",
     "updateNow": "Jetzt aktualisieren"
   },
+  "accountLoadError": {
+    "title": "Dein Konto konnte nicht geladen werden",
+    "description": "Du bist weiterhin angemeldet. Prüfe deine Verbindung und lade deine Plateful-Daten erneut.",
+    "retry": "Erneut versuchen"
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Nie wieder ratlos vor dem Kühlschrank stehen",
@@ -245,7 +250,8 @@
     "invalidLink": "Ungültiger Link",
     "expiredLink": "Dieser Link ist abgelaufen",
     "invalidOrExpiredLink": "Ungültiger oder abgelaufener Link",
-    "rateLimited": "Es wurden zu viele Einladungslinks geöffnet. Warte ein paar Minuten und versuche es dann erneut.",
+    "rateLimited_one": "Es wurden zu viele Einladungslinks geöffnet. Versuche es in ungefähr {{count}} Minute erneut.",
+    "rateLimited_other": "Es wurden zu viele Einladungslinks geöffnet. Versuche es in ungefähr {{count}} Minuten erneut.",
     "joinSuccess": "Du wurdest erfolgreich zum Haushalt beigetragen",
     "joinError": "Fehler beim Beitreten des Haushalts",
     "joinLoading": "Beitreten...",
@@ -637,7 +643,8 @@
     "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",
     "commentPlaceholder": "Dein Kommentar (optional)",
-    "submit": "Speichern"
+    "submit": "Speichern",
+    "formerMember": "Ehemaliges Mitglied"
   },
   "categorys": {
     "category": "Kategorie",

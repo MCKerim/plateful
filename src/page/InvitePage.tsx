@@ -12,19 +12,27 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { getInviteJoinRequirement, inviteApi, InvitePreview } from "@/api/invite.api";
-import { useUserData } from "@/hooks/user/useUserData";
+import {
+  getInviteJoinRequirement,
+  inviteApi,
+  inviteRetryMinutes,
+  InvitePreview,
+} from "@/api/invite.api";
+import type { CurrentAuthUser } from "@/api/user.api";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHousehold } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 
-export default function InvitePage() {
+type Props = {
+  refreshUser: (authUser: CurrentAuthUser | null, forceBlocking?: boolean) => Promise<boolean>;
+};
+
+export default function InvitePage({ refreshUser }: Readonly<Props>) {
   const { supabase } = useSupabase();
   const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-  const { fetchUserData } = useUserData();
   const user = useAppSelector(selectUser);
   const currentHousehold = useAppSelector(selectHousehold);
 
@@ -56,7 +64,11 @@ export default function InvitePage() {
         }
 
         if (result.status === "rate_limited") {
-          toast.error(t("invitePage.rateLimited"));
+          toast.error(
+            t("invitePage.rateLimited", {
+              count: inviteRetryMinutes(result.retryAfterSeconds),
+            })
+          );
           return;
         }
 
@@ -104,14 +116,23 @@ export default function InvitePage() {
       const result = await inviteApi.accept(supabase, token);
 
       switch (result.status) {
-        case "joined":
+        case "joined": {
           if (result.householdId !== preview.householdId) {
             throw new Error("The joined household did not match the invite.");
           }
-          await fetchUserData(user);
+          // Membership changed on the server, so block navigation until the
+          // central auth coordinator atomically publishes the new household.
+          // Move the URL first so a retry after a transport failure resumes at
+          // Home instead of reopening an invite that was already accepted.
+          const refreshPromise = refreshUser(user, true);
+          navigate("/", { replace: true });
+          const didRefresh = await refreshPromise;
+          if (!didRefresh) {
+            return;
+          }
           toast.success(t("invitePage.joinSuccess"));
-          navigate("/");
           break;
+        }
         case "already_member":
           if (result.householdId !== preview.householdId) {
             throw new Error("The current household did not match the invite.");
@@ -152,7 +173,9 @@ export default function InvitePage() {
               : preview.status === "ready"
                 ? t("invitePage.invitedTo")
                 : preview.status === "rate_limited"
-                  ? t("invitePage.rateLimited")
+                  ? t("invitePage.rateLimited", {
+                      count: inviteRetryMinutes(preview.retryAfterSeconds),
+                    })
                   : t("invitePage.invalidOrExpiredLink")}
           </p>
 

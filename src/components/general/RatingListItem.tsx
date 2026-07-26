@@ -7,6 +7,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import DeleteDialog from "./DeleteDialog";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../ui/drawer";
 import { useTranslation } from "react-i18next";
+import { ratingAuthorLabel } from "@/lib/ratingAuthorLabel";
 
 type Props = {
   rating: RecipeRatingWithUser;
@@ -26,7 +27,9 @@ export default function RatingListItem({
   return (
     <div className="mb-6" key={rating.id}>
       <div className="flex justify-between items-center">
-        <p className="font-semibold second-font">{rating.users.username}</p>
+        <p className="font-semibold second-font">
+          {ratingAuthorLabel(rating, t("rating.formerMember"))}
+        </p>
 
         <div className="flex items-center gap-1">
           <p className="text-sm text-muted-foreground">{formatDateByLocale(rating.created_at)}</p>

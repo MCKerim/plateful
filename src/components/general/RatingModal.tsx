@@ -31,8 +31,8 @@ export type RatingModalRef = {
 
 export type RecipeRatingWithUser = RecipeRatings & {
   users: {
-    username: string;
-  };
+    username: string | null;
+  } | null;
 };
 
 const RatingModal = forwardRef<RatingModalRef, Props>(
