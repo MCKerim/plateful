@@ -5,6 +5,7 @@ import { setUser } from "@/redux/slices/userSlice";
 import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { userApi } from "@/api/user.api";
+import type { CurrentAuthUser } from "@/api/user.api";
 import posthog from "posthog-js";
 import i18n from "@/i18n";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
@@ -17,8 +18,8 @@ export function useUserData() {
   const queryClient = useQueryClient();
 
   const fetchUserData = useCallback(
-    async (userId: string | null): Promise<void> => {
-      if (!userId) {
+    async (authUser: CurrentAuthUser | null): Promise<void> => {
+      if (!authUser) {
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
@@ -33,15 +34,7 @@ export function useUserData() {
       }
 
       try {
-        const userData = await userApi.getById(supabase, userId);
-
-        if (!userData) {
-          dispatch(setUser(null));
-          dispatch(setHousehold(null));
-          dispatch(setHouseholdMembers(null));
-          posthog.reset();
-          return;
-        }
+        const userData = await userApi.getCurrent(supabase, authUser);
 
         dispatch(setUser(userData));
 

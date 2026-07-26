@@ -57,6 +57,7 @@ import { useUserData } from "./hooks/user/useUserData";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
+import type { CurrentAuthUser } from "@/api/user.api";
 
 function App() {
   const { supabase } = useSupabase();
@@ -215,22 +216,22 @@ function App() {
     };
   }, [navigate, supabase]);
 
-  async function updateUser(userId: string | null): Promise<void> {
+  async function updateUser(authUser: CurrentAuthUser | null): Promise<void> {
     setLoading(true);
-    await fetchUserData(userId);
+    await fetchUserData(authUser);
     setLoading(false);
   }
 
   useEffect(() => {
     const { data: { subscription } = { subscription: undefined } } =
-      supabase.auth.onAuthStateChange(async (_event, session) => {
-        updateUser(session?.user.id ?? null);
-
-        try {
-          await closeBrowser();
-        } catch (error) {
-          console.error(error);
-        }
+      supabase.auth.onAuthStateChange((_event, session) => {
+        // Supabase holds its auth lock while this callback runs. Defer all
+        // asynchronous work and use the supplied session instead of calling
+        // auth.getSession(), which can deadlock the client after login.
+        globalThis.setTimeout(() => {
+          void updateUser(session?.user ?? null);
+          void closeBrowser().catch((error) => console.error(error));
+        }, 0);
       });
 
     return () => {
@@ -255,7 +256,7 @@ function App() {
         () => {
           // Refetch user data and update Redux state
           supabase.auth.getSession().then(({ data: { session } }) => {
-            updateUser(session?.user.id ?? null);
+            updateUser(session?.user ?? null);
           });
         }
       )
@@ -287,9 +288,17 @@ function App() {
 
     const channel = supabase
       .channel("recipes-changes")
-      .on("postgres_changes", { event: "*", schema: "public", table: "recipe_imports" }, scheduleRefresh)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "recipe_imports" },
+        scheduleRefresh
+      )
       .on("postgres_changes", { event: "*", schema: "public", table: "recipes" }, scheduleRefresh)
-      .on("postgres_changes", { event: "*", schema: "public", table: "collections" }, scheduleRefresh)
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "collections" },
+        scheduleRefresh
+      )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "recipe_collections" },
@@ -391,8 +400,14 @@ function App() {
         <Route path="/survey" element={guardOnboardingRoute(<SurveyStart />, "survey")} />
         <Route path="/survey/:questionId" element={guardOnboardingRoute(<Survey />, "survey")} />
 
-        <Route path="/howitworks" element={guardOnboardingRoute(<HowItWorks />, "post-household")} />
-        <Route path="/socialproof" element={guardOnboardingRoute(<SocialProof />, "post-household")} />
+        <Route
+          path="/howitworks"
+          element={guardOnboardingRoute(<HowItWorks />, "post-household")}
+        />
+        <Route
+          path="/socialproof"
+          element={guardOnboardingRoute(<SocialProof />, "post-household")}
+        />
         <Route path="/trial" element={guardOnboardingRoute(<TrialOffer />, "post-household")} />
         <Route
           path="/trialreminder"

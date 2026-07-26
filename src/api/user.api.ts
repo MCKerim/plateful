@@ -5,6 +5,12 @@ import { NotificationPreferences } from "@/types/notification.types";
 type User = Database["public"]["Tables"]["users"]["Row"];
 type Household = Database["public"]["Tables"]["household"]["Row"];
 
+export type CurrentAuthUser = {
+  id: string;
+  email?: string;
+  created_at: string;
+};
+
 export type HouseholdMember = {
   id: string;
   username: string;
@@ -64,26 +70,14 @@ export function parseCurrentProfile(value: Json): Omit<User, "created_at" | "ema
 }
 
 export const userApi = {
-  async getById(supabase: SupabaseClient<Database>, userId: string): Promise<User | null> {
-    const [
-      { data, error },
-      {
-        data: { session },
-        error: sessionError,
-      },
-    ] = await Promise.all([supabase.rpc("get_current_profile"), supabase.auth.getSession()]);
+  async getCurrent(supabase: SupabaseClient<Database>, authUser: CurrentAuthUser): Promise<User> {
+    const { data, error } = await supabase.rpc("get_current_profile");
 
     if (error) {
       throw error;
     }
-    if (sessionError) {
-      throw sessionError;
-    }
-    if (!session || session.user.id !== userId) {
-      return null;
-    }
 
-    const email = session.user.email;
+    const email = authUser.email;
     if (!email) {
       throw new Error("The authenticated account has no email address.");
     }
@@ -91,7 +85,7 @@ export const userApi = {
     return {
       ...parseCurrentProfile(data),
       email,
-      created_at: session.user.created_at,
+      created_at: authUser.created_at,
     };
   },
 

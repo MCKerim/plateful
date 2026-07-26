@@ -108,7 +108,7 @@ export default function InvitePage() {
           if (result.householdId !== preview.householdId) {
             throw new Error("The joined household did not match the invite.");
           }
-          await fetchUserData(user.id);
+          await fetchUserData(user);
           toast.success(t("invitePage.joinSuccess"));
           navigate("/");
           break;
