@@ -8,7 +8,8 @@ export type InvitePreview =
       householdName: string;
       expiresAt: string;
     }
-  | { status: "unavailable" };
+  | { status: "unavailable" }
+  | { status: "rate_limited"; retryAfterSeconds: number };
 
 export type AcceptInviteResult =
   | {
@@ -38,6 +39,18 @@ export function parseInvitePreview(value: Json): InvitePreview {
 
   if (value.status === "unavailable") {
     return { status: "unavailable" };
+  }
+
+  if (value.status === "rate_limited") {
+    const retryAfterSeconds = value.retry_after_seconds;
+    if (
+      typeof retryAfterSeconds !== "number" ||
+      !Number.isInteger(retryAfterSeconds) ||
+      retryAfterSeconds < 1
+    ) {
+      throw new Error("The invite service returned an invalid retry window.");
+    }
+    return { status: "rate_limited", retryAfterSeconds };
   }
 
   if (value.status !== "ready") {

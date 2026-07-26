@@ -1231,6 +1231,7 @@ export type Database = {
       create_household: { Args: { p_name: string }; Returns: string }
       create_household_invite: { Args: never; Returns: string }
       delete_household: { Args: never; Returns: undefined }
+      get_current_profile: { Args: never; Returns: Json }
       increment_household_mission: {
         Args: { p_household_id: string; p_mission_id: string }
         Returns: {

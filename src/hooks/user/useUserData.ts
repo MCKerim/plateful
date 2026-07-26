@@ -9,10 +9,7 @@ import posthog from "posthog-js";
 import i18n from "@/i18n";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
 import { SocialLogin } from "@capgo/capacitor-social-login";
-import {
-  setCustomerInfo,
-  resetSubscription,
-} from "@/redux/slices/subscriptionSlice";
+import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
 
 export function useUserData() {
   const { supabase } = useSupabase();
@@ -28,9 +25,7 @@ export function useUserData() {
         dispatch(resetSubscription());
         queryClient.clear();
         posthog.reset();
-        logoutUser().catch((err) =>
-          console.error("Failed to logout from RevenueCat:", err)
-        );
+        logoutUser().catch((err) => console.error("Failed to logout from RevenueCat:", err));
         SocialLogin.logout({ provider: "google" }).catch(() => {
           // Ignore — user may not have signed in with Google
         });
@@ -49,7 +44,6 @@ export function useUserData() {
         }
 
         dispatch(setUser(userData));
-        dispatch(setHousehold(userData.household ?? null));
 
         // Sync language with i18n
         const storedLanguage = userData.language;
@@ -92,10 +86,16 @@ export function useUserData() {
         }
 
         if (!userData.household_id) {
+          dispatch(setHousehold(null));
+          dispatch(setHouseholdMembers(null));
           return;
         }
 
-        const membersData = await userApi.getHouseholdMembers(supabase, userData.household_id);
+        const [householdData, membersData] = await Promise.all([
+          userApi.getHousehold(supabase, userData.household_id),
+          userApi.getHouseholdMembers(supabase, userData.household_id),
+        ]);
+        dispatch(setHousehold(householdData));
         dispatch(setHouseholdMembers(membersData));
       } catch (error) {
         console.error("Error fetching user data:", error);

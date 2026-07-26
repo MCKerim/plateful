@@ -55,6 +55,11 @@ export default function InvitePage() {
           return;
         }
 
+        if (result.status === "rate_limited") {
+          toast.error(t("invitePage.rateLimited"));
+          return;
+        }
+
         if (
           getInviteJoinRequirement(user?.household_id ?? null, result.householdId) ===
           "must_leave_current_household"
@@ -146,7 +151,9 @@ export default function InvitePage() {
               ? t("common.loading")
               : preview.status === "ready"
                 ? t("invitePage.invitedTo")
-                : t("invitePage.invalidOrExpiredLink")}
+                : preview.status === "rate_limited"
+                  ? t("invitePage.rateLimited")
+                  : t("invitePage.invalidOrExpiredLink")}
           </p>
 
           {invitedHouseholdName && (

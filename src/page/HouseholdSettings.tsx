@@ -214,9 +214,7 @@ export default function HouseholdSettings() {
             className="flex items-center justify-between w-full"
             onClick={() => !isCurrentUser && setSelectedMember(member)}
           >
-            <span className="truncate min-w-0">
-              {member.username} - {member.email}
-            </span>
+            <span className="truncate min-w-0">{member.username}</span>
             <span className="flex items-center gap-1.5 shrink-0 ml-2">
               {memberIsOwner && (
                 <span className="text-xs font-medium text-accent-foreground bg-accent px-2 py-0.5 rounded-full">
@@ -238,7 +236,7 @@ export default function HouseholdSettings() {
         <DrawerContent>
           <DrawerHeader>
             <DrawerTitle>{selectedMember?.username}</DrawerTitle>
-            <DrawerDescription>{selectedMember?.email}</DrawerDescription>
+            <DrawerDescription>{t("householdSettings.memberDescription")}</DrawerDescription>
           </DrawerHeader>
 
           <DrawerFooter className="gap-3 mb-4">

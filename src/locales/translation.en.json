@@ -193,6 +193,7 @@
     "invalidLink": "Invalid link",
     "expiredLink": "This link has expired",
     "invalidOrExpiredLink": "Invalid or expired link",
+    "rateLimited": "Too many invite links were opened. Wait a few minutes, then try again.",
     "joinSuccess": "You have successfully joined the household",
     "joinError": "Error joining household",
     "joinLoading": "Joining...",
@@ -528,6 +529,7 @@
   "householdSettings": {
     "achievements": "Achievements:",
     "member": "Member",
+    "memberDescription": "Household member",
     "members": "Members",
     "you": "You",
     "owner": "Owner",

@@ -17,7 +17,7 @@ export const ratingsApi = {
   async getByRecipe(supabase: SupabaseClient, recipeId: string): Promise<RecipeRatingWithUser[]> {
     const { data, error } = await supabase
       .from("recipe_ratings")
-      .select("*, users(created_at, email, username)")
+      .select("*, users(username)")
       .eq("recipe_id", recipeId)
       .order("created_at", { ascending: false });
 
@@ -32,7 +32,7 @@ export const ratingsApi = {
     const { data, error } = await supabase
       .from("recipe_ratings")
       .insert([{ recipe_id: params.recipeId, stars: params.stars, note: params.note }])
-      .select("*, users(created_at, email, username)")
+      .select("*, users(username)")
       .single();
 
     if (error) throw error;
@@ -47,7 +47,7 @@ export const ratingsApi = {
       .from("recipe_ratings")
       .update({ stars: params.stars, note: params.note })
       .eq("id", params.ratingId)
-      .select("*, users(created_at, email, username)")
+      .select("*, users(username)")
       .single();
 
     if (error) throw error;

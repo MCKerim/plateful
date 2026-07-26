@@ -245,6 +245,7 @@
     "invalidLink": "Ungültiger Link",
     "expiredLink": "Dieser Link ist abgelaufen",
     "invalidOrExpiredLink": "Ungültiger oder abgelaufener Link",
+    "rateLimited": "Es wurden zu viele Einladungslinks geöffnet. Warte ein paar Minuten und versuche es dann erneut.",
     "joinSuccess": "Du wurdest erfolgreich zum Haushalt beigetragen",
     "joinError": "Fehler beim Beitreten des Haushalts",
     "joinLoading": "Beitreten...",
@@ -528,6 +529,7 @@
   "householdSettings": {
     "achievements": "Errungenschaften:",
     "member": "Mitglied",
+    "memberDescription": "Haushaltsmitglied",
     "members": "Mitglieder",
     "you": "Du",
     "owner": "Eigentümer",

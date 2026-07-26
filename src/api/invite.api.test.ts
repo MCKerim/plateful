@@ -38,6 +38,25 @@ describe("inviteApi", () => {
     ).toThrow();
   });
 
+  it("parses a rate-limited preview without exposing invite data", () => {
+    expect(
+      parseInvitePreview({
+        status: "rate_limited",
+        retry_after_seconds: 421,
+      })
+    ).toEqual({
+      status: "rate_limited",
+      retryAfterSeconds: 421,
+    });
+
+    expect(() =>
+      parseInvitePreview({
+        status: "rate_limited",
+        retry_after_seconds: 0,
+      })
+    ).toThrow();
+  });
+
   it("requires leaving before joining a different household", () => {
     expect(getInviteJoinRequirement(null, "invited")).toBe("can_join");
     expect(getInviteJoinRequirement("invited", "invited")).toBe("already_member");
