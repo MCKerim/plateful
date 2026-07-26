@@ -33,12 +33,21 @@ export function useUserData() {
         return;
       }
 
+      let userData;
       try {
-        const userData = await userApi.getCurrent(supabase, authUser);
+        userData = await userApi.getCurrent(supabase, authUser);
+      } catch (error) {
+        // The auth event is the source of truth for whether a session exists.
+        // A profile request failure must not turn a signed-in session into a
+        // client-side logout.
+        console.error("Error fetching current user profile:", error);
+        return;
+      }
 
-        dispatch(setUser(userData));
+      dispatch(setUser(userData));
 
-        // Sync language with i18n
+      try {
+        // Keep language setup independent from authentication state.
         const storedLanguage = userData.language;
         const detectedLanguage = i18n.language.split("-")[0]; // 'en-US' -> 'en'
         const supportedLanguages = ["en", "de"];
@@ -46,7 +55,7 @@ export function useUserData() {
         if (storedLanguage && supportedLanguages.includes(storedLanguage)) {
           // Apply stored language from Supabase
           if (i18n.language !== storedLanguage) {
-            i18n.changeLanguage(storedLanguage);
+            await i18n.changeLanguage(storedLanguage);
           }
           localStorage.setItem("language", storedLanguage);
         } else {
@@ -62,28 +71,36 @@ export function useUserData() {
             })
             .catch((err) => console.error("Failed to save detected language:", err));
 
-          i18n.changeLanguage(languageToSave);
+          await i18n.changeLanguage(languageToSave);
           localStorage.setItem("language", languageToSave);
         }
+      } catch (error) {
+        console.error("Failed to synchronize user language:", error);
+      }
 
+      try {
         posthog.identify(userData.id, {
           email: userData.email,
           username: userData.username,
         });
+      } catch (error) {
+        console.error("Failed to identify user with PostHog:", error);
+      }
 
-        try {
-          const customerInfo = await identifyUser(userData.id, userData.email);
-          dispatch(setCustomerInfo(customerInfo));
-        } catch (err) {
-          console.error("Failed to identify user with RevenueCat:", err);
-        }
+      try {
+        const customerInfo = await identifyUser(userData.id, userData.email);
+        dispatch(setCustomerInfo(customerInfo));
+      } catch (error) {
+        console.error("Failed to identify user with RevenueCat:", error);
+      }
 
-        if (!userData.household_id) {
-          dispatch(setHousehold(null));
-          dispatch(setHouseholdMembers(null));
-          return;
-        }
+      if (!userData.household_id) {
+        dispatch(setHousehold(null));
+        dispatch(setHouseholdMembers(null));
+        return;
+      }
 
+      try {
         const [householdData, membersData] = await Promise.all([
           userApi.getHousehold(supabase, userData.household_id),
           userApi.getHouseholdMembers(supabase, userData.household_id),
@@ -91,11 +108,11 @@ export function useUserData() {
         dispatch(setHousehold(householdData));
         dispatch(setHouseholdMembers(membersData));
       } catch (error) {
-        console.error("Error fetching user data:", error);
-        dispatch(setUser(null));
+        // Household data can be retried independently. Clearing the user here
+        // made a transient tenant-data failure look like an authentication loss.
+        console.error("Error fetching household data:", error);
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
-        posthog.reset();
       }
     },
     [supabase, dispatch, queryClient]
