@@ -210,6 +210,23 @@
     "currentHouseholdFallback": "your current household",
     "invitedHouseholdFallback": "the invited household"
   },
+  "oauthConsent": {
+    "title": "Connect {{client}} to Plateful?",
+    "subtitle": "It will be able to act on your Plateful account.",
+    "subtitleWithHousehold": "It will be able to act on your Plateful account and the recipes in “{{household}}”.",
+    "permissionRead": "Read your recipes, including ingredients, steps, nutrition and ratings",
+    "permissionWrite": "Create new recipes and edit existing ones",
+    "permissionDelete": "Delete recipes permanently — deleted recipes cannot be restored",
+    "permissionHousehold": "Everything it changes is shared with everyone in your household",
+    "revokeHint": "You can disconnect this app at any time from its own settings. Only connect apps you trust.",
+    "approve": "Connect",
+    "deny": "Cancel",
+    "deciding": "Connecting...",
+    "clientUri": "App website: {{uri}}",
+    "missingRequest": "This connection link is incomplete. Start the connection again from the app you want to link.",
+    "loadFailed": "This connection request is invalid or has expired. Start the connection again from the app you want to link.",
+    "decisionFailed": "Could not complete the connection. Please try again."
+  },
   "signup": {
     "title": "Plateful",
     "subtitle": "Never stare blankly at your fridge again!",

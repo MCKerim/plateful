@@ -51,6 +51,7 @@ import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import SharedRecipe from "./page/SharedRecipe";
+import OAuthConsent from "./page/OAuthConsent";
 import NotificationSettings from "./page/NotificationSettings";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
@@ -465,6 +466,11 @@ function App() {
 
         {/* Public share route — no auth required */}
         <Route path="/share/:token" element={<SharedRecipe />} />
+
+        {/* OAuth 2.1 consent screen (Supabase Auth sends the user here with an
+            authorization_id). Signing in renders in place, so the query string
+            survives — same trick as /invite/:token. */}
+        <Route path="/oauth/consent" element={isLoggedIn() ? <OAuthConsent /> : <SignUp />} />
 
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />
