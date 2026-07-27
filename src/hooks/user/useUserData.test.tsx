@@ -77,6 +77,7 @@ const user = {
   username: "plateful-user",
   household_id: "household-id",
   language: "en",
+  deletion_requested_at: null,
   has_completed_survey: true,
   notification_preferences: null,
 };

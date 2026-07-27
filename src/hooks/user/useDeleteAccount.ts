@@ -1,49 +1,40 @@
-import { useMutation } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
-import { useAppDispatch } from "@/redux/hooks";
-import { setUser } from "@/redux/slices/userSlice";
-import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
-import { resetSubscription } from "@/redux/slices/subscriptionSlice";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
-import { useNavigate } from "react-router";
-import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import posthog from "posthog-js";
-import { logoutUser } from "@/lib/revenuecat";
+import {
+  announceAccountDeletionRequest,
+  loadAccountDeletionContext,
+  requestAccountDeletion,
+  storeDeletionRequest,
+  storedDeletionRequest,
+} from "@/lib/accountDeletion";
 
-export function useDeleteAccount() {
+export function useDeleteAccount(enabled: boolean) {
   const { supabase } = useSupabase();
-  const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
-  const { t } = useTranslation();
 
-  return useMutation({
-    mutationFn: async () => {
-      const { data: sessionData } = await supabase.auth.getSession();
-      const token = sessionData.session?.access_token;
-      if (!token) throw new Error("No session");
+  const contextQuery = useQuery({
+    queryKey: ["account-deletion", "context"],
+    queryFn: () => loadAccountDeletionContext(supabase),
+    enabled,
+    staleTime: 0,
+    retry: 1,
+  });
 
-      const response = await supabase.functions.invoke("delete-account", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+  const deleteAccountMutation = useMutation({
+    mutationFn: async ({ successorUserId }: { successorUserId: string | null }) => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) throw new Error("unauthorized");
 
-      if (response.error) throw response.error;
-    },
-    onSuccess: async () => {
-      dispatch(setUser(null));
-      dispatch(setHousehold(null));
-      dispatch(setHouseholdMembers(null));
-      dispatch(resetSubscription());
-      queryClient.clear();
-      posthog.reset();
-      logoutUser().catch((err) => console.error("Failed to logout from RevenueCat:", err));
-      await supabase.auth.signOut();
-      navigate("/");
-    },
-    onError: () => {
-      toast.error(t("settings.deleteAccountError"));
+      const requestId = storedDeletionRequest(user.id)?.requestId ?? crypto.randomUUID();
+      // Persist before the destructive request. If the response is lost after
+      // the database commit, bootstrap resumes this exact idempotent request.
+      storeDeletionRequest(user.id, requestId);
+      const status = await requestAccountDeletion(supabase, requestId, successorUserId);
+      announceAccountDeletionRequest();
+      return status;
     },
   });
+
+  return { contextQuery, deleteAccountMutation };
 }

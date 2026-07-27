@@ -69,6 +69,7 @@ describe("userApi", () => {
       has_completed_survey: true,
       notification_preferences: null,
       created_at: "2026-07-26T20:31:55Z",
+      deletion_requested_at: null,
     });
     expect(rpc).toHaveBeenCalledWith("get_current_profile");
   });

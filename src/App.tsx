@@ -57,6 +57,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import { useAuthBootstrap } from "@/hooks/user/useAuthBootstrap";
 import AccountLoadError from "@/components/general/AccountLoadError";
+import AccountDeletionProgress from "@/components/general/AccountDeletionProgress";
 
 function App() {
   const { supabase } = useSupabase();
@@ -165,7 +166,7 @@ function App() {
       cancelled = true;
       listenerHandle?.remove();
     };
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
@@ -340,6 +341,12 @@ function App() {
 
   if (authBootstrap.status === "error") {
     return <AccountLoadError onRetry={retryAuthBootstrap} />;
+  }
+
+  if (authBootstrap.status === "deleting") {
+    return (
+      <AccountDeletionProgress retrying={authBootstrap.retrying} onRetry={retryAuthBootstrap} />
+    );
   }
 
   if (isSubLoading) {

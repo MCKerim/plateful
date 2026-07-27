@@ -5,7 +5,10 @@ const WEEKLY_REMINDER_ID = 1001;
 const DAILY_MEAL_REMINDER_ID = 1002;
 const TRIAL_ENDING_REMINDER_ID = 1003;
 
-export type NotificationType = "weekly_planning_reminder" | "daily_meal_reminder" | "trial_ending_reminder";
+export type NotificationType =
+  | "weekly_planning_reminder"
+  | "daily_meal_reminder"
+  | "trial_ending_reminder";
 
 export function isNotificationSupported(): boolean {
   return Capacitor.isNativePlatform() && Capacitor.isPluginAvailable("LocalNotifications");
@@ -82,10 +85,7 @@ function getWeeklyReminderBody(language: string): string {
 
 // --- Daily Meal Reminder ---
 
-export async function scheduleDailyMealReminder(
-  time: string,
-  language: string
-): Promise<void> {
+export async function scheduleDailyMealReminder(time: string, language: string): Promise<void> {
   if (!isNotificationSupported()) return;
 
   await cancelDailyMealReminder();
@@ -168,4 +168,18 @@ export async function cancelTrialEndingReminder(): Promise<void> {
   } catch {
     // Notification may not exist yet
   }
+}
+
+export async function cancelAllAccountNotifications(): Promise<void> {
+  if (!isNotificationSupported()) return;
+
+  const pending = await LocalNotifications.getPending();
+  await Promise.all([
+    pending.notifications.length > 0
+      ? LocalNotifications.cancel({
+          notifications: pending.notifications.map(({ id }) => ({ id })),
+        })
+      : Promise.resolve(),
+    LocalNotifications.removeAllDeliveredNotifications(),
+  ]);
 }

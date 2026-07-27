@@ -504,12 +504,23 @@
       },
       "deleteAccount": {
         "title": "Delete Account",
-        "description": "This action is permanent and cannot be undone. All your data will be deleted.",
-        "subscriptionWarning": "If you have an active subscription, cancel it first in the App Store or Play Store. Deleting your account does not cancel your subscription.",
+        "description": "This is permanent. Your account, profile, ratings, notes, and private activity will be deleted. Shared household recipes and cooking history remain without your identity.",
+        "loading": "Checking your account…",
+        "contextError": "We couldn't safely prepare account deletion. Try again before continuing.",
+        "successorLabel": "Choose the new household owner",
+        "successorDescription": "Before your account is deleted, ownership of {{household}} must be transferred to another member.",
+        "successorPlaceholder": "Select a household member",
+        "householdWarning": "You are the only member of {{household}}. Deleting your account will also permanently delete this household and its shared data.",
+        "subscriptionWarning": "Deleting your account does not cancel your active store subscription. Cancel it in the App Store or Play Store to prevent another renewal.",
         "confirmationText": "Type \"delete\" to confirm",
         "confirmationPlaceholder": "delete",
         "confirm": "Delete Account",
-        "cancel": "Cancel"
+        "cancel": "Cancel",
+        "processingTitle": "Deleting your account",
+        "processingDescription": "Your personal data is being removed from Plateful and its service providers. This can take a little while.",
+        "processingCanClose": "You can close the app. Deletion continues securely and resumes here if needed.",
+        "processingRetry": "Deletion is still safe and queued, but the latest status check could not connect.",
+        "completed": "Your Plateful account was deleted."
       }
     },
     "deleteAccountError": "Failed to delete account. Please try again or contact support.",

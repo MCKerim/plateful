@@ -504,12 +504,23 @@
       },
       "deleteAccount": {
         "title": "Konto löschen",
-        "description": "Diese Aktion ist dauerhaft und kann nicht rückgängig gemacht werden. Alle deine Daten werden gelöscht.",
-        "subscriptionWarning": "Wenn du ein aktives Abonnement hast, kündige es zuerst im App Store oder Google Play. Das Löschen deines Kontos kündigt dein Abonnement nicht.",
+        "description": "Das ist endgültig. Dein Konto, Profil, deine Bewertungen, Notizen und privaten Aktivitäten werden gelöscht. Geteilte Haushaltsrezepte und der Kochverlauf bleiben ohne deine Identität erhalten.",
+        "loading": "Dein Konto wird geprüft…",
+        "contextError": "Die Kontolöschung konnte nicht sicher vorbereitet werden. Versuche es erneut, bevor du fortfährst.",
+        "successorLabel": "Neue Haushaltseigentümerin oder neuen Haushaltseigentümer wählen",
+        "successorDescription": "Bevor dein Konto gelöscht wird, muss {{household}} an ein anderes Mitglied übertragen werden.",
+        "successorPlaceholder": "Haushaltsmitglied auswählen",
+        "householdWarning": "Du bist das einzige Mitglied von {{household}}. Beim Löschen deines Kontos werden auch dieser Haushalt und seine geteilten Daten endgültig gelöscht.",
+        "subscriptionWarning": "Das Löschen deines Kontos beendet dein aktives Store-Abonnement nicht. Kündige es im App Store oder bei Google Play, damit es sich nicht erneut verlängert.",
         "confirmationText": "Tippe \"löschen\" zur Bestätigung",
         "confirmationPlaceholder": "löschen",
         "confirm": "Konto löschen",
-        "cancel": "Abbrechen"
+        "cancel": "Abbrechen",
+        "processingTitle": "Dein Konto wird gelöscht",
+        "processingDescription": "Deine persönlichen Daten werden aus Plateful und den verbundenen Diensten entfernt. Das kann einen Moment dauern.",
+        "processingCanClose": "Du kannst die App schließen. Die Löschung läuft sicher weiter und wird hier bei Bedarf fortgesetzt.",
+        "processingRetry": "Die Löschung ist weiterhin sicher vorgemerkt, aber der letzte Statusabruf konnte keine Verbindung herstellen.",
+        "completed": "Dein Plateful-Konto wurde gelöscht."
       }
     },
     "deleteAccountError": "Konto löschen fehlgeschlagen. Bitte versuche es erneut oder kontaktiere den Support.",

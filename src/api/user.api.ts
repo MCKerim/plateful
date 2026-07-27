@@ -40,7 +40,9 @@ function optionalString(value: { [key: string]: Json | undefined }, key: string)
   return candidate;
 }
 
-export function parseCurrentProfile(value: Json): Omit<User, "created_at" | "email"> {
+export function parseCurrentProfile(
+  value: Json
+): Omit<User, "created_at" | "deletion_requested_at" | "email"> {
   if (!isJsonObject(value)) {
     throw new Error("The profile service returned an invalid profile.");
   }
@@ -91,6 +93,7 @@ export const userApi = {
       ...profile,
       email,
       created_at: authUser.created_at,
+      deletion_requested_at: null,
     };
   },
 

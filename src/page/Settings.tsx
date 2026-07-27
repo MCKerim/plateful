@@ -26,6 +26,13 @@ import { useUpdateLanguage } from "@/hooks/user/useUpdateLanguage";
 import { useDeleteAccount } from "@/hooks/user/useDeleteAccount";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Settings() {
   const { supabase } = useSupabase();
@@ -35,10 +42,12 @@ export default function Settings() {
   const [newUsername, setNewUsername] = useState(user?.username || "");
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
   const [deleteConfirmationText, setDeleteConfirmationText] = useState("");
+  const [successorUserId, setSuccessorUserId] = useState<string | null>(null);
 
   const updateUsernameMutation = useUpdateUsername();
   const updateLanguageMutation = useUpdateLanguage();
-  const deleteAccountMutation = useDeleteAccount();
+  const { contextQuery: deletionContextQuery, deleteAccountMutation } =
+    useDeleteAccount(isDeleteAccountDialogOpen);
   const { presentCustomerCenter } = useCustomerCenter();
   const { isActive: isActiveSub, data: householdSub } = useHouseholdSubscription();
 
@@ -84,12 +93,20 @@ export default function Settings() {
   };
 
   const handleDeleteAccount = () => {
-    deleteAccountMutation.mutate(undefined, {
-      onSuccess: () => {
-        setIsDeleteAccountDialogOpen(false);
-        setDeleteConfirmationText("");
-      },
-    });
+    deleteAccountMutation.mutate(
+      { successorUserId },
+      {
+        onSuccess: () => {
+          setIsDeleteAccountDialogOpen(false);
+          setDeleteConfirmationText("");
+          setSuccessorUserId(null);
+        },
+        onError: (error) => {
+          console.error("Account deletion request failed:", error);
+          toast.error(t("settings.deleteAccountError"));
+        },
+      }
+    );
   };
 
   const getDeleteConfirmationWord = () => {
@@ -97,7 +114,12 @@ export default function Settings() {
   };
 
   const isDeleteConfirmationValid = () => {
-    return deleteConfirmationText.toLowerCase() === getDeleteConfirmationWord();
+    const context = deletionContextQuery.data;
+    return (
+      deleteConfirmationText.toLowerCase() === getDeleteConfirmationWord() &&
+      !!context &&
+      (!context.requiresSuccessor || !!successorUserId)
+    );
   };
 
   function handleUpdateUsername() {
@@ -349,7 +371,10 @@ export default function Settings() {
         open={isDeleteAccountDialogOpen}
         onOpenChange={(open) => {
           setIsDeleteAccountDialogOpen(open);
-          if (!open) setDeleteConfirmationText("");
+          if (!open) {
+            setDeleteConfirmationText("");
+            setSuccessorUserId(null);
+          }
         }}
       >
         <DialogContent className="sm:max-w-[425px]">
@@ -358,24 +383,102 @@ export default function Settings() {
           </DialogHeader>
 
           <div className="flex flex-col gap-4 py-4">
-            <p className="text-sm text-muted-foreground">
-              {t("settings.confirmations.deleteAccount.description")}
-            </p>
+            {deletionContextQuery.isPending && (
+              <div className="flex items-center justify-center gap-2 py-4 text-sm text-muted-foreground">
+                <Loader2 className="animate-spin" size={16} />
+                {t("settings.confirmations.deleteAccount.loading")}
+              </div>
+            )}
 
-            <p className="text-sm text-muted-foreground">
-              {t("settings.confirmations.deleteAccount.subscriptionWarning")}
-            </p>
+            {deletionContextQuery.isError && (
+              <div className="rounded-lg border border-destructive/40 bg-destructive/5 p-3">
+                <p className="text-sm text-destructive">
+                  {t("settings.confirmations.deleteAccount.contextError")}
+                </p>
+                <Button
+                  className="mt-3"
+                  size="sm"
+                  variant="secondary"
+                  onClick={() => deletionContextQuery.refetch()}
+                >
+                  {t("common.retry")}
+                </Button>
+              </div>
+            )}
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">
-                {t("settings.confirmations.deleteAccount.confirmationText")}
-              </label>
-              <Input
-                value={deleteConfirmationText}
-                onChange={(e) => setDeleteConfirmationText(e.target.value)}
-                placeholder={t("settings.confirmations.deleteAccount.confirmationPlaceholder")}
-              />
-            </div>
+            {deletionContextQuery.data && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  {t("settings.confirmations.deleteAccount.description")}
+                </p>
+
+                {deletionContextQuery.data.requiresSuccessor && (
+                  <div className="flex flex-col gap-2 rounded-lg border p-3">
+                    <label className="text-sm font-medium">
+                      {t("settings.confirmations.deleteAccount.successorLabel")}
+                    </label>
+                    <p className="text-sm text-muted-foreground">
+                      {t("settings.confirmations.deleteAccount.successorDescription", {
+                        household: deletionContextQuery.data.householdName,
+                      })}
+                    </p>
+                    <Select value={successorUserId ?? undefined} onValueChange={setSuccessorUserId}>
+                      <SelectTrigger>
+                        <SelectValue
+                          placeholder={t(
+                            "settings.confirmations.deleteAccount.successorPlaceholder"
+                          )}
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {deletionContextQuery.data.eligibleSuccessors.map((successor) => (
+                          <SelectItem key={successor.id} value={successor.id}>
+                            {successor.username}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+
+                {deletionContextQuery.data.deletesHousehold && (
+                  <p className="rounded-lg border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
+                    {t("settings.confirmations.deleteAccount.householdWarning", {
+                      household: deletionContextQuery.data.householdName,
+                    })}
+                  </p>
+                )}
+
+                {deletionContextQuery.data.isSubscriptionPayer && (
+                  <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-3">
+                    <p className="text-sm text-muted-foreground">
+                      {t("settings.confirmations.deleteAccount.subscriptionWarning")}
+                    </p>
+                    {isNativePlatform() && (
+                      <Button
+                        className="mt-3 w-full"
+                        variant="secondary"
+                        onClick={presentCustomerCenter}
+                      >
+                        <CreditCard size={16} />
+                        {t("settings.subscription.manageSubscription")}
+                      </Button>
+                    )}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium">
+                    {t("settings.confirmations.deleteAccount.confirmationText")}
+                  </label>
+                  <Input
+                    value={deleteConfirmationText}
+                    onChange={(e) => setDeleteConfirmationText(e.target.value)}
+                    placeholder={t("settings.confirmations.deleteAccount.confirmationPlaceholder")}
+                  />
+                </div>
+              </>
+            )}
 
             <div className="flex gap-2">
               <Button
@@ -393,7 +496,12 @@ export default function Settings() {
               <Button
                 className="w-full"
                 variant="destructive"
-                disabled={!isDeleteConfirmationValid() || deleteAccountMutation.isPending}
+                disabled={
+                  !isDeleteConfirmationValid() ||
+                  deleteAccountMutation.isPending ||
+                  deletionContextQuery.isPending ||
+                  deletionContextQuery.isError
+                }
                 onClick={handleDeleteAccount}
               >
                 {deleteAccountMutation.isPending ? (

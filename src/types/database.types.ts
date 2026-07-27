@@ -113,19 +113,19 @@ export type Database = {
       cooking_session_checks: {
         Row: {
           checked_at: string
-          checked_by: string
+          checked_by: string | null
           ingredient_id: string
           session_id: string
         }
         Insert: {
           checked_at?: string
-          checked_by: string
+          checked_by?: string | null
           ingredient_id: string
           session_id: string
         }
         Update: {
           checked_at?: string
-          checked_by?: string
+          checked_by?: string | null
           ingredient_id?: string
           session_id?: string
         }
@@ -192,7 +192,7 @@ export type Database = {
       cooking_session_timers: {
         Row: {
           created_at: string
-          created_by: string
+          created_by: string | null
           duration_seconds: number | null
           ends_at: string | null
           id: string
@@ -203,7 +203,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          created_by: string
+          created_by?: string | null
           duration_seconds?: number | null
           ends_at?: string | null
           id?: string
@@ -214,7 +214,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           duration_seconds?: number | null
           ends_at?: string | null
           id?: string
@@ -254,7 +254,7 @@ export type Database = {
           id: string
           recipe_id: string
           started_at: string
-          started_by: string
+          started_by: string | null
           status: string
           target_servings: number | null
         }
@@ -264,7 +264,7 @@ export type Database = {
           id?: string
           recipe_id: string
           started_at?: string
-          started_by: string
+          started_by?: string | null
           status?: string
           target_servings?: number | null
         }
@@ -274,7 +274,7 @@ export type Database = {
           id?: string
           recipe_id?: string
           started_at?: string
-          started_by?: string
+          started_by?: string | null
           status?: string
           target_servings?: number | null
         }
@@ -384,7 +384,7 @@ export type Database = {
         Row: {
           badge_id: string
           claimed_at: string
-          claimed_by: string
+          claimed_by: string | null
           household_id: string
           id: string
           mission_set: string
@@ -392,7 +392,7 @@ export type Database = {
         Insert: {
           badge_id: string
           claimed_at?: string
-          claimed_by: string
+          claimed_by?: string | null
           household_id: string
           id?: string
           mission_set: string
@@ -400,7 +400,7 @@ export type Database = {
         Update: {
           badge_id?: string
           claimed_at?: string
-          claimed_by?: string
+          claimed_by?: string | null
           household_id?: string
           id?: string
           mission_set?: string
@@ -431,7 +431,7 @@ export type Database = {
           id: string
           is_active: boolean
           last_event_at: string | null
-          payer_user_id: string
+          payer_user_id: string | null
           store: string | null
           updated_at: string
         }
@@ -443,7 +443,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           last_event_at?: string | null
-          payer_user_id: string
+          payer_user_id?: string | null
           store?: string | null
           updated_at?: string
         }
@@ -455,7 +455,7 @@ export type Database = {
           id?: string
           is_active?: boolean
           last_event_at?: string | null
-          payer_user_id?: string
+          payer_user_id?: string | null
           store?: string | null
           updated_at?: string
         }
@@ -678,7 +678,7 @@ export type Database = {
         Row: {
           attempts: number
           created_at: string
-          created_by: string
+          created_by: string | null
           error: string | null
           household_id: string
           id: string
@@ -694,7 +694,7 @@ export type Database = {
         Insert: {
           attempts?: number
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           error?: string | null
           household_id: string
           id?: string
@@ -710,7 +710,7 @@ export type Database = {
         Update: {
           attempts?: number
           created_at?: string
-          created_by?: string
+          created_by?: string | null
           error?: string | null
           household_id?: string
           id?: string
@@ -1146,6 +1146,7 @@ export type Database = {
       users: {
         Row: {
           created_at: string
+          deletion_requested_at: string | null
           email: string
           has_completed_survey: boolean
           household_id: string | null
@@ -1156,6 +1157,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          deletion_requested_at?: string | null
           email: string
           has_completed_survey?: boolean
           household_id?: string | null
@@ -1166,6 +1168,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          deletion_requested_at?: string | null
           email?: string
           has_completed_survey?: boolean
           household_id?: string | null
@@ -1231,7 +1234,12 @@ export type Database = {
       create_household: { Args: { p_name: string }; Returns: string }
       create_household_invite: { Args: never; Returns: string }
       delete_household: { Args: never; Returns: undefined }
+      get_account_deletion_context: { Args: never; Returns: Json }
       get_current_profile: { Args: never; Returns: Json }
+      get_my_account_deletion_status: {
+        Args: { p_request_id?: string | null }
+        Returns: Json
+      }
       increment_household_mission: {
         Args: { p_household_id: string; p_mission_id: string }
         Returns: {
@@ -1258,6 +1266,10 @@ export type Database = {
       remove_household_member: {
         Args: { p_member_id: string }
         Returns: undefined
+      }
+      request_account_deletion: {
+        Args: { p_request_id: string; p_successor_user_id?: string | null }
+        Returns: Json
       }
       replace_recipe_collections: {
         Args: { p_collection_ids?: string[]; p_recipe_id: string }
