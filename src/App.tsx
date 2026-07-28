@@ -51,7 +51,7 @@ import "react-photo-view/dist/react-photo-view.css";
 import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import SharedRecipe from "./page/SharedRecipe";
-import OAuthConsent from "./page/OAuthConsent";
+import OAuthConsentRoute, { PostSignInLanding } from "./components/general/OAuthConsentRoute";
 import NotificationSettings from "./page/NotificationSettings";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
@@ -372,7 +372,7 @@ function App() {
         <Route path="/imprint" element={<Impressum />} />
 
         {/* Onboarding */}
-        <Route path="/" element={isLoggedIn() ? <Navigate to="/home" /> : <Welcome />} />
+        <Route path="/" element={isLoggedIn() ? <PostSignInLanding /> : <Welcome />} />
 
         <Route path="/signup" element={isLoggedIn() ? <Navigate to="/home" /> : <SignUp />} />
 
@@ -468,9 +468,10 @@ function App() {
         <Route path="/share/:token" element={<SharedRecipe />} />
 
         {/* OAuth 2.1 consent screen (Supabase Auth sends the user here with an
-            authorization_id). Signing in renders in place, so the query string
-            survives — same trick as /invite/:token. */}
-        <Route path="/oauth/consent" element={isLoggedIn() ? <OAuthConsent /> : <SignUp />} />
+            authorization_id). Signing in renders in place so the query string
+            survives — and the request is stashed so the magic-link path, which
+            leaves this URL entirely, can still find its way back. */}
+        <Route path="/oauth/consent" element={<OAuthConsentRoute isLoggedIn={isLoggedIn()} />} />
 
         {/* 404 Not Found Route */}
         <Route path="*" element={<NotFound />} />
