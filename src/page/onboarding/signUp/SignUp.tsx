@@ -26,7 +26,20 @@ async function sha256(message: string): Promise<string> {
     .join("");
 }
 
-export default function SignUp() {
+/**
+ * `connect` is this screen serving an OAuth request (`/oauth/consent` renders it
+ * in place when the user is signed out). It swaps the marketing headline for
+ * something that explains why they're being asked to sign in — landing on
+ * "Never stare blankly at your fridge again!" after clicking Connect in another
+ * app reads as a signup wall, and existing users are the ones connecting.
+ *
+ * The requesting app cannot be named here: its name comes from
+ * `getAuthorizationDetails`, which needs a session we don't have yet. The
+ * consent screen immediately after does name it.
+ */
+type Props = { variant?: "onboarding" | "connect" };
+
+export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -47,8 +60,10 @@ export default function SignUp() {
   }, []);
 
   useEffect(() => {
-    trackScreenViewed("signup");
-  }, []);
+    // Only the onboarding funnel. Someone connecting an AI assistant is an
+    // existing user, and counting them as a signup would distort it.
+    if (variant === "onboarding") trackScreenViewed("signup");
+  }, [variant]);
 
   useEffect(() => {
     generateNonce();
@@ -139,9 +154,19 @@ export default function SignUp() {
 
       <div className="flex flex-col items-center h-screen px-4 py-10">
         <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-          <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
-
-          <p className="text-sm text-muted-foreground second-font">{t("signup.subtitle")}</p>
+          {variant === "connect" ? (
+            <>
+              <h1 className="font-bold text-5xl first-font">{t("oauthConsent.signInTitle")}</h1>
+              <p className="mt-2 text-sm text-muted-foreground second-font">
+                {t("oauthConsent.signInSubtitle")}
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
+              <p className="text-sm text-muted-foreground second-font">{t("signup.subtitle")}</p>
+            </>
+          )}
         </div>
 
         <RiveComponent onClick={replayAnimation} />

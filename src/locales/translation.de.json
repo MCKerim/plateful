@@ -266,6 +266,8 @@
     "title": "{{client}} mit Plateful verbinden?",
     "subtitle": "Die App kann dann in deinem Plateful-Konto handeln.",
     "subtitleWithHousehold": "Die App kann dann in deinem Plateful-Konto und mit den Rezepten in „{{household}}“ handeln.",
+    "signInTitle": "Anmelden zum Verbinden",
+    "signInSubtitle": "Melde dich bei deinem Plateful-Konto an, um die Verbindung mit der App abzuschließen, von der du kommst.",
     "permissionRead": "Deine Rezepte lesen, inklusive Zutaten, Schritten, Nährwerten und Bewertungen",
     "permissionWrite": "Neue Rezepte erstellen und bestehende bearbeiten",
     "permissionDelete": "Rezepte endgültig löschen – gelöschte Rezepte lassen sich nicht wiederherstellen",

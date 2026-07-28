@@ -214,6 +214,8 @@
     "title": "Connect {{client}} to Plateful?",
     "subtitle": "It will be able to act on your Plateful account.",
     "subtitleWithHousehold": "It will be able to act on your Plateful account and the recipes in “{{household}}”.",
+    "signInTitle": "Sign in to connect",
+    "signInSubtitle": "Sign in to your Plateful account to finish connecting the app you came from.",
     "permissionRead": "Read your recipes, including ingredients, steps, nutrition and ratings",
     "permissionWrite": "Create new recipes and edit existing ones",
     "permissionDelete": "Delete recipes permanently — deleted recipes cannot be restored",

@@ -23,7 +23,7 @@ export default function OAuthConsentRoute({ isLoggedIn }: Readonly<{ isLoggedIn:
     if (!isLoggedIn) rememberPendingConsent(search);
   }, [isLoggedIn, search]);
 
-  return isLoggedIn ? <OAuthConsent /> : <SignUp />;
+  return isLoggedIn ? <OAuthConsent /> : <SignUp variant="connect" />;
 }
 
 /**

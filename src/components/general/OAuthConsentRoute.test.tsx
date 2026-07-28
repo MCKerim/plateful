@@ -5,7 +5,7 @@ import OAuthConsentRoute, { PostSignInLanding } from "./OAuthConsentRoute";
 import { peekPendingConsent, rememberPendingConsent } from "@/lib/pendingOAuthConsent";
 
 vi.mock("@/page/onboarding/signUp/SignUp", () => ({
-  default: () => <div>sign-in screen</div>,
+  default: ({ variant }: { variant?: string }) => <div>sign-in screen:{variant ?? "onboarding"}</div>,
 }));
 vi.mock("@/page/OAuthConsent", () => ({
   default: () => <div>consent screen</div>,
@@ -37,10 +37,19 @@ describe("OAuthConsentRoute", () => {
   it("shows sign-in in place and remembers the request when signed out", () => {
     renderAt("/oauth/consent?authorization_id=abc", false);
 
-    expect(screen.getByText("sign-in screen")).toBeInTheDocument();
+    expect(screen.getByText("sign-in screen:connect")).toBeInTheDocument();
     // Choosing "continue with email" navigates away from this URL, so the
     // request has to be stashed before that happens or it is simply lost.
     expect(peekPendingConsent()).toBe("/oauth/consent?authorization_id=abc");
+  });
+
+  it("asks the sign-in screen for its connect framing", () => {
+    // The onboarding variant greets an OAuth arrival with "Never stare blankly
+    // at your fridge again!" and counts them in the signup funnel — they are an
+    // existing user finishing a connection, not a new signup.
+    renderAt("/oauth/consent?authorization_id=abc", false);
+
+    expect(screen.getByText("sign-in screen:connect")).toBeInTheDocument();
   });
 });
 
