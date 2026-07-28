@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   household: { name: "Team Kitchen" } as { name: string } | null,
   toastError: vi.fn(),
   redirectTo: vi.fn(),
+  signOut: vi.fn(),
 }));
 
 // Redefining `window.location` to observe navigation crashes the jsdom worker,
@@ -30,6 +31,7 @@ const supabaseValue = {
         approveAuthorization: mocks.approveAuthorization,
         denyAuthorization: mocks.denyAuthorization,
       },
+      signOut: mocks.signOut,
     },
   },
 };
@@ -57,6 +59,7 @@ vi.mock("react-i18next", () => ({ useTranslation: () => translation }));
 
 beforeEach(() => {
   mocks.redirectTo.mockClear();
+  mocks.signOut.mockClear();
   mocks.household = { name: "Team Kitchen" };
 });
 
@@ -163,12 +166,41 @@ describe("OAuthConsent", () => {
   });
 
   it("shows no consent buttons when the request is expired or invalid", async () => {
-    mocks.getAuthorizationDetails.mockResolvedValue({ data: null, error: new Error("expired") });
+    mocks.getAuthorizationDetails.mockResolvedValue({ data: null, error: { status: 400 } });
 
     renderPage("?authorization_id=stale");
 
     expect(await screen.findByText("oauthConsent.loadFailed")).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "oauthConsent.approve" })).not.toBeInTheDocument();
+  });
+
+  it("tells the user their session expired rather than blaming the request", async () => {
+    // A dead Plateful session 403s on the same call a bad authorization_id does.
+    // Reporting it as "invalid connection request" sends people off re-adding a
+    // connector that was never broken — which is exactly what happened in prod.
+    mocks.getAuthorizationDetails.mockResolvedValue({
+      data: null,
+      error: { status: 403, code: "session_not_found" },
+    });
+
+    renderPage("?authorization_id=auth-123");
+
+    expect(await screen.findByText("oauthConsent.sessionExpired")).toBeInTheDocument();
+    expect(screen.queryByText("oauthConsent.loadFailed")).not.toBeInTheDocument();
+  });
+
+  it("offers a sign-in that preserves the pending authorization", async () => {
+    mocks.getAuthorizationDetails.mockResolvedValue({
+      data: null,
+      error: { status: 401 },
+    });
+
+    renderPage("?authorization_id=auth-123");
+    await userEvent.click(await screen.findByRole("button", { name: "oauthConsent.signInAgain" }));
+
+    // Signing out drops the route to the sign-in screen without touching the URL,
+    // so the authorization_id survives and consent resumes after logging in.
+    expect(mocks.signOut).toHaveBeenCalled();
   });
 
   it("keeps the user on the page when the decision fails", async () => {

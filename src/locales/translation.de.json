@@ -277,6 +277,8 @@
     "clientUri": "Website der App: {{uri}}",
     "missingRequest": "Dieser Verbindungslink ist unvollständig. Starte die Verbindung erneut in der App, die du verknüpfen möchtest.",
     "loadFailed": "Diese Verbindungsanfrage ist ungültig oder abgelaufen. Starte die Verbindung erneut in der App, die du verknüpfen möchtest.",
+    "sessionExpired": "Deine Plateful-Sitzung ist abgelaufen. Melde dich erneut an, um die Verbindung abzuschließen – du landest direkt wieder hier.",
+    "signInAgain": "Erneut anmelden",
     "decisionFailed": "Die Verbindung konnte nicht abgeschlossen werden. Bitte versuche es erneut."
   },
   "list": {

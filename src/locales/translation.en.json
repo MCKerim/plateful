@@ -225,6 +225,8 @@
     "clientUri": "App website: {{uri}}",
     "missingRequest": "This connection link is incomplete. Start the connection again from the app you want to link.",
     "loadFailed": "This connection request is invalid or has expired. Start the connection again from the app you want to link.",
+    "sessionExpired": "Your Plateful session has expired. Sign in again to finish connecting — you'll come straight back here.",
+    "signInAgain": "Sign in again",
     "decisionFailed": "Could not complete the connection. Please try again."
   },
   "signup": {

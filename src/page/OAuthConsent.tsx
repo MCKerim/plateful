@@ -31,7 +31,17 @@ import { selectHousehold } from "@/redux/slices/householdSlice";
  * on `t` — otherwise switching language would re-run it and re-request an
  * authorization that may only be fetched once.
  */
-type ConsentErrorKey = "missingRequest" | "loadFailed";
+type ConsentErrorKey = "missingRequest" | "loadFailed" | "sessionExpired";
+
+/**
+ * A dead Plateful session and a bad authorization request fail at the same call
+ * but need opposite fixes — sign in again here, versus start over in the other
+ * app. Reporting the first as the second sends people off re-adding a connector
+ * that was never the problem, so the two are told apart by status code.
+ */
+function isSessionError(error: { status?: number; code?: string } | null): boolean {
+  return error?.status === 401 || error?.status === 403 || error?.code === "session_not_found";
+}
 
 type ConsentState =
   | { status: "loading" }
@@ -67,7 +77,10 @@ export default function OAuthConsent() {
         if (cancelled) return;
 
         if (error || !data) {
-          setState({ status: "error", key: "loadFailed" });
+          setState({
+            status: "error",
+            key: isSessionError(error) ? "sessionExpired" : "loadFailed",
+          });
           return;
         }
 
@@ -145,7 +158,19 @@ export default function OAuthConsent() {
           )}
 
           {state.status === "error" && (
-            <p className="second-font font-medium text-primary">{t(`oauthConsent.${state.key}`)}</p>
+            <>
+              <p className="second-font font-medium text-primary">
+                {t(`oauthConsent.${state.key}`)}
+              </p>
+              {state.key === "sessionExpired" && (
+                // Signing out drops this route to the sign-in screen, and the URL
+                // (with authorization_id) is untouched — so signing back in
+                // returns straight to this consent request rather than losing it.
+                <Button className="w-full" onClick={() => supabase.auth.signOut()}>
+                  {t("oauthConsent.signInAgain")}
+                </Button>
+              )}
+            </>
           )}
 
           {state.status === "ready" && (
