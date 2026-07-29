@@ -87,11 +87,6 @@ async function embedQuery(text: string): Promise<string | null> {
   }
 }
 
-/** Sentence-like queries only — plain dish words never pay the parse latency. */
-function looksLikeSentence(text: string): boolean {
-  return text.split(/\s+/).length >= 3 || /\d/.test(text);
-}
-
 const PARSE_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -201,7 +196,9 @@ Deno.serve(async (req: Request) => {
 
   // Embed the ORIGINAL query (a sentence embeds fine and this can run
   // concurrently with the parse); keyword-search the parse's residual text.
-  const wantsParse = body.parse === true && text.length > 0 && looksLikeSentence(text);
+  // The app owns the parse gate (2+ words or digits); a parse that finds no
+  // constraints is harmless, so the server just trusts the flag.
+  const wantsParse = body.parse === true && text.length > 0;
   const [embedding, parseResult] = await Promise.all([
     text.length > 0 ? embedQuery(text) : Promise.resolve(null),
     wantsParse ? parseQuery(text) : Promise.resolve(null),
