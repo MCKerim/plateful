@@ -4,7 +4,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 // Recipe search (search v3 — iOS repo docs/search-design.md): embeds the query
 // text (text-embedding-3-small, multilingual) and — when the caller asks and
 // the query looks like a sentence — parses it into structured constraints
-// with gpt-4.1-mini ("low carb vegetarisch unter 30 min" → max_carbs_g +
+// with a small OpenAI model ("low carb vegetarisch unter 30 min" → max_carbs_g +
 // vegetarian + max_total_minutes). Both run concurrently, then one
 // `search_recipes` RPC call under the caller's own JWT (RLS scopes results;
 // this function adds no auth logic). Response: { results, parsed } — `parsed`
@@ -124,8 +124,9 @@ async function parseQuery(text: string): Promise<{ residual: string; parsed: Par
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        temperature: 0,
+        // No explicit temperature: some 5.x tiers reject it, and a rejected
+        // parse degrades SILENTLY to no-chips here.
+        model: "gpt-5.4-nano",
         messages: [
           { role: "system", content: PARSE_PROMPT },
           { role: "user", content: text },
