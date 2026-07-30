@@ -29,7 +29,11 @@ const TAG_SLUGS = [
   "low-cleanup", "few-ingredients", "weeknight",
   "vegetarian", "vegan", "pescetarian", "gluten-free", "dairy-free",
   "creamy", "crispy", "spicy", "fresh-light", "hearty", "comfort-food", "sweet",
+  "smoky",
   "breakfast", "main", "side", "dessert", "snack", "drink",
+  "italian", "asian", "mexican", "indian", "mediterranean", "middle-eastern",
+  "american", "german",
+  "spring", "summer", "autumn", "winter",
 ];
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -110,7 +114,7 @@ const PARSE_PROMPT = `You turn a recipe-search query (German or English) into st
 
 Rules:
 - "text": the residual dish/food words worth text-searching, WITHOUT the constraint words ("schnelle vegane Bowls ohne Nüsse" → "Bowls"). Empty string if the query is constraints only.
-- "tags": only values that clearly apply, from the allowed list (diet words → vegetarian/vegan/pescetarian/gluten-free/dairy-free; methods → one-pot/baked/…; courses → breakfast/main/side/dessert/snack/drink; character → creamy/crispy/spicy/fresh-light/hearty/comfort-food/sweet).
+- "tags": only values that clearly apply, from the allowed list (diet words → vegetarian/vegan/pescetarian/gluten-free/dairy-free; methods → one-pot/baked/…; courses → breakfast/main/side/dessert/snack/drink; character → creamy/crispy/spicy/fresh-light/hearty/comfort-food/sweet/smoky; cuisines → italian/asian/mexican/indian/mediterranean/middle-eastern/american/german, where "italienisch"/"Italian"/"Pasta-Abend" → italian and Chinese/Japanese/Thai/Korean/Vietnamese all → asian; seasons → spring/summer/autumn/winter).
 - "include_ingredients"/"exclude_ingredients": canonical English food slugs, kebab-case, singular ("mit Hähnchen" → ["chicken"]; "ohne Erdnüsse" → ["peanut"]).
 - Numbers: "unter 30 min"/"under 30 minutes" → max_total_minutes 30; "schnell"/"quick" with no number → max_total_minutes 30; "unter 600 kcal" → max_calories 600; "high protein"/"proteinreich" → min_protein_g 25; "low carb" → max_carbs_g 30.
 - null / [] for anything not clearly requested. Never invent constraints.`;
