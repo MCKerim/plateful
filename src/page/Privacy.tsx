@@ -54,7 +54,10 @@ export default function Privacy() {
             <div className="space-y-2">
               <h3 className="font-medium">Account Information</h3>
               <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>Email address (for account creation and authentication)</li>
+                <li>
+                  Email address (for account creation, authentication, support, and product
+                  analytics)
+                </li>
                 <li>Name (optional, for personalization)</li>
                 <li>Profile picture (optional)</li>
               </ul>
@@ -196,9 +199,12 @@ export default function Privacy() {
               <div className="space-y-1">
                 <h3 className="font-medium">PostHog (EU region)</h3>
                 <p>
-                  Usage patterns, app errors, device information, and anonymized session data are
-                  sent to PostHog for product analytics and error monitoring. Data is hosted in the
-                  EU.{" "}
+                  Usage patterns, app errors, device information, session data, and your account
+                  email address are sent to PostHog for product analytics, support, and error
+                  monitoring. The email address is linked to your Plateful account so activity from
+                  the same account can be understood across sessions. This data is hosted in the EU
+                  and is not used to track you across other companies' apps or websites or for
+                  advertising.{" "}
                   <a
                     href="https://posthog.com/privacy"
                     target="_blank"
@@ -441,9 +447,10 @@ export default function Privacy() {
               </li>
             </ul>
             <p>
-              We use PostHog (EU region) for product analytics. PostHog collects anonymized usage
-              data, error events, and device information to help us understand how the app is used
-              and identify bugs.
+              We use PostHog (EU region) for product analytics. PostHog collects usage data, error
+              events, device information, and your account email address to help us understand how
+              the app is used, provide support, and identify bugs. The data is linked to your
+              Plateful account but is not used for cross-app tracking or advertising.
             </p>
           </section>
 
