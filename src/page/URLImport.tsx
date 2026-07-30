@@ -15,27 +15,7 @@ import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { recipeImportApi } from "@/api/recipeImport.api";
-
-/**
- * Cleans a user-typed link into an absolute URL, or returns null if it isn't a
- * plausible one yet. Prepends `https://` when the scheme is missing and requires
- * a dotted host. Mirrors the iOS URL import's `normalizedURL`.
- */
-function normalizeUrl(raw: string): string | null {
-  let text = raw.trim();
-  if (text === "") return null;
-  const lower = text.toLowerCase();
-  if (!lower.startsWith("http://") && !lower.startsWith("https://")) {
-    text = "https://" + text;
-  }
-  try {
-    const url = new URL(text);
-    if (!url.hostname.includes(".")) return null;
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
+import { normalizeRecipeImportUrl } from "@/lib/normalizeRecipeImportUrl";
 
 export default function URLImport() {
   const { t, i18n } = useTranslation();
@@ -61,7 +41,7 @@ export default function URLImport() {
 
   const handleSave = useCallback(
     async (rawUrl: string) => {
-      const url = normalizeUrl(rawUrl);
+      const url = normalizeRecipeImportUrl(rawUrl);
       if (!url) {
         toast.error(t("urlImport.errors.invalidUrl"));
         return;
