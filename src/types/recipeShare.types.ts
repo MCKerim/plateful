@@ -36,6 +36,10 @@ export type SharedRecipeSnapshot = {
   ingredients: SnapshotIngredient[];
 };
 
+export type ResolvedRecipeShare = {
+  snapshot: SharedRecipeSnapshot;
+};
+
 export type SharedRecipeRow = {
   id: string;
   token: string;

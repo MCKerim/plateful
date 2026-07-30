@@ -1,5 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { SharedRecipeSnapshot, SharedRecipeRow } from "@/types/recipeShare.types";
+import type { ResolvedRecipeShare, SharedRecipeSnapshot } from "@/types/recipeShare.types";
 import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
 import { isTrustedRecipeImageUrl, recipeImageApi } from "@/api/recipeImage.api";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
@@ -89,21 +89,22 @@ export const recipeShareApi = {
   },
 
   /**
-   * Fetch a shared recipe by token. No auth required (public RLS policy).
+   * Resolve one shared recipe by its capability token. No auth is required,
+   * but the backing table is not exposed through this read path.
    */
-  async getByToken(supabase: SupabaseClient, token: string): Promise<SharedRecipeRow | null> {
-    const { data, error } = await supabase
-      .from("shared_recipes")
-      .select("*")
-      .eq("token", token)
-      .single();
+  async getByToken(supabase: SupabaseClient, token: string): Promise<ResolvedRecipeShare | null> {
+    const { data, error } = await supabase.rpc("resolve_recipe_share", {
+      p_token: token,
+    });
 
-    if (error) {
-      if (error.code === "PGRST116") return null; // not found
-      throw error;
-    }
+    if (error) throw error;
 
-    return data as unknown as SharedRecipeRow;
+    const row = data?.[0];
+    if (!row) return null;
+
+    return {
+      snapshot: row.snapshot as unknown as SharedRecipeSnapshot,
+    };
   },
 
   /**

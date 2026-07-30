@@ -1271,6 +1271,12 @@ export type Database = {
         Args: { p_request_id: string; p_successor_user_id?: string | null }
         Returns: Json
       }
+      resolve_recipe_share: {
+        Args: { p_token: string }
+        Returns: {
+          snapshot: Json
+        }[]
+      }
       replace_recipe_collections: {
         Args: { p_collection_ids?: string[]; p_recipe_id: string }
         Returns: undefined
