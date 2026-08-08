@@ -49,10 +49,14 @@ export default function Settings() {
   const { contextQuery: deletionContextQuery, deleteAccountMutation } =
     useDeleteAccount(isDeleteAccountDialogOpen);
   const { presentCustomerCenter } = useCustomerCenter();
-  const { isActive: isActiveSub, data: householdSub } = useHouseholdSubscription();
+  const {
+    isActive: isActiveSub,
+    entitlements,
+    hasOverlappingSubscriptions,
+  } = useHouseholdSubscription();
 
-  const isCurrentUserPayer = householdSub?.payer_user_id === user?.id;
-  const payerName = householdSub?.payer?.username;
+  const isCurrentUserPayer = entitlements.some((e) => e.user_id === user?.id);
+  const payerName = entitlements[0]?.username;
 
   useEffect(() => {
     let isMounted = true;
@@ -296,6 +300,14 @@ export default function Settings() {
 
           {isActiveSub && !isCurrentUserPayer && (
             <p className="text-sm">{t("settings.subscription.managedBy", { name: payerName })}</p>
+          )}
+
+          {/* Two members each paying for one household. Nothing here can undo
+              it, only the subscriber can cancel in their store, so say so. */}
+          {hasOverlappingSubscriptions && isCurrentUserPayer && (
+            <p className="text-sm text-muted-foreground">
+              {t("settings.subscription.duplicateWarning")}
+            </p>
           )}
         </div>
 

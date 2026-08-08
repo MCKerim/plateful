@@ -558,7 +558,8 @@
       "title": "Abonnement",
       "manageSubscription": "Abonnement verwalten",
       "restorePurchases": "Käufe wiederherstellen",
-      "managedBy": "Abonnement verwaltet von {{name}}"
+      "managedBy": "Abonnement verwaltet von {{name}}",
+      "duplicateWarning": "Mehr als ein Mitglied deines Haushalts bezahlt für Plateful. Es wird nur ein Abonnement benötigt, du kannst deins also im Store kündigen."
     }
   },
   "badges": {

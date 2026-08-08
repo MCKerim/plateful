@@ -219,19 +219,21 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
-  // Subscription endpoint - return active subscription so paywall is bypassed
-  await page.route("**/rest/v1/household_subscriptions?*", async (route) => {
+  // Entitlements endpoint - one row means the household is covered, so the
+  // paywall is bypassed. Premium is derived from membership now: the view
+  // returns the members who hold a live entitlement, and none means paywalled.
+  await page.route("**/rest/v1/household_entitlements?*", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify({
-        id: "test-sub-id",
-        household_id: scenario.household?.id ?? "test-household-id",
-        payer_user_id: scenario.user.id,
-        is_active: true,
-        updated_at: new Date().toISOString(),
-        payer: { username: scenario.user.username },
-      }),
+      body: JSON.stringify([
+        {
+          household_id: scenario.household?.id ?? "test-household-id",
+          user_id: scenario.user.id,
+          username: scenario.user.username,
+          expires_at: null,
+        },
+      ]),
     });
   });
 

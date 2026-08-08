@@ -2,10 +2,11 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient, SupabaseClient } from "npm:@supabase/supabase-js@2";
 import { CORS, ANSWEAR_HEADER } from "../_shared/headers.ts";
 
-// This function is the ONLY writer of `household_subscriptions` (clients have
-// no INSERT/UPDATE policies — a client-writable row would let anyone
-// self-grant premium). Events reference the store customer; we map them to a
-// Supabase user, then to their household.
+// This function is the ONLY writer of `user_subscriptions` (clients have no
+// INSERT/UPDATE policies — a client-writable row would let anyone self-grant
+// premium). Events reference the store customer; we map them to a Supabase
+// user and stop there. Which household the entitlement unlocks is derived from
+// membership at read time, via the `household_entitlements` view.
 
 const ACTIVE_EVENTS = new Set([
   "INITIAL_PURCHASE",
@@ -38,11 +39,16 @@ function supabaseUserId(...ids: unknown[]): string | undefined {
     .find((id): id is string => typeof id === "string" && UUID_RE.test(id));
 }
 
-/** Points the user's household row at `isActive`, carrying the event's
+/** Points the user's own entitlement at `isActive`, carrying the event's
  * expiry/store/environment for support visibility. No-op when the user is
- * unknown, not in a household, or the event is older than the last applied
- * one (a retried/stale delivery must not overwrite newer state). */
-async function setHouseholdSubscription(
+ * unknown or the event is older than the last applied one (a retried/stale
+ * delivery must not overwrite newer state).
+ *
+ * Deliberately household-blind: which household benefits is derived from
+ * membership at read time (`household_entitlements`), so a payer who moves
+ * between households cannot leave a stale grant behind, and a purchase made
+ * while between households is still recorded. */
+async function setUserSubscription(
   supabase: SupabaseClient,
   userId: string | undefined,
   isActive: boolean,
@@ -50,23 +56,15 @@ async function setHouseholdSubscription(
 ): Promise<{ error?: string }> {
   if (!userId) return {};
 
-  const { data: userData } = await supabase
-    .from("users")
-    .select("id, household_id")
-    .eq("id", userId)
-    .single();
-
-  if (!userData?.household_id) return {};
-
   const eventAt =
     typeof event.event_timestamp_ms === "number"
       ? new Date(event.event_timestamp_ms)
       : new Date();
 
   const { data: existing } = await supabase
-    .from("household_subscriptions")
+    .from("user_subscriptions")
     .select("last_event_at")
-    .eq("household_id", userData.household_id)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (existing?.last_event_at && eventAt < new Date(existing.last_event_at)) {
@@ -76,10 +74,9 @@ async function setHouseholdSubscription(
     return {};
   }
 
-  const { error } = await supabase.from("household_subscriptions").upsert(
+  const { error } = await supabase.from("user_subscriptions").upsert(
     {
-      household_id: userData.household_id,
-      payer_user_id: userData.id,
+      user_id: userId,
       is_active: isActive,
       expires_at:
         typeof event.expiration_at_ms === "number"
@@ -91,11 +88,11 @@ async function setHouseholdSubscription(
       last_event_at: eventAt.toISOString(),
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "household_id" }
+    { onConflict: "user_id" }
   );
 
   if (error) {
-    console.error("Error upserting household subscription:", error);
+    console.error("Error upserting user subscription:", error);
     return { error: error.message };
   }
   return {};
@@ -143,14 +140,14 @@ Deno.serve(async (req: Request) => {
 
   // TRANSFER moves the store subscription between customers (the same
   // Apple/Google account used while signed into different app accounts): the
-  // losing side's household locks, the gaining side's unlocks.
+  // losing side's entitlement ends, the gaining side's begins.
   if (eventType === "TRANSFER") {
     const from = supabaseUserId(event.transferred_from);
     const to = supabaseUserId(event.transferred_to);
     console.log(`event=TRANSFER from=${from ?? "none"} to=${to ?? "none"}`);
     const results = [
-      await setHouseholdSubscription(supabase, from, false, event),
-      await setHouseholdSubscription(supabase, to, true, event),
+      await setUserSubscription(supabase, from, false, event),
+      await setUserSubscription(supabase, to, true, event),
     ];
     const failed = results.find((r) => r.error);
     if (failed) {
@@ -181,7 +178,7 @@ Deno.serve(async (req: Request) => {
     `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"} is_active=${isActive}`
   );
 
-  const { error } = await setHouseholdSubscription(supabase, rcUserId, isActive, event);
+  const { error } = await setUserSubscription(supabase, rcUserId, isActive, event);
   if (error) {
     return new Response(JSON.stringify({ error }), {
       status: 500,

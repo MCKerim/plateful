@@ -7,4 +7,7 @@ export type RecipeCollectionMembership = Database["public"]["Tables"]["recipe_co
 export type Household = Database["public"]["Tables"]["household"]["Row"];
 export type User = Database["public"]["Tables"]["users"]["Row"];
 export type MealPlanning = Database["public"]["Tables"]["meal_planning"]["Row"];
-export type HouseholdSubscription = Database["public"]["Tables"]["household_subscriptions"]["Row"];
+// Premium is no longer a per-household row: entitlements live on the user and
+// the household's state is derived by the `household_entitlements` view. See
+// `subscriptionApi` for the shape the app actually uses.
+export type HouseholdEntitlement = Database["public"]["Views"]["household_entitlements"]["Row"];

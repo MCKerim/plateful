@@ -558,7 +558,8 @@
       "title": "Subscription",
       "manageSubscription": "Manage Subscription",
       "restorePurchases": "Restore Purchases",
-      "managedBy": "Subscription managed by {{name}}"
+      "managedBy": "Subscription managed by {{name}}",
+      "duplicateWarning": "More than one member of your household is paying for Plateful. Only one subscription is needed, so you can cancel yours in the store."
     }
   },
   "badges": {

@@ -11,13 +11,21 @@ export function useHouseholdSubscription() {
 
   const query = useQuery({
     queryKey: queryKeys.subscription.byHousehold(householdId ?? ""),
-    queryFn: () => subscriptionApi.getByHouseholdId(supabase, householdId!),
+    queryFn: () => subscriptionApi.listByHouseholdId(supabase, householdId!),
     enabled: !!householdId,
     staleTime: 1000 * 60 * 5,
   });
 
+  const entitlements = query.data ?? [];
+
   return {
     ...query,
-    isActive: query.data?.is_active === true,
+    entitlements,
+    // Any live entitlement in the household unlocks it for everyone in it.
+    isActive: entitlements.length > 0,
+    // More than one member paying for the same household. Only reachable by two
+    // solo subscribers moving in together, and only they can cancel, in the
+    // store — so it is surfaced rather than silently charged twice.
+    hasOverlappingSubscriptions: entitlements.length > 1,
   };
 }
