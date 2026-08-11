@@ -64,7 +64,10 @@ export default function AddRecipe() {
   const [instructionItems, setInstructionItems] = useState<EditorItem[]>([]);
   const [link, setLink] = useState("");
   const [ingredients, setIngredients] = useState<EditorItem[]>([]);
-  const [baseServings, setBaseServings] = useState<number | null>(null);
+  // Starts at 1 rather than empty: base_servings is NOT NULL, so a blank
+  // field would just become 1 on save without the user seeing it. Null is
+  // still allowed transiently so the field can be cleared while retyping.
+  const [baseServings, setBaseServings] = useState<number | null>(1);
   // `undefined` until the editor reports values (loaded recipe or user action),
   // so saving before an edited recipe loads never wipes its saved nutrition.
   const [nutrition, setNutrition] = useState<NutritionValues | undefined>(undefined);
@@ -189,7 +192,7 @@ export default function AddRecipe() {
       setTitle(recipe.name);
       setDescription(recipe.description ?? "");
       setLink(recipe.link ?? "");
-      setBaseServings(recipe.base_servings);
+      setBaseServings(recipe.base_servings ?? 1);
       setImageSupabaseUrl(recipe.image_path ?? "");
       setImageRemoved(false);
     }
@@ -311,7 +314,7 @@ export default function AddRecipe() {
           description: description || null,
           instructions: instructionsMarkdown,
           link,
-          baseServings,
+          baseServings: baseServings ?? 1,
           nutrition,
         });
       } else {
@@ -321,7 +324,7 @@ export default function AddRecipe() {
           instructions: instructionsMarkdown,
           link,
           householdId: householdId!,
-          baseServings,
+          baseServings: baseServings ?? 1,
           nutrition,
         });
         targetRecipeId = createdRecipe.id;
@@ -513,6 +516,7 @@ export default function AddRecipe() {
             placeholder={t("addRecipe.servingsPlaceholder")}
             value={baseServings ?? ""}
             onChange={(e) => setBaseServings(e.target.value ? parseInt(e.target.value) : null)}
+            onBlur={() => setBaseServings((current) => (current && current >= 1 ? current : 1))}
             min={1}
           />
         </div>
