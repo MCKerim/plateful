@@ -78,6 +78,12 @@ async function setUserSubscription(
     {
       user_id: userId,
       is_active: isActive,
+      // Anything that grants access also means it renews: a purchase, a
+      // renewal, a trial, and UNCANCELLATION, which is exactly someone turning
+      // auto-renew back on. Anything that revokes has nothing left to renew.
+      // The one event that separates the two is CANCELLATION, handled by
+      // `setAutoRenewOff` rather than here, because it must leave access alone.
+      auto_renews: isActive,
       expires_at:
         typeof event.expiration_at_ms === "number"
           ? new Date(event.expiration_at_ms).toISOString()
@@ -93,6 +99,54 @@ async function setUserSubscription(
 
   if (error) {
     console.error("Error upserting user subscription:", error);
+    return { error: error.message };
+  }
+  return {};
+}
+
+/** Records that auto-renew was switched off, and nothing else.
+ *
+ * A cancellation leaves access exactly as it was — the paid period runs on to
+ * EXPIRATION — so this deliberately touches neither `is_active` nor
+ * `expires_at`. An UPDATE rather than an upsert for the same reason: with no
+ * row there is no subscription to cancel, and inserting one would conjure a
+ * subscription out of a cancellation. */
+async function setAutoRenewOff(
+  supabase: SupabaseClient,
+  userId: string | undefined,
+  event: Record<string, unknown>
+): Promise<{ error?: string }> {
+  if (!userId) return {};
+
+  const eventAt =
+    typeof event.event_timestamp_ms === "number"
+      ? new Date(event.event_timestamp_ms)
+      : new Date();
+
+  const { data: existing } = await supabase
+    .from("user_subscriptions")
+    .select("last_event_at")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (existing?.last_event_at && eventAt < new Date(existing.last_event_at)) {
+    console.log(
+      `skipping stale cancellation (${eventAt.toISOString()} < ${existing.last_event_at})`
+    );
+    return {};
+  }
+
+  const { error } = await supabase
+    .from("user_subscriptions")
+    .update({
+      auto_renews: false,
+      last_event_at: eventAt.toISOString(),
+      updated_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  if (error) {
+    console.error("Error recording cancellation:", error);
     return { error: error.message };
   }
   return {};
@@ -163,8 +217,13 @@ Deno.serve(async (req: Request) => {
     eventType === "CANCELLATION" && event.cancel_reason === "CUSTOMER_SUPPORT";
   const isActive = ACTIVE_EVENTS.has(eventType);
   const isInactive = REVOKE_EVENTS.has(eventType) || isRefund;
+  // A cancellation that isn't a refund. Access is untouched, so the only thing
+  // worth recording is that this period won't be followed by another — which is
+  // what stops the app telling a household to cancel a subscription that is
+  // already on its way out.
+  const isAutoRenewOff = eventType === "CANCELLATION" && !isRefund;
 
-  if (!isActive && !isInactive) {
+  if (!isActive && !isInactive && !isAutoRenewOff) {
     return new Response("ok", { status: 200, headers: ANSWEAR_HEADER });
   }
 
@@ -175,10 +234,13 @@ Deno.serve(async (req: Request) => {
   );
 
   console.log(
-    `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"} is_active=${isActive}`
+    `event=${eventType} app_user_id=${event.app_user_id} resolved_user=${rcUserId ?? "none"} ` +
+      (isAutoRenewOff ? "auto_renews=false" : `is_active=${isActive}`)
   );
 
-  const { error } = await setUserSubscription(supabase, rcUserId, isActive, event);
+  const { error } = isAutoRenewOff
+    ? await setAutoRenewOff(supabase, rcUserId, event)
+    : await setUserSubscription(supabase, rcUserId, isActive, event);
   if (error) {
     return new Response(JSON.stringify({ error }), {
       status: 500,
