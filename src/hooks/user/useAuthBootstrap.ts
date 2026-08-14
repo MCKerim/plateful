@@ -41,7 +41,7 @@ export function useAuthBootstrap() {
     ) => {
       storeDeletionRequest(authUser.id, requestId);
       loadedUserId.current = authUser.id;
-      await fetchUserData(null, isCurrent);
+      await fetchUserData(null, isCurrent, { resetAnalyticsIdentity: true });
       if (!isCurrent()) return;
       await cancelAllAccountNotifications().catch((error) =>
         console.error("Failed to cancel account notifications:", error)
@@ -92,7 +92,13 @@ export function useAuthBootstrap() {
         }
       }
 
-      const result = await fetchUserData(authUser, isCurrent);
+      // `isIdentityChange` is the only signal that separates a real sign-out
+      // (a known user becoming null) from a visitor who was never signed in.
+      // Supabase emits a null session to every new `onAuthStateChange`
+      // subscriber, so without this gate PostHog's identity resets constantly.
+      const result = await fetchUserData(authUser, isCurrent, {
+        resetAnalyticsIdentity: isIdentityChange,
+      });
       if (!isCurrent() || result.status === "superseded") {
         return false;
       }
@@ -119,7 +125,7 @@ export function useAuthBootstrap() {
   const finishLocalDeletion = useCallback(async () => {
     const finishGeneration = ++generation.current;
     const isCurrent = () => generation.current === finishGeneration;
-    await fetchUserData(null, isCurrent);
+    await fetchUserData(null, isCurrent, { resetAnalyticsIdentity: true });
     await cancelAllAccountNotifications().catch((error) =>
       console.error("Failed to cancel account notifications:", error)
     );

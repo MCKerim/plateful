@@ -20,6 +20,20 @@ export type UserDataLoadResult =
 
 type IsCurrentLoad = () => boolean;
 
+export type FetchUserDataOptions = {
+  /**
+   * Whether this load is a real sign-out — a known user becoming nobody.
+   *
+   * PostHog's `reset()` is a logout *event* handler, not a signed-out *state*
+   * handler: every call mints a fresh anonymous distinct_id and session id. The
+   * signed-out branch below also runs for visitors who were never signed in
+   * (Supabase hands every new `onAuthStateChange` subscriber a null session), so
+   * calling it unconditionally shredded a single visitor into hundreds of
+   * "persons". Only the caller knows whether the identity actually changed.
+   */
+  resetAnalyticsIdentity?: boolean;
+};
+
 let languageSynchronizationQueue: Promise<void> = Promise.resolve();
 let revenueCatIdentityQueue: Promise<void> = Promise.resolve();
 
@@ -31,7 +45,8 @@ export function useUserData() {
   const fetchUserData = useCallback(
     async (
       authUser: CurrentAuthUser | null,
-      isCurrent: IsCurrentLoad = () => true
+      isCurrent: IsCurrentLoad = () => true,
+      { resetAnalyticsIdentity = false }: FetchUserDataOptions = {}
     ): Promise<UserDataLoadResult> => {
       if (!isCurrent()) {
         return { status: "superseded" };
@@ -43,7 +58,9 @@ export function useUserData() {
         dispatch(setHouseholdMembers(null));
         dispatch(resetSubscription());
         queryClient.clear();
-        posthog.reset();
+        if (resetAnalyticsIdentity) {
+          posthog.reset();
+        }
         revenueCatIdentityQueue = revenueCatIdentityQueue
           .catch(() => undefined)
           .then(async () => {

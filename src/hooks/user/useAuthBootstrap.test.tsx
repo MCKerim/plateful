@@ -152,7 +152,9 @@ describe("useAuthBootstrap", () => {
       await Promise.resolve();
     });
     expect(result.current.state).toEqual({ status: "ready" });
-    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(userA, expect.any(Function));
+    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(userA, expect.any(Function), {
+      resetAnalyticsIdentity: true,
+    });
   });
 
   it("keeps routine refresh failures nonblocking but blocks a household transition", async () => {
@@ -205,7 +207,9 @@ describe("useAuthBootstrap", () => {
       retryAfterSeconds: 60,
       retrying: false,
     });
-    expect(mocks.fetchUserData).toHaveBeenCalledWith(null, expect.any(Function));
+    expect(mocks.fetchUserData).toHaveBeenCalledWith(null, expect.any(Function), {
+      resetAnalyticsIdentity: true,
+    });
     expect(JSON.parse(localStorage.getItem("plateful.accountDeletionRequest") ?? "null")).toEqual({
       userId: userA.id,
       requestId: "f0040000-0000-4000-8000-000000000050",
@@ -247,6 +251,11 @@ describe("useAuthBootstrap", () => {
 
     expect(result.current.state).toEqual({ status: "ready" });
     expect(localStorage.getItem("plateful.accountDeletionRequest")).toBeNull();
-    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(userA, expect.any(Function));
+    // The deletion flow already recorded userA as loaded, and the orphaned
+    // receipt leaves them signed in as the same person — no identity change, so
+    // the analytics identity must survive the recovery.
+    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(userA, expect.any(Function), {
+      resetAnalyticsIdentity: false,
+    });
   });
 });

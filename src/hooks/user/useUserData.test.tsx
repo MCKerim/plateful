@@ -178,6 +178,28 @@ describe("useUserData", () => {
 
     expect(mocks.dispatch).toHaveBeenCalledWith(setUser(null));
     expect(mocks.queryClientClear).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the analytics identity for a visitor who was never signed in", async () => {
+    const { result } = renderHook(() => useUserData());
+
+    // Supabase hands every new `onAuthStateChange` subscriber a null session, so
+    // this branch runs constantly for anonymous visitors. `posthog.reset()`
+    // mints a fresh distinct_id and session id each time, which turned single
+    // visitors into hundreds of "persons".
+    await act(() => result.current.fetchUserData(null));
+    await act(() => result.current.fetchUserData(null));
+
+    expect(mocks.posthogReset).not.toHaveBeenCalled();
+  });
+
+  it("resets the analytics identity on a real sign-out", async () => {
+    const { result } = renderHook(() => useUserData());
+
+    await act(() =>
+      result.current.fetchUserData(null, () => true, { resetAnalyticsIdentity: true })
+    );
+
     expect(mocks.posthogReset).toHaveBeenCalledOnce();
   });
 });
