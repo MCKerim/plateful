@@ -1,5 +1,13 @@
 import type { ParsedIngredient } from "@/types/ingredient.types";
 
+// PARITY: this parser exists three times — here (web/Capacitor editor), in the
+// recipe-extractor repo (`src/lib/parse-ingredient.ts`, canonical: parses every
+// import), and as a Swift port in the native iOS app
+// (`plateful/Core/IngredientParser.swift`). All three must produce identical
+// rows. Any behavioral change MUST update the shared fixture contract
+// (`parse-ingredient.fixtures.json`, canonical copy in the extractor repo) in
+// every repo and keep all three test suites green.
+
 // Unit normalization map (singular, lowercase)
 const UNIT_MAP: Record<string, string> = {
   // Volume - English
@@ -110,6 +118,41 @@ const UNIT_MAP: Record<string, string> = {
   packungen: "package",
   prise: "pinch",
   prisen: "pinch",
+  messerspitze: "pinch",
+  msp: "pinch",
+  kelle: "ladle",
+  kellen: "ladle",
+  schuss: "dash",
+  spritzer: "splash",
+  handvoll: "handful",
+  päckchen: "package",
+  pck: "package",
+  stk: "piece",
+  stange: "stalk",
+  stangen: "stalk",
+  zweig: "sprig",
+  zweige: "sprig",
+  blatt: "leaf",
+  blätter: "leaf",
+  würfel: "cube",
+  glas: "glass",
+  gläser: "glass",
+  tropfen: "drop",
+  kopf: "head",
+  köpfe: "head",
+  // Count/measure words missing from the English section above
+  pinch: "pinch",
+  pinches: "pinch",
+  dash: "dash",
+  dashes: "dash",
+  splash: "splash",
+  splashes: "splash",
+  handful: "handful",
+  handfuls: "handful",
+  drop: "drop",
+  drops: "drop",
+  stick: "stick",
+  sticks: "stick",
 };
 
 // Patterns that indicate non-scalable ingredients
@@ -149,66 +192,6 @@ const FRACTION_MAP: Record<string, number> = {
   "⅞": 0.875,
 };
 
-// Preparation words to extract
-const PREPARATION_WORDS = [
-  "chopped",
-  "diced",
-  "minced",
-  "sliced",
-  "grated",
-  "shredded",
-  "crushed",
-  "ground",
-  "melted",
-  "softened",
-  "cubed",
-  "julienned",
-  "peeled",
-  "seeded",
-  "cored",
-  "trimmed",
-  "halved",
-  "quartered",
-  "beaten",
-  "whisked",
-  "sifted",
-  "packed",
-  "loosely packed",
-  "firmly packed",
-  "room temperature",
-  "cold",
-  "frozen",
-  "thawed",
-  "fresh",
-  "dried",
-  "finely",
-  "coarsely",
-  "roughly",
-  "thinly",
-  // German
-  "gehackt",
-  "gewürfelt",
-  "geschnitten",
-  "gerieben",
-  "zerkleinert",
-  "gemahlen",
-  "geschmolzen",
-  "weich",
-  "geschält",
-  "entkernt",
-  "halbiert",
-  "geviertelt",
-  "verquirlt",
-  "gesiebt",
-  "frisch",
-  "getrocknet",
-  "tiefgekühlt",
-  "aufgetaut",
-  "fein",
-  "grob",
-  "dünn",
-];
-
 /**
  * Parse a fraction string like "1/2" to a number
  */
@@ -244,6 +227,21 @@ function toDecimalDisplay(value: number): string {
 }
 
 /**
+ * Parse a numeric token that may use a decimal point ("1.5"), a German decimal
+ * comma ("1,5"), or a thousands separator ("1.000" German / "1,000" English).
+ * A separator followed by exactly three zeros reads as thousands — recipes
+ * never state quantities to three-zero decimal precision. Mirrors the
+ * extractor's `parseNumericToken`.
+ */
+function parseNumericToken(token: string): number {
+  const thousands = token.match(/^(\d+)[.,]000$/);
+  if (thousands) {
+    return parseInt(thousands[1], 10) * 1000;
+  }
+  return parseFloat(token.replace(",", "."));
+}
+
+/**
  * Extract quantity value and display from a string
  */
 function extractQuantity(text: string): {
@@ -254,10 +252,10 @@ function extractQuantity(text: string): {
   const remaining = text.trim();
 
   // Pattern 1: Range like "2-3" or "2 - 3"
-  const rangeMatch = remaining.match(/^(\d+(?:\.\d+)?)\s*[-–—]\s*(\d+(?:\.\d+)?)/);
+  const rangeMatch = remaining.match(/^(\d+(?:[.,]\d+)?)\s*[-–—]\s*(\d+(?:[.,]\d+)?)/);
   if (rangeMatch) {
-    const low = parseFloat(rangeMatch[1]);
-    const high = parseFloat(rangeMatch[2]);
+    const low = parseNumericToken(rangeMatch[1]);
+    const high = parseNumericToken(rangeMatch[2]);
     const midpoint = (low + high) / 2;
     return {
       value: midpoint,
@@ -294,10 +292,12 @@ function extractQuantity(text: string): {
     }
   }
 
-  // Pattern 4: Decimal or integer like "2.5" or "250"
-  const numberMatch = remaining.match(/^(\d+(?:\.\d+)?)/);
+  // Pattern 4: Decimal or integer like "2.5", "2,5", or "250". The display
+  // keeps the source spelling ("1,5" stays "1,5" for German recipes); only the
+  // numeric value is normalized.
+  const numberMatch = remaining.match(/^(\d+(?:[.,]\d+)?)/);
   if (numberMatch) {
-    const value = parseFloat(numberMatch[1]);
+    const value = parseNumericToken(numberMatch[1]);
     return {
       value,
       display: numberMatch[1],
@@ -324,15 +324,17 @@ function extractUnit(text: string): {
   const remaining = text.trim();
 
   // Try to match a unit at the start of the string
-  // Sort by length descending to match longer units first (e.g., "fluid ounces" before "fl")
+  // Sort by length descending to match longer units first (e.g., "fluid ounces" before "fl").
+  // Abbreviations may carry a trailing period ("EL.", "Msp.") — consumed but
+  // stripped from the stored unit.
   const unitKeys = Object.keys(UNIT_MAP).sort((a, b) => b.length - a.length);
 
   for (const unitKey of unitKeys) {
-    const regex = new RegExp(`^${unitKey}(?:\\s+|$)`, "i");
+    const regex = new RegExp(`^${unitKey}\\.?(?:\\s+|$)`, "i");
     const match = remaining.match(regex);
     if (match) {
       return {
-        unit: match[0].trim(),
+        unit: match[0].trim().replace(/\.$/, ""),
         unitNormalized: UNIT_MAP[unitKey.toLowerCase()],
         remaining: remaining.slice(match[0].length).trim(),
       };
@@ -350,23 +352,33 @@ function extractUnit(text: string): {
 /**
  * Extract preparation notes from ingredient text
  */
-function extractPreparationNote(text: string): {
+function extractPreparationNote(
+  text: string,
+  hasQuantity: boolean,
+): {
   preparationNote: string | null;
   remaining: string;
 } {
   let remaining = text;
   const foundPreps: string[] = [];
 
-  // Check for comma-separated preparation notes
-  const commaMatch = remaining.match(/,\s*(.+)$/);
-  if (commaMatch) {
-    const potentialPrep = commaMatch[1].toLowerCase();
-    for (const prep of PREPARATION_WORDS) {
-      if (potentialPrep.includes(prep.toLowerCase())) {
-        foundPreps.push(commaMatch[1].trim());
-        remaining = remaining.slice(0, remaining.indexOf(",")).trim();
-        break;
+  // Everything after the first comma is a preparation/state note ("Champignons,
+  // in Scheiben", "Pasta, ungekocht") — no word whitelist; a mis-filed tail
+  // still renders as the small note line instead of polluting the name. Two
+  // guards, mirroring the extractor: only quantified lines split (an
+  // unquantified "Salz, Pfeffer, Paprikapulver" is an enumeration, not a name
+  // plus note), and a digit-flanked comma is a decimal ("Joghurt 1,5%"), never
+  // a note boundary.
+  if (hasQuantity) {
+    for (let i = remaining.indexOf(","); i !== -1; i = remaining.indexOf(",", i + 1)) {
+      const isDecimal = /\d/.test(remaining[i - 1] ?? "") && /\d/.test(remaining[i + 1] ?? "");
+      if (i === 0 || isDecimal) continue;
+      const tail = remaining.slice(i + 1).trim();
+      if (tail) {
+        foundPreps.push(tail);
       }
+      remaining = remaining.slice(0, i).trim();
+      break;
     }
   }
 
@@ -484,7 +496,10 @@ export function parseIngredient(rawText: string): ParsedIngredient {
   const afterFiller = removeFillerWords(afterUnit);
 
   // Extract preparation notes
-  const { preparationNote, remaining: ingredientName } = extractPreparationNote(afterFiller);
+  const { preparationNote, remaining: ingredientName } = extractPreparationNote(
+    afterFiller,
+    quantityValue !== null,
+  );
 
   return {
     quantityValue,
