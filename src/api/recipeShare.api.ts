@@ -136,7 +136,9 @@ export const recipeShareApi = {
         name: snapshot.name,
         description: snapshot.description ?? null,
         instructions: snapshot.instructions ?? null,
-        base_servings: snapshot.base_servings ?? null,
+        // `base_servings` is NOT NULL. Snapshots taken before 2026-08-11 can
+        // carry a null, so fall back to 1 rather than sending the null on.
+        base_servings: snapshot.base_servings ?? 1,
         servings_unit: snapshot.servings_unit ?? null,
         household_id: householdId,
         owner_id: authData.user.id,

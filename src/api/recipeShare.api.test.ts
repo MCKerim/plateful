@@ -48,4 +48,29 @@ describe("recipeShareApi", () => {
 
     await expect(recipeShareApi.getByToken({ rpc } as never, "token")).rejects.toBe(error);
   });
+
+  // `recipes.base_servings` is NOT NULL. Snapshots taken before 2026-08-11 can
+  // carry a null, and a column default only covers an omitted key — sending the
+  // null on made share-accept fail outright.
+  it("substitutes 1 for a snapshot with no base_servings", async () => {
+    let inserted: Record<string, unknown> | undefined;
+    const supabase = {
+      auth: { getUser: vi.fn().mockResolvedValue({ data: { user: { id: "user-1" } } }) },
+      from: vi.fn(() => ({
+        insert: vi.fn((payload: Record<string, unknown>) => {
+          inserted = payload;
+          return {
+            select: () => ({
+              single: () => Promise.resolve({ data: { id: "recipe-1" }, error: null }),
+            }),
+          };
+        }),
+      })),
+    };
+
+    await recipeShareApi.importIntoHousehold(supabase as never, snapshot, "household-1");
+
+    expect(snapshot.base_servings).toBeNull();
+    expect(inserted?.base_servings).toBe(1);
+  });
 });

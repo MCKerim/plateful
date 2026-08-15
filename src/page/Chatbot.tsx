@@ -301,7 +301,9 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         instructions: instructions || null,
         link: "",
         householdId,
-        baseServings: servings ?? null,
+        // `base_servings` is NOT NULL, and the model does not always return a
+        // count, so fall back to 1 rather than sending an explicit null.
+        baseServings: servings ?? 1,
       });
 
       const availableCollectionIds = new Set(
