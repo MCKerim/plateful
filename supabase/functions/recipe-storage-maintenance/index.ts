@@ -1,5 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { PrefixStorage, removePrefix } from "../_shared/remove-prefix.ts";
 
 const BUCKET = "recipeimages";
 const MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024;
@@ -17,44 +18,19 @@ interface CleanupJob {
   attempt_count: number;
 }
 
+interface CleanupHealth {
+  dead_jobs: number;
+  stuck_jobs: number;
+  pending_jobs: number;
+  oldest_pending_age: string | null;
+  last_completion: string | null;
+}
+
 function json(body: Record<string, unknown>, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
     headers: JSON_HEADERS,
   });
-}
-
-async function removePrefix(
-  supabase: ReturnType<typeof createClient>,
-  bucket: string,
-  prefix: string
-): Promise<number> {
-  let removed = 0;
-
-  // Removing each page changes the next page, so always request offset zero.
-  // SEC-003 paths are exactly one folder deep; nested folders are rejected.
-  for (let page = 0; page < 100; page += 1) {
-    const { data: entries, error: listError } = await supabase.storage.from(bucket).list(prefix, {
-      limit: 100,
-      offset: 0,
-      sortBy: { column: "name", order: "asc" },
-    });
-    if (listError) throw listError;
-
-    const nestedFolder = (entries ?? []).find((entry) => entry.id == null);
-    if (nestedFolder) {
-      throw new Error("cleanup prefix contains an unexpected nested folder");
-    }
-
-    const paths = (entries ?? []).map((entry) => `${prefix}/${entry.name}`);
-    if (paths.length === 0) return removed;
-
-    const { error: removeError } = await supabase.storage.from(bucket).remove(paths);
-    if (removeError) throw removeError;
-    removed += paths.length;
-  }
-
-  throw new Error("cleanup prefix exceeded the 10,000-object safety limit");
 }
 
 Deno.serve(async (req: Request) => {
@@ -134,8 +110,7 @@ Deno.serve(async (req: Request) => {
 
       if (job.is_prefix) {
         removedObjects += await removePrefix(
-          supabase,
-          job.bucket_id,
+          supabase.storage.from(job.bucket_id) as unknown as PrefixStorage,
           job.object_path.replace(/\/+$/, "")
         );
       } else {
@@ -163,10 +138,29 @@ Deno.serve(async (req: Request) => {
     }
   }
 
+  // The cron that invokes this function reports "succeeded" on every run — its
+  // body is `net.http_post`, which only queues the request — so a failing queue
+  // is invisible from `cron.job_run_details`. Log the queue's own state instead,
+  // which persists, unlike the few hours of `net._http_response`.
+  const { data: healthRows, error: healthError } = await supabase.rpc(
+    "recipe_image_cleanup_health"
+  );
+  if (healthError) {
+    console.error("recipe-storage-maintenance: health check failed", healthError);
+  }
+  const health = (healthRows as CleanupHealth[] | null)?.[0];
+  if (health && (health.dead_jobs > 0 || health.stuck_jobs > 0)) {
+    console.error(
+      "recipe-storage-maintenance: cleanup queue is unhealthy",
+      `dead=${health.dead_jobs} stuck=${health.stuck_jobs} pending=${health.pending_jobs}`
+    );
+  }
+
   return json({
     claimed: jobs.length,
     completed,
     failed,
     removed_objects: removedObjects,
+    ...(health ? { health } : {}),
   });
 });
