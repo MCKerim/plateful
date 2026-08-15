@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, Link } from "react-router";
 import { useSupabase } from "@/utils/supabase";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,6 +11,7 @@ import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 
 export default function Login() {
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { trackScreenViewed } = useOnboardingTracking();
@@ -49,6 +52,8 @@ export default function Login() {
         setLoading(false);
         return;
       }
+
+      posthog?.capture(AnalyticsEvent.magicLinkRequested);
 
       // Store email for verification page
       sessionStorage.setItem("signupEmail", email);

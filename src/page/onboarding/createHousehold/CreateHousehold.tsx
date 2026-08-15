@@ -13,9 +13,12 @@ import { NavLink, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 
 export default function CreateHousehold() {
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const user = useAppSelector(selectUser);
@@ -49,6 +52,10 @@ export default function CreateHousehold() {
 
     try {
       const householdId = await householdApi.create(supabase, { name: trimmedName });
+
+      // householdId comes from Postgres already lowercase — the contract for
+      // this property (see @/lib/analyticsEvents).
+      posthog?.capture(AnalyticsEvent.householdCreated, { household_id: householdId });
 
       dispatch(setUser({ ...user, household_id: householdId }));
       dispatch(

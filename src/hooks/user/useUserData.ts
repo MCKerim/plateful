@@ -121,6 +121,11 @@ export function useUserData() {
         posthog.identify(userData.id, {
           email: userData.email,
           username: userData.username,
+          // iOS sets the same person property (lowercase, as Postgres stores
+          // it) — without it, household-level segmentation only sees iOS
+          // users. Omitted while null so a not-yet-onboarded user keeps any
+          // previously recorded household.
+          ...(userData.household_id ? { household_id: userData.household_id } : {}),
         });
       } catch (error) {
         console.error("Failed to identify user with PostHog:", error);

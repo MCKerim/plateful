@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { usePostHog } from "posthog-js/react";
 import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { ratingsApi, UpdateRatingParams } from "@/api/ratings.api";
 import { RecipeRatingWithUser } from "@/components/general/RatingModal";
 
@@ -9,10 +11,14 @@ type UpdateRatingWithRecipeId = UpdateRatingParams & { recipeId: string };
 export function useUpdateRating() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
+  const posthog = usePostHog();
 
   return useMutation({
     mutationFn: async (params: UpdateRatingWithRecipeId) => {
       return ratingsApi.update(supabase, params);
+    },
+    onSuccess: (_data, params) => {
+      posthog?.capture(AnalyticsEvent.recipeRated, { rating: params.stars, is_edit: true });
     },
     onMutate: async (params) => {
       await queryClient.cancelQueries({

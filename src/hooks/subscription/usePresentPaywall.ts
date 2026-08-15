@@ -1,6 +1,8 @@
 import { useCallback } from "react";
+import { usePostHog } from "posthog-js/react";
 import { RevenueCatUI } from "@revenuecat/purchases-capacitor-ui";
 import { PAYWALL_RESULT } from "@revenuecat/purchases-capacitor";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { setCustomerInfo } from "@/redux/slices/subscriptionSlice";
@@ -16,6 +18,7 @@ import { useTranslation } from "react-i18next";
 
 export function usePresentPaywall() {
   const { t, i18n } = useTranslation();
+  const posthog = usePostHog();
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
   const { supabase } = useSupabase();
@@ -37,6 +40,12 @@ export function usePresentPaywall() {
           result === PAYWALL_RESULT.PURCHASED ||
           result === PAYWALL_RESULT.RESTORED
         ) {
+          posthog?.capture(
+            result === PAYWALL_RESULT.PURCHASED
+              ? AnalyticsEvent.subscriptionPurchased
+              : AnalyticsEvent.subscriptionRestored
+          );
+
           const customerInfo = await getCustomerInfo();
           dispatch(setCustomerInfo(customerInfo));
 
@@ -71,7 +80,7 @@ export function usePresentPaywall() {
         return null;
       }
     },
-    [dispatch, t, i18n.language, householdId, supabase, queryClient]
+    [dispatch, t, i18n.language, householdId, supabase, queryClient, posthog]
   );
 
   return { presentPaywall };

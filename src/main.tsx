@@ -55,6 +55,11 @@ function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
         api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
         defaults: "2025-05-24",
         capture_exceptions: true,
+        // Super property on every event, matching the native iOS app. Shared
+        // dashboards filter on app_environment = production; without it our
+        // events silently drop out of every such insight. The constant is
+        // correct because dev builds skip PostHog entirely (above).
+        loaded: (ph) => ph.register({ app_environment: "production" }),
       }}
     >
       <ErrorBoundary>{children}</ErrorBoundary>

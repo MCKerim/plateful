@@ -1,5 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
+import { usePostHog } from "posthog-js/react";
 import { useSupabase } from "@/utils/supabase";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { nutritionApi, NutritionEstimateInput, NutritionValues } from "@/api/nutrition.api";
 
 /**
@@ -9,8 +11,12 @@ import { nutritionApi, NutritionEstimateInput, NutritionValues } from "@/api/nut
  */
 export function useEstimateNutrition() {
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
 
   return useMutation<NutritionValues, Error, NutritionEstimateInput>({
     mutationFn: (input) => nutritionApi.estimate(supabase, input),
+    onSuccess: () => {
+      posthog?.capture(AnalyticsEvent.nutritionCalculated);
+    },
   });
 }

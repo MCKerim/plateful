@@ -16,12 +16,15 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { recipeImportApi } from "@/api/recipeImport.api";
 import { normalizeRecipeImportUrl } from "@/lib/normalizeRecipeImportUrl";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 
 export default function URLImport() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [urlInput, setUrlInput] = useState("");
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
   const householdId = useAppSelector(selectHouseholdId);
   const [isSaving, setIsSaving] = useState(false);
   // The placeholder was created; we show a brief confirmation then leave.
@@ -52,12 +55,15 @@ export default function URLImport() {
       }
 
       setIsSaving(true);
+      posthog?.capture(AnalyticsEvent.recipeImportStarted, { source: "url" });
       try {
         await recipeImportApi.createUrlImport(supabase, {
           url,
           householdId,
           language: i18n.language.split("-")[0],
         });
+        // Succeeded = the submission was accepted; extraction runs async.
+        posthog?.capture(AnalyticsEvent.recipeImportSucceeded, { source: "url" });
 
         incrementMission.mutate({ missionId: "import_recipes" });
         await queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
@@ -72,12 +78,13 @@ export default function URLImport() {
         redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
       } catch (err) {
         console.error("Failed to start URL import:", err);
+        posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "url" });
         toast.error(t("urlImport.errors.importFailed"));
       } finally {
         setIsSaving(false);
       }
     },
-    [supabase, householdId, i18n.language, incrementMission, queryClient, navigate, t]
+    [supabase, posthog, householdId, i18n.language, incrementMission, queryClient, navigate, t]
   );
 
   useEffect(() => {

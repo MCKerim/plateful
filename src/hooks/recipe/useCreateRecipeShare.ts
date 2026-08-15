@@ -1,5 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
+import { usePostHog } from "posthog-js/react";
 import { useSupabase } from "@/utils/supabase";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { recipeShareApi } from "@/api/recipeShare.api";
 import { recipeApi } from "@/api/recipe.api";
 import { ingredientsApi } from "@/api/ingredients.api";
@@ -15,6 +17,7 @@ const SHARE_BASE_URL = "https://app.plateful.cloud/share";
 export function useCreateRecipeShare() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
+  const posthog = usePostHog();
 
   return useMutation({
     mutationFn: async (recipeId: string): Promise<{ token: string; recipeName: string }> => {
@@ -63,6 +66,8 @@ export function useCreateRecipeShare() {
     },
 
     onSuccess: async ({ token, recipeName }) => {
+      posthog?.capture(AnalyticsEvent.recipeShareLinkCreated);
+
       const shareUrl = `${SHARE_BASE_URL}/${token}`;
 
       try {

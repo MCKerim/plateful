@@ -8,6 +8,8 @@ import { useNavigate, Link } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { Capacitor } from "@capacitor/core";
 
@@ -45,6 +47,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const navigate = useNavigate();
   const [showTransition, setShowTransition] = useState(true);
   const { trackScreenViewed } = useOnboardingTracking();
+  const posthog = usePostHog();
 
   // Safari blocks the window.open inside SocialLogin.login once the click
   // handler has awaited real async work (crypto.subtle.digest), so the nonce
@@ -136,6 +139,8 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
       });
 
       if (error) throw error;
+
+      posthog?.capture(AnalyticsEvent.signedIn, { method: "google" });
     } catch (error) {
       console.error("Unexpected error during sign up:", error);
       toast.error("Authentication failed. Please try again.");

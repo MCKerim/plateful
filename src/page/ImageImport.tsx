@@ -18,6 +18,8 @@ import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { recipeImportApi } from "@/api/recipeImport.api";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 
 // The backend extractor is unreliable with large photo batches, so cap the
 // import at 4 — same limit the iOS app and share extension enforce.
@@ -29,6 +31,7 @@ export default function ImageImport() {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
   const householdId = useAppSelector(selectHouseholdId);
   const queryClient = useQueryClient();
   const [isSaving, setIsSaving] = useState(false);
@@ -144,12 +147,16 @@ export default function ImageImport() {
     }
 
     setIsSaving(true);
+    // `photo`, not the DB's `image` — the analytics vocabulary is iOS's.
+    posthog?.capture(AnalyticsEvent.recipeImportStarted, { source: "photo" });
     try {
       await recipeImportApi.createImageImport(supabase, {
         files: images.map((img) => img.file),
         householdId,
         language: i18n.language.split("-")[0],
       });
+      // Succeeded = the submission was accepted; extraction runs async.
+      posthog?.capture(AnalyticsEvent.recipeImportSucceeded, { source: "photo" });
 
       incrementMission.mutate({ missionId: "import_recipes" });
       await queryClient.invalidateQueries({ queryKey: queryKeys.recipeImports.all });
@@ -163,6 +170,7 @@ export default function ImageImport() {
       redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
     } catch (err) {
       console.error("Failed to start image import:", err);
+      posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "photo" });
       toast.error(t("urlImport.errors.importFailed"));
     } finally {
       setIsSaving(false);

@@ -2,11 +2,14 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { toast } from "sonner";
 
 export default function EmailVerification() {
   const { t } = useTranslation();
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
 
   const [email] = useState<string>(() => {
     const urlParams = new URLSearchParams(globalThis.location.search);
@@ -38,6 +41,9 @@ export default function EmailVerification() {
         toast.error(t("emailVerification.errors.resendFailed"));
         return;
       }
+
+      // A resend is a fresh request — count it like iOS does.
+      posthog?.capture(AnalyticsEvent.magicLinkRequested);
 
       toast.success(t("emailVerification.resendSent"));
     } catch (err) {

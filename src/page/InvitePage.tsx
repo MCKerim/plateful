@@ -23,6 +23,8 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHousehold } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 
 type Props = {
   refreshUser: (authUser: CurrentAuthUser | null, forceBlocking?: boolean) => Promise<boolean>;
@@ -30,6 +32,7 @@ type Props = {
 
 export default function InvitePage({ refreshUser }: Readonly<Props>) {
   const { supabase } = useSupabase();
+  const posthog = usePostHog();
   const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
@@ -120,6 +123,9 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
           if (result.householdId !== preview.householdId) {
             throw new Error("The joined household did not match the invite.");
           }
+          posthog?.capture(AnalyticsEvent.householdJoined, {
+            household_id: result.householdId,
+          });
           // Membership changed on the server, so block navigation until the
           // central auth coordinator atomically publishes the new household.
           // Move the URL first so a retry after a transport failure resumes at
