@@ -45,7 +45,7 @@ export default function Privacy() {
               <p>Im Kassemänneken 5</p>
               <p>46325 Borken (Weseke)</p>
               <p>Germany</p>
-              <p>Email: MCKerim@gmx.de</p>
+              <p>Email: support@plateful.cloud</p>
             </div>
           </section>
 
@@ -394,7 +394,7 @@ export default function Privacy() {
             <h2 className="text-lg font-semibold">Your Rights (GDPR)</h2>
             <p>
               As a user in the EU, you have the following rights under the GDPR. To exercise any of
-              these rights, contact us at MCKerim@gmx.de:
+              these rights, contact us at support@plateful.cloud:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
@@ -411,7 +411,7 @@ export default function Privacy() {
               </li>
               <li>
                 <span className="font-medium">Data portability (Art. 20):</span> Request an export
-                of your data in a machine-readable format. Please contact us at MCKerim@gmx.de and
+                of your data in a machine-readable format. Please contact us at support@plateful.cloud and
                 we will provide your data within 30 days.
               </li>
               <li>
@@ -505,7 +505,7 @@ export default function Privacy() {
               <p>Im Kassemänneken 5</p>
               <p>46325 Borken (Weseke)</p>
               <p>Germany</p>
-              <p>Email: MCKerim@gmx.de</p>
+              <p>Email: support@plateful.cloud</p>
               <p>Through the app's support feature</p>
               <p>Via our social media channels</p>
             </div>

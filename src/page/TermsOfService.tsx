@@ -43,7 +43,7 @@ export default function TermsOfService() {
               <p>Im Kassemänneken 5</p>
               <p>46325 Borken (Weseke)</p>
               <p>Germany</p>
-              <p>Email: MCKerim@gmx.de</p>
+              <p>Email: support@plateful.cloud</p>
             </div>
           </section>
 
@@ -378,7 +378,7 @@ export default function TermsOfService() {
               <p>Im Kassemänneken 5</p>
               <p>46325 Borken (Weseke)</p>
               <p>Germany</p>
-              <p>Email: MCKerim@gmx.de</p>
+              <p>Email: support@plateful.cloud</p>
               <p>Through the app's support feature</p>
               <p>Via our social media channels</p>
             </div>

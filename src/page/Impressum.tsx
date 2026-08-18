@@ -26,7 +26,7 @@ export default function Impressum() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Kontakt</h2>
             <div className="bg-muted p-4 rounded-lg space-y-1">
-              <p>E-Mail: MCKerim@gmx.de</p>
+              <p>E-Mail: support@plateful.cloud</p>
             </div>
           </section>
 
