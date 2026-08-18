@@ -115,6 +115,35 @@ describe("useUserData", () => {
     expect(mocks.dispatch).not.toHaveBeenCalledWith(setUser(null));
   });
 
+  it("reports the device language upward without letting the stored one change the interface", async () => {
+    mocks.getCurrent.mockResolvedValue({ ...user, language: "de" });
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    // The device owns the interface language. Pulling "de" down from the
+    // server is what used to undo a language change made on another client.
+    expect(mocks.changeLanguage).not.toHaveBeenCalled();
+    expect(mocks.updateLanguage).toHaveBeenCalledWith(mocks.supabase, {
+      userId: user.id,
+      language: "en",
+    });
+  });
+
+  it("leaves the stored language alone when it already matches the device", async () => {
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+    await act(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    });
+
+    expect(mocks.updateLanguage).not.toHaveBeenCalled();
+  });
+
   it("returns a retryable failure without publishing partial household state", async () => {
     mocks.getHousehold.mockRejectedValue(new Error("Temporary household failure"));
     const { result } = renderHook(() => useUserData());

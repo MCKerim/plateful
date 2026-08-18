@@ -121,6 +121,8 @@ Push notification permission management is in `src/hooks/notifications/`. Fireba
 
 Supports English and German. Use `useTranslation()` hook and add strings to `src/locales/translation.{lang}.json`.
 
+**The device owns the interface language, not the server.** i18next's detector resolves it and caches it in `localStorage['i18nextLng']`; the picker in `src/page/Settings.tsx` calls `i18n.changeLanguage()` directly. `users.language` is a **write-only mirror** — report it upward on sign-in (`src/hooks/user/useUserData.ts`) and never read it back into the UI. Only the server reads that column: the `seed_default_collections` trigger and the MCP server's `get_context`, for content generated where there is no request to take a language from. Reading it back is what let an English iPhone silently undo a German choice made here. Recipe imports carry their own `language` column, stamped at insert. Full cross-repo contract: `docs/language.md` in `~/programming/ios-native/plateful`.
+
 ### Data Fetching Pattern
 
 The app uses a layered architecture for data fetching:

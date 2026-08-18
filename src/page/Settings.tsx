@@ -151,6 +151,10 @@ export default function Settings() {
   }
 
   function handleUpdateLanguage(language: string) {
+    // The device owns the interface language, so switch it first and
+    // unconditionally; the server row is a mirror the backend reads, not the
+    // source of truth, and a signed-out visitor can still change languages.
+    void i18n.changeLanguage(language);
     if (!user) return;
     updateLanguageMutation.mutate({ userId: user.id, language });
   }

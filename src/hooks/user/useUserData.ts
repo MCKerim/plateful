@@ -134,40 +134,29 @@ export function useUserData() {
       // Language and billing identity are useful integrations, but neither is
       // allowed to hold the authenticated app bootstrap open. Queuing them
       // preserves auth-event order during rapid sign-out/account switching.
+      //
+      // This reports the language upward and never pulls it down. The device
+      // owns which language the app renders in (i18next's detector, cached in
+      // localStorage); `users.language` is a write-only mirror that only the
+      // server reads, for recipes generated where there is no request to take
+      // a language from. Reading it back is what let an English iPhone
+      // silently undo a German choice made here. See docs/language.md in
+      // ~/programming/ios-native/plateful.
       languageSynchronizationQueue = languageSynchronizationQueue
         .catch(() => undefined)
         .then(async () => {
           if (!isCurrent()) return;
 
-          const storedLanguage = userData.language;
-          const detectedLanguage = i18n.language.split("-")[0]; // 'en-US' -> 'en'
-          const supportedLanguages = ["en", "de"];
+          const currentLanguage = i18n.language.split("-")[0]; // 'en-US' -> 'en'
+          if (userData.language === currentLanguage) return;
 
-          if (storedLanguage && supportedLanguages.includes(storedLanguage)) {
-            if (i18n.language !== storedLanguage) {
-              await i18n.changeLanguage(storedLanguage);
-            }
-            if (isCurrent()) {
-              localStorage.setItem("language", storedLanguage);
-            }
-            return;
-          }
-
-          const languageToSave = supportedLanguages.includes(detectedLanguage)
-            ? detectedLanguage
-            : "en";
           try {
             await userApi.updateLanguage(supabase, {
               userId: userData.id,
-              language: languageToSave,
+              language: currentLanguage,
             });
           } catch (error) {
-            console.error("Failed to save detected language:", error);
-          }
-          if (!isCurrent()) return;
-          await i18n.changeLanguage(languageToSave);
-          if (isCurrent()) {
-            localStorage.setItem("language", languageToSave);
+            console.error("Failed to report the current language:", error);
           }
         })
         .catch((error) => console.error("Failed to synchronize user language:", error));
