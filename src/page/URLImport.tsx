@@ -18,6 +18,7 @@ import { recipeImportApi } from "@/api/recipeImport.api";
 import { normalizeRecipeImportUrl } from "@/lib/normalizeRecipeImportUrl";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { contentLanguage } from "@/lib/contentLanguage";
 
 export default function URLImport() {
   const { t, i18n } = useTranslation();
@@ -60,7 +61,7 @@ export default function URLImport() {
         await recipeImportApi.createUrlImport(supabase, {
           url,
           householdId,
-          language: i18n.language.split("-")[0],
+          language: contentLanguage(),
         });
         // Succeeded = the submission was accepted; extraction runs async.
         posthog?.capture(AnalyticsEvent.recipeImportSucceeded, { source: "url" });

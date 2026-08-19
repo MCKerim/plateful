@@ -20,6 +20,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { recipeImportApi } from "@/api/recipeImport.api";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { contentLanguage } from "@/lib/contentLanguage";
 
 // The backend extractor is unreliable with large photo batches, so cap the
 // import at 4 — same limit the iOS app and share extension enforce.
@@ -28,7 +29,7 @@ const MAX_IMPORT_IMAGES = 4;
 let lastAutoImportedFileUris: string | null = null;
 
 export default function ImageImport() {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { supabase } = useSupabase();
   const posthog = usePostHog();
@@ -153,7 +154,7 @@ export default function ImageImport() {
       await recipeImportApi.createImageImport(supabase, {
         files: images.map((img) => img.file),
         householdId,
-        language: i18n.language.split("-")[0],
+        language: contentLanguage(),
       });
       // Succeeded = the submission was accepted; extraction runs async.
       posthog?.capture(AnalyticsEvent.recipeImportSucceeded, { source: "photo" });

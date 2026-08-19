@@ -7,7 +7,7 @@ import { useSupabase } from "@/utils/supabase";
 import { userApi } from "@/api/user.api";
 import type { CurrentAuthUser } from "@/api/user.api";
 import posthog from "posthog-js";
-import i18n from "@/i18n";
+import { contentLanguage } from "@/lib/contentLanguage";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
@@ -147,7 +147,7 @@ export function useUserData() {
         .then(async () => {
           if (!isCurrent()) return;
 
-          const currentLanguage = i18n.language.split("-")[0]; // 'en-US' -> 'en'
+          const currentLanguage = contentLanguage();
           if (userData.language === currentLanguage) return;
 
           try {
