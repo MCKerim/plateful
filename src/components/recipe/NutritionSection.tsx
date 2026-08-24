@@ -50,6 +50,13 @@ export default function NutritionSection({ nutrition, isPending = false }: Reado
   const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
+  // One pulse definition for BOTH value rows (collapsed and expanded), so
+  // they breathe together while an estimate runs.
+  const pulseAnimate = isPending ? { opacity: [0.35, 0.8, 0.35] } : { opacity: 1 };
+  const pulseTransition = isPending
+    ? { duration: 2, repeat: Infinity, ease: "easeInOut" as const }
+    : { duration: 0.2 };
+
   const hasAny = Object.values(nutrition).some((v) => v !== null);
   if (!hasAny && !isPending) return null;
 
@@ -93,14 +100,8 @@ export default function NutritionSection({ nutrition, isPending = false }: Reado
       aria-label={t("nutrition.perServingNote")}
       className="w-full mt-2 rounded-3xl border border-border/60 bg-muted/40 backdrop-blur-md shadow-sm px-4 py-3.5 flex flex-col"
     >
-      <motion.div
-        className="flex flex-col"
-        animate={isPending ? { opacity: [0.35, 0.8, 0.35] } : { opacity: 1 }}
-        transition={
-          isPending ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }
-        }
-      >
-        <div className="flex">{PRIMARY.map(tile)}</div>
+      <motion.div className="flex" animate={pulseAnimate} transition={pulseTransition}>
+        {PRIMARY.map(tile)}
       </motion.div>
 
       {isPending && (
@@ -120,7 +121,9 @@ export default function NutritionSection({ nutrition, isPending = false }: Reado
             className="overflow-hidden"
           >
             <div className="flex flex-col gap-3 pt-4">
-              <div className="flex">{SECONDARY.map(tile)}</div>
+              <motion.div className="flex" animate={pulseAnimate} transition={pulseTransition}>
+                {SECONDARY.map(tile)}
+              </motion.div>
               <p className="text-center text-xs text-muted-foreground">
                 {t("nutrition.perServingNote")}
               </p>
