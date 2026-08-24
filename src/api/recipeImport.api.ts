@@ -63,16 +63,6 @@ export const recipeImportApi = {
   },
 
   /**
-   * Re-runs a failed import via the `retry_import` RPC (flips it back to
-   * `importing` server-side). The client can't UPDATE `recipe_imports` directly
-   * — that's revoked — so retry must go through the RPC.
-   */
-  async retry(supabase: SupabaseClient, importId: string): Promise<void> {
-    const { error } = await supabase.rpc("retry_import", { p_import_id: importId });
-    if (error) throw error;
-  },
-
-  /**
    * Dismisses an import placeholder by deleting its row. Any recipes it already
    * produced are untouched (`recipes.import_id` is `ON DELETE SET NULL`).
    */

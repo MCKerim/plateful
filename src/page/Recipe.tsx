@@ -223,7 +223,23 @@ export default function Recipe() {
     </>
   );
 
-  if (isLoading || !recipe) return <RecipePageSkeleton />;
+  if (isLoading) return <RecipePageSkeleton />;
+
+  // Loaded and null: the recipe was deleted (likely by another household
+  // member) while this link/tab was open — say so instead of skeleton-ing
+  // forever (or, before `getById` moved to maybeSingle, crashing).
+  if (!recipe)
+    return (
+      <Layout showHeader={false} showFooter={false}>
+        <div className="flex flex-col items-center justify-center gap-3 px-6 py-24 text-center">
+          <span className="text-lg font-semibold">{t("recipe.goneTitle")}</span>
+          <span className="text-sm text-muted-foreground">{t("recipe.goneBody")}</span>
+          <Button variant="secondary" className="mt-2" onClick={() => navigate(-1)}>
+            {t("survey.back")}
+          </Button>
+        </div>
+      </Layout>
+    );
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter}>

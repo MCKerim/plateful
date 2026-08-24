@@ -43,7 +43,14 @@ const emptyNutrition: NutritionValues = {
 
 export const recipeApi = {
   async getById(supabase: SupabaseClient, recipeId: string): Promise<Recipes | null> {
-    const { data, error } = await supabase.from("recipes").select("*").eq("id", recipeId).single();
+    // maybeSingle, not single: a recipe deleted by another household member
+    // must resolve to null (a friendly "gone" page), not throw "Cannot coerce
+    // the result to a single JSON object" at whoever still has the link open.
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .eq("id", recipeId)
+      .maybeSingle();
 
     if (error) throw error;
     return data;

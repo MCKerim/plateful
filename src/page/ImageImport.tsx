@@ -22,9 +22,9 @@ import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { contentLanguage } from "@/lib/contentLanguage";
 
-// The backend extractor is unreliable with large photo batches, so cap the
-// import at 4 — same limit the iOS app and share extension enforce.
-const MAX_IMPORT_IMAGES = 4;
+// Cap the import's photo batch — the same limit the server CHECK constraint
+// and the iOS app enforce (raised 4 → 8 on 2026-08-23; keep all in step).
+const MAX_IMPORT_IMAGES = 8;
 
 let lastAutoImportedFileUris: string | null = null;
 

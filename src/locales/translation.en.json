@@ -311,7 +311,12 @@
     "importing": "Importing...",
     "recentlyAdded": "Recently Added",
     "importFailed": "Import failed",
-    "retry": "Retry",
+    "importFailedSourceUnavailable": "This post is private or no longer available, so we couldn’t read it. Private recipes can still be imported as screenshots.",
+    "importFailedUnreachable": "We couldn’t reach this link. Check that it’s complete and correct, then import it again.",
+    "importFailedNoRecipePage": "We didn’t find a recipe on that page. Screenshots of the recipe or its text usually work.",
+    "importFailedPhotos": "We couldn’t find a recipe in these photos. Clearer photos usually work, or paste the recipe’s text.",
+    "importFailedText": "We couldn’t make a recipe from that text. Tweak it and generate again.",
+    "importFailedLink": "We couldn’t read this link. Screenshots of the recipe or its text usually work.",
     "dismiss": "Dismiss"
   },
   "collections": {
@@ -359,6 +364,8 @@
     }
   },
   "recipe": {
+    "goneTitle": "This Recipe Is Gone",
+    "goneBody": "It may have been deleted by someone in your household.",
     "editRecipe": "Edit recipe",
     "toTheRecipe": "To the recipe",
     "planRecipe": "Plan recipe",

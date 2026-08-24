@@ -24,7 +24,7 @@ export function useRecipeImports() {
     queryFn: async (): Promise<RecipeImportPlaceholder[]> => {
       const { data, error } = await supabase
         .from("recipe_imports")
-        .select("id, source_type, source_url, status, error, created_at")
+        .select("id, source_type, source_url, status, error, error_code, created_at")
         .in("status", ["importing", "failed"])
         .order("created_at", { ascending: false });
 
@@ -36,6 +36,7 @@ export function useRecipeImports() {
         sourceUrl: row.source_url,
         status: row.status as RecipeImportStatus,
         error: row.error,
+        errorCode: row.error_code,
         createdAt: row.created_at,
       }));
     },

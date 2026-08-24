@@ -733,6 +733,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           error: string | null
+          error_code: string | null
           household_id: string
           id: string
           language: string | null
@@ -749,6 +750,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           error?: string | null
+          error_code?: string | null
           household_id: string
           id?: string
           language?: string | null
@@ -765,6 +767,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           error?: string | null
+          error_code?: string | null
           household_id?: string
           id?: string
           language?: string | null
@@ -1003,6 +1006,8 @@ export type Database = {
           instructions: string | null
           link: string | null
           name: string
+          nutrition_auto: boolean
+          nutrition_pending: boolean
           owner_id: string | null
           protein_g: number | null
           search_tsv: unknown
@@ -1034,6 +1039,8 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name: string
+          nutrition_auto?: boolean
+          nutrition_pending?: boolean
           owner_id?: string | null
           protein_g?: number | null
           search_tsv?: unknown
@@ -1065,6 +1072,8 @@ export type Database = {
           instructions?: string | null
           link?: string | null
           name?: string
+          nutrition_auto?: boolean
+          nutrition_pending?: boolean
           owner_id?: string | null
           protein_g?: number | null
           search_tsv?: unknown
@@ -1389,6 +1398,8 @@ export type Database = {
           image_path: string | null
           import_id: string | null
           name: string | null
+          nutrition_auto: boolean | null
+          nutrition_pending: boolean | null
           servings_unit: string | null
           status: string | null
         }
@@ -1402,6 +1413,8 @@ export type Database = {
           image_path?: string | null
           import_id?: string | null
           name?: string | null
+          nutrition_auto?: boolean | null
+          nutrition_pending?: boolean | null
           servings_unit?: string | null
           status?: string | null
         }
@@ -1415,6 +1428,8 @@ export type Database = {
           image_path?: string | null
           import_id?: string | null
           name?: string | null
+          nutrition_auto?: boolean | null
+          nutrition_pending?: boolean | null
           servings_unit?: string | null
           status?: string | null
         }

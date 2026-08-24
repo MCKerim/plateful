@@ -311,7 +311,12 @@
     "importing": "Importiere...",
     "recentlyAdded": "Zuletzt hinzugefügt",
     "importFailed": "Import fehlgeschlagen",
-    "retry": "Erneut versuchen",
+    "importFailedSourceUnavailable": "Dieser Beitrag ist privat oder nicht mehr verfügbar, deshalb konnten wir ihn nicht auslesen. Private Rezepte kannst du stattdessen als Screenshots importieren.",
+    "importFailedUnreachable": "Diesen Link konnten wir nicht erreichen. Prüfe, ob er vollständig und richtig ist, und importiere ihn dann noch einmal.",
+    "importFailedNoRecipePage": "Auf dieser Seite haben wir kein Rezept gefunden. Screenshots des Rezepts oder sein Text funktionieren meistens.",
+    "importFailedPhotos": "In diesen Fotos konnten wir kein Rezept finden. Schärfere Fotos funktionieren meistens, oder füge den Text des Rezepts ein.",
+    "importFailedText": "Aus diesem Text konnten wir kein Rezept machen. Passe ihn an und generiere es noch einmal.",
+    "importFailedLink": "Diesen Link konnten wir nicht auslesen. Screenshots des Rezepts oder sein Text funktionieren meistens.",
     "dismiss": "Verwerfen"
   },
   "collections": {
@@ -359,6 +364,8 @@
     }
   },
   "recipe": {
+    "goneTitle": "Dieses Rezept ist verschwunden",
+    "goneBody": "Vielleicht hat es jemand aus deinem Haushalt gelöscht.",
     "editRecipe": "Rezept bearbeiten",
     "toTheRecipe": "Zum Rezept",
     "planRecipe": "Rezept planen",
