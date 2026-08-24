@@ -26,6 +26,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import Rive from "@rive-app/react-canvas";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
+import { nutritionApi } from "@/api/nutrition.api";
 import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
@@ -341,6 +342,15 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         });
       }
 
+      // First nutrition estimate, now that the ingredient rows exist.
+      // Best-effort: the recipe is saved either way, and the server skips
+      // recipes whose nutrition_auto flag is off.
+      if (ingredients && ingredients.length > 0) {
+        nutritionApi.refresh(supabase, newRecipe.id).catch((error) => {
+          console.error("Nutrition refresh request failed", error);
+        });
+      }
+
       setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
       setPendingFeedback((prev) => [
         ...prev,
@@ -397,6 +407,14 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         await replaceInstructionsMutation.mutateAsync({
           recipeId,
           inputs: parseInstructionsMarkdown(instructions),
+        });
+      }
+
+      // The ingredients changed, so the stored per-serving values went stale —
+      // ask the backend to re-estimate (it skips manual-nutrition recipes).
+      if (ingredients && ingredients.length > 0) {
+        nutritionApi.refresh(supabase, recipeId).catch((error) => {
+          console.error("Nutrition refresh request failed", error);
         });
       }
 

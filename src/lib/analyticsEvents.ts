@@ -32,7 +32,12 @@ export const AnalyticsEvent = {
   recipeShareLinkCreated: "recipe_share_link_created",
   sharedRecipeImported: "shared_recipe_imported",
   recipeRated: "recipe_rated",
-  nutritionCalculated: "nutrition_calculated",
+  /**
+   * A save changed how a recipe's nutrition is managed (`enabled`: the new
+   * `nutrition_auto` state). Fired for edits only — a recipe created with the
+   * toggle off was never auto-managed and would inflate the metric.
+   */
+  nutritionAutoToggled: "nutrition_auto_toggled",
   subscriptionPurchased: "subscription_purchased",
   subscriptionRestored: "subscription_restored",
   householdCreated: "household_created",

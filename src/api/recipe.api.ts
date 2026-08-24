@@ -11,6 +11,8 @@ export type CreateRecipeParams = {
   baseServings?: number | null;
   /** When provided, writes all 7 metrics (a null value clears that column). */
   nutrition?: NutritionValues | null;
+  /** `recipes.nutrition_auto`; omitted = the database default (true). */
+  nutritionAuto?: boolean;
 };
 
 export type UpdateRecipeParams = {
@@ -22,6 +24,13 @@ export type UpdateRecipeParams = {
   baseServings?: number | null;
   /** When provided, writes all 7 metrics (a null value clears that column). */
   nutrition?: NutritionValues | null;
+  /**
+   * When provided, writes `nutrition_auto`; omitted = leave the flag alone.
+   * Only the recipe editor (which shows the toggle) should provide it — an
+   * unconditional `true` here once flipped manual recipes back to automatic
+   * on iOS, so callers that don't manage the toggle must not send it.
+   */
+  nutritionAuto?: boolean;
 };
 
 export type RecipeImageInfo = {
@@ -101,6 +110,7 @@ export const recipeApi = {
           link: params.link,
           household_id: params.householdId,
           base_servings: params.baseServings,
+          nutrition_auto: params.nutritionAuto ?? true,
           ...(params.nutrition ? params.nutrition : {}),
         },
       ])
@@ -121,8 +131,10 @@ export const recipeApi = {
         link: params.link,
         base_servings: params.baseServings,
         // Only touch nutrition columns when the editor supplied them, so other
-        // update paths never accidentally wipe a saved estimate.
+        // update paths never accidentally wipe a saved estimate (or, with
+        // nutrition_auto on, clobber one the worker wrote mid-edit).
         ...(params.nutrition !== undefined ? (params.nutrition ?? emptyNutrition) : {}),
+        ...(params.nutritionAuto !== undefined ? { nutrition_auto: params.nutritionAuto } : {}),
       })
       .eq("id", params.recipeId)
       .select()

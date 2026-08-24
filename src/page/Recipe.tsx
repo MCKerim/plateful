@@ -376,7 +376,9 @@ export default function Recipe() {
         <p className="text-md font-medium mt-2 whitespace-pre-wrap">{recipe.description}</p>
       )}
 
-      {/* Nutrition Section (per serving; hidden when nothing calculated) */}
+      {/* Nutrition Section (per serving; hidden when nothing calculated and
+          no estimate is running — nutrition_pending pulses until the worker's
+          values arrive via Realtime → refetch) */}
       <NutritionSection
         nutrition={{
           calories_kcal: recipe.calories_kcal,
@@ -387,6 +389,7 @@ export default function Recipe() {
           fiber_g: recipe.fiber_g,
           sodium_mg: recipe.sodium_mg,
         }}
+        isPending={recipe.nutrition_pending}
       />
 
       {/* Ingredients Section */}

@@ -6,6 +6,10 @@ import { NutritionValues } from "@/api/nutrition.api";
 
 type Props = {
   nutrition: NutritionValues;
+  /** `recipes.nutrition_pending`: an estimate is queued or running. The card
+   *  shows (pulsing, with an "Updating nutrition…" note) even when every
+   *  value is still null; the finished values arrive via Realtime → refetch. */
+  isPending?: boolean;
 };
 
 type MetricDef = {
@@ -38,14 +42,16 @@ const THIN_SPACE = " ";
  * (🔥520 · C 62 · P 18 · F 21), no heading, no units, no chevron. Tapping unfolds
  * it: units appear, each value gets its name underneath, sugar/fiber/sodium slide
  * in, and a small "Nutrition per serving" note anchors the bottom. Hidden
- * entirely when nothing has been calculated.
+ * entirely when nothing has been calculated and no estimate is running; while
+ * one is (`isPending`), the values breathe with a soft opacity pulse under an
+ * "Updating nutrition…" note — mirroring the iOS card.
  */
-export default function NutritionSection({ nutrition }: Readonly<Props>) {
+export default function NutritionSection({ nutrition, isPending = false }: Readonly<Props>) {
   const { t, i18n } = useTranslation();
   const [isExpanded, setIsExpanded] = useState(false);
 
   const hasAny = Object.values(nutrition).some((v) => v !== null);
-  if (!hasAny) return null;
+  if (!hasAny && !isPending) return null;
 
   const format = (value: number) =>
     value.toLocaleString(i18n.language, { maximumFractionDigits: 1, useGrouping: false });
@@ -87,7 +93,21 @@ export default function NutritionSection({ nutrition }: Readonly<Props>) {
       aria-label={t("nutrition.perServingNote")}
       className="w-full mt-2 rounded-3xl border border-border/60 bg-muted/40 backdrop-blur-md shadow-sm px-4 py-3.5 flex flex-col"
     >
-      <div className="flex">{PRIMARY.map(tile)}</div>
+      <motion.div
+        className="flex flex-col"
+        animate={isPending ? { opacity: [0.35, 0.8, 0.35] } : { opacity: 1 }}
+        transition={
+          isPending ? { duration: 2, repeat: Infinity, ease: "easeInOut" } : { duration: 0.2 }
+        }
+      >
+        <div className="flex">{PRIMARY.map(tile)}</div>
+      </motion.div>
+
+      {isPending && (
+        <p className="pt-2 text-center text-xs text-muted-foreground">
+          {t("nutrition.updating")}
+        </p>
+      )}
 
       <AnimatePresence initial={false}>
         {isExpanded && (

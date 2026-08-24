@@ -8,7 +8,7 @@ import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams, useSearchParams } from "react-router";
 import { toast } from "sonner";
@@ -39,7 +39,9 @@ import {
   parseInstructionsMarkdown,
 } from "@/lib/transformers/instruction.transformer";
 import NutritionEditor from "@/components/recipe/NutritionEditor";
-import { NutritionValues } from "@/api/nutrition.api";
+import { nutritionApi, NutritionValues } from "@/api/nutrition.api";
+import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import CollectionMultiSelect from "@/components/collections/CollectionMultiSelect";
 import {
   useRecipeCollectionIds,
@@ -49,6 +51,28 @@ import { recipeImageApi } from "@/api/recipeImage.api";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
+
+/**
+ * Per-serving values rescaled to a new serving count, at display precision
+ * (whole kcal/mg, grams to one decimal) so the numbers read as cleanly as an
+ * estimate would. Same math as the iOS editor's servings-only rescale.
+ */
+function rescaleNutrition(values: NutritionValues, factor: number): NutritionValues {
+  const scale = (value: number | null, decimals: 0 | 1): number | null => {
+    if (value == null) return null;
+    const scaled = value * factor;
+    return decimals === 0 ? Math.round(scaled) : Number(scaled.toFixed(1));
+  };
+  return {
+    calories_kcal: scale(values.calories_kcal, 0),
+    carbs_g: scale(values.carbs_g, 1),
+    protein_g: scale(values.protein_g, 1),
+    fat_g: scale(values.fat_g, 1),
+    sugar_g: scale(values.sugar_g, 1),
+    fiber_g: scale(values.fiber_g, 1),
+    sodium_mg: scale(values.sodium_mg, 0),
+  };
+}
 
 export default function AddRecipe() {
   const { supabase } = useSupabase();
@@ -71,6 +95,16 @@ export default function AddRecipe() {
   // `undefined` until the editor reports values (loaded recipe or user action),
   // so saving before an edited recipe loads never wipes its saved nutrition.
   const [nutrition, setNutrition] = useState<NutritionValues | undefined>(undefined);
+  // Mirrors `recipes.nutrition_auto`: on (default) = the backend re-estimates
+  // whenever a save changes the ingredients and the editor fields are locked.
+  const [nutritionAuto, setNutritionAuto] = useState(true);
+  // Save-time diff baselines (what "unchanged" means) + whether the user
+  // hand-edited the nutrition fields this session — values typed while the
+  // toggle was off must be re-estimated if it's back on at save.
+  const loadedNutritionAuto = useRef(true);
+  const loadedIngredientLines = useRef<string[]>([]);
+  const loadedBaseServings = useRef(1);
+  const nutritionEdited = useRef(false);
 
   const filterCollectionSelection = useAppSelector(selectCollectionSelection);
   const [selectedCollectionIds, setSelectedCollectionIds] = useState<string[] | null>(() => {
@@ -88,6 +122,7 @@ export default function AddRecipe() {
   const [imageUploading, setImageUploading] = useState(false);
 
   const navigate = useNavigate();
+  const posthog = usePostHog();
 
   const recipeId = params.recipeId ?? null;
 
@@ -195,6 +230,9 @@ export default function AddRecipe() {
       setBaseServings(recipe.base_servings ?? 1);
       setImageSupabaseUrl(recipe.image_path ?? "");
       setImageRemoved(false);
+      setNutritionAuto(recipe.nutrition_auto);
+      loadedNutritionAuto.current = recipe.nutrition_auto;
+      loadedBaseServings.current = recipe.base_servings ?? 1;
     }
   }, [recipe]);
 
@@ -202,6 +240,9 @@ export default function AddRecipe() {
   useEffect(() => {
     if (existingIngredients.length > 0) {
       setIngredients(ingredientsToEditorItems(existingIngredients));
+      loadedIngredientLines.current = existingIngredients
+        .map((row) => row.rawText.trim())
+        .filter((text) => text !== "");
     }
   }, [existingIngredients]);
 
@@ -304,6 +345,51 @@ export default function AddRecipe() {
       });
     };
 
+    // What this save should do about nutrition, decided in one place — the
+    // web port of the iOS editor's nutritionPlan(). While `nutrition_auto` is
+    // on, the backend owns the seven columns: writing this editor's snapshot
+    // back would race (and erase) an estimate that landed mid-edit, so the
+    // update omits them unless there is a concrete local value to write.
+    const editingExisting = Boolean(recipeId ?? createdRecipeId);
+    const valuesEmpty =
+      !nutrition || Object.values(nutrition).every((value) => value == null);
+    // Order-insensitive: reordering lines changes no food, so it neither
+    // deserves an AI call nor blocks the servings rescale below.
+    const linesChanged =
+      [...ingredientLines].sort().join("\n") !==
+      [...loadedIngredientLines.current].sort().join("\n");
+    const wantsNutritionRefresh =
+      nutritionAuto &&
+      ingredientLines.length > 0 &&
+      (linesChanged || !loadedNutritionAuto.current || nutritionEdited.current || valuesEmpty);
+
+    let nutritionWrite: NutritionValues | null | undefined;
+    if (!nutritionAuto || !editingExisting) {
+      // Manual mode (the fields are the user's, verbatim) — and an insert has
+      // no columns to leave untouched.
+      nutritionWrite = nutrition;
+    } else if (wantsNutritionRefresh) {
+      nutritionWrite = undefined; // the worker writes the real values
+    } else if (ingredientLines.length === 0 && loadedIngredientLines.current.length > 0) {
+      // Emptied the recipe: the stored per-serving values lost their basis.
+      nutritionWrite = null; // recipeApi maps null → clear all seven
+    } else if (
+      (baseServings ?? 1) !== loadedBaseServings.current &&
+      loadedBaseServings.current > 0 &&
+      (baseServings ?? 1) > 0 &&
+      nutrition &&
+      !valuesEmpty
+    ) {
+      // Servings-only change: deterministic local rescale — same food,
+      // different denominator, no AI call.
+      nutritionWrite = rescaleNutrition(
+        nutrition,
+        loadedBaseServings.current / (baseServings ?? 1)
+      );
+    } else {
+      nutritionWrite = undefined; // untouched under auto: leave the columns alone
+    }
+
     try {
       let targetRecipeId = recipeId ?? createdRecipeId;
 
@@ -315,7 +401,8 @@ export default function AddRecipe() {
           instructions: instructionsMarkdown,
           link,
           baseServings: baseServings ?? 1,
-          nutrition,
+          nutrition: nutritionWrite,
+          nutritionAuto,
         });
       } else {
         const createdRecipe = await createRecipeMutation.mutateAsync({
@@ -325,7 +412,8 @@ export default function AddRecipe() {
           link,
           householdId: householdId!,
           baseServings: baseServings ?? 1,
-          nutrition,
+          nutrition: nutritionWrite,
+          nutritionAuto,
         });
         targetRecipeId = createdRecipe.id;
         // Keep the ID before any secondary save. A retry after an image,
@@ -351,10 +439,26 @@ export default function AddRecipe() {
       }
 
       await saveIngredients(targetRecipeId);
+
+      // AFTER the ingredient rows above — they are what the worker estimates
+      // from. Best-effort: the recipe is saved either way, and the values
+      // arrive via Realtime whether or not this page is still open.
+      if (wantsNutritionRefresh) {
+        try {
+          await nutritionApi.refresh(supabase, targetRecipeId);
+        } catch (error) {
+          console.error("Nutrition refresh request failed", error);
+        }
+      }
+
       await replaceCollectionsMutation.mutateAsync({
         recipeId: targetRecipeId,
         collectionIds: selectedCollectionIds ?? membershipsQuery.data ?? [],
       });
+
+      if (recipeId && nutritionAuto !== loadedNutritionAuto.current) {
+        posthog?.capture(AnalyticsEvent.nutritionAutoToggled, { enabled: nutritionAuto });
+      }
 
       toast.success(t("addRecipe.recipeSaved"));
       navigate(`/recipe/${targetRecipeId}`, { replace: true });
@@ -539,9 +643,11 @@ export default function AddRecipe() {
         <NutritionEditor
           initial={initialNutrition}
           onChange={setNutrition}
-          title={title}
-          servings={baseServings}
-          ingredientLines={ingredientLines}
+          onEdited={() => {
+            nutritionEdited.current = true;
+          }}
+          auto={nutritionAuto}
+          onAutoChange={setNutritionAuto}
         />
       </div>
     </Layout>

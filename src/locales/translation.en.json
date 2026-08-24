@@ -467,14 +467,10 @@
       "protein": "P",
       "fat": "F"
     },
-    "calculate": "Calculate nutrition",
-    "recalculate": "Recalculate",
-    "calculating": "Calculating...",
-    "errors": {
-      "titleRequired": "Add a recipe name first.",
-      "ingredientsRequired": "Add ingredients first.",
-      "calculateFailed": "Couldn't calculate nutrition right now. Please try again."
-    }
+    "updateAutomatically": "Update automatically",
+    "autoOnHint": "Values are per serving, estimated from the ingredients. They update on their own when the ingredients change.",
+    "autoOffHint": "Values are per serving. They stay exactly as you enter them.",
+    "updating": "Updating nutrition…"
   },
   "home": {
     "title": "Home",

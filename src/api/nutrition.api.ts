@@ -3,7 +3,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 /**
  * The seven per-serving nutrition metrics, keyed exactly like the `recipes`
  * table columns. `null` means "not calculated" (the whole card is hidden when
- * every value is null).
+ * every value is null and no estimate is pending).
  */
 export type NutritionValues = {
   calories_kcal: number | null;
@@ -15,75 +15,40 @@ export type NutritionValues = {
   sodium_mg: number | null;
 };
 
-export type NutritionEstimateInput = {
-  title: string;
-  servings: number | null;
-  /** Human-readable ingredient lines, e.g. "200 g flour". At least one. */
-  ingredients: string[];
-};
-
-/**
- * The recipe-extractor's estimate route replies in camelCase (its zod schema),
- * NOT the snake_case DB columns — so we map on the way in.
- */
-type NutritionEstimateResponse = {
-  nutrition: {
-    caloriesKcal: number;
-    carbsG: number;
-    proteinG: number;
-    fatG: number;
-    sugarG: number;
-    fiberG: number;
-    sodiumMg: number;
-  };
-};
-
-const ESTIMATE_ENDPOINT = "https://extractor.plateful.cloud/api/nutrition/estimate";
+const REFRESH_ENDPOINT = "https://extractor.plateful.cloud/api/nutrition/refresh";
 
 export const nutritionApi = {
   /**
-   * Estimates nutrition per serving for the recipe as it currently sits in the
-   * editor (unsaved edits included). The extractor verifies the caller's
-   * Supabase JWT and returns the values without persisting anything — saving
-   * happens through the normal recipe-save path. Mirrors the iOS
-   * `NutritionEstimator`.
+   * Asks the backend to re-estimate a SAVED recipe's nutrition — the
+   * automatic-update path (contract: the iOS repo's
+   * docs/system-architecture.md). The extractor verifies the caller's
+   * Supabase JWT, checks the recipe belongs to their household, sets
+   * `nutrition_pending` (the card's loading state) and queues a worker job
+   * that overwrites the seven columns; the values arrive via the normal
+   * Realtime → refetch path, so the user can leave the page. Call it after a
+   * save whose ingredient rows are already written — the worker estimates
+   * from those. Replaces the deleted Calculate button's `estimate` route
+   * (which the extractor keeps serving for older installed clients). Mirrors
+   * the iOS `NutritionRefresher`.
    */
-  async estimate(
-    supabase: SupabaseClient,
-    input: NutritionEstimateInput
-  ): Promise<NutritionValues> {
+  async refresh(supabase: SupabaseClient, recipeId: string): Promise<void> {
     const {
       data: { session },
     } = await supabase.auth.getSession();
     const token = session?.access_token;
     if (!token) throw new Error("Not authenticated");
 
-    const response = await fetch(ESTIMATE_ENDPOINT, {
+    const response = await fetch(REFRESH_ENDPOINT, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({
-        title: input.title,
-        servings: input.servings,
-        ingredients: input.ingredients,
-      }),
+      body: JSON.stringify({ recipe_id: recipeId }),
     });
 
     if (!response.ok) {
-      throw new Error(`Nutrition estimate failed (${response.status})`);
+      throw new Error(`Nutrition refresh failed (${response.status})`);
     }
-
-    const { nutrition } = (await response.json()) as NutritionEstimateResponse;
-    return {
-      calories_kcal: nutrition.caloriesKcal,
-      carbs_g: nutrition.carbsG,
-      protein_g: nutrition.proteinG,
-      fat_g: nutrition.fatG,
-      sugar_g: nutrition.sugarG,
-      fiber_g: nutrition.fiberG,
-      sodium_mg: nutrition.sodiumMg,
-    };
   },
 };

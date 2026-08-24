@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { toast } from "sonner";
-import { Sparkles, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { NutritionValues, NutritionEstimateInput } from "@/api/nutrition.api";
-import { useEstimateNutrition } from "@/hooks/recipe/useEstimateNutrition";
+import { Switch } from "@/components/ui/switch";
+import { NutritionValues } from "@/api/nutrition.api";
 
 type FieldKey = keyof NutritionValues;
 
@@ -76,30 +73,36 @@ type Props = {
   /** The loaded recipe's nutrition (edit mode), or null until it loads / when adding. */
   initial: NutritionValues | null;
   onChange: (values: NutritionValues) => void;
-  /** Context for the "Calculate" estimate — current editor contents. */
-  title: string;
-  servings: number | null;
-  ingredientLines: string[];
+  /** Fired on USER edits only (never on seeding) — the parent uses it to
+   *  know hand-typed values need a re-estimate if auto is back on at save. */
+  onEdited: () => void;
+  /** Mirrors `recipes.nutrition_auto`: on = the backend owns the values. */
+  auto: boolean;
+  onAutoChange: (auto: boolean) => void;
 };
 
 /**
- * Editor section for the 7 per-serving nutrition metrics: a Calculate button
- * (AI estimate from the extractor) plus manually editable fields. Owns its own
- * field state and reports parsed values up via `onChange`, which the parent
- * folds into the recipe save. It only starts reporting once seeded from a
- * loaded recipe (or a user action), so a save issued before the recipe loads
- * never wipes an existing estimate — the same guard the iOS editor uses.
+ * Editor section for the 7 per-serving nutrition metrics. An "Update
+ * automatically" switch mirrors `recipes.nutrition_auto`: while it's on the
+ * backend re-estimates the values whenever a save changes the ingredients and
+ * the fields are locked; switching it off frees them for manual values that
+ * nothing ever overwrites. (This replaced the Calculate button on 2026-08-24 —
+ * flipping the switch back on is the re-estimate gesture.)
+ *
+ * Owns its own field state and reports parsed values up via `onChange`, which
+ * the parent folds into the recipe save. It only starts reporting once seeded
+ * from a loaded recipe (or a user action), so a save issued before the recipe
+ * loads never wipes an existing estimate — the same guard the iOS editor uses.
  */
 export default function NutritionEditor({
   initial,
   onChange,
-  title,
-  servings,
-  ingredientLines,
+  onEdited,
+  auto,
+  onAutoChange,
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const [drafts, setDrafts] = useState<Drafts>(EMPTY_DRAFTS);
-  const estimate = useEstimateNutrition();
   const seeded = useRef(false);
 
   // Seed once from the loaded recipe (edit mode). Reporting the seeded values up
@@ -113,40 +116,11 @@ export default function NutritionEditor({
 
   function updateField(key: FieldKey, text: string) {
     seeded.current = true;
+    onEdited();
     const next = { ...drafts, [key]: text };
     setDrafts(next);
     onChange(draftsToValues(next));
   }
-
-  function handleCalculate() {
-    if (!title.trim()) {
-      toast.error(t("nutrition.errors.titleRequired"));
-      return;
-    }
-    if (ingredientLines.length === 0) {
-      toast.error(t("nutrition.errors.ingredientsRequired"));
-      return;
-    }
-
-    const input: NutritionEstimateInput = {
-      title: title.trim(),
-      servings,
-      ingredients: ingredientLines,
-    };
-
-    estimate.mutate(input, {
-      onSuccess: (values) => {
-        seeded.current = true;
-        setDrafts(valuesToDrafts(values));
-        onChange(values);
-      },
-      onError: () => {
-        toast.error(t("nutrition.errors.calculateFailed"));
-      },
-    });
-  }
-
-  const hasValues = FIELDS.some((f) => drafts[f.key].trim() !== "");
 
   return (
     <div className="grid w-full gap-2">
@@ -155,23 +129,12 @@ export default function NutritionEditor({
         <span className="text-xs text-muted-foreground">{t("nutrition.perServing")}</span>
       </div>
 
-      <Button
-        type="button"
-        variant="secondary"
-        onClick={handleCalculate}
-        disabled={estimate.isPending}
-      >
-        {estimate.isPending ? (
-          <Loader2 className="animate-spin" />
-        ) : (
-          <Sparkles />
-        )}
-        {estimate.isPending
-          ? t("nutrition.calculating")
-          : hasValues
-            ? t("nutrition.recalculate")
-            : t("nutrition.calculate")}
-      </Button>
+      <div className="flex items-center justify-between gap-2 py-1">
+        <Label htmlFor="nutrition-auto" className="font-normal">
+          {t("nutrition.updateAutomatically")}
+        </Label>
+        <Switch id="nutrition-auto" checked={auto} onCheckedChange={onAutoChange} />
+      </div>
 
       <div className="grid grid-cols-2 gap-3">
         {FIELDS.map((field) => (
@@ -186,10 +149,15 @@ export default function NutritionEditor({
               placeholder="—"
               value={drafts[field.key]}
               onChange={(e) => updateField(field.key, e.target.value)}
+              disabled={auto}
             />
           </div>
         ))}
       </div>
+
+      <span className="text-xs text-muted-foreground">
+        {auto ? t("nutrition.autoOnHint") : t("nutrition.autoOffHint")}
+      </span>
     </div>
   );
 }

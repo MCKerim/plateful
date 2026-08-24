@@ -462,14 +462,10 @@
       "protein": "P",
       "fat": "F"
     },
-    "calculate": "Nährwerte berechnen",
-    "recalculate": "Neu berechnen",
-    "calculating": "Berechne...",
-    "errors": {
-      "titleRequired": "Gib zuerst einen Rezeptnamen ein.",
-      "ingredientsRequired": "Füge zuerst Zutaten hinzu.",
-      "calculateFailed": "Nährwerte konnten gerade nicht berechnet werden. Bitte versuche es erneut."
-    }
+    "updateAutomatically": "Automatisch aktualisieren",
+    "autoOnHint": "Alle Werte gelten pro Portion und werden aus den Zutaten geschätzt. Sie aktualisieren sich von selbst, wenn sich die Zutaten ändern.",
+    "autoOffHint": "Alle Werte gelten pro Portion. Sie bleiben genau so, wie du sie einträgst.",
+    "updating": "Nährwerte werden aktualisiert…"
   },
   "home": {
     "title": "Startseite",
