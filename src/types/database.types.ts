@@ -1577,7 +1577,6 @@ export type Database = {
         }
         Returns: boolean
       }
-      retry_import: { Args: { p_import_id: string }; Returns: undefined }
       scale_recipe_servings: {
         Args: { p_new_base: number; p_recipe_id: string }
         Returns: undefined

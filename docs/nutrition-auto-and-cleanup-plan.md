@@ -76,18 +76,18 @@ cross-repo contract doc `plateful-ios/docs/analytics.md` when this ships.
 
 **A6. Retirements.** Delete `useEstimateNutrition.ts`; replace
 `nutritionApi.estimate` with `refresh` (keep the `NutritionValues` types).
-The extractor's `/api/nutrition/estimate` route stays live until installed
-Android builds drain (the `household_subscriptions` lesson: old APKs call
-old routes for weeks) — revisit removal only after adoption shows in the
-release metrics.
+UPDATE 2026-08-24, after the vc36 release: the extractor's
+`/api/nutrition/estimate` route AND the `retry_import` RPC were removed the
+same day at Kerim's call, without waiting for pre-vc36 installs to drain —
+their Calculate/Retry buttons now error, accepted.
 
 ## Workstream B — the standing 2026-08-23 cleanup batch
 
 **B1. Remove Retry.** `ImportCard.tsx` drops the Retry button;
 `recipeImport.api.ts` drops `retryImport`. The worker never retries — the
-button re-ran a job that provably never succeeds twice. Leave the
-`retry_import` RPC in the database for old installed clients; mark it for
-much-later removal.
+button re-ran a job that provably never succeeds twice. (The `retry_import`
+RPC itself was dropped from the database later the same day — see the
+update note in Workstream A.)
 
 **B2. Failure copy off `error_code`.** ImportCard's failed state keys its
 message on `recipe_imports.error_code`: `source_unavailable` (post/page is
