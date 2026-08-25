@@ -5,7 +5,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import Fuse from "fuse.js";
 import { useTranslation } from "react-i18next";
-import Rive from "@rive-app/react-canvas";
 import SortingModal from "@/components/general/SortingModal";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import {
@@ -296,10 +295,6 @@ export default function Cookbook() {
         !isLoading &&
         searchResults.length === 0 && (
           <div className="flex flex-col items-center justify-center w-full gap-2 mt-10">
-            <div className="w-full h-[80px] mx-auto">
-              <Rive src="/plateful-character.riv" artboard="Sad" />
-            </div>
-
             <p className="flex justify-center italic font-bold">{t("cookbook.nothingFound")}</p>
           </div>
         )}

@@ -2,7 +2,6 @@ import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useTranslation } from "react-i18next";
-import Rive from "@rive-app/react-canvas";
 
 type Props = {
   open: boolean;
@@ -18,10 +17,6 @@ export default function UpdateDialog({ open, onConfirm, onCancel }: Readonly<Pro
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle className="text-center first-font text-xl">{t("update.title")}</DialogTitle>
-
-          <div className="h-[150px] w-full">
-            <Rive src="/plateful-character.riv" artboard="Fly-In" />
-          </div>
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">

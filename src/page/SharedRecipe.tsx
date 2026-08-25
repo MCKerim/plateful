@@ -2,7 +2,6 @@ import { useParams, useNavigate, NavLink } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import { motion } from "motion/react";
-import Rive from "@rive-app/react-canvas";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -111,10 +110,6 @@ export default function SharedRecipe() {
     return (
       <Layout showHeader={false} showFooter={false} footer={notFoundFooter}>
         <div className="flex flex-col items-center justify-center flex-1 gap-4 text-center py-16 px-4">
-          <div className="w-48 h-48">
-            <Rive src="/plateful-character.riv" artboard="Sad" />
-          </div>
-
           <motion.div
             className="flex flex-col gap-2"
             initial={{ opacity: 0, y: 10 }}

@@ -23,7 +23,8 @@ import {
   EditRecipeProposal,
 } from "@/redux/slices/chatbotSlice";
 import { useNavigate, useSearchParams } from "react-router";
-import Rive from "@rive-app/react-canvas";
+import MascotBowl from "@/components/general/MascotBowl";
+import mascotSalad from "@/assets/mascot-filled-salad.webp";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
 import { nutritionApi } from "@/api/nutrition.api";
@@ -450,10 +451,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
     >
       {/* Chat BG */}
       {visibleMessages.length === 0 && (
-        <div className="absolute flex-col items-center justify-center w-full gap-2 -translate-x-1/2 left-1/2">
-          <div className="w-full h-[200px] mx-auto">
-            <Rive src="/plateful-character.riv" artboard="Fly-In" />
-          </div>
+        <div className="flex flex-1 flex-col items-center justify-center w-full gap-2">
+          <MascotBowl src={mascotSalad} className="mb-6 w-[min(160px,45vw)]" />
 
           <div className="flex items-center justify-center w-full gap-2 mb-6">
             <h2 className="first-font text-xl font-bold">{t("chatbot.greeting")}</h2>

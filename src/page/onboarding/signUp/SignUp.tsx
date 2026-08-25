@@ -1,9 +1,11 @@
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
-import { useRive } from "@rive-app/react-canvas";
+import { motion, useReducedMotion } from "motion/react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import CircleTransition from "@/components/general/CircleTransition";
+import MascotBowl from "@/components/general/MascotBowl";
+import mascotSalad from "@/assets/mascot-filled-salad.webp";
 import { useNavigate, Link } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
@@ -48,6 +50,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const [showTransition, setShowTransition] = useState(true);
   const { trackScreenViewed } = useOnboardingTracking();
   const posthog = usePostHog();
+  const reduceMotion = useReducedMotion();
 
   // Safari blocks the window.open inside SocialLogin.login once the click
   // handler has awaited real async work (crypto.subtle.digest), so the nonce
@@ -86,31 +89,8 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
     });
   }, []);
 
-  const { rive, RiveComponent } = useRive({
-    src: "/plateful-character.riv",
-    artboard: "Fly-In",
-    autoplay: false,
-  });
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (rive) {
-        rive.play();
-      }
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [rive]);
-
   const handleTransitionComplete = () => {
     setShowTransition(false);
-  };
-
-  const replayAnimation = () => {
-    if (rive) {
-      rive.reset({ artboard: "Fly-In" });
-      rive.play();
-    }
   };
 
   const signUp = async () => {
@@ -158,7 +138,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
       />
 
       <div className="flex flex-col items-center h-screen px-4 py-10">
-        <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
+        <div className="flex flex-col w-full mb-8 text-center">
           {variant === "connect" ? (
             <>
               <h1 className="font-bold text-5xl first-font">{t("oauthConsent.signInTitle")}</h1>
@@ -174,7 +154,14 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
           )}
         </div>
 
-        <RiveComponent onClick={replayAnimation} />
+        <motion.div
+          className="flex min-h-0 flex-1 w-full items-end justify-center pb-5"
+          initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.25, ease: "easeOut" }}
+        >
+          <MascotBowl src={mascotSalad} grounded className="w-[min(228px,58vw)] max-h-full" />
+        </motion.div>
 
         <div className="flex flex-col w-full max-w-sm gap-2">
           <div className="text-balance text-center text-xs text-muted-foreground">
