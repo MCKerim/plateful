@@ -12,12 +12,22 @@ export default defineConfig(({ mode }) => {
       react(),
       VitePWA({
         registerType: "autoUpdate",
-        includeAssets: ["favicon.svg", "robots.txt", "apple-touch-icon.png"],
+        includeAssets: [
+          "favicon.ico",
+          "favicon-16x16.png",
+          "favicon-32x32.png",
+          "apple-touch-icon-180x180.png",
+        ],
         manifest: {
           name: "Plateful",
           short_name: "Plateful",
           description: "App to plan your meal!",
           icons: [
+            {
+              src: "pwa-64x64.png",
+              sizes: "64x64",
+              type: "image/png",
+            },
             {
               src: "pwa-192x192.png",
               sizes: "192x192",
@@ -27,6 +37,12 @@ export default defineConfig(({ mode }) => {
               src: "pwa-512x512.png",
               sizes: "512x512",
               type: "image/png",
+            },
+            {
+              src: "maskable-icon-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
             },
           ],
           theme_color: "#ffffff",
