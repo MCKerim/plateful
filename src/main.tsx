@@ -40,6 +40,18 @@ const queryClient = new QueryClient({
   },
 });
 
+// Plateful has no service worker any more (see public/sw.js). Clients that
+// reach this bundle with one still registered are torn down here; the
+// self-destroying sw.js covers the ones still stuck on an old shell.
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.getRegistrations().then((registrations) => {
+    for (const registration of registrations) registration.unregister();
+  });
+  if ("caches" in globalThis) {
+    caches.keys().then((keys) => keys.forEach((key) => caches.delete(key)));
+  }
+}
+
 const isDevelopment = import.meta.env.MODE === "development";
 
 function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
