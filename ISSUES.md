@@ -32,17 +32,10 @@ were deliberately left out of that pass:
   app deliberately went to system surfaces instead. Either follow chapter 06 or
   consciously keep this app on its own palette.
 
-**Still old art, no decision needed**
+**Still old art**
 
-- **Splash screens** — 26 `splash.png` files under
-  `android/app/src/main/res/drawable*/` are the old cartoon bowl on orange. The
-  launcher icon is now the new mascot, so a launch currently shows both
-  identities in sequence. Worth doing before the next Play release.
 - **Favicon is an interim.** The tab icon is now the mascot, but brand chapter 04
   puts the compact brand mark here and that is still "pending / not designed".
   At 16px the detailed bowl is mush — same call the website made, same limit.
-- **Play Console listing** — the 512 icon, feature graphic and screenshots live
-  in the console, not this repo, and ship independently of any APK. The new
-  512 icon is ready at `android/store/play-store-icon-512.png`.
 - **Capacitor iOS target** — `ios/App/App/Assets.xcassets/{AppIcon,Splash}` are
   the old art. Never built or shipped, so cosmetic only.
