@@ -2,7 +2,7 @@
 
 > **PersonalOS:** Kerims Kontext- und Wahrheitsschicht liegt unter `~/PersonalOS` (Einstieg `AGENTS.md`, Kurzkontext `USER.md`). Plateful-Produkt- und Markenwahrheit: `business/products/plateful.md`, `business/brands/plateful/`; Entscheidungen: `decisions/`; Projekte: `projects/`. Diese Datei enthält nur Operatives für dieses Repo. Bei Widerspruch gilt das PersonalOS; dauerhafte Änderungen dort beim Owner eintragen (mit Quelle), nicht hier. Ist `~/PersonalOS` nicht erreichbar (Cloud-Session), arbeite mit dieser Datei und benenne Kontextlücken.
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
+This file provides guidance to coding agents (Claude Code, Codex and cloud sessions) when working with code in this repository. `CLAUDE.md` only imports this file.
 
 ## Build & Development Commands
 
