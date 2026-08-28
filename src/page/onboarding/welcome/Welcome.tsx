@@ -17,9 +17,7 @@ export default function Welcome() {
       <div className="text-center mb-8 flex-1 w-full flex flex-col justify-center text-primary-foreground overflow-hidden">
         <h1 className="text-4xl md:text-5xl first-font">{t("welcome.title")}</h1>
 
-        <h2 className="italic text-lg md:text-xl font-semibold second-font">
-          {t("welcome.subtitle")}
-        </h2>
+        <h2 className="italic text-lg md:text-xl font-semibold">{t("welcome.subtitle")}</h2>
       </div>
 
       <NavLink to="/signup" className={"w-full max-w-sm"}>

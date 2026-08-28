@@ -142,14 +142,14 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
           {variant === "connect" ? (
             <>
               <h1 className="font-bold text-5xl first-font">{t("oauthConsent.signInTitle")}</h1>
-              <p className="mt-2 text-sm text-muted-foreground second-font">
+              <p className="mt-2 text-sm text-muted-foreground">
                 {t("oauthConsent.signInSubtitle")}
               </p>
             </>
           ) : (
             <>
               <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
-              <p className="text-sm text-muted-foreground second-font">{t("signup.subtitle")}</p>
+              <p className="text-sm text-muted-foreground">{t("signup.subtitle")}</p>
             </>
           )}
         </div>

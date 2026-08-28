@@ -71,7 +71,7 @@ export default function Login() {
     <div className="flex flex-col items-center h-screen px-4 py-10">
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
         <h1 className="font-bold text-6xl first-font">{t("login.title")}</h1>
-        <p className="text-sm text-muted-foreground second-font mt-2">{t("login.subtitle")}</p>
+        <p className="text-sm text-muted-foreground mt-2">{t("login.subtitle")}</p>
       </div>
 
       <form onSubmit={handleLogin} className="flex flex-col w-full max-w-sm gap-4">

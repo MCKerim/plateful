@@ -154,14 +154,12 @@ export default function OAuthConsent() {
           <Plug className="w-12 h-12" />
 
           {state.status === "loading" && (
-            <p className="second-font font-medium text-primary">{t("common.loading")}</p>
+            <p className="font-medium text-primary">{t("common.loading")}</p>
           )}
 
           {state.status === "error" && (
             <>
-              <p className="second-font font-medium text-primary">
-                {t(`oauthConsent.${state.key}`)}
-              </p>
+              <p className="font-medium text-primary">{t(`oauthConsent.${state.key}`)}</p>
               {state.key === "sessionExpired" && (
                 // Signing out drops this route to the sign-in screen, and the URL
                 // (with authorization_id) is untouched — so signing back in
@@ -178,7 +176,7 @@ export default function OAuthConsent() {
               <h1 className="first-font text-3xl break-words">
                 {t("oauthConsent.title", { client: state.clientName })}
               </h1>
-              <p className="second-font text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {household?.name
                   ? t("oauthConsent.subtitleWithHousehold", { household: household.name })
                   : t("oauthConsent.subtitle")}

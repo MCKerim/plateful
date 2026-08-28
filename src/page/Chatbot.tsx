@@ -195,7 +195,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       const supabaseKey = import.meta.env.VITE_SUPABASE_KEY;
       const session = (await supabase.auth.getSession()).data.session;
       const availableCollections = householdId
-        ? collectionsQuery.data ?? (await collectionsQuery.refetch()).data ?? []
+        ? (collectionsQuery.data ?? (await collectionsQuery.refetch()).data ?? [])
         : [];
 
       const response = await fetch(`${supabaseUrl}/functions/v1/chatbot`, {
@@ -289,8 +289,15 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveSuggestedRecipe(proposal: NewRecipeProposal) {
-    const { proposalId, title, description, servings, ingredients, instructions, collectionIds = [] } =
-      proposal;
+    const {
+      proposalId,
+      title,
+      description,
+      servings,
+      ingredients,
+      instructions,
+      collectionIds = [],
+    } = proposal;
     if (!householdId) {
       toast.error(t("chatbot.saveRecipeError"));
       return;
@@ -370,16 +377,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
   }
 
   async function saveEditedRecipe(proposal: EditRecipeProposal) {
-    const {
-      proposalId,
-      recipeId,
-      title,
-      description,
-      servings,
-      ingredients,
-      instructions,
-      link,
-    } = proposal;
+    const { proposalId, recipeId, title, description, servings, ingredients, instructions, link } =
+      proposal;
     try {
       await updateRecipeMutation.mutateAsync({
         recipeId,
@@ -520,7 +519,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
                     {/* Recipe context chip if present */}
                     {"recipeName" in message &&
                       (message as ChatMessage & { recipeName?: string }).recipeName && (
-                        <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium second-font rounded mb-2">
+                        <div className="text-background border border-dashed border-background text-center py-[0.5px] px-4 font-medium rounded mb-2">
                           {(message as ChatMessage & { recipeName?: string }).recipeName}
                         </div>
                       )}
@@ -563,9 +562,10 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
                       onSaveNew={saveSuggestedRecipe}
                       onSaveEdit={saveEditedRecipe}
                       collectionNames={(toolOutput.args.collectionIds ?? [])
-                        .map((id) =>
-                          (collectionsQuery.data ?? []).find((collection) => collection.id === id)
-                            ?.name
+                        .map(
+                          (id) =>
+                            (collectionsQuery.data ?? []).find((collection) => collection.id === id)
+                              ?.name
                         )
                         .filter((name): name is string => Boolean(name))}
                       t={t}
@@ -601,7 +601,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
           <div className="flex gap-2 flex-wrap mb-2 items-center">
             {/* Recipe context chip */}
             {recipeContext && (
-              <div className="bg-accent text-accent-foreground second-font font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
+              <div className="bg-accent text-accent-foreground font-semibold rounded-md px-3 py-2 text-sm flex items-center gap-2 max-w-[200px]">
                 <span className="truncate">{recipeContext.name}</span>
               </div>
             )}

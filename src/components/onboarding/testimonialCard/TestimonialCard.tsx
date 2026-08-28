@@ -43,7 +43,7 @@ export default function TestimonialCard({ quote, name, delay, rotate = 0 }: Read
 
       <p className="text-sm mt-1">{quote}</p>
 
-      <div className="mt-3 text-sm font-semibold second-font">- {name}</div>
+      <div className="mt-3 text-sm font-semibold">- {name}</div>
     </motion.div>
   );
 }

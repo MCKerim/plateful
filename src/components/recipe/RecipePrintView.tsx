@@ -57,7 +57,7 @@ export function RecipePrintView({
           {/* Left column: ingredients */}
           {ingredients.length > 0 && (
             <div>
-              <h2 className="second-font text-[10pt] font-bold mb-1">{t("ingredients.title")}</h2>
+              <h2 className="text-[10pt] font-bold mb-1">{t("ingredients.title")}</h2>
               {groupedIngredients.map((group, i) => (
                 <div key={group.name ?? `g-${i}`}>
                   {group.name && <p className="text-[8pt] font-bold mt-1.5 mb-0.5">{group.name}</p>}
@@ -77,7 +77,7 @@ export function RecipePrintView({
           {/* Right column: instructions */}
           {recipe.instructions && (
             <div>
-              <h2 className="second-font text-[10pt] font-bold mb-1">{t("recipe.instructions")}</h2>
+              <h2 className="text-[10pt] font-bold mb-1">{t("recipe.instructions")}</h2>
 
               <MarkdownRenderer content={recipe.instructions} />
             </div>

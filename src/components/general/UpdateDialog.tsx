@@ -20,7 +20,7 @@ export default function UpdateDialog({ open, onConfirm, onCancel }: Readonly<Pro
         </DialogHeader>
 
         <DialogDescription className="flex flex-col gap-4 py-4">
-          <p className="text-center second-font">{t("update.updateAvailable")}</p>
+          <p className="text-center">{t("update.updateAvailable")}</p>
 
           <Button className="w-full" onClick={onConfirm}>
             {t("update.updateNow")}

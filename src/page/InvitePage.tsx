@@ -173,7 +173,7 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
             <House className="w-12 h-12" />
           </div>
 
-          <p className="second-font font-medium text-primary">
+          <p className="font-medium text-primary">
             {preview === null
               ? t("common.loading")
               : preview.status === "ready"

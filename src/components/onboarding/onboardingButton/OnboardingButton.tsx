@@ -20,7 +20,7 @@ export default function OnboardingButton({
   return (
     <Button
       className={
-        "second-font w-full h-12 rounded-full font-semibold text-base " +
+        "w-full h-12 rounded-full font-semibold text-base " +
         // makes button always black on start screen
         (isStart && " bg-primary dark:bg-primary-foreground dark:text-primary")
       }

@@ -13,7 +13,7 @@ export default function JoinHousehold() {
       </div>
 
       <div className="flex flex-col w-full max-w-sm gap-4 mx-auto">
-        <p className="second-font font-medium leading-relaxed text-center text-primary">
+        <p className="font-medium leading-relaxed text-center text-primary">
           {t("joinHousehold.description")}
         </p>
 

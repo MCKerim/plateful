@@ -55,14 +55,14 @@ export default function SurveyStart() {
       <div className="flex flex-col w-full gap-3">
         {resumeQuestion && (
           <Button
-            className="second-font w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+            className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
             onClick={() => navigate(`/survey/${resumeQuestion}`)}
           >
             {t("surveyStart.resumeButton")}
           </Button>
         )}
         <Button
-          className="second-font w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+          className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
           variant={resumeQuestion ? "secondary" : "default"}
           onClick={() => navigate("/survey/1")}
         >

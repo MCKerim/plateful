@@ -58,9 +58,7 @@ export default function TrialOffer() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <h1 className="text-4xl font-bold first-font leading-tight">
-          {t("trialOffer.title")}
-        </h1>
+        <h1 className="text-4xl font-bold first-font leading-tight">{t("trialOffer.title")}</h1>
       </motion.div>
 
       {/* Receipt */}
@@ -90,7 +88,7 @@ export default function TrialOffer() {
                 >
                   <Check className="w-4 h-4 text-accent shrink-0" />
 
-                  <span className="text-sm second-font font-semibold">{t(key)}</span>
+                  <span className="text-sm font-semibold">{t(key)}</span>
                 </motion.div>
               ))}
             </div>
@@ -128,7 +126,7 @@ export default function TrialOffer() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: BOTTOM_DELAY, ease: "easeOut" }}
       >
-        <p className="text-sm text-muted-foreground flex items-center gap-1 second-font">
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
           <Check className="w-4 h-4 text-green-500 shrink-0" />
           {t("trialOffer.noPayment")}
         </p>

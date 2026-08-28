@@ -8,10 +8,7 @@ type Props = {
   recipeName: string;
 };
 
-export default function PlannedMealCard({
-  recipeId,
-  recipeName,
-}: Readonly<Props>) {
+export default function PlannedMealCard({ recipeId, recipeName }: Readonly<Props>) {
   const { data: imageUrl } = useRecipeFirstImage(recipeId);
 
   return (
@@ -28,7 +25,7 @@ export default function PlannedMealCard({
           />
 
           <div className="flex-1 px-3 min-w-0">
-            <p className="second-font text-sm font-semibold break-words leading-tight line-clamp-2">
+            <p className="text-sm font-semibold break-words leading-tight line-clamp-2">
               {recipeName}
             </p>
           </div>

@@ -282,7 +282,7 @@ export default function MealPlanner() {
           </Button>
 
           <div className="flex flex-col items-center">
-            <h2 className="text-lg font-semibold second-font">
+            <h2 className="text-lg font-semibold">
               {isSameWeek(currentWeek, new Date())
                 ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
@@ -481,7 +481,7 @@ export default function MealPlanner() {
             <div className="h-full w-[74px] bg-muted border-r-4 border-background"></div>
 
             <div className="flex-1 px-2.5">
-              <p className="second-font text-md font-semibold break-words leading-tight line-clamp-3">
+              <p className="text-md font-semibold break-words leading-tight line-clamp-3">
                 {activeItem.recipeName}
               </p>
             </div>

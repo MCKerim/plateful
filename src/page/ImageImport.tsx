@@ -185,10 +185,7 @@ export default function ImageImport() {
       {/* Keep the image-source actions above the fixed CTA, including on devices
           with a home indicator. The previous h-safe-b utility is not defined
           in this Tailwind configuration. */}
-      <div
-        aria-hidden="true"
-        className="h-[calc(4.625rem+env(safe-area-inset-bottom))] shrink-0"
-      />
+      <div aria-hidden="true" className="h-[calc(4.625rem+env(safe-area-inset-bottom))] shrink-0" />
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 flex gap-2 border-border border-t-[1px] p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
         {busy ? (
@@ -273,7 +270,7 @@ export default function ImageImport() {
             >
               <div className="flex flex-col gap-1 items-center">
                 <Camera className="!size-8" />
-                <p className="second-font font-medium text-lg">{t("common.camera")}</p>
+                <p className="font-medium text-lg">{t("common.camera")}</p>
               </div>
             </Button>
 
@@ -285,7 +282,7 @@ export default function ImageImport() {
             >
               <div className="flex flex-col gap-1 items-center">
                 <ImageIcon className="!size-8" />
-                <p className="second-font font-medium text-lg">{t("common.gallery")}</p>
+                <p className="font-medium text-lg">{t("common.gallery")}</p>
               </div>
             </Button>
           </div>
@@ -298,10 +295,8 @@ export default function ImageImport() {
             <CheckCircle2 className="text-primary size-16" />
 
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-bold second-font">{t("urlImport.startedTitle")}</h2>
-              <p className="second-font text-muted-foreground">
-                {t("urlImport.startedDescription")}
-              </p>
+              <h2 className="text-lg font-bold">{t("urlImport.startedTitle")}</h2>
+              <p className="text-muted-foreground">{t("urlImport.startedDescription")}</p>
             </div>
           </div>
         </div>

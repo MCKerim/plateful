@@ -49,9 +49,7 @@ export default function SocialProof() {
       >
         <h1 className="text-3xl font-bold first-font">{t("socialProof.title")}</h1>
 
-        <p className="text-lg italic second-font text-muted-foreground mt-1">
-          {t("socialProof.subtitle")}
-        </p>
+        <p className="text-lg italic text-muted-foreground mt-1">{t("socialProof.subtitle")}</p>
       </motion.div>
 
       {/* Testimonial cards */}

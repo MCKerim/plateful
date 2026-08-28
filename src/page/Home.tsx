@@ -66,7 +66,7 @@ export default function Home() {
       <div className="mb-36">
         {todaysMeals.length > 0 ? (
           <>
-            <h2 className="second-font text-lg font-semibold">{t("home.todayYouPlanned")}</h2>
+            <h2 className="text-lg font-semibold">{t("home.todayYouPlanned")}</h2>
 
             <div className="flex flex-col gap-2">
               {todaysMeals.map((item) => (
@@ -82,7 +82,7 @@ export default function Home() {
           </>
         ) : (
           <div className="flex flex-col items-center gap-2 py-4">
-            <h2 className="second-font text-lg font-bold">{t("home.nothingPlannedToday")}</h2>
+            <h2 className="text-lg font-bold">{t("home.nothingPlannedToday")}</h2>
 
             <NavLink to="/planner">
               <Button variant="outline">
@@ -98,7 +98,7 @@ export default function Home() {
       {/* Recently added recipes */}
       {recentlyAddedRecipes.length > 0 && (
         <div>
-          <h2 className="second-font text-lg font-semibold">{t("cookbook.recentlyAdded")}</h2>
+          <h2 className="text-lg font-semibold">{t("cookbook.recentlyAdded")}</h2>
 
           <div className="grid grid-cols-2 gap-2">
             {recentlyAddedRecipes.map((recipe) => (

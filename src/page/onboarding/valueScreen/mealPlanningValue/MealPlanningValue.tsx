@@ -26,7 +26,7 @@ export default function MealPlanningValue() {
         <h1 className="text-4xl font-bold first-font">{t("valueScreens.mealPlanning.title")}</h1>
 
         <motion.h2
-          className="text-2xl italic font-semibold second-font"
+          className="text-2xl italic font-semibold"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.15 }}

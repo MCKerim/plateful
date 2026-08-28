@@ -23,10 +23,6 @@ were deliberately left out of that pass:
 
 **Deferred by decision — not bugs, waiting on a call**
 
-- **Lora** — brand chapter 02 (2026-08-16) locked the type system to Shrikhand
-  (display) + Roboto (functional copy) and dropped Lora; the website already
-  followed. `index.html` still loads it and `.second-font` is used in 68 places
-  here. Needs a decision before it is worth touching.
 - **Warm-neutral palette** — `src/index.css` still runs the pre-brand-lock
   palette (`#faf9f5` / `#1b1602` / `#edece8`, terracotta destructive). The iOS
   app deliberately went to system surfaces instead. Either follow chapter 06 or

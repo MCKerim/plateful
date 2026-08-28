@@ -81,7 +81,7 @@ export default function NotificationSettings() {
 
   return (
     <Layout>
-      <h1 className="second-font text-2xl">{t("notificationSettings.title")}</h1>
+      <h1 className="text-2xl">{t("notificationSettings.title")}</h1>
 
       <div className="flex flex-col gap-4">
         {!isNotificationSupported() && (

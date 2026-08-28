@@ -19,9 +19,7 @@ export default function AccountDeletionProgress({
         <div className="mx-auto mb-5 flex size-14 items-center justify-center rounded-full bg-destructive/10 text-destructive">
           {retrying ? <ShieldCheck size={26} /> : <Loader2 className="animate-spin" size={26} />}
         </div>
-        <h1 className="second-font text-2xl">
-          {t("settings.confirmations.deleteAccount.processingTitle")}
-        </h1>
+        <h1 className="text-2xl">{t("settings.confirmations.deleteAccount.processingTitle")}</h1>
         <p className="mt-3 text-sm text-muted-foreground">
           {t("settings.confirmations.deleteAccount.processingDescription")}
         </p>

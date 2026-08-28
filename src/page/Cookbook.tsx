@@ -205,7 +205,7 @@ export default function Cookbook() {
               <ChevronLeft />
             </Button>
           )}
-          <h1 className="second-font text-lg font-bold">
+          <h1 className="text-lg font-bold">
             {selectedCollection?.name ?? t("collections.allRecipes")}
           </h1>
         </div>
@@ -230,7 +230,7 @@ export default function Cookbook() {
 
           {(recentlyAddedRecipes.length > 0 || imports.length > 0) && (
             <div className="mt-6">
-              <h2 className="second-font text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
+              <h2 className="text-lg font-bold">{t("cookbook.recentlyAdded")}</h2>
 
               <div className="grid grid-cols-2 gap-2">
                 {imports.map((recipeImport) => (

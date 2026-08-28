@@ -58,9 +58,7 @@ export default function RecipeCard({
 
           <div className="flex flex-col justify-between gap-2 p-2 border-b-2 border-l-2 border-r-2 rounded-b-lg">
             <div className="flex justify-between">
-              <h1 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
-                {name}
-              </h1>
+              <h1 className="font-bold leading-tight text-md line-clamp-2 break-words">{name}</h1>
             </div>
 
             {TAGS.length > 0 && <div className="flex gap-1">{renderTagPills()}</div>}

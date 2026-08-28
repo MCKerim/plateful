@@ -54,7 +54,7 @@ export default function SurveyLayout({
 
         <motion.h1
           key={`question-${questionNumber}`}
-          className="mb-4 text-3xl second-font font-bold text-center"
+          className="mb-4 text-3xl font-bold text-center"
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.4, ease: "easeOut" }}
@@ -109,7 +109,7 @@ export default function SurveyLayout({
           className="w-full"
         >
           <Button
-            className="w-full second-font h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
+            className="w-full h-12 text-base font-semibold rounded-full shadow-lg shadow-primary/20"
             onClick={onComplete}
             asChild
             disabled={!showNextButton}

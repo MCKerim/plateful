@@ -306,7 +306,7 @@ export default function WeeklyPlanDialog({
           </Button>
 
           <div className="flex flex-col items-center">
-            <h2 className="text-lg font-bold second-font">
+            <h2 className="text-lg font-bold">
               {isSameWeek(currentWeek, new Date())
                 ? t("mealPlanner.thisWeek")
                 : isSameWeek(currentWeek, addWeeks(new Date(), 1))
@@ -373,7 +373,7 @@ export default function WeeklyPlanDialog({
                     {plannedForDay.map((item, index) => (
                       <p
                         key={index}
-                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground second-font font-semibold truncate max-w-[120px]"
+                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-semibold truncate max-w-[120px]"
                       >
                         {item.recipe_name}
                       </p>

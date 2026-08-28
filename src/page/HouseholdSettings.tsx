@@ -296,9 +296,7 @@ export default function HouseholdSettings() {
           <Separator className="my-2" />
 
           <div>
-            <h2 className="second-font text-base font-semibold mb-3">
-              {t("householdSettings.achievements")}
-            </h2>
+            <h2 className="text-base font-semibold mb-3">{t("householdSettings.achievements")}</h2>
 
             <div className="flex flex-wrap gap-3 mb-4">
               {rewards.map((reward, i) => (
@@ -309,7 +307,7 @@ export default function HouseholdSettings() {
                 >
                   <div className="flex items-center gap-2">
                     <span className="text-2xl">🏅</span>
-                    <p className="second-font text-base font-semibold text-foreground leading-tight">
+                    <p className="text-base font-semibold text-foreground leading-tight">
                       {t(`badges.${reward.badgeId}`)}
                     </p>
                   </div>

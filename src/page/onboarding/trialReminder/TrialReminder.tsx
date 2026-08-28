@@ -40,9 +40,7 @@ export default function TrialReminder() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <h1 className="text-4xl font-bold first-font leading-tight">
-          {t("trialReminder.title")}
-        </h1>
+        <h1 className="text-4xl font-bold first-font leading-tight">{t("trialReminder.title")}</h1>
       </motion.div>
 
       {/* Center visual: bell bubble */}
@@ -79,15 +77,12 @@ export default function TrialReminder() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.9, ease: "easeOut" }}
       >
-        <p className="text-sm text-muted-foreground flex items-center gap-1 second-font">
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
           <Check className="w-4 h-4 text-green-500 shrink-0" />
           {t("trialReminder.noPayment")}
         </p>
 
-        <OnboardingButton
-          label={t("trialReminder.button")}
-          onClick={handleContinue}
-        />
+        <OnboardingButton label={t("trialReminder.button")} onClick={handleContinue} />
       </motion.div>
     </OnboardingLayout>
   );

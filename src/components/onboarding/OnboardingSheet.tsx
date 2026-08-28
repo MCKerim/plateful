@@ -41,7 +41,7 @@ export default function OnboardingSheet({
           </div>
         )}
         <DrawerHeader className="text-center">
-          <DrawerTitle className="text-xl font-bold second-font">{t(titleKey)}</DrawerTitle>
+          <DrawerTitle className="text-xl font-bold">{t(titleKey)}</DrawerTitle>
         </DrawerHeader>
 
         <ul className="flex flex-col gap-2 pl-10 pb-2 list-disc">

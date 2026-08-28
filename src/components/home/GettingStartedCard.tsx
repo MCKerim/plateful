@@ -102,7 +102,7 @@ export default function GettingStartedCard() {
         <CardHeader className="p-4 pb-4">
           <button className="flex w-full items-center justify-between" onClick={handleToggle}>
             <div className="flex flex-col items-start gap-0.5">
-              <span className="second-font text-base font-semibold leading-none">
+              <span className="text-base font-semibold leading-none">
                 {t("home.gettingStarted.title")}
               </span>
               <span className="text-xs text-muted-foreground">
@@ -180,7 +180,7 @@ export default function GettingStartedCard() {
               <span className="animate-badge-pop relative z-10 text-7xl leading-none">⭐</span>
             </div>
 
-            <DialogTitle className="second-font text-xl text-center">
+            <DialogTitle className="text-xl text-center">
               {t("home.gettingStarted.rewardDialog.title")}
             </DialogTitle>
 
@@ -192,7 +192,7 @@ export default function GettingStartedCard() {
           <div className="mx-auto w-fit rotate-[-2deg] rounded-2xl border-2 border-dashed bg-card px-5 py-2 text-center shadow-md mb-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl">🏅</span>
-              <p className="second-font text-base font-semibold text-foreground leading-tight">
+              <p className="text-base font-semibold text-foreground leading-tight">
                 {t(`badges.${BADGE_ID}`)}
               </p>
             </div>

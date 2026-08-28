@@ -36,7 +36,7 @@ export default function ImageSourceDrawer({
         <div className="flex flex-col gap-1 items-center">
           {icon}
 
-          <p className="second-font font-medium text-lg">{label}</p>
+          <p className="font-medium text-lg">{label}</p>
         </div>
       </Button>
     );

@@ -71,7 +71,7 @@ export default function EmailSignUp() {
       <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
         <h1 className="font-bold text-4xl first-font">{t("emailSignup.title")}</h1>
 
-        <p className="text-sm text-muted-foreground second-font">{t("emailSignup.subtitle")}</p>
+        <p className="text-sm text-muted-foreground">{t("emailSignup.subtitle")}</p>
       </div>
 
       <form

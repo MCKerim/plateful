@@ -182,10 +182,8 @@ export default function URLImport() {
             <CheckCircle2 className="text-primary size-16" />
 
             <div className="flex flex-col gap-1">
-              <h2 className="text-lg font-bold second-font">{t("urlImport.startedTitle")}</h2>
-              <p className="second-font text-muted-foreground">
-                {t("urlImport.startedDescription")}
-              </p>
+              <h2 className="text-lg font-bold">{t("urlImport.startedTitle")}</h2>
+              <p className="text-muted-foreground">{t("urlImport.startedDescription")}</p>
             </div>
           </div>
         )}

@@ -302,7 +302,7 @@ export default function Recipe() {
               >
                 <div className="flex justify-start gap-4 w-full h-full items-center">
                   <Pencil />
-                  <p className="second-font font-semibold">{t("recipe.editRecipe")}</p>
+                  <p className="font-semibold">{t("recipe.editRecipe")}</p>
                 </div>
               </Button>
 
@@ -318,7 +318,7 @@ export default function Recipe() {
               >
                 <div className="flex justify-start gap-4 w-full h-full items-center">
                   <Share2 />
-                  <p className="second-font font-semibold">{t("share.shareRecipe")}</p>
+                  <p className="font-semibold">{t("share.shareRecipe")}</p>
                 </div>
               </Button>
 
@@ -326,7 +326,7 @@ export default function Recipe() {
                 <Button variant="secondary" size="lg" onClick={handlePrint}>
                   <div className="flex justify-start gap-4 w-full h-full items-center">
                     <Printer />
-                    <p className="second-font font-semibold">{t("recipe.printPdf")}</p>
+                    <p className="font-semibold">{t("recipe.printPdf")}</p>
                   </div>
                 </Button>
               )}
@@ -337,7 +337,7 @@ export default function Recipe() {
                   <Button variant="secondary" size="lg" className="w-full">
                     <div className="flex justify-start gap-4 w-full h-full items-center">
                       <Trash2 />
-                      <p className="second-font font-semibold">{t("common.delete")}</p>
+                      <p className="font-semibold">{t("common.delete")}</p>
                     </div>
                   </Button>
                 }

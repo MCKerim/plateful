@@ -15,12 +15,7 @@ type Props = {
   eaten: boolean;
 };
 
-export default function TodaysMealCard({
-  id,
-  recipeId,
-  recipeName,
-  eaten,
-}: Readonly<Props>) {
+export default function TodaysMealCard({ id, recipeId, recipeName, eaten }: Readonly<Props>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: imageUrl } = useRecipeFirstImage(recipeId);
@@ -40,10 +35,9 @@ export default function TodaysMealCard({
 
         <div className="flex flex-col gap-2 p-2 border-b-2 border-l-2 border-r-2 rounded-b-lg">
           <button onClick={() => navigate(`/recipe/${recipeId}`)} className="text-left">
-            <h3 className="second-font font-bold leading-tight text-md line-clamp-2 break-words">
+            <h3 className="font-bold leading-tight text-md line-clamp-2 break-words">
               {recipeName}
             </h3>
-
           </button>
 
           <div className="flex gap-2">

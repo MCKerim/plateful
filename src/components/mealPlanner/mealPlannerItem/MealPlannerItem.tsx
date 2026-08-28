@@ -167,7 +167,7 @@ export default function MealPlannerItem({
           }}
           className="text-left flex-1 px-2.5 min-w-0 h-full flex flex-col justify-center gap-0.5"
         >
-          <p className="second-font text-md font-semibold break-words leading-tight line-clamp-2 w-full">
+          <p className="text-md font-semibold break-words leading-tight line-clamp-2 w-full">
             {recipeName}
           </p>
         </button>

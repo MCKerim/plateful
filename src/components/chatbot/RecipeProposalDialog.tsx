@@ -12,7 +12,12 @@ import { Button } from "@/components/ui/button";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useRecipeIngredients } from "@/hooks/ingredients/useRecipeIngredients";
-import { ToolOutputForUI, NewRecipeProposal, EditRecipeProposal, ChatbotIngredient } from "@/redux/slices/chatbotSlice";
+import {
+  ToolOutputForUI,
+  NewRecipeProposal,
+  EditRecipeProposal,
+  ChatbotIngredient,
+} from "@/redux/slices/chatbotSlice";
 
 interface RecipeProposalDialogProps {
   toolOutput: ToolOutputForUI;
@@ -38,17 +43,17 @@ export function RecipeProposalDialog({
   const { data: originalIngredients } = useRecipeIngredients(editRecipeId ?? null);
 
   // For edit proposals, merge tool output with original recipe (tool output takes precedence)
-  const getMergedString = (
-    toolValue: string | undefined,
-    fallback: string | null | undefined
-  ) => {
+  const getMergedString = (toolValue: string | undefined, fallback: string | null | undefined) => {
     if (toolValue !== undefined && toolValue !== null) return toolValue;
     if (isEditProposal && originalRecipe) return fallback ?? "";
     return "";
   };
 
   const finalTitle = getMergedString(toolOutput.args.title, originalRecipe?.name);
-  const finalDescription = getMergedString(toolOutput.args.description, originalRecipe?.description);
+  const finalDescription = getMergedString(
+    toolOutput.args.description,
+    originalRecipe?.description
+  );
   const finalServings = toolOutput.args.servings ?? originalRecipe?.base_servings ?? undefined;
   const finalIngredients: ChatbotIngredient[] | undefined =
     toolOutput.args.ingredients ??
@@ -62,25 +67,22 @@ export function RecipeProposalDialog({
 
   // Group ingredients by section for display
   const ingredientSections = finalIngredients
-    ? finalIngredients.reduce<{ section: string | null; items: string[] }[]>(
-        (acc, ing) => {
-          const lastGroup = acc[acc.length - 1];
-          if (lastGroup && lastGroup.section === ing.section) {
-            lastGroup.items.push(ing.item);
-          } else {
-            acc.push({ section: ing.section, items: [ing.item] });
-          }
-          return acc;
-        },
-        []
-      )
+    ? finalIngredients.reduce<{ section: string | null; items: string[] }[]>((acc, ing) => {
+        const lastGroup = acc[acc.length - 1];
+        if (lastGroup && lastGroup.section === ing.section) {
+          lastGroup.items.push(ing.item);
+        } else {
+          acc.push({ section: ing.section, items: [ing.item] });
+        }
+        return acc;
+      }, [])
     : [];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <div>
-          <p className="second-font font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
+          <p className="font-medium mt-2 border-t border-dashed border-secondary-foreground pt-2 text-center">
             {finalTitle}
           </p>
 
@@ -94,7 +96,7 @@ export function RecipeProposalDialog({
 
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="second-font text-lg font-bold mt-2">{finalTitle}</DialogTitle>
+          <DialogTitle className="text-lg font-bold mt-2">{finalTitle}</DialogTitle>
 
           <DialogDescription className="sr-only">
             {isEditProposal ? t("chatbot.previewEditedRecipe") : t("chatbot.previewRecipe")}

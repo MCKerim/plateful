@@ -33,9 +33,7 @@ export default function HowItWorks() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
       >
-        <h1 className="text-4xl font-bold first-font">
-          {t("howItWorks.title")}
-        </h1>
+        <h1 className="text-4xl font-bold first-font">{t("howItWorks.title")}</h1>
       </motion.div>
 
       {/* Steps */}
@@ -88,12 +86,8 @@ export default function HowItWorks() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: delay + 0.1, ease: "easeOut" }}
               >
-                <span className="text-sm font-medium text-muted-foreground">
-                  {i + 1}.
-                </span>{" "}
-                <span className="text-base font-semibold second-font">
-                  {t(`howItWorks.${step.key}`)}
-                </span>
+                <span className="text-sm font-medium text-muted-foreground">{i + 1}.</span>{" "}
+                <span className="text-base font-semibold">{t(`howItWorks.${step.key}`)}</span>
               </motion.div>
             </div>
           );
