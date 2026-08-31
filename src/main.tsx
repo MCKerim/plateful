@@ -11,6 +11,7 @@ import { RevenueCatProvider } from "./providers/RevenueCatProvider.tsx";
 import AppUrlListener from "./components/AppUrlListener.tsx";
 import { PostHogProvider } from "posthog-js/react";
 import posthog from "posthog-js";
+import { Capacitor } from "@capacitor/core";
 import { Toaster } from "./components/ui/sonner.tsx";
 import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
@@ -80,6 +81,35 @@ if ("serviceWorker" in navigator) {
 
 const isDevelopment = import.meta.env.MODE === "development";
 
+/**
+ * Which product this bundle is running as, sent on every event as a super
+ * property. `web` and `android_app` both come from this one codebase, and until
+ * this existed the only way to tell them apart was `$host = 'localhost'` — an
+ * incidental detail of how Capacitor's WebView serves the bundle, which would
+ * have broken silently the moment anyone set `server.hostname`.
+ *
+ * `$os` is NOT the discriminator: someone browsing app.plateful.cloud on an
+ * Android phone reports `$os = Android` while never having installed the app.
+ *
+ * The native iOS app registers `platform: "ios_app"` from its own Analytics.swift
+ * (and its Share Extension does too). Every client has to send this, or a
+ * dashboard filtered on `platform` silently drops whichever one doesn't.
+ *
+ * Derived from `getPlatform()` rather than `isNativePlatform()` so a Capacitor
+ * iOS build — which doesn't exist today — would label itself rather than
+ * quietly counting as Android, and still wouldn't collide with the native app.
+ */
+function currentPlatform(): string {
+  switch (Capacitor.getPlatform()) {
+    case "android":
+      return "android_app";
+    case "ios":
+      return "ios_capacitor";
+    default:
+      return "web";
+  }
+}
+
 function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
   // Skip PostHog in development
   if (isDevelopment) {
@@ -93,11 +123,15 @@ function AppProviders({ children }: Readonly<{ children: React.ReactNode }>) {
         api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
         defaults: "2025-05-24",
         capture_exceptions: true,
-        // Super property on every event, matching the native iOS app. Shared
+        // Super properties on every event, matching the native iOS app. Shared
         // dashboards filter on app_environment = production; without it our
         // events silently drop out of every such insight. The constant is
         // correct because dev builds skip PostHog entirely (above).
-        loaded: (ph) => ph.register({ app_environment: "production" }),
+        loaded: (ph) =>
+          ph.register({
+            app_environment: "production",
+            platform: currentPlatform(),
+          }),
       }}
     >
       <ErrorBoundary>{children}</ErrorBoundary>

@@ -42,6 +42,7 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 - **DnD**: @dnd-kit/core (meal planner zone-based drag) + @dnd-kit/sortable (ingredient list reordering)
 - **Subscriptions**: RevenueCat (in-app purchases, paywall)
 - **Analytics**: PostHog (`src/hooks/analytics/`); error reporting via `@/utils/reportError` (see Error Reporting below)
+  - Every event carries the `platform` super property (`web` / `android_app`), registered in `main.tsx`. The native iOS app sends `ios_app` from its own repo — **every client must send it**, or a platform-filtered dashboard silently drops whichever one doesn't. `$os` is not a substitute: it can't tell the Android app from someone browsing app.plateful.cloud on an Android phone.
 
 ### Path Alias
 
