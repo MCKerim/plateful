@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { reportError } from "@/utils/reportError";
 
 export default function CreateHousehold() {
   const { supabase } = useSupabase();
@@ -69,7 +70,7 @@ export default function CreateHousehold() {
       setHouseholdName("");
       navigate("/inviteMembers");
     } catch (error) {
-      console.error("Error creating household:", error);
+      reportError("Error creating household", error);
       toast.error(t("createHousehold.errors.createFailed"));
     } finally {
       setIsLoading(false);

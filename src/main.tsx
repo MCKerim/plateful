@@ -12,8 +12,9 @@ import AppUrlListener from "./components/AppUrlListener.tsx";
 import { PostHogProvider } from "posthog-js/react";
 import posthog from "posthog-js";
 import { Toaster } from "./components/ui/sonner.tsx";
-import { QueryClient, QueryClientProvider, QueryCache } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider, QueryCache, MutationCache } from "@tanstack/react-query";
 import { ErrorBoundary } from "./components/ErrorBoundary.tsx";
+import { markReported } from "@/utils/reportError";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 // React Query configuration
@@ -26,6 +27,31 @@ const queryClient = new QueryClient({
       posthog.captureException(error as Error, {
         query_key: JSON.stringify(query.queryKey),
       });
+    },
+  }),
+  // Reads were reported here from the start; writes were not, and writes are
+  // where the user-visible failures live. Every mutation failure now lands in
+  // PostHog from one place, which covers all 68 `useMutation` calls at once —
+  // including the 39 with no `onError` of their own, which previously failed in
+  // complete silence.
+  //
+  // This runs before the mutation's own `onError` and before a `mutateAsync`
+  // rejection reaches its caller, so marking the error here is what lets
+  // `reportError` be called anywhere without filing the same failure twice —
+  // `try { await x.mutateAsync() } catch` blocks routinely catch plain API calls
+  // as well, so the answer isn't fixed per call site.
+  //
+  // No mutation in this app sets a `mutationKey`, so `mutation_key` is usually
+  // null and the exception's own stack is what identifies the call site. Setting
+  // a key on a mutation you care about makes its failures greppable by name.
+  mutationCache: new MutationCache({
+    onError: (error, _variables, _context, mutation) => {
+      posthog.captureException(error as Error, {
+        mutation_key: mutation.options.mutationKey
+          ? JSON.stringify(mutation.options.mutationKey)
+          : null,
+      });
+      markReported(error);
     },
   }),
   defaultOptions: {

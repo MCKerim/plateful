@@ -16,6 +16,7 @@ import {
 import { cancelAllAccountNotifications } from "@/lib/notifications";
 import i18n from "@/i18n";
 import { toast } from "sonner";
+import { reportError } from "@/utils/reportError";
 
 export type AuthBootstrapState =
   | { status: "loading" }
@@ -44,7 +45,7 @@ export function useAuthBootstrap() {
       await fetchUserData(null, isCurrent, { resetAnalyticsIdentity: true });
       if (!isCurrent()) return;
       await cancelAllAccountNotifications().catch((error) =>
-        console.error("Failed to cancel account notifications:", error)
+        reportError("Failed to cancel account notifications", error)
       );
       if (isCurrent()) {
         setState({ status: "deleting", requestId, retryAfterSeconds, retrying: false });
@@ -127,11 +128,11 @@ export function useAuthBootstrap() {
     const isCurrent = () => generation.current === finishGeneration;
     await fetchUserData(null, isCurrent, { resetAnalyticsIdentity: true });
     await cancelAllAccountNotifications().catch((error) =>
-      console.error("Failed to cancel account notifications:", error)
+      reportError("Failed to cancel account notifications", error)
     );
     clearStoredDeletionRequest();
     const { error } = await supabase.auth.signOut({ scope: "local" });
-    if (error) console.error("Failed to clear the deleted account session:", error);
+    if (error) reportError("Failed to clear the deleted account session", error);
     if (isCurrent()) {
       loadedUserId.current = null;
       currentAuthUser.current = null;
@@ -155,7 +156,9 @@ export function useAuthBootstrap() {
         }, 0);
         pendingTimers.add(timer);
 
-        void closeBrowser().catch((error) => console.error(error));
+        void closeBrowser().catch((error) =>
+          reportError("Failed to close the in-app browser", error)
+        );
       });
 
     const resumeDeletion = () => {
@@ -211,7 +214,7 @@ export function useAuthBootstrap() {
               await bootstrapUser(currentAuthUser.current, true);
               return;
             }
-            console.error("Account deletion status check failed:", error);
+            reportError("Account deletion status check failed", error);
             setState({
               status: "deleting",
               requestId,

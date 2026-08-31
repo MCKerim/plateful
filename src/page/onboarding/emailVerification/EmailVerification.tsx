@@ -5,6 +5,7 @@ import { useSupabase } from "@/utils/supabase";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { toast } from "sonner";
+import { reportError } from "@/utils/reportError";
 
 export default function EmailVerification() {
   const { t } = useTranslation();
@@ -47,7 +48,7 @@ export default function EmailVerification() {
 
       toast.success(t("emailVerification.resendSent"));
     } catch (err) {
-      console.error("Sign up error:", err);
+      reportError("Sign up error", err);
       toast.error(t("emailSignup.errors.signupFailed"));
     }
   };

@@ -8,6 +8,7 @@ import OnboardingButton from "@/components/onboarding/onboardingButton/Onboardin
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
+import { reportError } from "@/utils/reportError";
 
 export default function Login() {
   const { supabase } = useSupabase();
@@ -61,7 +62,7 @@ export default function Login() {
       // Navigate to verification page
       navigate("/signup/verify");
     } catch (err) {
-      console.error("Login error:", err);
+      reportError("Login error", err);
       setError(t("login.errors.loginFailed"));
       setLoading(false);
     }

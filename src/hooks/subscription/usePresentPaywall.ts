@@ -15,6 +15,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { useSupabase } from "@/utils/supabase";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { reportError } from "@/utils/reportError";
 
 export function usePresentPaywall() {
   const { t, i18n } = useTranslation();
@@ -75,7 +76,7 @@ export function usePresentPaywall() {
 
         return result;
       } catch (error) {
-        console.error("Paywall presentation error:", error);
+        reportError("Paywall presentation error", error);
         toast.error(t("subscription.paywallError"));
         return null;
       }

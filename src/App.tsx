@@ -59,6 +59,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { useAuthBootstrap } from "@/hooks/user/useAuthBootstrap";
 import AccountLoadError from "@/components/general/AccountLoadError";
 import AccountDeletionProgress from "@/components/general/AccountDeletionProgress";
+import { reportError } from "@/utils/reportError";
 
 function App() {
   const { supabase } = useSupabase();
@@ -86,7 +87,7 @@ function App() {
           setShowUpdateDialog(true);
         }
       } catch (error) {
-        console.error("Error checking for app updates:", error);
+        reportError("Error checking for app updates", error);
       }
     };
 
@@ -129,7 +130,7 @@ function App() {
         await AppUpdate.openAppStore();
       }
     } catch (error) {
-      console.error("Error performing app update:", error);
+      reportError("Error performing app update", error);
     }
   };
 
@@ -172,7 +173,7 @@ function App() {
   useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       EdgeToEdge.enable().catch((e) => {
-        console.error("Error enabling edge to edge:", e);
+        reportError("Error enabling edge to edge", e);
       });
     }
   }, []);

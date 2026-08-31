@@ -21,6 +21,7 @@ import { recipeImportApi } from "@/api/recipeImport.api";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { contentLanguage } from "@/lib/contentLanguage";
+import { reportError } from "@/utils/reportError";
 
 // Cap the import's photo batch — the same limit the server CHECK constraint
 // and the iOS app enforce (raised 4 → 8 on 2026-08-23; keep all in step).
@@ -108,7 +109,7 @@ export default function ImageImport() {
           const dataUrl = URL.createObjectURL(blob);
           loaded.push({ file, dataUrl });
         } catch (err) {
-          console.error("Failed to load shared image:", err);
+          reportError("Failed to load shared image", err);
         }
       }
       await addImages(loaded);
@@ -170,7 +171,7 @@ export default function ImageImport() {
       // then land in the cookbook where the placeholder card is waiting.
       redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
     } catch (err) {
-      console.error("Failed to start image import:", err);
+      reportError("Failed to start image import", err);
       posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "photo" });
       toast.error(t("urlImport.errors.importFailed"));
     } finally {

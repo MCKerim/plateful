@@ -3,6 +3,7 @@ import { RevenueCatUI } from "@revenuecat/purchases-capacitor-ui";
 import { isNativePlatform } from "@/lib/revenuecat";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { reportError } from "@/utils/reportError";
 
 export function useCustomerCenter() {
   const { t } = useTranslation();
@@ -16,7 +17,7 @@ export function useCustomerCenter() {
     try {
       await RevenueCatUI.presentCustomerCenter();
     } catch (error) {
-      console.error("Customer center error:", error);
+      reportError("Customer center error", error);
       toast.error(t("subscription.customerCenterError"));
     }
   }, [t]);

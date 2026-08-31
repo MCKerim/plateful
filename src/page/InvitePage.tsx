@@ -25,6 +25,7 @@ import { selectUser } from "@/redux/slices/userSlice";
 import { useSupabase } from "@/utils/supabase";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { reportError } from "@/utils/reportError";
 
 type Props = {
   refreshUser: (authUser: CurrentAuthUser | null, forceBlocking?: boolean) => Promise<boolean>;
@@ -86,7 +87,7 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
           return;
         }
 
-        console.error("Error loading invite:", error);
+        reportError("Error loading invite", error);
         setPreview({ status: "unavailable" });
         toast.error(t("invitePage.invalidOrExpiredLink"));
       }
@@ -155,7 +156,7 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
           break;
       }
     } catch (error) {
-      console.error("Error joining household:", error);
+      reportError("Error joining household", error);
       toast.error(t("invitePage.joinError"));
     } finally {
       setIsJoining(false);

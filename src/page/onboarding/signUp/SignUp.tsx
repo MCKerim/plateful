@@ -14,6 +14,7 @@ import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { Capacitor } from "@capacitor/core";
+import { reportError } from "@/utils/reportError";
 
 function getUrlSafeNonce(): string {
   const bytes = new Uint8Array(32);
@@ -122,7 +123,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
 
       posthog?.capture(AnalyticsEvent.signedIn, { method: "google" });
     } catch (error) {
-      console.error("Unexpected error during sign up:", error);
+      reportError("Unexpected error during sign up", error);
       toast.error("Authentication failed. Please try again.");
     } finally {
       generateNonce();

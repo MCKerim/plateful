@@ -32,6 +32,7 @@ import CollectionDeleteDialog from "@/components/collections/CollectionDeleteDia
 import type { RecipeCollection } from "@/types/exportedDatabaseTypes.types";
 import { toast } from "sonner";
 import { filterRecipesByCollection } from "@/lib/collectionFiltering";
+import { reportError } from "@/utils/reportError";
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
@@ -170,7 +171,7 @@ export default function Cookbook() {
       toast.success(t("collections.deleted", { name: collectionToDelete.name }));
       setCollectionToDelete(null);
     } catch (error) {
-      console.error(error);
+      reportError("Failed to delete collection", error);
       toast.error(t("collections.errors.deleteFailed"));
     }
   }

@@ -48,6 +48,7 @@ import {
   useReplaceRecipeCollections,
 } from "@/hooks/collections/useCollections";
 import { recipeImageApi } from "@/api/recipeImage.api";
+import { reportError } from "@/utils/reportError";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -447,7 +448,7 @@ export default function AddRecipe() {
         try {
           await nutritionApi.refresh(supabase, targetRecipeId);
         } catch (error) {
-          console.error("Nutrition refresh request failed", error);
+          reportError("Nutrition refresh request failed", error);
         }
       }
 
@@ -463,7 +464,7 @@ export default function AddRecipe() {
       toast.success(t("addRecipe.recipeSaved"));
       navigate(`/recipe/${targetRecipeId}`, { replace: true });
     } catch (error) {
-      console.error(error);
+      reportError("Failed to save recipe", error);
       toast.error(t("addRecipe.errors.saveFailed"));
     }
   }

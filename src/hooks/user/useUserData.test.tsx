@@ -13,6 +13,7 @@ const mocks = vi.hoisted(() => ({
   updateLanguage: vi.fn(),
   posthogIdentify: vi.fn(),
   posthogReset: vi.fn(),
+  posthogCaptureException: vi.fn(),
   changeLanguage: vi.fn(),
   identifyUser: vi.fn(),
   logoutUser: vi.fn(),
@@ -45,6 +46,9 @@ vi.mock("posthog-js", () => ({
   default: {
     identify: mocks.posthogIdentify,
     reset: mocks.posthogReset,
+    // `reportError` reports through the same singleton, so every error
+    // path exercised here calls this too.
+    captureException: mocks.posthogCaptureException,
   },
 }));
 
@@ -97,6 +101,7 @@ describe("useUserData", () => {
     mocks.updateLanguage.mockReset().mockResolvedValue(undefined);
     mocks.posthogIdentify.mockReset();
     mocks.posthogReset.mockReset();
+    mocks.posthogCaptureException.mockReset();
     mocks.changeLanguage.mockReset().mockResolvedValue(undefined);
     mocks.identifyUser.mockReset().mockResolvedValue(null);
     mocks.logoutUser.mockReset().mockResolvedValue(null);

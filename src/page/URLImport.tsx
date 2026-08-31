@@ -19,6 +19,7 @@ import { normalizeRecipeImportUrl } from "@/lib/normalizeRecipeImportUrl";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { contentLanguage } from "@/lib/contentLanguage";
+import { reportError } from "@/utils/reportError";
 
 export default function URLImport() {
   const { t, i18n } = useTranslation();
@@ -78,7 +79,7 @@ export default function URLImport() {
         // placeholder card is already waiting.
         redirectTimerRef.current = setTimeout(() => navigate("/cookbook", { replace: true }), 1600);
       } catch (err) {
-        console.error("Failed to start URL import:", err);
+        reportError("Failed to start URL import", err);
         posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "url" });
         toast.error(t("urlImport.errors.importFailed"));
       } finally {

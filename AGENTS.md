@@ -41,7 +41,7 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 - **UI**: shadcn/ui components (Radix primitives) + Material UI icons + Lucide icons
 - **DnD**: @dnd-kit/core (meal planner zone-based drag) + @dnd-kit/sortable (ingredient list reordering)
 - **Subscriptions**: RevenueCat (in-app purchases, paywall)
-- **Analytics**: PostHog (`src/hooks/analytics/`)
+- **Analytics**: PostHog (`src/hooks/analytics/`); error reporting via `@/utils/reportError` (see Error Reporting below)
 
 ### Path Alias
 
@@ -50,6 +50,21 @@ Use `@/` to import from `src/` (configured in vite.config.ts and tsconfig.json).
 ### No Barrel Files
 
 Do not create `index.ts` barrel files for re-exporting. Import directly from source files instead (e.g., `@/hooks/recipe/useRecipe` not `@/hooks/recipe`).
+
+### Error Reporting
+
+Never leave a caught failure at `console.error`. Use `reportError(message, error, context?)` from `@/utils/reportError`, which logs **and** reports to PostHog in one call — the message doubles as the `source` property, so keep it specific and stable.
+
+Coverage is layered, and the layers must not overlap:
+
+- **Reads** — `QueryCache.onError` (`main.tsx`) reports every React Query failure with its `query_key`.
+- **Writes** — `MutationCache.onError` (`main.tsx`) reports every mutation failure, covering all `useMutation` calls including those with no `onError` of their own.
+- **Everything else** — plain `try/catch` and `.catch()` in hooks, providers and event handlers: call `reportError`.
+- **Render crashes** — `ErrorBoundary`. **Unhandled** errors and rejections — `capture_exceptions: true`.
+
+`MutationCache.onError` marks each error it files, and `reportError` skips anything already marked, so a `try { await x.mutateAsync() } catch` block can call `reportError` freely without double-filing. The one place to leave alone is a mutation's own `onError` handler, where the cache has always already reported — those keep a bare `console.error` on purpose.
+
+Why the rule exists: this app once had 58 `console.error` sites and a `useErrorTracking` hook that nothing imported, so every caught failure outside a read was invisible. The paywall captured its success event and console-logged its failures, so the data showed only purchases that worked.
 
 ### Key Directory Structure
 

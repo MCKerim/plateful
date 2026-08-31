@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { reportError } from "@/utils/reportError";
 
 export default function Settings() {
   const { supabase } = useSupabase();
@@ -66,7 +67,7 @@ export default function Settings() {
       if (!isMounted) return;
 
       if (error || !data) {
-        console.error("Error fetching user: ", error);
+        reportError("Error fetching user", error);
         return;
       }
 
@@ -92,7 +93,7 @@ export default function Settings() {
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
     if (error) {
-      console.error("Error while sign out: ", error);
+      reportError("Error while sign out", error);
     }
   };
 

@@ -5,6 +5,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useTranslation } from "react-i18next";
 import { useNativeCamera } from "../../hooks/general/useNativeCamera";
 import { AlertCircle } from "lucide-react";
+import { reportError } from "@/utils/reportError";
 
 interface ImagePickerProps {
   onImageSelected: (file: File | undefined, previewUrl: string) => void;
@@ -32,7 +33,7 @@ export const ImagePicker: React.FC<ImagePickerProps> = ({
         onImageSelected(result.file, result.dataUrl);
       }
     } catch (err) {
-      console.error("Error taking photo:", err);
+      reportError("Error taking photo", err);
       setError(t("common.errorTakingPhoto"));
     }
   };

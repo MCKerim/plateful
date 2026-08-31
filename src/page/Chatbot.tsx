@@ -45,6 +45,7 @@ import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import ChatbotIllustration from "@/components/onboarding/illustrations/ChatbotIllustration";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { useCollections, useReplaceRecipeCollections } from "@/hooks/collections/useCollections";
+import { reportError } from "@/utils/reportError";
 
 type VisionPart = { type: "input_text"; text: string } | { type: "input_image"; image_url: string };
 
@@ -270,7 +271,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         }
       }
     } catch (error) {
-      console.error("Error calling chatbot function:", error);
+      reportError("Error calling chatbot function", error);
 
       dispatch(addMessage({ role: "assistant", content: t("chatbot.errorMessage") }));
     } finally {
@@ -355,7 +356,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       // recipes whose nutrition_auto flag is off.
       if (ingredients && ingredients.length > 0) {
         nutritionApi.refresh(supabase, newRecipe.id).catch((error) => {
-          console.error("Nutrition refresh request failed", error);
+          reportError("Nutrition refresh request failed", error);
         });
       }
 
@@ -371,7 +372,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         },
       });
     } catch (error) {
-      console.error(error);
+      reportError("Failed to save recipe from chatbot proposal", error);
       toast.error(t("chatbot.saveRecipeError"));
     }
   }
@@ -414,7 +415,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       // ask the backend to re-estimate (it skips manual-nutrition recipes).
       if (ingredients && ingredients.length > 0) {
         nutritionApi.refresh(supabase, recipeId).catch((error) => {
-          console.error("Nutrition refresh request failed", error);
+          reportError("Nutrition refresh request failed", error);
         });
       }
 
@@ -429,7 +430,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         },
       });
     } catch (error) {
-      console.error(error);
+      reportError("Failed to update recipe from chatbot proposal", error);
       toast.error(t("chatbot.updateRecipeError"));
     }
   }

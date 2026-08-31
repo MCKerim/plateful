@@ -9,6 +9,7 @@ import { useSupabase } from "@/utils/supabase";
 import { redirectTo } from "@/utils/nativeBrowser";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHousehold } from "@/redux/slices/householdSlice";
+import { reportError } from "@/utils/reportError";
 
 /**
  * OAuth consent screen for Supabase Auth's OAuth 2.1 server.
@@ -99,7 +100,7 @@ export default function OAuthConsent() {
         });
       } catch (err) {
         if (cancelled) return;
-        console.error("Error loading OAuth authorization:", err);
+        reportError("Error loading OAuth authorization", err);
         setState({ status: "error", key: "loadFailed" });
       }
     };
@@ -134,7 +135,7 @@ export default function OAuthConsent() {
 
       redirectTo(data.redirect_url);
     } catch (err) {
-      console.error("Error submitting OAuth decision:", err);
+      reportError("Error submitting OAuth decision", err);
       toast.error(t("oauthConsent.decisionFailed"));
       setIsDeciding(false);
     }

@@ -8,6 +8,7 @@ import { SURVEY_QUESTIONS } from "./SurveyQuestions";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
+import { reportError } from "@/utils/reportError";
 
 // Interleaved navigation: questions that exit to a value screen instead of the next question
 const NEXT_AFTER_QUESTION: Record<number, string> = {
@@ -92,7 +93,7 @@ export default function Survey() {
     );
 
     if (error) {
-      console.error("Error saving survey answer:", error);
+      reportError("Error saving survey answer", error);
       toast.error(t("survey.errors.saveFailed"));
       return;
     }
@@ -134,7 +135,7 @@ export default function Survey() {
     );
 
     if (error) {
-      console.error("Error saving survey answer:", error);
+      reportError("Error saving survey answer", error);
       toast.error(t("survey.errors.saveFailed"));
       return;
     }

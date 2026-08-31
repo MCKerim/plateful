@@ -9,6 +9,7 @@ import { restorePurchases as restorePurchasesApi } from "@/lib/revenuecat";
 import { ENTITLEMENT_ID } from "@/types/subscription.types";
 import { toast } from "sonner";
 import { useTranslation } from "react-i18next";
+import { reportError } from "@/utils/reportError";
 
 export function useSubscription() {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export function useSubscription() {
         toast.info(t("subscription.restoreNoPurchases"), { id: toastId });
       }
     } catch (error) {
-      console.error("Failed to restore purchases:", error);
+      reportError("Failed to restore purchases", error);
       toast.error(t("subscription.restoreError"), { id: toastId });
     }
   }, [dispatch, t]);

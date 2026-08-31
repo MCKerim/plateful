@@ -11,6 +11,7 @@ import { Share } from "@capacitor/share";
 import { writeClipboardText } from "@/utils/nativeClipboard";
 import { toast } from "sonner";
 import { inviteApi } from "@/api/invite.api";
+import { reportError } from "@/utils/reportError";
 
 export default function InviteLink() {
   const { supabase } = useSupabase();
@@ -47,7 +48,7 @@ export default function InviteLink() {
       })
       .catch((error) => {
         if (!cancelled) {
-          console.error("Error creating invite:", error);
+          reportError("Error creating invite", error);
           toast.error(t("inviteLink.createError"));
         }
         if (inviteRequest.current === request) {
@@ -69,7 +70,7 @@ export default function InviteLink() {
         dialogTitle: t("inviteLink.shareDialogTitle"),
       });
     } catch (err) {
-      console.error("Error sharing link:", err);
+      reportError("Error sharing link", err);
       await copyInviteLink();
     }
   }
@@ -83,7 +84,7 @@ export default function InviteLink() {
       await writeClipboardText(inviteLink);
       toast.success(t("inviteLink.copySuccess"));
     } catch (err) {
-      console.error("Error copying link:", err);
+      reportError("Error copying link", err);
       toast.error(t("inviteLink.copyError"));
     }
   }

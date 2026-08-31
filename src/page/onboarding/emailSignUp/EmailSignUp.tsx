@@ -7,6 +7,7 @@ import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { reportError } from "@/utils/reportError";
 
 export default function EmailSignUp() {
   const { supabase } = useSupabase();
@@ -60,7 +61,7 @@ export default function EmailSignUp() {
       // Navigate to verification page
       navigate("/signup/verify");
     } catch (err) {
-      console.error("Sign up error:", err);
+      reportError("Sign up error", err);
       setError(t("emailSignup.errors.signupFailed"));
       setLoading(false);
     }

@@ -8,6 +8,7 @@ import {
   getCustomerInfo,
   isNativePlatform,
 } from "@/lib/revenuecat";
+import { reportError } from "@/utils/reportError";
 
 export function RevenueCatProvider({
   children,
@@ -34,7 +35,7 @@ export function RevenueCatProvider({
           });
         listenerIdRef.current = listenerId;
       } catch (error) {
-        console.error("RevenueCat: initialization failed", error);
+        reportError("RevenueCat: initialization failed", error);
         dispatch(setCustomerInfo(null));
       }
     };
@@ -45,7 +46,9 @@ export function RevenueCatProvider({
       if (isNativePlatform() && listenerIdRef.current) {
         Purchases.removeCustomerInfoUpdateListener({
           listenerToRemove: listenerIdRef.current,
-        }).catch(console.error);
+        }).catch((error) =>
+          reportError("RevenueCat: failed to remove the customer-info listener", error)
+        );
       }
     };
   }, [dispatch]);

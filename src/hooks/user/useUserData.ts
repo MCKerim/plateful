@@ -11,6 +11,7 @@ import { contentLanguage } from "@/lib/contentLanguage";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
+import { reportError } from "@/utils/reportError";
 
 export type UserDataLoadResult =
   | { status: "ready" }
@@ -67,7 +68,7 @@ export function useUserData() {
             if (!isCurrent()) return;
             await logoutUser();
           })
-          .catch((err) => console.error("Failed to logout from RevenueCat:", err));
+          .catch((err) => reportError("Failed to logout from RevenueCat", err));
         SocialLogin.logout({ provider: "google" }).catch(() => {
           // Ignore — user may not have signed in with Google
         });
@@ -81,7 +82,7 @@ export function useUserData() {
         // The auth event is the source of truth for whether a session exists.
         // A profile request failure must not turn a signed-in session into a
         // client-side logout.
-        console.error("Error fetching current user profile:", error);
+        reportError("Error fetching current user profile", error);
         return isCurrent() ? { status: "failed", stage: "profile" } : { status: "superseded" };
       }
 
@@ -101,7 +102,7 @@ export function useUserData() {
             userApi.getHouseholdMembers(supabase, userData.household_id),
           ]);
         } catch (error) {
-          console.error("Error fetching household data:", error);
+          reportError("Error fetching household data", error);
           return isCurrent() ? { status: "failed", stage: "household" } : { status: "superseded" };
         }
       }
@@ -128,7 +129,7 @@ export function useUserData() {
           ...(userData.household_id ? { household_id: userData.household_id } : {}),
         });
       } catch (error) {
-        console.error("Failed to identify user with PostHog:", error);
+        reportError("Failed to identify user with PostHog", error);
       }
 
       // Language and billing identity are useful integrations, but neither is
@@ -156,10 +157,10 @@ export function useUserData() {
               language: currentLanguage,
             });
           } catch (error) {
-            console.error("Failed to report the current language:", error);
+            reportError("Failed to report the current language", error);
           }
         })
-        .catch((error) => console.error("Failed to synchronize user language:", error));
+        .catch((error) => reportError("Failed to synchronize user language", error));
 
       revenueCatIdentityQueue = revenueCatIdentityQueue
         .catch(() => undefined)
@@ -170,7 +171,7 @@ export function useUserData() {
             dispatch(setCustomerInfo(customerInfo));
           }
         })
-        .catch((error) => console.error("Failed to identify user with RevenueCat:", error));
+        .catch((error) => reportError("Failed to identify user with RevenueCat", error));
 
       return { status: "ready" };
     },
