@@ -20,6 +20,13 @@ interface Notification {
   loc_key: string;
   loc_args?: string[];
   thread_id?: string;
+  /** How long this notification stays worth delivering, in seconds. Omitted,
+   * APNs holds one for a device that is offline and hands it over whenever it
+   * comes back, which is right for "your import is done" and wrong for
+   * anything tied to a time of day: a dinner reminder that was missed at six
+   * must not surface at eleven. Senders that care set it; the others keep
+   * APNs' store-and-forward behaviour unchanged. */
+  expiration_seconds?: number;
   data?: Record<string, string>;
 }
 
@@ -114,14 +121,22 @@ async function deliver(
   const aps: Record<string, unknown> = { alert, sound: "default" };
   if (notification.thread_id) aps["thread-id"] = notification.thread_id;
 
+  const headers: Record<string, string> = {
+    authorization: `bearer ${jwt}`,
+    "apns-topic": APNS_TOPIC,
+    "apns-push-type": "alert",
+    "apns-priority": "10",
+  };
+  // An absolute UNIX timestamp, per APNs: past it, the notification is dropped
+  // rather than kept for the next time the device shows up.
+  if (typeof notification.expiration_seconds === "number") {
+    const expiry = Math.floor(Date.now() / 1000) + notification.expiration_seconds;
+    headers["apns-expiration"] = String(expiry);
+  }
+
   const response = await fetch(`${host}/3/device/${row.token}`, {
     method: "POST",
-    headers: {
-      authorization: `bearer ${jwt}`,
-      "apns-topic": APNS_TOPIC,
-      "apns-push-type": "alert",
-      "apns-priority": "10",
-    },
+    headers,
     body: JSON.stringify({ aps, ...(notification.data ?? {}) }),
   });
 
