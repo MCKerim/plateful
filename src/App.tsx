@@ -191,10 +191,12 @@ function App() {
             const today = new Date();
             const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, "0")}-${String(today.getDate()).padStart(2, "0")}`;
 
+            // Notes on today are placements too; only a dish can be opened.
             const { data } = await supabase
               .from("meal_planning")
               .select("recipe_id")
-              .eq("planned_date", todayStr);
+              .eq("planned_date", todayStr)
+              .not("recipe_id", "is", null);
 
             const meals = data ?? [];
             if (meals.length === 1 && meals[0].recipe_id) {
@@ -270,6 +272,21 @@ function App() {
       }, 300);
     };
 
+    // The plan the same way, so a household member's replanning (a moved
+    // dish, a note) shows without waiting for the 30 s poll. No column
+    // filter on purpose: a DELETE event carries only the row's primary key
+    // and would never pass a `household_id` filter, while inserts and
+    // updates are RLS-scoped to the household anyway. A stranger's delete
+    // costs one no-op refetch.
+    let planRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const schedulePlanRefresh = () => {
+      if (planRefreshTimer) return;
+      planRefreshTimer = setTimeout(() => {
+        planRefreshTimer = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all });
+      }, 300);
+    };
+
     const channel = supabase
       .channel("recipes-changes")
       .on(
@@ -288,10 +305,21 @@ function App() {
         { event: "*", schema: "public", table: "recipe_collections" },
         scheduleRefresh
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "meal_planning" },
+        schedulePlanRefresh
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "planner_notes" },
+        schedulePlanRefresh
+      )
       .subscribe();
 
     return () => {
       if (refreshTimer) clearTimeout(refreshTimer);
+      if (planRefreshTimer) clearTimeout(planRefreshTimer);
       supabase.removeChannel(channel);
     };
   }, [householdId, queryClient, supabase]);
