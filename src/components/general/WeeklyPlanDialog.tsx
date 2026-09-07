@@ -1,9 +1,9 @@
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
-import { useState, useEffect, useCallback, ReactNode } from "react";
+import { useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus } from "lucide-react";
-import { getWeekdays } from "@/lib/dateHelper/dateHelper";
+import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus, StickyNote } from "lucide-react";
+import { getWeekdays, toPlannedDateString } from "@/lib/dateHelper/dateHelper";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { useSwipe } from "@/hooks/useSwipe";
@@ -13,13 +13,15 @@ import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { setCurrentWeek as setMealPlannerWeek } from "@/redux/slices/mealPlannerSlice";
 import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
-import { useRecipePlansForWeek } from "@/hooks/meal-planning/useRecipePlansForWeek";
-import { useSaveRecipePlans } from "@/hooks/meal-planning/useSaveRecipePlans";
+import { usePlacementsForWeek } from "@/hooks/meal-planning/usePlacementsForWeek";
+import { useApplyPlannerChanges } from "@/hooks/meal-planning/useApplyPlannerChanges";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
+import { planSubjectKey } from "@/lib/mealPlanHelper/mealPlanHelper";
+import { PlannedItemSummary, PlanSubject } from "@/types/meal-planning.types";
 
 type Props = {
-  recipeId: string;
-  recipeName: string;
+  /** The recipe or note being planned; `null` keeps a closed dialog mounted without loading anything. */
+  subject: PlanSubject | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   trigger?: ReactNode | null;
@@ -35,18 +37,21 @@ const locales = {
   de: de,
 };
 
-function getPlannedItemsForDate(
-  plannedItems: { planned_date: string; recipe_name: string }[],
-  date: Date
-) {
+function getPlannedItemsForDate(plannedItems: PlannedItemSummary[], date: Date) {
   return plannedItems.filter(
     (item) => item.planned_date && isSameDay(new Date(item.planned_date), date)
   );
 }
 
+/**
+ * Plans a recipe or a note onto any days of any week and into the pool, with
+ * the household's plan in view. The save is one server transaction
+ * (`apply_planner_changes`): the added days and pool copies plus the
+ * deselected days together, so a failure midway can't leave the plan with
+ * half of the change.
+ */
 export default function WeeklyPlanDialog({
-  recipeId,
-  recipeName,
+  subject,
   open: controlledOpen,
   onOpenChange: controlledOnOpenChange,
   trigger,
@@ -64,47 +69,53 @@ export default function WeeklyPlanDialog({
   const isControlled = controlledOpen !== undefined;
   const isDialogOpen = isControlled ? controlledOpen : internalOpen;
 
+  const subjectKey = subject ? planSubjectKey(subject) : "";
+
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [withoutDateCount, setWithoutDateCount] = useState(1);
   const [currentWeek, setCurrentWeek] = useState(initialWeek ?? new Date());
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
-  // Track original plan IDs per initialized week (needed for cross-week deletes)
+  // Track original placement IDs per initialized week (needed for cross-week deletes)
   const [planIdsByWeek, setPlanIdsByWeek] = useState<
     Map<string, Array<{ id: string; date: Date }>>
   >(new Map());
+  // The insertion ids of the pending save, kept while the selection is
+  // unchanged: a retry after a lost response then lands on the same rows
+  // instead of planning a day twice (the RPC ignores an id it already has).
+  const insertionIds = useRef<{ signature: string; ids: string[] }>({ signature: "", ids: [] });
 
-  // Fetch all planned items summary (for showing recipes on each day - includes recipe names)
+  // Everything planned in the shown week, for the chips on each day
   const { data: plannedItems = [], isFetching: isFetchingPlannedItems } = usePlannedItemsSummary(
     currentWeek,
     isDialogOpen
   );
 
-  // Fetch existing plans for THIS recipe in the current week (needed for IDs to delete)
-  const { data: recipePlans = [], isFetching: isFetchingRecipePlans } = useRecipePlansForWeek(
-    recipeId,
+  // THIS subject's placements in the shown week (needed for the IDs to delete)
+  const { data: placements = [], isFetching: isFetchingPlacements } = usePlacementsForWeek(
+    subject,
     currentWeek,
     isDialogOpen
   );
 
-  // Mutation for saving
   const incrementMission = useIncrementMission();
-  const saveMutation = useSaveRecipePlans({
-    onSuccess: (result) => {
-      if (result.added > 0) {
+  const applyChanges = useApplyPlannerChanges({
+    onSuccess: (result, variables) => {
+      // Planning a note is not planning a meal.
+      if (variables.subject.kind === "recipe" && result.added > 0) {
         incrementMission.mutate({ missionId: "plan_meals", count: result.added });
       }
     },
   });
 
-  // Check if a date has THIS recipe planned (using the always-fresh plannedItems data)
-  const isDatePlannedForThisRecipe = useCallback(
-    (date: Date): boolean => {
-      const itemsForDay = getPlannedItemsForDate(plannedItems, date);
-      return itemsForDay.some((item) => item.recipe_name === recipeName);
-    },
-    [plannedItems, recipeName]
+  // Whether the subject already sits on a day of the shown week
+  const isDatePlannedForSubject = useCallback(
+    (date: Date): boolean =>
+      placements.some(
+        (placement) => placement.planned_date && isSameDay(placement.planned_date, date)
+      ),
+    [placements]
   );
 
   // Reset state when dialog closes
@@ -116,32 +127,34 @@ export default function WeeklyPlanDialog({
       setCurrentWeek(initialWeek ?? new Date());
       setInitializedWeeks(new Set());
       setPlanIdsByWeek(new Map());
+      insertionIds.current = { signature: "", ids: [] };
     }
   }, [isDialogOpen]);
 
-  // Reset when recipe changes
+  // Reset when the subject changes
   useEffect(() => {
     setSelectedDates([]);
     setWithoutDate(false);
     setCurrentWeek(initialWeek ?? new Date());
     setInitializedWeeks(new Set());
     setPlanIdsByWeek(new Map());
-  }, [recipeId]);
+    insertionIds.current = { signature: "", ids: [] };
+  }, [subjectKey]);
 
   // Initialize/update selected dates when week changes or data loads
   // This adds already-planned dates for weeks that haven't been initialized yet
   useEffect(() => {
     // Don't initialize while data is still being fetched for this week
-    if (!isDialogOpen || isFetchingPlannedItems || isFetchingRecipePlans) return;
+    if (!isDialogOpen || isFetchingPlannedItems || isFetchingPlacements) return;
 
     const weekKey = getWeekdays(currentWeek)[0].toISOString();
 
     // Skip if this week has already been initialized
     if (initializedWeeks.has(weekKey)) return;
 
-    // Find all days in current week that have this recipe planned
+    // Find all days in current week that already hold the subject
     const weekDays = getWeekdays(currentWeek);
-    const alreadyPlannedDates = weekDays.filter((day) => isDatePlannedForThisRecipe(day));
+    const alreadyPlannedDates = weekDays.filter((day) => isDatePlannedForSubject(day));
 
     // Add the already-planned dates to selectedDates (without duplicates)
     if (alreadyPlannedDates.length > 0) {
@@ -156,12 +169,12 @@ export default function WeeklyPlanDialog({
       });
     }
 
-    // Store plan IDs for this week (needed for cross-week deletes on save)
+    // Store placement IDs for this week (needed for cross-week deletes on save)
     setPlanIdsByWeek((prev) => {
       const updated = new Map(prev);
       updated.set(
         weekKey,
-        recipePlans.filter((p) => p.planned_date).map((p) => ({ id: p.id, date: p.planned_date! }))
+        placements.filter((p) => p.planned_date).map((p) => ({ id: p.id, date: p.planned_date! }))
       );
       return updated;
     });
@@ -170,14 +183,12 @@ export default function WeeklyPlanDialog({
     setInitializedWeeks((prev) => new Set(prev).add(weekKey));
   }, [
     isDialogOpen,
-    plannedItems,
     currentWeek,
     initializedWeeks,
-    recipeName,
     isFetchingPlannedItems,
-    isFetchingRecipePlans,
-    recipePlans,
-    isDatePlannedForThisRecipe,
+    isFetchingPlacements,
+    placements,
+    isDatePlannedForSubject,
   ]);
 
   function handleOpenChange(open: boolean) {
@@ -219,7 +230,7 @@ export default function WeeklyPlanDialog({
   }
 
   async function handleSave() {
-    if (!householdId) {
+    if (!householdId || !subject) {
       toast.error(t("common.error"));
       return;
     }
@@ -236,7 +247,7 @@ export default function WeeklyPlanDialog({
         weekDays.some((wd) => isSameDay(wd, d))
       );
 
-      // Plans that were originally there but are now deselected → remove
+      // Placements that were originally there but are now deselected → remove
       for (const plan of originalPlans) {
         if (!selectedInThisWeek.some((d) => isSameDay(d, plan.date))) {
           planIdsToRemove.push(plan.id);
@@ -265,16 +276,32 @@ export default function WeeklyPlanDialog({
       return;
     }
 
+    // One row per added day, `null` per pool copy; ids reused for an unchanged retry.
+    const plannedDates: (string | null)[] = [
+      ...datesToAdd.map(toPlannedDateString),
+      ...Array.from({ length: withoutDate ? withoutDateCount : 0 }, () => null),
+    ];
+    const signature = JSON.stringify([plannedDates, planIdsToRemove]);
+    if (insertionIds.current.signature !== signature) {
+      insertionIds.current = { signature, ids: plannedDates.map(() => crypto.randomUUID()) };
+    }
+    const insertions = plannedDates.map((planned_date, index) => ({
+      id: insertionIds.current.ids[index],
+      planned_date,
+    }));
+
     try {
-      const result = await saveMutation.mutateAsync({
-        recipeId,
+      const result = await applyChanges.mutateAsync({
         householdId,
-        datesToAdd,
-        planIdsToRemove,
-        withoutDateCount: withoutDate ? withoutDateCount : 0,
+        subject,
+        insertions,
+        deleteIds: planIdsToRemove,
       });
 
-      toast.success(t("recipe.planningSuccessful"));
+      toast.success(
+        subject.kind === "recipe" ? t("recipe.planningSuccessful") : t("mealPlanner.planUpdated")
+      );
+      insertionIds.current = { signature: "", ids: [] };
 
       handleOpenChange(false);
       onSaveComplete?.({ success: true, ...result });
@@ -284,7 +311,9 @@ export default function WeeklyPlanDialog({
         navigate("/planner");
       }
     } catch {
-      toast.error(t("recipe.planningFailed"));
+      toast.error(
+        subject.kind === "recipe" ? t("recipe.planningFailed") : t("mealPlanner.planUpdateFailed")
+      );
       onSaveComplete?.({ success: false, added: 0, removed: 0 });
     }
   }
@@ -343,8 +372,7 @@ export default function WeeklyPlanDialog({
             const isSelected = selectedDates.some((d) => isSameDay(d, day));
             const plannedForDay = getPlannedItemsForDate(plannedItems, day);
             const hasPlannedItems = plannedForDay.length > 0;
-            // Use the fresh plannedItems data to check if this recipe is planned
-            const hasExistingPlan = isDatePlannedForThisRecipe(day);
+            const hasExistingPlan = isDatePlannedForSubject(day);
 
             return (
               <Button
@@ -367,15 +395,16 @@ export default function WeeklyPlanDialog({
                   {isToday && ` - ${t("common.today")}`}
                 </p>
 
-                {/* Show planned items */}
+                {/* Show planned items: recipes by name, notes by text */}
                 {hasPlannedItems && (
                   <div className="w-full flex flex-wrap gap-1 pl-2">
                     {plannedForDay.map((item, index) => (
                       <p
                         key={index}
-                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-semibold truncate max-w-[120px]"
+                        className="text-xs px-2 py-0.5 rounded-sm bg-muted text-muted-foreground font-semibold truncate max-w-[120px] flex items-center gap-1"
                       >
-                        {item.recipe_name}
+                        {item.kind === "note" && <StickyNote size={12} className="shrink-0" />}
+                        <span className="truncate">{item.label}</span>
                       </p>
                     ))}
                   </div>
@@ -422,8 +451,8 @@ export default function WeeklyPlanDialog({
         )}
 
         {/* Save Button */}
-        <Button className="mt-4" onClick={handleSave} disabled={saveMutation.isPending}>
-          {saveMutation.isPending ? t("common.saving") : t("common.save")}
+        <Button className="mt-4" onClick={handleSave} disabled={applyChanges.isPending}>
+          {applyChanges.isPending ? t("common.saving") : t("common.save")}
         </Button>
       </div>
     </DialogContent>

@@ -3,6 +3,7 @@ import { useSupabase } from "@/utils/supabase";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
+import { transformPlannedItemsSummary } from "@/lib/transformers/meal-planning.transformer";
 
 export function usePlannedItemsSummary(currentWeek: Date, enabled: boolean) {
   const { supabase } = useSupabase();
@@ -16,7 +17,10 @@ export function usePlannedItemsSummary(currentWeek: Date, enabled: boolean) {
 
   return useQuery({
     queryKey: queryKeys.mealPlanning.summary(weekStart.toISOString()),
-    queryFn: () => mealPlanningApi.getSummaryForWeek(supabase, weekStart, weekEnd),
+    queryFn: async () =>
+      transformPlannedItemsSummary(
+        await mealPlanningApi.getSummaryForWeek(supabase, weekStart, weekEnd)
+      ),
     enabled,
     refetchInterval: 1000 * 30, // Poll every 30s for household sync
     placeholderData: keepPreviousData,

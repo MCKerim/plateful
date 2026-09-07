@@ -303,7 +303,27 @@
     "planned": "Geplant",
     "selectDayOrWithoutDate": "Bitte wählen Sie einen Tag aus oder wählen Sie 'Ohne Datum'.",
     "alreadyPlanned": "Bereits geplant",
-    "willBeRemoved": "Wird entfernt"
+    "willBeRemoved": "Wird entfernt",
+    "addToPlan": "Zum Plan hinzufügen",
+    "addRecipe": "Rezept",
+    "addNote": "Notiz",
+    "addToDay": "Zu diesem Tag hinzufügen",
+    "planUpdated": "Plan aktualisiert",
+    "planUpdateFailed": "Der Plan konnte nicht aktualisiert werden. Bitte versuche es später erneut.",
+    "note": {
+      "title": "Notiz",
+      "editTitle": "Notiz bearbeiten",
+      "placeholder": "z. B. Draußen essen",
+      "suggestions": "Vorschläge",
+      "suggestion": {
+        "eatingOut": "Draußen essen",
+        "birthday": "Geburtstag",
+        "leftovers": "Reste",
+        "atFamilys": "Bei Familie"
+      },
+      "add": "Hinzufügen",
+      "saveError": "Notiz konnte nicht gespeichert werden"
+    }
   },
   "cookbook": {
     "enterRecipeName": "Rezept suchen...",
@@ -496,7 +516,8 @@
   "mealPlannerItem": {
     "editPlan": "Plan bearbeiten",
     "moveToNoDate": "Zu ohne Datum",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "editNote": "Notiz bearbeiten"
   },
   "settings": {
     "title": "Einstellungen",

@@ -3,12 +3,15 @@ import { Button } from "@/components/ui/button";
 import { Donut, House, CalendarDays } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { NavLink, useNavigate } from "react-router";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { isSameDay } from "date-fns";
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
 import RecipeCard from "@/components/general/RecipeCard";
 import TodaysMealCard from "@/components/home/TodaysMealCard";
+import TodaysNoteCard from "@/components/home/TodaysNoteCard";
+import NoteDialog, { NoteDialogState } from "@/components/mealPlanner/noteDialog/NoteDialog";
+import { orderForDisplay } from "@/lib/mealPlanHelper/mealPlanHelper";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import GettingStartedCard from "@/components/home/GettingStartedCard";
 
@@ -22,11 +25,16 @@ export default function Home() {
   // Fetch recipes for "recently added" section
   const { data: recipes = [] } = useRecipes();
 
-  const todaysMeals = useMemo(
+  // Today's plan, recipes first and then notes: a note ("Eating out") is the
+  // plan's word for the day too, so the "nothing planned" line stays away.
+  const todaysItems = useMemo(
     () =>
-      currentWeekItems.filter((item) => item.planned_date && isSameDay(item.planned_date, today)),
+      orderForDisplay(
+        currentWeekItems.filter((item) => item.planned_date && isSameDay(item.planned_date, today))
+      ),
     [currentWeekItems, today]
   );
+  const [noteDialog, setNoteDialog] = useState<NoteDialogState | null>(null);
 
   const recentlyAddedRecipes = useMemo(() => {
     const importing = recipes.filter((r) => r.status === "importing");
@@ -64,20 +72,28 @@ export default function Home() {
 
       {/* Today's planned meals */}
       <div className="mb-36">
-        {todaysMeals.length > 0 ? (
+        {todaysItems.length > 0 ? (
           <>
             <h2 className="text-lg font-semibold">{t("home.todayYouPlanned")}</h2>
 
             <div className="flex flex-col gap-2">
-              {todaysMeals.map((item) => (
-                <TodaysMealCard
-                  key={item.id}
-                  id={item.id}
-                  recipeId={item.recipeId}
-                  recipeName={item.recipeName}
-                  eaten={item.eaten}
-                />
-              ))}
+              {todaysItems.map((item) =>
+                item.kind === "recipe" ? (
+                  <TodaysMealCard
+                    key={item.id}
+                    id={item.id}
+                    recipeId={item.recipeId}
+                    recipeName={item.recipeName}
+                    eaten={item.eaten}
+                  />
+                ) : (
+                  <TodaysNoteCard
+                    key={item.id}
+                    note={item}
+                    onEdit={() => setNoteDialog({ mode: "edit", note: item })}
+                  />
+                )
+              )}
             </div>
           </>
         ) : (
@@ -124,6 +140,8 @@ export default function Home() {
           </Button>
         </NavLink>
       </div>
+
+      <NoteDialog state={noteDialog} onClose={() => setNoteDialog(null)} />
 
       {/* Add recipe FAB */}
       <AddNewRecipeDrawer

@@ -214,8 +214,7 @@ export default function Recipe() {
 
         {recipe && (
           <WeeklyPlanDialog
-            recipeId={recipe.id}
-            recipeName={recipe.name}
+            subject={{ kind: "recipe", id: recipe.id, name: recipe.name }}
             navigateOnSuccess={true}
           />
         )}

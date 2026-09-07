@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getWeekdays, toWeekday } from "./dateHelper";
+import { getWeekdays, toPlannedDateString, toWeekday } from "./dateHelper";
 
 // Mock i18n module
 vi.mock("@/i18n", () => ({
@@ -181,5 +181,16 @@ describe("dateHelper", () => {
 
       expect(result).toMatch(/\d{2}\/\d{2}\/\d{4}/);
     });
+  });
+});
+
+describe("toPlannedDateString", () => {
+  it("names the local calendar day, whatever the time of day", () => {
+    expect(toPlannedDateString(new Date(2026, 8, 7, 0, 30))).toBe("2026-09-07");
+    expect(toPlannedDateString(new Date(2026, 8, 7, 23, 30))).toBe("2026-09-07");
+  });
+
+  it("zero-pads month and day", () => {
+    expect(toPlannedDateString(new Date(2026, 0, 3))).toBe("2026-01-03");
   });
 });

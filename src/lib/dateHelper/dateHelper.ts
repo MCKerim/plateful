@@ -54,6 +54,15 @@ export function getWeekdays(date: Date = new Date()): Date[] {
   return weekdays;
 }
 
+/**
+ * A calendar day as the server's `planned_date` wants it: a local
+ * `yyyy-MM-dd`. Never `toISOString()` here: that is UTC, and between local
+ * midnight and 02:00 it names the previous day.
+ */
+export function toPlannedDateString(date: Date): string {
+  return formatDate(date, "yyyy-MM-dd");
+}
+
 export const formatDateByLocale = (date: string | Date) => {
   const dateObj = typeof date === "string" ? new Date(date) : date;
 

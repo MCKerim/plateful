@@ -1,5 +1,28 @@
-import { RecipeMealPlanInfo } from "@/types/meal-planning.types";
+import { MealPlannerItem, PlanSubject, RecipeMealPlanInfo } from "@/types/meal-planning.types";
 import { TFunction } from "i18next";
+
+/** A stable key for a plan subject, for query keys and effect dependencies. */
+export function planSubjectKey(subject: PlanSubject): string {
+  return subject.kind === "recipe" ? `recipe:${subject.id}` : `note:${subject.noteId}`;
+}
+
+/** What the weekly plan dialog edits when opened from a planned entry. */
+export function planSubjectOf(item: MealPlannerItem): PlanSubject {
+  return item.kind === "recipe"
+    ? { kind: "recipe", id: item.recipeId, name: item.recipeName }
+    : { kind: "note", noteId: item.noteId, text: item.text };
+}
+
+/**
+ * A day's (or the pool's) order on screen: recipes first, then notes, each
+ * group in the plan's own order. The native app lists a day the same way.
+ */
+export function orderForDisplay<T extends MealPlannerItem>(items: T[]): T[] {
+  return [
+    ...items.filter((item) => item.kind === "recipe"),
+    ...items.filter((item) => item.kind === "note"),
+  ];
+}
 
 export function getMealPlanStatus(
   info: RecipeMealPlanInfo | null,

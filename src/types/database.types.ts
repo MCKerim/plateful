@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      app_config: {
+        Row: {
+          min_supported_version: string
+          platform: string
+          updated_at: string
+        }
+        Insert: {
+          min_supported_version: string
+          platform: string
+          updated_at?: string
+        }
+        Update: {
+          min_supported_version?: string
+          platform?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       collections: {
         Row: {
           color_hex: string
@@ -26,6 +44,7 @@ export type Database = {
           sticker_key: string | null
           sticker_x: number
           sticker_y: number
+          stickers: Json | null
           updated_at: string
         }
         Insert: {
@@ -39,6 +58,7 @@ export type Database = {
           sticker_key?: string | null
           sticker_x?: number
           sticker_y?: number
+          stickers?: Json | null
           updated_at?: string
         }
         Update: {
@@ -52,6 +72,7 @@ export type Database = {
           sticker_key?: string | null
           sticker_x?: number
           sticker_y?: number
+          stickers?: Json | null
           updated_at?: string
         }
         Relationships: [
@@ -580,30 +601,36 @@ export type Database = {
       meal_planning: {
         Row: {
           created_at: string
-          eaten: boolean
-          household_id: string | null
+          eaten: boolean | null
+          household_id: string
           id: string
+          note_id: string | null
           owner_id: string | null
           planned_date: string | null
           recipe_id: string | null
+          updated_at: string
         }
         Insert: {
           created_at?: string
-          eaten?: boolean
-          household_id?: string | null
+          eaten?: boolean | null
+          household_id: string
           id?: string
+          note_id?: string | null
           owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
+          updated_at?: string
         }
         Update: {
           created_at?: string
-          eaten?: boolean
-          household_id?: string | null
+          eaten?: boolean | null
+          household_id?: string
           id?: string
+          note_id?: string | null
           owner_id?: string | null
           planned_date?: string | null
           recipe_id?: string | null
+          updated_at?: string
         }
         Relationships: [
           {
@@ -612,6 +639,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "household"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meal_planning_note_id_fkey"
+            columns: ["note_id", "household_id"]
+            isOneToOne: false
+            referencedRelation: "planner_notes"
+            referencedColumns: ["id", "household_id"]
           },
           {
             foreignKeyName: "meal_planning_owner_id_fkey"
@@ -629,17 +663,10 @@ export type Database = {
           },
           {
             foreignKeyName: "meal_planning_recipe_id_fkey"
-            columns: ["recipe_id"]
+            columns: ["recipe_id", "household_id"]
             isOneToOne: false
             referencedRelation: "recipes"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "meal_planning_recipe_id_fkey"
-            columns: ["recipe_id"]
-            isOneToOne: false
-            referencedRelation: "recipes_with_rating"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "household_id"]
           },
         ]
       }
@@ -667,8 +694,58 @@ export type Database = {
         }
         Relationships: []
       }
+      planner_notes: {
+        Row: {
+          created_at: string
+          household_id: string
+          id: string
+          owner_id: string | null
+          text: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          household_id: string
+          id?: string
+          owner_id?: string | null
+          text: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          household_id?: string
+          id?: string
+          owner_id?: string | null
+          text?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "planner_notes_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "planner_notes_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "household_entitlements"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "planner_notes_owner_id_fkey"
+            columns: ["owner_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       push_tokens: {
         Row: {
+          device_id: string | null
           environment: string
           platform: string
           token: string
@@ -676,6 +753,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          device_id?: string | null
           environment?: string
           platform?: string
           token: string
@@ -683,6 +761,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          device_id?: string | null
           environment?: string
           platform?: string
           token?: string
@@ -985,9 +1064,72 @@ export type Database = {
           },
         ]
       }
+      recipe_remixes: {
+        Row: {
+          attempts: number
+          created_at: string
+          created_by: string | null
+          error: string | null
+          household_id: string
+          id: string
+          instruction: string | null
+          language: string | null
+          presets: string[]
+          proposal: Json | null
+          recipe_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          household_id: string
+          id?: string
+          instruction?: string | null
+          language?: string | null
+          presets?: string[]
+          proposal?: Json | null
+          recipe_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          created_by?: string | null
+          error?: string | null
+          household_id?: string
+          id?: string
+          instruction?: string | null
+          language?: string | null
+          presets?: string[]
+          proposal?: Json | null
+          recipe_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_remixes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_remixes_recipe_id_fkey"
+            columns: ["recipe_id"]
+            isOneToOne: false
+            referencedRelation: "recipes_with_rating"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipes: {
         Row: {
-          base_servings: number | null
+          base_servings: number
           calories_kcal: number | null
           carbs_g: number | null
           cookbook_id: string | null
@@ -1020,7 +1162,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
-          base_servings?: number | null
+          base_servings?: number
           calories_kcal?: number | null
           carbs_g?: number | null
           cookbook_id?: string | null
@@ -1053,7 +1195,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
-          base_servings?: number | null
+          base_servings?: number
           calories_kcal?: number | null
           carbs_g?: number | null
           cookbook_id?: string | null
@@ -1276,6 +1418,7 @@ export type Database = {
       }
       user_subscriptions: {
         Row: {
+          auto_renews: boolean
           created_at: string
           environment: string | null
           expires_at: string | null
@@ -1286,6 +1429,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          auto_renews?: boolean
           created_at?: string
           environment?: string | null
           expires_at?: string | null
@@ -1296,6 +1440,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          auto_renews?: boolean
           created_at?: string
           environment?: string | null
           expires_at?: string | null
@@ -1332,6 +1477,7 @@ export type Database = {
           id: string
           language: string | null
           notification_preferences: Json | null
+          timezone: string | null
           username: string
         }
         Insert: {
@@ -1343,6 +1489,7 @@ export type Database = {
           id?: string
           language?: string | null
           notification_preferences?: Json | null
+          timezone?: string | null
           username?: string
         }
         Update: {
@@ -1354,6 +1501,7 @@ export type Database = {
           id?: string
           language?: string | null
           notification_preferences?: Json | null
+          timezone?: string | null
           username?: string
         }
         Relationships: [
@@ -1370,6 +1518,7 @@ export type Database = {
     Views: {
       household_entitlements: {
         Row: {
+          auto_renews: boolean | null
           environment: string | null
           expires_at: string | null
           household_id: string | null
@@ -1446,6 +1595,16 @@ export type Database = {
     }
     Functions: {
       accept_household_invite: { Args: { p_token: string }; Returns: Json }
+      apply_planner_changes: {
+        Args: {
+          p_delete_ids: string[]
+          p_household_id: string
+          p_insertions: Json
+          p_note_id?: string
+          p_recipe_id?: string
+        }
+        Returns: undefined
+      }
       apply_recipe_enrichment: {
         Args: {
           p_embedding?: string
@@ -1485,6 +1644,16 @@ export type Database = {
       }
       create_household: { Args: { p_name: string }; Returns: string }
       create_household_invite: { Args: never; Returns: string }
+      create_planner_note: {
+        Args: {
+          p_entry_id: string
+          p_household_id: string
+          p_note_id: string
+          p_planned_date?: string
+          p_text: string
+        }
+        Returns: undefined
+      }
       delete_household: { Args: never; Returns: undefined }
       f_array_to_string: {
         Args: { arr: string[]; sep: string }
@@ -1520,6 +1689,16 @@ export type Database = {
       }
       leave_household: { Args: never; Returns: string }
       preview_household_invite: { Args: { p_token: string }; Returns: Json }
+      recipe_image_cleanup_health: {
+        Args: never
+        Returns: {
+          dead_jobs: number
+          last_completion: string
+          oldest_pending_age: string
+          pending_jobs: number
+          stuck_jobs: number
+        }[]
+      }
       recipe_needs_enrichment: {
         Args: { p_recipe_id: string }
         Returns: boolean
@@ -1545,10 +1724,20 @@ export type Database = {
         }
         Returns: boolean
       }
-      register_push_token: {
-        Args: { p_environment: string; p_platform: string; p_token: string }
-        Returns: undefined
-      }
+      register_push_token:
+        | {
+            Args: { p_environment: string; p_platform: string; p_token: string }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              p_device_id: string
+              p_environment: string
+              p_platform: string
+              p_token: string
+            }
+            Returns: undefined
+          }
       remove_household_member: {
         Args: { p_member_id: string }
         Returns: undefined
@@ -1565,7 +1754,7 @@ export type Database = {
         Args: { p_token: string }
         Returns: {
           snapshot: Json
-        }
+        }[]
       }
       retry_account_deletion_job: {
         Args: {
@@ -1617,6 +1806,10 @@ export type Database = {
         Args: { p_enabled: boolean; p_key: string }
         Returns: undefined
       }
+      set_notification_preference_value: {
+        Args: { p_key: string; p_value: Json }
+        Returns: undefined
+      }
       transfer_household_ownership: {
         Args: { p_member_id: string }
         Returns: undefined
@@ -1640,12 +1833,12 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1669,11 +1862,11 @@ export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1694,11 +1887,11 @@ export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
     | keyof DefaultSchema["Tables"]
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
+  TableName extends (DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1719,11 +1912,11 @@ export type Enums<
   DefaultSchemaEnumNameOrOptions extends
     | keyof DefaultSchema["Enums"]
     | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
+  EnumName extends (DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
+    : never) = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
@@ -1736,11 +1929,11 @@ export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
     | keyof DefaultSchema["CompositeTypes"]
     | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
+  CompositeTypeName extends (PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
     ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
+    : never) = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }

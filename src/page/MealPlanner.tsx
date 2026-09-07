@@ -14,7 +14,14 @@ import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { Button } from "@/components/ui/button";
-import { CalendarOff, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  CalendarOff,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Plus,
+  StickyNote,
+} from "lucide-react";
 import { useNavigate } from "react-router";
 import {
   DndContext,
@@ -39,10 +46,18 @@ import { useDeletePlannedItem } from "@/hooks/meal-planning/useDeletePlannedItem
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
 import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlannedItemDate";
-import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
+import {
+  MealPlannerItem as MealPlannerItemType,
+  PlannedNote,
+  PlannedRecipe,
+  PlanSubject,
+} from "@/types/meal-planning.types";
 import MealPlannerItemSkeleton from "@/components/mealPlanner/mealPlannerItem/MealPlannerItemSkeleton";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import MealPlannerIllustration from "@/components/onboarding/illustrations/MealPlannerIllustration";
+import PlannerEntryChooser from "@/components/mealPlanner/plannerEntryChooser/PlannerEntryChooser";
+import NoteDialog, { NoteDialogState } from "@/components/mealPlanner/noteDialog/NoteDialog";
+import { orderForDisplay, planSubjectOf } from "@/lib/mealPlanHelper/mealPlanHelper";
 
 const locales = {
   en: enUS,
@@ -73,10 +88,11 @@ export default function MealPlanner() {
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<string>();
-  const [editingRecipe, setEditingRecipe] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
+  /** The recipe or note whose weekly plan dialog is open. */
+  const [editingSubject, setEditingSubject] = useState<PlanSubject | null>(null);
+  /** The day whose "+" opened the recipe-or-note chooser. */
+  const [chooserDay, setChooserDay] = useState<Date | null>(null);
+  const [noteDialog, setNoteDialog] = useState<NoteDialogState | null>(null);
 
   // React Query hooks - clean and simple!
   const { data: plannedItems = [], isLoading } = useMealPlannerItems(currentWeek);
@@ -99,8 +115,12 @@ export default function MealPlanner() {
     })
   );
 
-  // Derived state
-  const notPlannedItems = plannedItems.filter((item) => item.planned_date === null && !item.eaten);
+  // Derived state. Eaten pool recipes are done with; a note has no such state.
+  const notPlannedItems = orderForDisplay(
+    plannedItems.filter(
+      (item) => item.planned_date === null && (item.kind === "note" || !item.eaten)
+    )
+  );
   const isDraggingFromDrawer = activeItem?.planned_date === null;
 
   // Auto-open drawer when there are unplanned items
@@ -139,18 +159,32 @@ export default function MealPlanner() {
     );
   }
 
-  function handleRecipeEaten(item: MealPlannerItemType) {
+  function handleRecipeEaten(item: PlannedRecipe) {
     handleSetEaten(item.id, true);
     setRecipeToRate(item.recipeId);
     ratingModalRef.current?.open();
   }
 
-  function handleEditPlan(recipeId: string, recipeName: string) {
-    setEditingRecipe({ id: recipeId, name: recipeName });
+  function handleToggleEaten(item: PlannedRecipe) {
+    if (item.eaten) {
+      handleSetEaten(item.id, false);
+    } else {
+      handleRecipeEaten(item);
+    }
+  }
+
+  function handleEditPlan(item: MealPlannerItemType) {
+    setEditingSubject(planSubjectOf(item));
+  }
+
+  function handleEditNote(note: PlannedNote) {
+    setNoteDialog({ mode: "edit", note });
   }
 
   function getItemsByDate(date: Date) {
-    return plannedItems.filter((item) => item.planned_date && isSameDay(item.planned_date, date));
+    return orderForDisplay(
+      plannedItems.filter((item) => item.planned_date && isSameDay(item.planned_date, date))
+    );
   }
 
   useEffect(() => {
@@ -245,6 +279,20 @@ export default function MealPlanner() {
     disabled: activeItem !== null,
   });
 
+  function renderItem(item: MealPlannerItemType, { inDay }: { inDay: boolean }) {
+    return (
+      <MealPlannerItem
+        item={item}
+        onToggleEaten={item.kind === "recipe" ? () => handleToggleEaten(item) : undefined}
+        onRemove={() => handleDelete(item.id)}
+        onEditPlan={() => handleEditPlan(item)}
+        onEditNote={item.kind === "note" ? () => handleEditNote(item) : undefined}
+        onMoveToNoDate={inDay ? () => handleUpdateDate(item.id, null) : undefined}
+        isDragging={activeItem?.id === item.id}
+      />
+    );
+  }
+
   return (
     <DndContext
       sensors={sensors}
@@ -264,16 +312,26 @@ export default function MealPlanner() {
       <Layout showHeader={false} noTopPadding>
         <RatingModal ref={ratingModalRef} recipeId={recipeToRate} showTriggerButton={false} />
 
-        {/* Weekly Plan Dialog for editing */}
+        {/* Weekly Plan Dialog for editing a recipe's or a note's days */}
         <WeeklyPlanDialog
-          recipeId={editingRecipe?.id ?? ""}
-          recipeName={editingRecipe?.name ?? ""}
-          open={editingRecipe !== null}
-          onOpenChange={(open) => !open && setEditingRecipe(null)}
+          subject={editingSubject}
+          open={editingSubject !== null}
+          onOpenChange={(open) => !open && setEditingSubject(null)}
           trigger={null}
           navigateOnSuccess={false}
           initialWeek={currentWeek}
         />
+
+        {/* A day's "+": a recipe from the cookbook, or a note for the day */}
+        <PlannerEntryChooser
+          day={chooserDay}
+          open={chooserDay !== null}
+          onOpenChange={(open) => !open && setChooserDay(null)}
+          onRecipe={() => navigate("/cookbook")}
+          onNote={(day) => setNoteDialog({ mode: "create", day })}
+        />
+
+        <NoteDialog state={noteDialog} onClose={() => setNoteDialog(null)} />
 
         {/* Week Navigation */}
         <div className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10">
@@ -332,44 +390,49 @@ export default function MealPlanner() {
                 ))}
               </>
             ) : (
-              getWeekdays(currentWeek).map((day) => (
-                <DroppableDay key={day.toISOString()} id={day.toISOString()}>
-                  <p
-                    className={`px-1.5 mb-1 text-sm font-semibold rounded-full w-fit ${
-                      isToday(day) ? "bg-accent text-accent-foreground" : ""
-                    }`}
-                  >
-                    {format(day, "EEE - dd.MM", {
-                      locale: locales[i18n.language as keyof typeof locales] || enUS,
-                    })}
-                  </p>
+              getWeekdays(currentWeek).map((day) => {
+                const items = getItemsByDate(day);
 
-                  {getItemsByDate(day).length > 0 ? (
-                    <ul className="flex flex-col gap-2">
-                      {getItemsByDate(day).map((item) => (
-                        <li key={item.id}>
-                          <MealPlannerItem
-                            {...item}
-                            onToggleEaten={() => {
-                              if (item.eaten) {
-                                handleSetEaten(item.id, false);
-                              } else {
-                                handleRecipeEaten(item);
-                              }
-                            }}
-                            onRecipeDelete={() => handleDelete(item.id)}
-                            onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
-                            onMoveToNoDate={() => handleUpdateDate(item.id, null)}
-                            isDragging={activeItem?.id === item.id}
-                          />
-                        </li>
-                      ))}
-                    </ul>
-                  ) : (
-                    <MealPlannerAdd onClick={() => navigate("/cookbook")} />
-                  )}
-                </DroppableDay>
-              ))
+                return (
+                  <DroppableDay key={day.toISOString()} id={day.toISOString()}>
+                    <div className="flex items-center justify-between mb-1">
+                      <p
+                        className={`px-1.5 text-sm font-semibold rounded-full w-fit ${
+                          isToday(day) ? "bg-accent text-accent-foreground" : ""
+                        }`}
+                      >
+                        {format(day, "EEE - dd.MM", {
+                          locale: locales[i18n.language as keyof typeof locales] || enUS,
+                        })}
+                      </p>
+
+                      {/* Only with entries on the day: an empty day's card is
+                          the (bigger) add button itself. */}
+                      {items.length > 0 && (
+                        <Button
+                          variant="ghost"
+                          size="iconSm"
+                          className="text-muted-foreground"
+                          aria-label={t("mealPlanner.addToDay")}
+                          onClick={() => setChooserDay(day)}
+                        >
+                          <Plus size={18} />
+                        </Button>
+                      )}
+                    </div>
+
+                    {items.length > 0 ? (
+                      <ul className="flex flex-col gap-2">
+                        {items.map((item) => (
+                          <li key={item.id}>{renderItem(item, { inDay: true })}</li>
+                        ))}
+                      </ul>
+                    ) : (
+                      <MealPlannerAdd onClick={() => setChooserDay(day)} />
+                    )}
+                  </DroppableDay>
+                );
+              })
             )}
           </div>
         </div>
@@ -427,20 +490,7 @@ export default function MealPlanner() {
                     <div className="flex gap-3 overflow-x-auto pb-2">
                       {notPlannedItems.map((item) => (
                         <div key={item.id} className="flex-shrink-0 w-[280px]">
-                          <MealPlannerItem
-                            key={item.id}
-                            {...item}
-                            onToggleEaten={() => {
-                              if (item.eaten) {
-                                handleSetEaten(item.id, false);
-                              } else {
-                                handleRecipeEaten(item);
-                              }
-                            }}
-                            onRecipeDelete={() => handleDelete(item.id)}
-                            onEditPlan={() => handleEditPlan(item.recipeId, item.recipeName)}
-                            isDragging={activeItem?.id === item.id}
-                          />
+                          {renderItem(item, { inDay: false })}
                         </div>
                       ))}
                     </div>
@@ -478,11 +528,13 @@ export default function MealPlanner() {
       >
         {activeItem && (
           <Card className="h-[72px] flex items-center shadow-2xl opacity-95">
-            <div className="h-full w-[74px] bg-muted border-r-4 border-background"></div>
+            <div className="h-full w-[74px] bg-muted border-r-4 border-background flex items-center justify-center text-muted-foreground">
+              {activeItem.kind === "note" && <StickyNote size={28} />}
+            </div>
 
             <div className="flex-1 px-2.5">
               <p className="text-md font-semibold break-words leading-tight line-clamp-3">
-                {activeItem.recipeName}
+                {activeItem.kind === "recipe" ? activeItem.recipeName : activeItem.text}
               </p>
             </div>
           </Card>

@@ -2,7 +2,9 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { Database, Json } from "@/types/database.types";
 import { NotificationPreferences } from "@/types/notification.types";
 
-type User = Database["public"]["Tables"]["users"]["Row"];
+// Minus `timezone`, the native app's write-only mirror for the server's plan
+// reminders: nothing in this client reads it (see exportedDatabaseTypes).
+type User = Omit<Database["public"]["Tables"]["users"]["Row"], "timezone">;
 type Household = Database["public"]["Tables"]["household"]["Row"];
 
 export type CurrentAuthUser = {

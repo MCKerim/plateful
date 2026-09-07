@@ -303,7 +303,27 @@
     "planned": "planned",
     "selectDayOrWithoutDate": "Please select a day or choose 'Without date'",
     "alreadyPlanned": "Already planned",
-    "willBeRemoved": "Will be removed"
+    "willBeRemoved": "Will be removed",
+    "addToPlan": "Add to plan",
+    "addRecipe": "Recipe",
+    "addNote": "Note",
+    "addToDay": "Add to this day",
+    "planUpdated": "Plan updated",
+    "planUpdateFailed": "Couldn't update the plan. Please try again later.",
+    "note": {
+      "title": "Note",
+      "editTitle": "Edit note",
+      "placeholder": "e.g. Eating out",
+      "suggestions": "Suggestions",
+      "suggestion": {
+        "eatingOut": "Eating out",
+        "birthday": "Birthday",
+        "leftovers": "Leftovers",
+        "atFamilys": "At family's"
+      },
+      "add": "Add",
+      "saveError": "Couldn't save note"
+    }
   },
   "cookbook": {
     "enterRecipeName": "Search recipe...",
@@ -380,7 +400,8 @@
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
     "moveToNoDate": "Move to no date",
-    "remove": "Remove"
+    "remove": "Remove",
+    "editNote": "Edit note"
   },
   "addRecipeDrawer": {
     "open": "Add recipe or Collection",

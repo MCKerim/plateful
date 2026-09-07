@@ -3,44 +3,59 @@ import { Card } from "../../ui/card";
 import { Button } from "../../ui/button";
 import { useEffect, useRef, useState } from "react";
 import { Drawer, DrawerClose, DrawerContent, DrawerFooter, DrawerTrigger } from "../../ui/drawer";
-import { CalendarDays, CalendarOff, Check, MoreVertical, Trash2 } from "lucide-react";
+import {
+  CalendarDays,
+  CalendarOff,
+  Check,
+  MoreVertical,
+  Pencil,
+  StickyNote,
+  Trash2,
+} from "lucide-react";
 import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
+import { isBefore, startOfToday } from "date-fns";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
+import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
 
 type Props = {
-  id: string;
-  recipeId: string;
-  recipeName: string;
-  eaten: boolean;
-  onToggleEaten: () => void;
-  onRecipeDelete: (id: string) => void;
+  item: MealPlannerItemType;
+  /** Recipes only: flips the cooked state. */
+  onToggleEaten?: () => void;
+  /** Takes this placement off the plan. */
+  onRemove: () => void;
+  /** Opens the weekly plan dialog for the recipe or the note. */
   onEditPlan: () => void;
+  /** Notes only: opens the text editor (also the row's tap). */
+  onEditNote?: () => void;
   onMoveToNoDate?: () => void;
   isDragging?: boolean;
 };
 
+/**
+ * One planned entry: a recipe (cover, name, cooked check) or a note (note
+ * symbol, text). Same card, same drag handle and menu for both; a note has
+ * no cooked state, and a past note only recedes.
+ */
 export default function MealPlannerItem({
-  id,
-  recipeId,
-  recipeName,
-  eaten,
+  item,
   onToggleEaten,
-  onRecipeDelete,
+  onRemove,
   onEditPlan,
+  onEditNote,
   onMoveToNoDate,
   isDragging = false,
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: imageUrl } = useRecipeFirstImage(recipeId);
+  const { data: imageUrl } = useRecipeFirstImage(item.kind === "recipe" ? item.recipeId : null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const dragHandleRef = useRef<HTMLDivElement>(null);
 
   const { attributes, listeners, setNodeRef } = useDraggable({
-    id: id,
+    id: item.id,
     data: {
       type: "meal-planner-item",
     },
@@ -129,10 +144,27 @@ export default function MealPlannerItem({
     };
   }, []);
 
+  const eaten = item.kind === "recipe" && item.eaten;
+  // A past note recedes like a cooked recipe. Presentation only: a note has
+  // no cooked state, and it stays editable and draggable.
+  const isPastNote =
+    item.kind === "note" &&
+    item.planned_date !== null &&
+    isBefore(item.planned_date, startOfToday());
+  const title = item.kind === "recipe" ? item.recipeName : item.text;
+
+  function open() {
+    if (item.kind === "recipe") {
+      navigate(`/recipe/${item.recipeId}`);
+    } else {
+      onEditNote?.();
+    }
+  }
+
   return (
     <Card
       ref={setNodeRef}
-      className={`h-[72px] flex items-center ${isDragging ? "invisible" : ""} ${eaten ? "opacity-60" : ""}`}
+      className={`h-[72px] flex items-center ${isDragging ? "invisible" : ""} ${eaten || isPastNote ? "opacity-60" : ""}`}
     >
       <div
         ref={dragHandleRef}
@@ -148,42 +180,52 @@ export default function MealPlannerItem({
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/recipe/${recipeId}`);
+            open();
           }}
           className="h-full shrink-0"
+          aria-label={item.kind === "note" ? t("mealPlannerItem.editNote") : undefined}
         >
-          <img
-            src={imageUrl || "/no-img.jpg"}
-            alt="Recipe"
-            className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
-            draggable={false}
-          />
+          {item.kind === "recipe" ? (
+            <img
+              src={imageUrl || "/no-img.jpg"}
+              alt="Recipe"
+              className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
+              draggable={false}
+            />
+          ) : (
+            <div className="h-full w-[74px] flex items-center justify-center bg-muted border-r-4 border-background text-muted-foreground">
+              <StickyNote size={28} />
+            </div>
+          )}
         </button>
 
         <button
           onClick={(e) => {
             e.stopPropagation();
-            navigate(`/recipe/${recipeId}`);
+            open();
           }}
           className="text-left flex-1 px-2.5 min-w-0 h-full flex flex-col justify-center gap-0.5"
         >
           <p className="text-md font-semibold break-words leading-tight line-clamp-2 w-full">
-            {recipeName}
+            {title}
           </p>
         </button>
       </div>
 
-      <Button
-        className={`rounded-full me-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
-        variant="outline"
-        size="icon"
-        onClick={(e) => {
-          e.stopPropagation();
-          onToggleEaten();
-        }}
-      >
-        <Check className="!size-5" />
-      </Button>
+      {item.kind === "recipe" && onToggleEaten && (
+        <Button
+          className={`rounded-full me-1 ${eaten ? "bg-accent text-accent-foreground border-accent" : ""}`}
+          variant="outline"
+          size="icon"
+          aria-label={t("home.markComplete")}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleEaten();
+          }}
+        >
+          <Check className="!size-5" />
+        </Button>
+      )}
 
       <Drawer open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <DrawerTrigger asChild>
@@ -201,6 +243,15 @@ export default function MealPlannerItem({
               </Button>
             </DrawerClose>
 
+            {item.kind === "note" && onEditNote && (
+              <DrawerClose asChild>
+                <Button className="w-full" variant="secondary" onClick={onEditNote}>
+                  <Pencil size={20} />
+                  {t("mealPlannerItem.editNote")}
+                </Button>
+              </DrawerClose>
+            )}
+
             {onMoveToNoDate && (
               <DrawerClose asChild>
                 <Button className="w-full" variant="secondary" onClick={onMoveToNoDate}>
@@ -213,7 +264,7 @@ export default function MealPlannerItem({
             <DeleteDialog
               onDelete={() => {
                 setIsDrawerOpen(false);
-                onRecipeDelete(id);
+                onRemove();
               }}
               customTrigger={
                 <Button className="w-full" variant="destructive">
