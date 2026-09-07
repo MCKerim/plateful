@@ -134,15 +134,25 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
         sticker_y: 0.22,
       };
       collections.push(created);
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(created) });
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(created),
+      });
       return;
     }
 
     const collectionId = url.match(/id=eq\.([a-f0-9-]+)/i)?.[1];
     if (method === "PATCH" && collectionId) {
       const collection = collections.find((item) => item.id === collectionId)!;
-      Object.assign(collection, route.request().postDataJSON(), { updated_at: new Date().toISOString() });
-      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(collection) });
+      Object.assign(collection, route.request().postDataJSON(), {
+        updated_at: new Date().toISOString(),
+      });
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(collection),
+      });
       return;
     }
 
@@ -164,7 +174,10 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
   });
 
   await page.route("**/rest/v1/recipe_collections?*", async (route) => {
-    const recipeId = route.request().url().match(/recipe_id=eq\.([a-f0-9-]+)/i)?.[1];
+    const recipeId = route
+      .request()
+      .url()
+      .match(/recipe_id=eq\.([a-f0-9-]+)/i)?.[1];
     const recipe = scenario.recipes.find((item) => item.id === recipeId);
     await route.fulfill({
       status: 200,
@@ -201,12 +214,73 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
-  // Meal planning endpoint (alternate table name)
+  // Meal planning endpoint: the week's rows (recipes and notes alike)
   await page.route("**/rest/v1/meal_planning?*", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(scenario.mealPlans),
+    });
+  });
+
+  // A new note lands in the scenario so the refetch after the RPC shows it
+  await page.route("**/rest/v1/rpc/create_planner_note", async (route) => {
+    const body = route.request().postDataJSON();
+    scenario.mealPlans.push({
+      id: body.p_entry_id,
+      recipe_id: null,
+      note_id: body.p_note_id,
+      household_id: body.p_household_id,
+      planned_date: body.p_planned_date ?? null,
+      eaten: null,
+      created_at: new Date().toISOString(),
+      recipes: null,
+      planner_notes: { id: body.p_note_id, text: body.p_text },
+    });
+    await route.fulfill({ status: 204, body: "" });
+  });
+
+  // The weekly plan dialog's save: the delta, applied to the scenario
+  await page.route("**/rest/v1/rpc/apply_planner_changes", async (route) => {
+    const body = route.request().postDataJSON();
+    const deleteIds: string[] = body.p_delete_ids ?? [];
+    scenario.mealPlans = scenario.mealPlans.filter((plan) => !deleteIds.includes(plan.id));
+    const note = scenario.mealPlans.find((plan) => plan.note_id === body.p_note_id);
+    const recipe = scenario.recipes.find((item) => item.id === body.p_recipe_id);
+    for (const insertion of body.p_insertions ?? []) {
+      scenario.mealPlans.push({
+        id: insertion.id,
+        recipe_id: body.p_recipe_id ?? null,
+        note_id: body.p_note_id ?? null,
+        household_id: body.p_household_id,
+        planned_date: insertion.planned_date ?? null,
+        eaten: body.p_recipe_id ? false : null,
+        created_at: new Date().toISOString(),
+        recipes: recipe ? { id: recipe.id, name: recipe.name } : null,
+        planner_notes: note?.planner_notes ?? null,
+      });
+    }
+    await route.fulfill({ status: 204, body: "" });
+  });
+
+  // Editing a note's text changes every copy
+  await page.route("**/rest/v1/planner_notes?*", async (route) => {
+    const noteId = route
+      .request()
+      .url()
+      .match(/id=eq\.([a-f0-9-]+)/i)?.[1];
+    const body = route.request().postDataJSON();
+    let found = false;
+    for (const plan of scenario.mealPlans) {
+      if (plan.planner_notes && plan.note_id === noteId) {
+        plan.planner_notes = { ...plan.planner_notes, text: body.text };
+        found = true;
+      }
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(found ? { id: noteId } : null),
     });
   });
 

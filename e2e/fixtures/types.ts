@@ -44,14 +44,18 @@ export type MockCollection = {
   sticker_y: number;
 };
 
+// One `meal_planning` row: a recipe (recipe_id + eaten true/false) or a note
+// (note_id + eaten null), never both.
 export type MockMealPlan = {
   id: string;
-  recipe_id: string;
+  recipe_id: string | null;
+  note_id: string | null;
   household_id: string;
   planned_date: string | null;
-  eaten: boolean;
+  eaten: boolean | null;
   created_at: string;
   recipes: { id: string; name: string } | null;
+  planner_notes: { id: string; text: string } | null;
 };
 
 export type MockSession = {

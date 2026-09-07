@@ -1,6 +1,6 @@
 import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
-import { createMealPlan } from "./factories/meal-plan.factory";
+import { createMealPlan, createNotePlan } from "./factories/meal-plan.factory";
 
 // Helper to get date string in YYYY-MM-DD format
 function formatDate(date: Date): string {
@@ -130,5 +130,39 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByText(/fri -/i)).toBeVisible();
     await expect(page.getByText(/sat -/i)).toBeVisible();
     await expect(page.getByText(/sun -/i)).toBeVisible();
+  });
+
+  test("should show a note on its day without a cooked check", async ({ page, setupAuth }) => {
+    const note = createNotePlan({ text: "Eating out", planned_date: formatDate(new Date()) });
+
+    await setupAuth({ recipes: [], mealPlans: [note] });
+
+    await page.goto("/planner");
+    await page.waitForLoadState("networkidle");
+
+    await expect(page.getByText("Eating out")).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole("button", { name: /cooked it/i })).toHaveCount(0);
+  });
+
+  test("should add a note to an empty day through the chooser", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/planner");
+    await page.waitForLoadState("networkidle");
+    await expect(page.getByRole("heading", { name: /this week/i })).toBeVisible({ timeout: 10000 });
+
+    // The first empty day card opens the recipe-or-note chooser
+    await page
+      .getByRole("button")
+      .filter({ has: page.locator("svg.lucide-plus") })
+      .first()
+      .click();
+    await page.getByRole("button", { name: /^note$/i }).click();
+
+    // The suggestion fills the field, Add creates the note
+    await page.getByRole("button", { name: "Leftovers" }).click();
+    await page.getByRole("button", { name: /^add$/i }).click();
+
+    await expect(page.getByText("Leftovers")).toBeVisible({ timeout: 10000 });
   });
 });
