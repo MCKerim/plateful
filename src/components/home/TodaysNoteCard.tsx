@@ -17,7 +17,7 @@ export default function TodaysNoteCard({ note, onEdit }: Readonly<Props>) {
   const { t } = useTranslation();
 
   return (
-    <Card className="bg-transparent">
+    <Card className="bg-transparent border-2">
       <button
         onClick={onEdit}
         className="flex w-full items-center gap-3 p-3 text-left"
