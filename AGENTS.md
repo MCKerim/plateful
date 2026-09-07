@@ -158,6 +158,10 @@ useMealPlannerItems (hook)
   → MealPlannerItem[] (domain type)
 ```
 
+### Planner notes
+
+A `meal_planning` row is one placement (a day, or the pool with `planned_date` null) carrying exactly one kind of content: a recipe (`recipe_id`, `eaten` true/false) or a note (`note_id` → `planner_notes`, `eaten` NULL) for a day the household won't cook ("Eating out"). `MealPlannerItem` is the discriminated union `PlannedRecipe | PlannedNote` (`kind`); a note's copies made through "Edit plan" share `noteId` and therefore one text. Writes: `create_planner_note` RPC (note + first placement, idempotent per client-minted id), `PATCH planner_notes` for the text, `apply_planner_changes` RPC for the weekly dialog's delta (recipes AND notes, one transaction), plain `PATCH`/`DELETE meal_planning` for moves and removal; the last placement's delete removes the note row on the server. Notes have no cooked state, no rating and no `plan_meals` mission count. **`planned_date` is a Postgres `date`: send a local `yyyy-MM-dd` (`toPlannedDateString`), never `toISOString()`**, which lands on the previous day between local midnight and 02:00. Server contract and the iOS side: `docs/knowledge/planner-notes.md` in `~/programming/ios-native/plateful`; the plan this was built from: `docs/planner-notes-plan.md`.
+
 ### Ingredients System
 
 Recipes store ingredients as structured data in the `recipe_ingredients` table, using a hybrid approach: raw text is always preserved (user sees what they typed), and parsed fields (`quantity_value`, `unit`, `ingredient_name`) enable scaling and future shopping list aggregation.
