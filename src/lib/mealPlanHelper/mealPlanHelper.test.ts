@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getMealPlanStatus } from "./mealPlanHelper";
+import { getMealPlanStatus, mergeNoteSuggestions } from "./mealPlanHelper";
 import type { RecipeMealPlanInfo } from "@/types/meal-planning.types";
 
 describe("mealPlanHelper", () => {
@@ -186,5 +186,45 @@ describe("mealPlanHelper", () => {
       };
       expect(getMealPlanStatus(info, mockT)).toBe("common.today");
     });
+  });
+});
+
+describe("mergeNoteSuggestions", () => {
+  const defaults = ["Eating out", "Birthday", "Leftovers", "At family's"];
+
+  it("puts the household's notes first and fills with the built-ins", () => {
+    expect(mergeNoteSuggestions(["Reste", "Pizza bestellen"], defaults)).toEqual([
+      "Reste",
+      "Pizza bestellen",
+      "Eating out",
+      "Birthday",
+      "Leftovers",
+      "At family's",
+    ]);
+  });
+
+  it("does not repeat a built-in the household already uses, whatever the case", () => {
+    expect(mergeNoteSuggestions(["leftovers ", "Reste"], defaults)).toEqual([
+      "leftovers",
+      "Reste",
+      "Eating out",
+      "Birthday",
+      "At family's",
+    ]);
+  });
+
+  it("stops at six and skips blanks", () => {
+    expect(mergeNoteSuggestions(["A", " ", "B", "C", "D", "E", "F", "G"], defaults)).toEqual([
+      "A",
+      "B",
+      "C",
+      "D",
+      "E",
+      "F",
+    ]);
+  });
+
+  it("shows the built-ins alone without history", () => {
+    expect(mergeNoteSuggestions([], defaults)).toEqual(defaults);
   });
 });

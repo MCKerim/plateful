@@ -1688,6 +1688,14 @@ export type Database = {
         }
       }
       leave_household: { Args: never; Returns: string }
+      planner_note_suggestions: {
+        Args: { p_household_id: string; p_limit?: number }
+        Returns: {
+          last_planned: string
+          suggestion: string
+          uses: number
+        }[]
+      }
       preview_household_invite: { Args: { p_token: string }; Returns: Json }
       recipe_image_cleanup_health: {
         Args: never

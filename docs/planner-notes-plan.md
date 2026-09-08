@@ -187,3 +187,7 @@ Sizes: S under half a day, M about a day. Two to three focused sessions in total
 2. Add the "+" on days that already hold items (recommended: yes, parity with iOS and the only way to put "Reste" next to a dish).
 3. Realtime for the plan with polling kept as fallback (recommended: yes, do it last).
 4. One release after the iOS update gate, or display-only first (recommended: one release).
+
+## Follow-up (2026-09-08): suggestion chips learn from the household
+
+Kerim's idea: the four built-in chips can't guess what a household really plans. Implemented on both platforms the same day. Server: RPC `planner_note_suggestions(p_household_id, p_limit default 6)` in the iOS repo's migrations, the household's note placements grouped by trimmed, case-insensitive text, ordered by count then latest day, returned in the most recently written spelling, texts over 30 characters left out (specifics, not labels). Since a note row lives as long as any placement of it exists, "the plan so far" is the history. Client rule, identical in Swift (`PlannerNoteSuggestionChips.merge`) and TypeScript (`mergeNoteSuggestions`): own texts first, then the built-ins not already among them, six at most. Here: `useNoteSuggestions` under the plan's query keys (every plan mutation's invalidation refreshes it), used by `NoteDialog`; the e2e mock answers the RPC from the scenario's notes. Verified on iOS against production first, then here by unit tests.

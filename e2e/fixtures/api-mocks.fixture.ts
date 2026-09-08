@@ -240,6 +240,23 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     await route.fulfill({ status: 204, body: "" });
   });
 
+  // The note dialog's chips: the scenario's note texts, most placed first
+  await page.route("**/rest/v1/rpc/planner_note_suggestions", async (route) => {
+    const counts = new Map<string, number>();
+    for (const plan of scenario.mealPlans) {
+      const text = plan.planner_notes?.text.trim();
+      if (text) counts.set(text, (counts.get(text) ?? 0) + 1);
+    }
+    const rows = [...counts.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([suggestion, uses]) => ({ suggestion, uses, last_planned: null }));
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(rows),
+    });
+  });
+
   // The weekly plan dialog's save: the delta, applied to the scenario
   await page.route("**/rest/v1/rpc/apply_planner_changes", async (route) => {
     const body = route.request().postDataJSON();

@@ -1,6 +1,12 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ResolvedRecipeShare, SharedRecipeSnapshot } from "@/types/recipeShare.types";
 import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
+import {
+  snapshotNutrition,
+  toStoredAnnotation,
+} from "@/lib/transformers/recipeShare.transformer";
+import { nutritionApi } from "@/api/nutrition.api";
+import { reportError } from "@/utils/reportError";
 import { isTrustedRecipeImageUrl, recipeImageApi } from "@/api/recipeImage.api";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import imageCompression from "browser-image-compression";
@@ -120,6 +126,11 @@ export const recipeShareApi = {
   /**
    * Import a shared recipe into the current user's household.
    * Downloads each snapshot image and re-uploads it to the new recipe's storage path.
+   *
+   * What the snapshot carries is copied, not re-derived: the sharer's
+   * nutrition values (and whether they were managed automatically) and the
+   * steps' cooking-mode annotations. Only a snapshot without nutrition falls
+   * back to asking the extractor for an estimate, the way a save does.
    */
   async importIntoHousehold(
     supabase: SupabaseClient,
@@ -128,6 +139,9 @@ export const recipeShareApi = {
   ): Promise<string> {
     const { data: authData } = await supabase.auth.getUser();
     if (!authData.user) throw new Error("Must be logged in to import a recipe");
+
+    const nutrition = snapshotNutrition(snapshot);
+    const nutritionAuto = snapshot.nutrition_auto ?? true;
 
     // 1. Create the recipe record
     const { data: recipe, error: recipeError } = await supabase
@@ -143,6 +157,8 @@ export const recipeShareApi = {
         household_id: householdId,
         owner_id: authData.user.id,
         link: snapshot.link ?? null,
+        ...(nutrition ?? {}),
+        nutrition_auto: nutritionAuto,
       })
       .select("id")
       .single();
@@ -150,13 +166,19 @@ export const recipeShareApi = {
     if (recipeError) throw recipeError;
     const newRecipeId = recipe.id;
 
+    // Minted here rather than by the database: the step annotations refer to
+    // ingredients by snapshot position, and the row ids must be known to
+    // write them (`ingredientIds[i]` is the row for `ingredients[i]`).
+    const ingredientIds = snapshot.ingredients.map(() => crypto.randomUUID());
+
     // 2+3. Insert ingredients and copy images in parallel
     const ingredientInsert =
       snapshot.ingredients.length > 0
         ? supabase
             .from("recipe_ingredients")
             .insert(
-              snapshot.ingredients.map((ing) => ({
+              snapshot.ingredients.map((ing, index) => ({
+                id: ingredientIds[index],
                 recipe_id: newRecipeId,
                 raw_text: ing.raw_text,
                 quantity_value: ing.quantity_value,
@@ -175,16 +197,21 @@ export const recipeShareApi = {
             })
         : Promise.resolve();
 
-    // Structured steps when the snapshot carries them; otherwise parse the
-    // legacy markdown so even an old share imports as step rows.
+    // Structured steps when the snapshot carries them — with the sharer's
+    // cooking-mode annotations re-pointed at the rows minted above; otherwise
+    // parse the legacy markdown so even an old share imports as step rows.
     const steps =
       snapshot.instruction_steps && snapshot.instruction_steps.length > 0
         ? snapshot.instruction_steps.map((step, index) => ({
             stepText: step.step_text,
             groupName: step.group_name,
             sortOrder: index,
+            annotation: toStoredAnnotation(step.annotation, ingredientIds),
           }))
-        : parseInstructionsMarkdown(snapshot.instructions ?? "");
+        : parseInstructionsMarkdown(snapshot.instructions ?? "").map((step) => ({
+            ...step,
+            annotation: null,
+          }));
     const instructionInsert =
       steps.length > 0
         ? supabase
@@ -195,6 +222,7 @@ export const recipeShareApi = {
                 step_text: step.stepText,
                 group_name: step.groupName ?? null,
                 sort_order: step.sortOrder ?? index,
+                annotation: step.annotation,
               }))
             )
             .then(({ error }) => {
@@ -205,6 +233,16 @@ export const recipeShareApi = {
     const imageCopy = importFirstSharedImage(supabase, snapshot.image_urls, newRecipeId);
 
     await Promise.all([ingredientInsert, instructionInsert, imageCopy]);
+
+    // No values came along (an older snapshot, or the sharer had none): ask
+    // for the first estimate now that the ingredient rows exist — the same
+    // best-effort call AddRecipe and the chatbot make. The values arrive via
+    // Realtime; the server skips recipes whose automatic updates are off.
+    if (!nutrition && nutritionAuto && snapshot.ingredients.length > 0) {
+      nutritionApi.refresh(supabase, newRecipeId).catch((error) => {
+        reportError("Shared recipe nutrition refresh request failed", error);
+      });
+    }
 
     return newRecipeId;
   },

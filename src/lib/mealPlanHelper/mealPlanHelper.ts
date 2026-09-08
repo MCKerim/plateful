@@ -14,6 +14,27 @@ export function planSubjectOf(item: MealPlannerItem): PlanSubject {
 }
 
 /**
+ * Which chips the note dialog shows: the household's own texts first (the
+ * server's order, most planned first), then the built-in suggestions that
+ * aren't already among them, six at most. Duplicates match without case and
+ * surrounding whitespace, the way the server groups them. The same rule as
+ * the native app's `PlannerNoteSuggestionChips.merge`.
+ */
+export function mergeNoteSuggestions(own: string[], defaults: string[], limit = 6): string[] {
+  const seen = new Set<string>();
+  const chips: string[] = [];
+  for (const candidate of [...own, ...defaults]) {
+    const trimmed = candidate.trim();
+    const key = trimmed.toLowerCase();
+    if (!trimmed || seen.has(key)) continue;
+    seen.add(key);
+    chips.push(trimmed);
+    if (chips.length === limit) break;
+  }
+  return chips;
+}
+
+/**
  * A day's (or the pool's) order on screen: recipes first, then notes, each
  * group in the plan's own order. The native app lists a day the same way.
  */

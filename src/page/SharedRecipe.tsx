@@ -9,6 +9,8 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import Layout from "@/components/layout/Layout";
 import MarkdownRenderer from "@/components/general/MarkdownRenderer";
+import NutritionSection from "@/components/recipe/NutritionSection";
+import { snapshotNutrition } from "@/lib/transformers/recipeShare.transformer";
 import { useRecipeShare } from "@/hooks/recipe/useRecipeShare";
 import { useImportRecipeShare } from "@/hooks/recipe/useImportRecipeShare";
 import { useAppSelector } from "@/redux/hooks";
@@ -139,6 +141,7 @@ export default function SharedRecipe() {
         )
       : snapshot.instructions;
   const groupedIngredients = groupIngredients(displayIngredients);
+  const nutrition = snapshotNutrition(snapshot);
 
   const saveButton =
     isLoggedIn && householdId ? (
@@ -215,6 +218,9 @@ export default function SharedRecipe() {
       {snapshot.description && (
         <p className="text-md font-medium mb-4 mt-2 whitespace-pre-wrap">{snapshot.description}</p>
       )}
+
+      {/* Nutrition — the sharer's values, when the snapshot carries them */}
+      {nutrition && <NutritionSection nutrition={nutrition} />}
 
       {/* Ingredients */}
       {displayIngredients.length > 0 && (

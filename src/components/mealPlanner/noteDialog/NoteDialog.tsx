@@ -16,6 +16,8 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useCreateNote } from "@/hooks/meal-planning/useCreateNote";
 import { useUpdateNoteText } from "@/hooks/meal-planning/useUpdateNoteText";
+import { useNoteSuggestions } from "@/hooks/meal-planning/useNoteSuggestions";
+import { mergeNoteSuggestions } from "@/lib/mealPlanHelper/mealPlanHelper";
 import { reportError } from "@/utils/reportError";
 import { PlannedNote } from "@/types/meal-planning.types";
 
@@ -45,6 +47,12 @@ export default function NoteDialog({ state, onClose }: Readonly<Props>) {
   const householdId = useAppSelector(selectHouseholdId);
   const createNote = useCreateNote();
   const updateNoteText = useUpdateNoteText();
+  // What this household plans leads the chips; the built-ins fill up.
+  const { data: ownSuggestions = [] } = useNoteSuggestions(householdId, state !== null);
+  const chips = mergeNoteSuggestions(
+    ownSuggestions,
+    SUGGESTIONS.map((key) => t(`mealPlanner.note.suggestion.${key}`))
+  );
 
   const [text, setText] = useState("");
   // Minted per draft and kept until it saved (see `useCreateNote`).
@@ -124,22 +132,19 @@ export default function NoteDialog({ state, onClose }: Readonly<Props>) {
           <div className="flex flex-col gap-2">
             <p className="text-sm text-muted-foreground">{t("mealPlanner.note.suggestions")}</p>
             <div className="flex flex-wrap gap-2">
-              {SUGGESTIONS.map((key) => {
-                const label = t(`mealPlanner.note.suggestion.${key}`);
-                return (
-                  <Button
-                    key={key}
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full"
-                    disabled={isSaving}
-                    onClick={() => setText(label)}
-                  >
-                    {label}
-                  </Button>
-                );
-              })}
+              {chips.map((chip) => (
+                <Button
+                  key={chip}
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full"
+                  disabled={isSaving}
+                  onClick={() => setText(chip)}
+                >
+                  {chip}
+                </Button>
+              ))}
             </div>
           </div>
 

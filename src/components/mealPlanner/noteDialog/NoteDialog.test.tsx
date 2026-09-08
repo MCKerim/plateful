@@ -7,6 +7,7 @@ import NoteDialog, { NoteDialogState } from "./NoteDialog";
 const mocks = vi.hoisted(() => ({
   createNote: vi.fn(),
   updateNoteText: vi.fn(),
+  getNoteSuggestions: vi.fn(),
   toastError: vi.fn(),
   captureException: vi.fn(),
   onClose: vi.fn(),
@@ -14,7 +15,11 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock("@/utils/supabase", () => ({ useSupabase: () => ({ supabase: {} }) }));
 vi.mock("@/api/meal-planning.api", () => ({
-  mealPlanningApi: { createNote: mocks.createNote, updateNoteText: mocks.updateNoteText },
+  mealPlanningApi: {
+    createNote: mocks.createNote,
+    updateNoteText: mocks.updateNoteText,
+    getNoteSuggestions: mocks.getNoteSuggestions,
+  },
 }));
 vi.mock("@/redux/hooks", () => ({ useAppSelector: () => "household-1" }));
 vi.mock("@/redux/slices/householdSlice", () => ({ selectHouseholdId: vi.fn() }));
@@ -42,6 +47,7 @@ function renderDialog(state: NoteDialogState) {
 beforeEach(() => {
   mocks.createNote.mockReset();
   mocks.updateNoteText.mockReset();
+  mocks.getNoteSuggestions.mockReset().mockResolvedValue([]);
   mocks.toastError.mockReset();
   mocks.captureException.mockReset();
   mocks.onClose.mockReset();
@@ -82,6 +88,31 @@ describe("NoteDialog", () => {
     });
     expect(second.noteId).toBe(first.noteId);
     expect(second.entryId).toBe(first.entryId);
+  });
+
+  it("leads with the household's own notes and drops a built-in it already uses", async () => {
+    mocks.getNoteSuggestions.mockResolvedValue([
+      "Pizza bestellen",
+      "mealPlanner.note.suggestion.leftovers",
+    ]);
+    renderDialog({ mode: "create", day: new Date(2026, 8, 13) });
+
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: "Pizza bestellen" })).toBeInTheDocument()
+    );
+    const chips = screen
+      .getAllByRole("button")
+      .map((button) => button.textContent)
+      // Every button but the dialog's own Close and the Add: the chips, in order.
+      .filter((label) => label && label !== "mealPlanner.note.add" && label !== "Close");
+    expect(chips).toEqual([
+      "Pizza bestellen",
+      "mealPlanner.note.suggestion.leftovers",
+      "mealPlanner.note.suggestion.eatingOut",
+      "mealPlanner.note.suggestion.birthday",
+      "mealPlanner.note.suggestion.atFamilys",
+    ]);
+    expect(mocks.getNoteSuggestions).toHaveBeenCalledWith({}, "household-1");
   });
 
   it("never saves blank text", async () => {

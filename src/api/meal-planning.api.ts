@@ -118,6 +118,19 @@ export const mealPlanningApi = {
   },
 
   /**
+   * The household's own note texts for the note dialog's chips, most planned
+   * first (see `planner_note_suggestions`); empty for a fresh household.
+   */
+  async getNoteSuggestions(supabase: SupabaseClient, householdId: string): Promise<string[]> {
+    const { data, error } = await supabase.rpc("planner_note_suggestions", {
+      p_household_id: householdId,
+    });
+
+    if (error) throw error;
+    return ((data ?? []) as { suggestion: string }[]).map((row) => row.suggestion);
+  },
+
+  /**
    * Changes the text every copy of the note shows. No row back means a
    * household member removed the note meanwhile; that is an error, never a
    * reason to recreate it.

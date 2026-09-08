@@ -9,6 +9,10 @@ import { instructionsApi } from "@/api/instructions.api";
 import { Share } from "@capacitor/share";
 import { useTranslation } from "react-i18next";
 import type { SnapshotIngredient, SnapshotInstructionStep } from "@/types/recipeShare.types";
+import {
+  nutritionForSnapshot,
+  toSnapshotAnnotation,
+} from "@/lib/transformers/recipeShare.transformer";
 import { writeClipboardText } from "@/utils/nativeClipboard";
 import { toast } from "sonner";
 
@@ -44,10 +48,16 @@ export function useCreateRecipeShare() {
         preparation_note: row.preparation_note,
       }));
 
+      // Cooking-mode annotations point at ingredient rows by id; the snapshot
+      // lists its ingredients as an array, so a mention travels as the
+      // ingredient's position (the import recreates the rows). This app has
+      // no cooking mode itself, but an iOS recipient gets the chips.
+      const ingredientIndexById = new Map(ingredientRows.map((row, index) => [row.id, index]));
       const instructionSteps: SnapshotInstructionStep[] = instructionRows.map((row) => ({
         step_text: row.step_text,
         group_name: row.group_name,
         sort_order: row.sort_order,
+        annotation: toSnapshotAnnotation(row.annotation, row.step_text, ingredientIndexById),
       }));
 
       // 4. Create the share record and immutable image copy server-side.
@@ -59,6 +69,10 @@ export function useCreateRecipeShare() {
         base_servings: recipe.base_servings,
         servings_unit: recipe.servings_unit,
         link: recipe.link ?? null,
+        // The sharer's values travel with the recipe, so the recipient's copy
+        // shows the same numbers instead of a fresh estimate.
+        nutrition: nutritionForSnapshot(recipe),
+        nutrition_auto: recipe.nutrition_auto,
         ingredients,
       });
 
