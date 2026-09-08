@@ -8,39 +8,44 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-// Mock window.matchMedia (required for some UI components)
-Object.defineProperty(window, "matchMedia", {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+// Browser-only mocks. A test file that opts into the node environment
+// (`// @vitest-environment node`, e.g. the share-preview edge function's
+// test) has no window, and must not fail in this setup before it runs.
+if (typeof window !== "undefined") {
+  // Mock window.matchMedia (required for some UI components)
+  Object.defineProperty(window, "matchMedia", {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
 
-// Mock IntersectionObserver
-class MockIntersectionObserver {
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
-}
-Object.defineProperty(window, "IntersectionObserver", {
-  writable: true,
-  value: MockIntersectionObserver,
-});
+  // Mock IntersectionObserver
+  class MockIntersectionObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  }
+  Object.defineProperty(window, "IntersectionObserver", {
+    writable: true,
+    value: MockIntersectionObserver,
+  });
 
-// Mock ResizeObserver
-class MockResizeObserver {
-  observe = vi.fn();
-  unobserve = vi.fn();
-  disconnect = vi.fn();
+  // Mock ResizeObserver
+  class MockResizeObserver {
+    observe = vi.fn();
+    unobserve = vi.fn();
+    disconnect = vi.fn();
+  }
+  Object.defineProperty(window, "ResizeObserver", {
+    writable: true,
+    value: MockResizeObserver,
+  });
 }
-Object.defineProperty(window, "ResizeObserver", {
-  writable: true,
-  value: MockResizeObserver,
-});
