@@ -12,7 +12,6 @@ import {
   StickyNote,
   Trash2,
 } from "lucide-react";
-import DeleteDialog from "../../general/DeleteDialog";
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 import { isBefore, startOfToday } from "date-fns";
@@ -261,18 +260,15 @@ export default function MealPlannerItem({
               </DrawerClose>
             )}
 
-            <DeleteDialog
-              onDelete={() => {
-                setIsDrawerOpen(false);
-                onRemove();
-              }}
-              customTrigger={
-                <Button className="w-full" variant="destructive">
-                  <Trash2 size={16} />
-                  {t("mealPlannerItem.remove")}
-                </Button>
-              }
-            />
+            {/* No confirmation, like the native app: a removed placement is
+                one tap to plan again, and the drawer is already a deliberate
+                step. */}
+            <DrawerClose asChild>
+              <Button className="w-full" variant="destructive" onClick={onRemove}>
+                <Trash2 size={16} />
+                {t("mealPlannerItem.remove")}
+              </Button>
+            </DrawerClose>
           </DrawerFooter>
         </DrawerContent>
       </Drawer>
