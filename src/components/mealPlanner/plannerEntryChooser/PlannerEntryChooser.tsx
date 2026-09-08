@@ -44,24 +44,14 @@ export default function PlannerEntryChooser({
   if (day && day !== lastDay) setLastDay(day);
   const shownDay = day ?? lastDay;
 
-  // The add-recipe drawer's big buttons: icon, label and a line of what it means.
-  function renderChoice(
-    icon: React.ReactNode,
-    label: string,
-    description: string,
-    onClick: () => void
-  ) {
+  // The add-recipe drawer's big buttons: icon and label, nothing else.
+  function renderChoice(icon: React.ReactNode, label: string, onClick: () => void) {
     return (
       <DrawerClose asChild>
         <Button variant="secondary" size="lg" onClick={onClick}>
           <div className="flex justify-start gap-4 w-full h-full items-center text-start">
             {icon}
-
-            <div className="flex flex-col justify-start">
-              <p className="font-semibold">{label}</p>
-
-              <p className="text-xs font-normal text-muted-foreground">{description}</p>
-            </div>
+            <p className="font-semibold">{label}</p>
           </div>
         </Button>
       </DrawerClose>
@@ -84,14 +74,12 @@ export default function PlannerEntryChooser({
           {renderChoice(
             <BookOpen />,
             t("mealPlanner.addRecipe"),
-            t("mealPlanner.addRecipeDescription"),
             () => shownDay && onRecipe(shownDay)
           )}
 
           {renderChoice(
             <StickyNote />,
             t("mealPlanner.addNote"),
-            t("mealPlanner.addNoteDescription"),
             () => shownDay && onNote(shownDay)
           )}
         </DrawerFooter>
