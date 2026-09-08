@@ -323,7 +323,9 @@
       },
       "add": "Hinzufügen",
       "saveError": "Notiz konnte nicht gespeichert werden"
-    }
+    },
+    "addRecipeDescription": "Aus deinem Kochbuch",
+    "addNoteDescription": "Draußen essen, Reste, ein Geburtstag"
   },
   "cookbook": {
     "enterRecipeName": "Rezept suchen...",

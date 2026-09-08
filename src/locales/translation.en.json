@@ -323,7 +323,9 @@
       },
       "add": "Add",
       "saveError": "Couldn't save note"
-    }
+    },
+    "addRecipeDescription": "From your cookbook",
+    "addNoteDescription": "Eating out, leftovers, a birthday"
   },
   "cookbook": {
     "enterRecipeName": "Search recipe...",
