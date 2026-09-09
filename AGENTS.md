@@ -30,6 +30,11 @@ npm run generate-supabase-types  # Regenerate TypeScript types from Supabase sch
 npm run generate-pwa-assets      # Generate PWA icons from logo
 ```
 
+### Releases
+
+- **Version style is `major.minor`, like the native iOS app: `1.0`, `1.1`, `1.2` … no patch number** (Kerim, 2026-09-09; the earlier `0.0.38` style is history). Every release bumps `versionCode` by one and sets `versionName` in `android/app/build.gradle`.
+- **The version shown on the Settings page is a hardcoded string** (`v1.1` in `src/page/Settings.tsx`, the "About" card) and is not derived from anything. It MUST change in the same commit as `versionName`, and the web deploy shows it too, so the two never drift.
+
 ## Architecture
 
 ### Tech Stack
