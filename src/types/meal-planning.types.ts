@@ -72,6 +72,13 @@ export type PlacementEntryRaw = {
   planned_date: string | null;
 };
 
+/** One recipe placement as the sort reads it: which recipe, which day (`null` in the pool), cooked or not. */
+export type RecipePlacementRow = {
+  recipe_id: string;
+  planned_date: string | null;
+  eaten: boolean;
+};
+
 export type RecipeMealPlanInfo = {
   activePlan: {
     id: string;

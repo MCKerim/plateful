@@ -5,6 +5,7 @@ import {
   PlannedItemSummaryRaw,
   PlanSubject,
   RecipeMealPlanInfo,
+  RecipePlacementRow,
 } from "@/types/meal-planning.types";
 import { toPlannedDateString } from "@/lib/dateHelper/dateHelper";
 
@@ -188,6 +189,19 @@ export const mealPlanningApi = {
 
     if (error) throw error;
     return data ?? [];
+  },
+
+  /**
+   * Every recipe placement the household ever made, for the cookbook's
+   * "not planned in a while" sort. RLS scopes the rows to the household.
+   */
+  async getAllRecipePlacements(supabase: SupabaseClient): Promise<RecipePlacementRow[]> {
+    const { data, error } = await supabase
+      .from("meal_planning")
+      .select("recipe_id, planned_date, eaten")
+      .not("recipe_id", "is", null);
+    if (error) throw error;
+    return (data ?? []) as RecipePlacementRow[];
   },
 
   async getInfoByRecipe(supabase: SupabaseClient, recipeId: string): Promise<RecipeMealPlanInfo> {

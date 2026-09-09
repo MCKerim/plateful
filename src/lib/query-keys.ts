@@ -5,6 +5,7 @@ export const queryKeys = {
     list: (weekStart: string) => ["meal-planning", "list", weekStart] as const,
     summary: (weekStart: string) => ["meal-planning", "summary", weekStart] as const,
     info: (recipeId: string) => ["meal-planning", "info", recipeId] as const,
+    lastPlanned: ["meal-planning", "last-planned"] as const,
     placements: (subjectKey: string, weekStart: string) =>
       ["meal-planning", "placements", subjectKey, weekStart] as const,
     noteSuggestions: (householdId: string) =>

@@ -720,7 +720,8 @@
     "newest": "Neueste",
     "oldest": "Älteste",
     "rating": "Am besten bewertet",
-    "aToZ": "A bis Z"
+    "aToZ": "A bis Z",
+    "leastRecentlyPlanned": "Lange nicht geplant"
   },
   "filterModal": {
     "title": "Filtern nach"

@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getMealPlanStatus, mergeNoteSuggestions } from "./mealPlanHelper";
+import {
+  getMealPlanStatus,
+  lastPlannedDates,
+  leastRecentlyPlannedKey,
+  mergeNoteSuggestions,
+} from "./mealPlanHelper";
 import type { RecipeMealPlanInfo } from "@/types/meal-planning.types";
 
 describe("mealPlanHelper", () => {
@@ -226,5 +231,55 @@ describe("mergeNoteSuggestions", () => {
 
   it("shows the built-ins alone without history", () => {
     expect(mergeNoteSuggestions([], defaults)).toEqual(defaults);
+  });
+
+  describe("lastPlannedDates", () => {
+    const today = "2026-09-09";
+
+    it("keeps the latest day per recipe, ahead or behind", () => {
+      const dates = lastPlannedDates(
+        [
+          { recipe_id: "a", planned_date: "2026-08-01", eaten: true },
+          { recipe_id: "a", planned_date: "2026-09-12", eaten: false },
+          { recipe_id: "a", planned_date: "2026-07-15", eaten: true },
+        ],
+        today
+      );
+      expect(dates).toEqual({ a: "2026-09-12" });
+    });
+
+    it("counts an uncooked pool copy as today", () => {
+      const dates = lastPlannedDates(
+        [
+          { recipe_id: "a", planned_date: "2026-08-01", eaten: true },
+          { recipe_id: "a", planned_date: null, eaten: false },
+        ],
+        today
+      );
+      expect(dates).toEqual({ a: today });
+    });
+
+    it("skips a pool copy already checked off", () => {
+      expect(
+        lastPlannedDates([{ recipe_id: "a", planned_date: null, eaten: true }], today)
+      ).toEqual({});
+    });
+  });
+
+  describe("leastRecentlyPlannedKey", () => {
+    it("uses the last planned day when there is one", () => {
+      expect(
+        leastRecentlyPlannedKey(
+          { id: "a", created_at: "2026-09-08T10:00:00+00:00" },
+          { a: "2026-02-01" }
+        )
+      ).toBe("2026-02-01");
+    });
+
+    it("falls back to the day the recipe was added", () => {
+      expect(
+        leastRecentlyPlannedKey({ id: "a", created_at: "2025-11-30T23:10:00+00:00" }, {})
+      ).toBe("2025-11-30");
+    });
   });
 });

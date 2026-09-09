@@ -11,6 +11,7 @@ const sortOptions = [
   { label: "Älteste", value: "oldest" },
   { label: "Am besten bewertet", value: "rating" },
   { label: "A bis Z", value: "aToZ" },
+  { label: "Lange nicht geplant", value: "leastRecentlyPlanned" },
 ];
 
 export default function SortingModal() {

@@ -33,6 +33,11 @@ import type { RecipeCollection } from "@/types/exportedDatabaseTypes.types";
 import { toast } from "sonner";
 import { filterRecipesByCollection } from "@/lib/collectionFiltering";
 import { reportError } from "@/utils/reportError";
+import { useLastPlannedDates } from "@/hooks/meal-planning/useLastPlannedDates";
+import { leastRecentlyPlannedKey } from "@/lib/mealPlanHelper/mealPlanHelper";
+
+/** One stable empty map, so an unloaded sort key doesn't re-sort on every render. */
+const NO_PLAN_DATES: Record<string, string> = {};
 
 export default function Cookbook() {
   const dispatch = useAppDispatch();
@@ -50,6 +55,9 @@ export default function Cookbook() {
   const collectionSelection = useAppSelector(selectCollectionSelection);
   const sorting = useAppSelector(selectSorting);
   const searchTerm = useAppSelector(selectSearchTerm);
+  const { data: lastPlanned = NO_PLAN_DATES } = useLastPlannedDates(
+    sorting === "leastRecentlyPlanned"
+  );
 
   const fuse = useMemo(
     () =>
@@ -86,6 +94,11 @@ export default function Cookbook() {
       if (sorting === "newest") return b.created_at.localeCompare(a.created_at);
       if (sorting === "oldest") return a.created_at.localeCompare(b.created_at);
       if (sorting === "aToZ") return a.recipeName.localeCompare(b.recipeName);
+      if (sorting === "leastRecentlyPlanned") {
+        const keyA = leastRecentlyPlannedKey(a, lastPlanned);
+        const keyB = leastRecentlyPlannedKey(b, lastPlanned);
+        return keyA === keyB ? a.created_at.localeCompare(b.created_at) : keyA.localeCompare(keyB);
+      }
       if (sorting === "rating") {
         if (a.avg_rating === null && b.avg_rating === null) {
           return 0;
@@ -101,7 +114,7 @@ export default function Cookbook() {
     });
 
     return searchedRecipes;
-  }, [searchTerm, sorting, collectionSelection, recipes, fuse]);
+  }, [searchTerm, sorting, collectionSelection, recipes, fuse, lastPlanned]);
 
   const selectedCollection = collections.find(
     (collection) => collection.id === collectionSelection

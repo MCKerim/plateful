@@ -1,4 +1,9 @@
-import { MealPlannerItem, PlanSubject, RecipeMealPlanInfo } from "@/types/meal-planning.types";
+import {
+  MealPlannerItem,
+  PlanSubject,
+  RecipeMealPlanInfo,
+  RecipePlacementRow,
+} from "@/types/meal-planning.types";
 import { TFunction } from "i18next";
 
 /** A stable key for a plan subject, for query keys and effect dependencies. */
@@ -43,6 +48,44 @@ export function orderForDisplay<T extends MealPlannerItem>(items: T[]): T[] {
     ...items.filter((item) => item.kind === "recipe"),
     ...items.filter((item) => item.kind === "note"),
   ];
+}
+
+/**
+ * The most recent day each recipe was on the plan, keyed by recipe id, as a
+ * `yyyy-MM-dd` string: the key behind the cookbook's "not planned in a while"
+ * sort. A dated placement counts as its day (ahead or behind), an uncooked
+ * pool copy counts as today, and a pool copy already checked off has no day
+ * and is skipped, the same reading `getMealPlanStatus` gives the cards.
+ * Recipes never on the plan are absent. Mirrors the native app's
+ * `PlannedMeal.lastPlannedDates`.
+ */
+export function lastPlannedDates(
+  rows: RecipePlacementRow[],
+  todayStr: string
+): Record<string, string> {
+  const dates: Record<string, string> = {};
+  for (const row of rows) {
+    let day: string;
+    if (row.planned_date !== null) day = row.planned_date;
+    else if (!row.eaten) day = todayStr;
+    else continue;
+    const known = dates[row.recipe_id];
+    if (known === undefined || known < day) dates[row.recipe_id] = day;
+  }
+  return dates;
+}
+
+/**
+ * Sort key for "not planned in a while": the last day on the plan, else the
+ * day the recipe was added, so yesterday's import doesn't top the list just
+ * because nobody has planned it yet. `created_at` is an ISO timestamp; its
+ * first ten characters are the day, comparable with the plan's dates.
+ */
+export function leastRecentlyPlannedKey(
+  recipe: { id: string; created_at: string },
+  lastPlanned: Record<string, string>
+): string {
+  return lastPlanned[recipe.id] ?? recipe.created_at.slice(0, 10);
 }
 
 export function getMealPlanStatus(
