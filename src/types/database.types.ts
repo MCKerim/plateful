@@ -1479,6 +1479,7 @@ export type Database = {
           notification_preferences: Json | null
           timezone: string | null
           username: string
+          week_start: number | null
         }
         Insert: {
           created_at?: string
@@ -1491,6 +1492,7 @@ export type Database = {
           notification_preferences?: Json | null
           timezone?: string | null
           username?: string
+          week_start?: number | null
         }
         Update: {
           created_at?: string
@@ -1503,6 +1505,7 @@ export type Database = {
           notification_preferences?: Json | null
           timezone?: string | null
           username?: string
+          week_start?: number | null
         }
         Relationships: [
           {
@@ -1810,6 +1813,7 @@ export type Database = {
           total_time_minutes: number
         }[]
       }
+      seed_week_start: { Args: { p_week_start: number }; Returns: number }
       set_notification_preference: {
         Args: { p_enabled: boolean; p_key: string }
         Returns: undefined

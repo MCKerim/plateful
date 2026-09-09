@@ -42,6 +42,26 @@ function optionalString(value: { [key: string]: Json | undefined }, key: string)
   return candidate;
 }
 
+/**
+ * `users.week_start`: 0 = Sunday .. 6 = Saturday, the account's own first
+ * weekday; null only for an account no client has seeded yet.
+ */
+function optionalWeekStart(value: { [key: string]: Json | undefined }): number | null {
+  const candidate = value.week_start;
+  if (candidate === null || candidate === undefined) {
+    return null;
+  }
+  if (
+    typeof candidate !== "number" ||
+    !Number.isInteger(candidate) ||
+    candidate < 0 ||
+    candidate > 6
+  ) {
+    throw new Error("The profile service returned an invalid week_start.");
+  }
+  return candidate;
+}
+
 export function parseCurrentProfile(
   value: Json
 ): Omit<User, "created_at" | "deletion_requested_at" | "email"> {
@@ -70,6 +90,7 @@ export function parseCurrentProfile(
     language: optionalString(value, "language"),
     has_completed_survey: hasCompletedSurvey,
     notification_preferences: notificationPreferences ?? null,
+    week_start: optionalWeekStart(value),
   };
 }
 
@@ -165,6 +186,40 @@ export const userApi = {
     const { error } = await supabase
       .from("users")
       .update({ language: params.language })
+      .eq("id", params.userId);
+
+    if (error) {
+      throw error;
+    }
+  },
+
+  /**
+   * Gives an account without a week start the device's, once. The RPC writes
+   * only a still-null row and answers with the value the account holds
+   * afterwards, so a client that lost the race adopts the other device's.
+   * A direct write filtered on the column is refused (a filter needs SELECT
+   * on it, which `authenticated` deliberately lacks on `users`).
+   */
+  async seedWeekStart(supabase: SupabaseClient<Database>, weekStart: number): Promise<number> {
+    const { data, error } = await supabase.rpc("seed_week_start", { p_week_start: weekStart });
+
+    if (error) {
+      throw error;
+    }
+    if (typeof data !== "number") {
+      throw new Error("The week start service returned an invalid value.");
+    }
+
+    return data;
+  },
+
+  async updateWeekStart(
+    supabase: SupabaseClient<Database>,
+    params: { userId: string; weekStart: number }
+  ): Promise<void> {
+    const { error } = await supabase
+      .from("users")
+      .update({ week_start: params.weekStart })
       .eq("id", params.userId);
 
     if (error) {

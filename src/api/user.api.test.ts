@@ -16,6 +16,7 @@ describe("userApi", () => {
           cooking_started: false,
           cooking_finished: true,
         },
+        week_start: 0,
       })
     ).toEqual({
       id: "user-id",
@@ -27,7 +28,21 @@ describe("userApi", () => {
         cooking_started: false,
         cooking_finished: true,
       },
+      week_start: 0,
     });
+  });
+
+  it("reads a missing week start as not seeded and rejects one outside the week", () => {
+    const profile = {
+      id: "user-id",
+      username: "Mara",
+      household_id: null,
+      has_completed_survey: false,
+    };
+    expect(parseCurrentProfile(profile).week_start).toBeNull();
+    expect(parseCurrentProfile({ ...profile, week_start: null }).week_start).toBeNull();
+    expect(() => parseCurrentProfile({ ...profile, week_start: 7 })).toThrow();
+    expect(() => parseCurrentProfile({ ...profile, week_start: "1" })).toThrow();
   });
 
   it("rejects a profile missing private contract fields", () => {
@@ -68,6 +83,7 @@ describe("userApi", () => {
       language: "de",
       has_completed_survey: true,
       notification_preferences: null,
+      week_start: null,
       created_at: "2026-07-26T20:31:55Z",
       deletion_requested_at: null,
     });

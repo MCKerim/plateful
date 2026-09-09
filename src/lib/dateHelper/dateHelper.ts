@@ -1,5 +1,6 @@
 import i18n from "@/i18n";
 import { formatDate } from "date-fns";
+import type { Day } from "date-fns";
 import { de } from "date-fns/locale";
 
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -35,23 +36,32 @@ export function toWeekday(date: Date): string {
   return prefix + dayAsWord + formattedDate;
 }
 
-// Returns an array of 1 week from Monday to Sunday (7 days total) for the week containing the given date
-export function getWeekdays(date: Date = new Date()): Date[] {
+/**
+ * The seven days of the week containing `date`, starting on `weekStart`
+ * (0 = Sunday .. 6 = Saturday, the server's numbering in `users.week_start`;
+ * callers take it from `useWeekStart()`). Every week this app shows or
+ * queries goes through here, so the account's week start reaches all of them.
+ */
+export function getWeekdays(date: Date, weekStart: number): Date[] {
   const weekdays = [];
-  const dayOfWeek = date.getDay();
 
-  // Calculate Monday of the week containing the given date
-  const monday = new Date(date);
-  monday.setDate(date.getDate() - ((dayOfWeek + 6) % 7));
+  // The first day of the week containing the given date.
+  const first = new Date(date);
+  first.setDate(date.getDate() - ((date.getDay() - weekStartsOn(weekStart) + 7) % 7));
 
-  // Generate exactly 7 days starting from Monday
+  // Generate exactly 7 days from there.
   for (let i = 0; i < 7; i++) {
-    const day = new Date(monday);
-    day.setDate(monday.getDate() + i);
+    const day = new Date(first);
+    day.setDate(first.getDate() + i);
     weekdays.push(day);
   }
 
   return weekdays;
+}
+
+/** `weekStart` as date-fns wants it (`isSameWeek` and friends default to Sunday otherwise). */
+export function weekStartsOn(weekStart: number): Day {
+  return (((weekStart % 7) + 7) % 7) as Day;
 }
 
 /**

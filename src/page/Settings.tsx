@@ -5,8 +5,8 @@ import { useSupabase } from "@/utils/supabase";
 import { useTranslation } from "react-i18next";
 import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
-import { useAppSelector } from "@/redux/hooks";
-import { selectUser } from "@/redux/slices/userSlice";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
+import { selectUser, setUserWeekStart } from "@/redux/slices/userSlice";
 import { Bell, CreditCard, Donut, House, LogOut, Pencil, Trash2 } from "lucide-react";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
@@ -23,6 +23,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { useUpdateUsername } from "@/hooks/user/useUpdateUsername";
 import { useUpdateLanguage } from "@/hooks/user/useUpdateLanguage";
+import { useUpdateWeekStart } from "@/hooks/user/useUpdateWeekStart";
+import { useWeekStart } from "@/hooks/user/useWeekStart";
+import { WEEKDAY_TRANSLATION_KEYS, deviceWeekStart, weekdayOrder } from "@/lib/weekStart";
 import { useDeleteAccount } from "@/hooks/user/useDeleteAccount";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -38,7 +41,9 @@ import { reportError } from "@/utils/reportError";
 export default function Settings() {
   const { supabase } = useSupabase();
   const { t, i18n } = useTranslation();
+  const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const firstWeekday = useWeekStart();
   const [isUsernameDialogOpen, setIsUsernameDialogOpen] = useState(false);
   const [newUsername, setNewUsername] = useState(user?.username || "");
   const [isDeleteAccountDialogOpen, setIsDeleteAccountDialogOpen] = useState(false);
@@ -47,6 +52,7 @@ export default function Settings() {
 
   const updateUsernameMutation = useUpdateUsername();
   const updateLanguageMutation = useUpdateLanguage();
+  const updateWeekStartMutation = useUpdateWeekStart();
   const { contextQuery: deletionContextQuery, deleteAccountMutation } =
     useDeleteAccount(isDeleteAccountDialogOpen);
   const { presentCustomerCenter } = useCustomerCenter();
@@ -151,6 +157,19 @@ export default function Settings() {
     );
   }
 
+  function handleUpdateWeekStart(value: string) {
+    if (!user) return;
+    const weekStart = parseInt(value, 10);
+    const previous = firstWeekday;
+    // Optimistic: the planner regroups at once. A failed write puts the old
+    // value back; the mutation cache has already reported it.
+    dispatch(setUserWeekStart(weekStart));
+    updateWeekStartMutation.mutate(
+      { userId: user.id, weekStart },
+      { onError: () => dispatch(setUserWeekStart(previous)) }
+    );
+  }
+
   function handleUpdateLanguage(language: string) {
     // The device owns the interface language, so switch it first and
     // unconditionally; the server row is a mirror the backend reads, not the
@@ -166,8 +185,9 @@ export default function Settings() {
 
       <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
-          <h2 className="font-medium border-b">{t("settings.language")}</h2>
+          <h2 className="font-medium border-b">{t("settings.general")}</h2>
 
+          <p className="text-sm">{t("settings.language")}</p>
           <div className="flex w-full gap-2">
             <Button
               className="w-full"
@@ -185,6 +205,24 @@ export default function Settings() {
               Deutsch
             </Button>
           </div>
+
+          {/* The planner's first weekday, the account's own: seeded from the
+              browser's locale the first time and chosen here after that, so
+              the server always knows the week the reminder counts. All seven
+              days, in the device's order; the labels are the reminder's. */}
+          <p className="text-sm">{t("settings.weekStart")}</p>
+          <Select value={firstWeekday.toString()} onValueChange={handleUpdateWeekStart}>
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {weekdayOrder(deviceWeekStart()).map((day) => (
+                <SelectItem key={day} value={day.toString()}>
+                  {t(`notificationSettings.days.${WEEKDAY_TRANSLATION_KEYS[day]}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getWeekdays, toPlannedDateString, toWeekday } from "./dateHelper";
+import { getWeekdays, toPlannedDateString, toWeekday, weekStartsOn } from "./dateHelper";
 
 // Mock i18n module
 vi.mock("@/i18n", () => ({
@@ -77,66 +77,79 @@ describe("dateHelper", () => {
 
   describe("getWeekdays", () => {
     it("should return 7 days", () => {
-      const result = getWeekdays(new Date(2024, 5, 15));
+      const result = getWeekdays(new Date(2024, 5, 15), 1);
       expect(result).toHaveLength(7);
     });
 
     it("should start from Monday (day 1)", () => {
-      const result = getWeekdays(new Date(2024, 5, 15)); // Saturday
+      const result = getWeekdays(new Date(2024, 5, 15), 1); // Saturday
       expect(result[0].getDay()).toBe(1); // Monday
     });
 
     it("should end on Sunday (day 0)", () => {
-      const result = getWeekdays(new Date(2024, 5, 15));
+      const result = getWeekdays(new Date(2024, 5, 15), 1);
       expect(result[6].getDay()).toBe(0); // Sunday
     });
 
     it("should return correct week when given a Monday", () => {
       const monday = new Date(2024, 5, 10); // June 10, 2024 (Monday)
-      const result = getWeekdays(monday);
+      const result = getWeekdays(monday, 1);
       expect(result[0].getDate()).toBe(10);
       expect(result[6].getDate()).toBe(16);
     });
 
     it("should return correct week when given a Sunday", () => {
       const sunday = new Date(2024, 5, 16); // June 16, 2024 (Sunday)
-      const result = getWeekdays(sunday);
+      const result = getWeekdays(sunday, 1);
       expect(result[0].getDate()).toBe(10); // Monday June 10
       expect(result[6].getDate()).toBe(16); // Sunday June 16
     });
 
     it("should return correct week when given a Wednesday", () => {
       const wednesday = new Date(2024, 5, 12); // June 12, 2024 (Wednesday)
-      const result = getWeekdays(wednesday);
+      const result = getWeekdays(wednesday, 1);
       expect(result[0].getDate()).toBe(10); // Monday June 10
       expect(result[6].getDate()).toBe(16); // Sunday June 16
     });
 
     it("should handle week spanning two months", () => {
       const date = new Date(2024, 5, 30); // June 30, 2024 (Sunday)
-      const result = getWeekdays(date);
+      const result = getWeekdays(date, 1);
       expect(result[0].getMonth()).toBe(5); // June
       expect(result[6].getMonth()).toBe(5); // June (June 30 is Sunday)
     });
 
     it("should handle week at year boundary", () => {
       const date = new Date(2024, 0, 1); // January 1, 2024 (Monday)
-      const result = getWeekdays(date);
+      const result = getWeekdays(date, 1);
       expect(result[0].getDate()).toBe(1);
       expect(result[0].getMonth()).toBe(0); // January
     });
 
-    it("should default to current date when no argument provided", () => {
-      vi.useFakeTimers();
-      vi.setSystemTime(new Date(2024, 5, 15)); // Saturday
-      const result = getWeekdays();
-      expect(result).toHaveLength(7);
-      expect(result[0].getDay()).toBe(1); // Monday
-      vi.useRealTimers();
+    it("starts on Sunday for a Sunday-first account", () => {
+      const saturday = new Date(2024, 5, 15); // June 15, 2024 (Saturday)
+      const result = getWeekdays(saturday, 0);
+      expect(result[0].getDay()).toBe(0);
+      expect(result[0].getDate()).toBe(9); // Sunday June 9
+      expect(result[6].getDate()).toBe(15); // Saturday June 15
+    });
+
+    it("puts a Sunday at the start of a Sunday-first week and the end of a Monday-first one", () => {
+      const sunday = new Date(2024, 5, 16); // June 16, 2024 (Sunday)
+      expect(getWeekdays(sunday, 0)[0].getDate()).toBe(16);
+      expect(getWeekdays(sunday, 1)[0].getDate()).toBe(10);
+    });
+
+    it("starts on any weekday the account asks for", () => {
+      const saturday = new Date(2024, 5, 15); // June 15, 2024 (Saturday)
+      const result = getWeekdays(saturday, 3); // Wednesday
+      expect(result[0].getDay()).toBe(3);
+      expect(result[0].getDate()).toBe(12); // Wednesday June 12
+      expect(result[6].getDate()).toBe(18); // Tuesday June 18
     });
 
     it("should return Date objects, not strings", () => {
-      const result = getWeekdays(new Date(2024, 5, 15));
+      const result = getWeekdays(new Date(2024, 5, 15), 1);
       result.forEach((day) => {
         expect(day).toBeInstanceOf(Date);
       });
@@ -181,6 +194,14 @@ describe("dateHelper", () => {
 
       expect(result).toMatch(/\d{2}\/\d{2}\/\d{4}/);
     });
+  });
+});
+
+describe("weekStartsOn", () => {
+  it("wraps into date-fns' 0..6", () => {
+    expect(weekStartsOn(0)).toBe(0);
+    expect(weekStartsOn(6)).toBe(6);
+    expect(weekStartsOn(8)).toBe(1);
   });
 });
 

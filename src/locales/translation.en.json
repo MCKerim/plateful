@@ -521,7 +521,9 @@
   },
   "settings": {
     "title": "Settings",
+    "general": "General",
     "language": "Language",
+    "weekStart": "Week starts on",
     "appearance": "Appearance",
     "household": "Household",
     "householdDescription": "Use Plateful with your friends or family!",

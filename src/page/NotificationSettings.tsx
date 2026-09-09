@@ -13,6 +13,8 @@ import { TimeInput } from "@/components/ui/time-input";
 import { useTranslation } from "react-i18next";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
+import { useWeekStart } from "@/hooks/user/useWeekStart";
+import { WEEKDAY_TRANSLATION_KEYS, weekdayOrder } from "@/lib/weekStart";
 import { useUpdateNotificationPreferences } from "@/hooks/notifications/useUpdateNotificationPreferences";
 import { useNotificationPermission } from "@/hooks/notifications/useNotificationPermission";
 import {
@@ -24,6 +26,7 @@ import { isNotificationSupported } from "@/lib/notifications";
 export default function NotificationSettings() {
   const { t } = useTranslation();
   const user = useAppSelector(selectUser);
+  const firstWeekday = useWeekStart();
   const updatePreferences = useUpdateNotificationPreferences();
   const { permissionState, requestPermission, checkPermission } = useNotificationPermission();
 
@@ -130,13 +133,12 @@ export default function NotificationSettings() {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="0">{t("notificationSettings.days.sunday")}</SelectItem>
-                    <SelectItem value="1">{t("notificationSettings.days.monday")}</SelectItem>
-                    <SelectItem value="2">{t("notificationSettings.days.tuesday")}</SelectItem>
-                    <SelectItem value="3">{t("notificationSettings.days.wednesday")}</SelectItem>
-                    <SelectItem value="4">{t("notificationSettings.days.thursday")}</SelectItem>
-                    <SelectItem value="5">{t("notificationSettings.days.friday")}</SelectItem>
-                    <SelectItem value="6">{t("notificationSettings.days.saturday")}</SelectItem>
+                    {/* In the planner's order, so the week reads the way the plan does. */}
+                    {weekdayOrder(firstWeekday).map((day) => (
+                      <SelectItem key={day} value={day.toString()}>
+                        {t(`notificationSettings.days.${WEEKDAY_TRANSLATION_KEYS[day]}`)}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

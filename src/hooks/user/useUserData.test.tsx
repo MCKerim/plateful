@@ -1,6 +1,6 @@
 import { act, renderHook } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { setUser } from "@/redux/slices/userSlice";
+import { setUser, setUserWeekStart } from "@/redux/slices/userSlice";
 import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useUserData } from "./useUserData";
 
@@ -11,6 +11,7 @@ const mocks = vi.hoisted(() => ({
   getHousehold: vi.fn(),
   getHouseholdMembers: vi.fn(),
   updateLanguage: vi.fn(),
+  seedWeekStart: vi.fn(),
   posthogIdentify: vi.fn(),
   posthogReset: vi.fn(),
   posthogCaptureException: vi.fn(),
@@ -39,6 +40,7 @@ vi.mock("@/api/user.api", () => ({
     getHousehold: mocks.getHousehold,
     getHouseholdMembers: mocks.getHouseholdMembers,
     updateLanguage: mocks.updateLanguage,
+    seedWeekStart: mocks.seedWeekStart,
   },
 }));
 
@@ -84,6 +86,7 @@ const user = {
   deletion_requested_at: null,
   has_completed_survey: true,
   notification_preferences: null,
+  week_start: 1,
 };
 
 describe("useUserData", () => {
@@ -98,6 +101,7 @@ describe("useUserData", () => {
       created_at: "2026-07-26T12:00:00Z",
     });
     mocks.getHouseholdMembers.mockReset().mockResolvedValue([]);
+    mocks.seedWeekStart.mockReset().mockResolvedValue(1);
     mocks.updateLanguage.mockReset().mockResolvedValue(undefined);
     mocks.posthogIdentify.mockReset();
     mocks.posthogReset.mockReset();
@@ -106,6 +110,28 @@ describe("useUserData", () => {
     mocks.identifyUser.mockReset().mockResolvedValue(null);
     mocks.logoutUser.mockReset().mockResolvedValue(null);
     mocks.socialLogout.mockReset().mockResolvedValue(undefined);
+  });
+
+  it("seeds a profile without a week start from the device and adopts the answer", async () => {
+    mocks.getCurrent.mockResolvedValue({ ...user, week_start: null });
+    // Another device won the race: the account holds Sunday, so this one adopts it.
+    mocks.seedWeekStart.mockResolvedValue(0);
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+
+    await vi.waitFor(() => {
+      expect(mocks.dispatch).toHaveBeenCalledWith(setUserWeekStart(0));
+    });
+    expect(mocks.seedWeekStart).toHaveBeenCalledWith(mocks.supabase, expect.any(Number));
+  });
+
+  it("leaves a seeded profile's week start alone", async () => {
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+
+    expect(mocks.seedWeekStart).not.toHaveBeenCalled();
   });
 
   it("keeps the authenticated user when PostHog identification fails", async () => {

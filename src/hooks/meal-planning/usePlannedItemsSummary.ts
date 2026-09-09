@@ -1,14 +1,16 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
+import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 import { transformPlannedItemsSummary } from "@/lib/transformers/meal-planning.transformer";
 
 export function usePlannedItemsSummary(currentWeek: Date, enabled: boolean) {
   const { supabase } = useSupabase();
+  const firstWeekday = useWeekStart();
 
-  const weekDays = getWeekdays(currentWeek);
+  const weekDays = getWeekdays(currentWeek, firstWeekday);
   const weekStart = new Date(weekDays[0]);
   const weekEnd = new Date(weekDays[6]);
 

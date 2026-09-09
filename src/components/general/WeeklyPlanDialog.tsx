@@ -3,7 +3,8 @@ import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { useState, useEffect, useCallback, useRef, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, ChevronLeft, ChevronRight, Minus, Plus, StickyNote } from "lucide-react";
-import { getWeekdays, toPlannedDateString } from "@/lib/dateHelper/dateHelper";
+import { getWeekdays, toPlannedDateString, weekStartsOn } from "@/lib/dateHelper/dateHelper";
+import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { format, isSameDay, addWeeks, subWeeks, isSameWeek } from "date-fns";
 import { enUS, es, fr, de } from "date-fns/locale";
 import { useSwipe } from "@/hooks/useSwipe";
@@ -75,6 +76,11 @@ export default function WeeklyPlanDialog({
   const [withoutDate, setWithoutDate] = useState(false);
   const [withoutDateCount, setWithoutDateCount] = useState(1);
   const [currentWeek, setCurrentWeek] = useState(initialWeek ?? new Date());
+  // The account's first weekday: every week here, and the "this week" test
+  // (date-fns counts from Sunday unless told), runs on it.
+  const firstWeekday = useWeekStart();
+  const shownWeekIs = (date: Date) =>
+    isSameWeek(currentWeek, date, { weekStartsOn: weekStartsOn(firstWeekday) });
   // Track which weeks have been initialized (by week start date ISO string)
   const [initializedWeeks, setInitializedWeeks] = useState<Set<string>>(new Set());
   // Track original placement IDs per initialized week (needed for cross-week deletes)
@@ -147,13 +153,13 @@ export default function WeeklyPlanDialog({
     // Don't initialize while data is still being fetched for this week
     if (!isDialogOpen || isFetchingPlannedItems || isFetchingPlacements) return;
 
-    const weekKey = getWeekdays(currentWeek)[0].toISOString();
+    const weekKey = getWeekdays(currentWeek, firstWeekday)[0].toISOString();
 
     // Skip if this week has already been initialized
     if (initializedWeeks.has(weekKey)) return;
 
     // Find all days in current week that already hold the subject
-    const weekDays = getWeekdays(currentWeek);
+    const weekDays = getWeekdays(currentWeek, firstWeekday);
     const alreadyPlannedDates = weekDays.filter((day) => isDatePlannedForSubject(day));
 
     // Add the already-planned dates to selectedDates (without duplicates)
@@ -184,6 +190,7 @@ export default function WeeklyPlanDialog({
   }, [
     isDialogOpen,
     currentWeek,
+    firstWeekday,
     initializedWeeks,
     isFetchingPlannedItems,
     isFetchingPlacements,
@@ -240,8 +247,7 @@ export default function WeeklyPlanDialog({
     const datesToAdd: Date[] = [];
 
     for (const [weekKey, originalPlans] of planIdsByWeek.entries()) {
-      const weekStart = new Date(weekKey);
-      const weekDays = getWeekdays(weekStart);
+      const weekDays = getWeekdays(new Date(weekKey), firstWeekday);
 
       const selectedInThisWeek = selectedDates.filter((d) =>
         weekDays.some((wd) => isSameDay(wd, d))
@@ -336,19 +342,19 @@ export default function WeeklyPlanDialog({
 
           <div className="flex flex-col items-center">
             <h2 className="text-lg font-bold">
-              {isSameWeek(currentWeek, new Date())
+              {shownWeekIs(new Date())
                 ? t("mealPlanner.thisWeek")
-                : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+                : shownWeekIs(addWeeks(new Date(), 1))
                   ? t("mealPlanner.nextWeek")
-                  : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                  : shownWeekIs(subWeeks(new Date(), 1))
                     ? t("mealPlanner.lastWeek")
-                    : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
-                        getWeekdays(currentWeek)[6],
+                    : `${format(getWeekdays(currentWeek, firstWeekday)[0], "dd.MM")} - ${format(
+                        getWeekdays(currentWeek, firstWeekday)[6],
                         "dd.MM"
                       )}`}
             </h2>
 
-            {!isSameWeek(currentWeek, new Date()) && (
+            {!shownWeekIs(new Date()) && (
               <Button
                 variant="link"
                 size="sm"
@@ -367,7 +373,7 @@ export default function WeeklyPlanDialog({
 
         {/* Day Buttons */}
         <div className="flex flex-col gap-2" {...swipeHandlers}>
-          {getWeekdays(currentWeek).map((day) => {
+          {getWeekdays(currentWeek, firstWeekday).map((day) => {
             const isToday = isSameDay(day, new Date());
             const isSelected = selectedDates.some((d) => isSameDay(d, day));
             const plannedForDay = getPlannedItemsForDate(plannedItems, day);

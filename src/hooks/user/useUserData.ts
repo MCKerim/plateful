@@ -1,13 +1,14 @@
 import { useCallback } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAppDispatch } from "@/redux/hooks";
-import { setUser } from "@/redux/slices/userSlice";
+import { setUser, setUserWeekStart } from "@/redux/slices/userSlice";
 import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useSupabase } from "@/utils/supabase";
 import { userApi } from "@/api/user.api";
 import type { CurrentAuthUser } from "@/api/user.api";
 import posthog from "posthog-js";
 import { contentLanguage } from "@/lib/contentLanguage";
+import { deviceWeekStart } from "@/lib/weekStart";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
@@ -36,6 +37,7 @@ export type FetchUserDataOptions = {
 };
 
 let languageSynchronizationQueue: Promise<void> = Promise.resolve();
+let weekStartSeedQueue: Promise<void> = Promise.resolve();
 let revenueCatIdentityQueue: Promise<void> = Promise.resolve();
 
 export function useUserData() {
@@ -161,6 +163,28 @@ export function useUserData() {
           }
         })
         .catch((error) => reportError("Failed to synchronize user language", error));
+
+      // The account owns its week start; the device only supplies the first
+      // value. An account that has none yet gets the browser locale's week
+      // through `seed_week_start`, which writes only a still-null row and
+      // answers with what the account holds afterwards (another device may
+      // have seeded first). Until it lands the planner falls back to the same
+      // device week (`selectWeekStart`), so nothing regroups.
+      if (userData.week_start === null) {
+        weekStartSeedQueue = weekStartSeedQueue
+          .catch(() => undefined)
+          .then(async () => {
+            if (!isCurrent()) return;
+            try {
+              const stored = await userApi.seedWeekStart(supabase, deviceWeekStart());
+              if (isCurrent()) {
+                dispatch(setUserWeekStart(stored));
+              }
+            } catch (error) {
+              reportError("Failed to seed the week start", error);
+            }
+          });
+      }
 
       revenueCatIdentityQueue = revenueCatIdentityQueue
         .catch(() => undefined)

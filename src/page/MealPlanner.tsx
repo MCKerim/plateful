@@ -12,7 +12,8 @@ import { format, isSameDay, isToday, addWeeks, subWeeks, isSameWeek } from "date
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
-import { getWeekdays } from "@/lib/dateHelper/dateHelper";
+import { getWeekdays, weekStartsOn } from "@/lib/dateHelper/dateHelper";
+import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { Button } from "@/components/ui/button";
 import {
   CalendarOff,
@@ -82,6 +83,11 @@ export default function MealPlanner() {
   const dispatch = useAppDispatch();
 
   const currentWeek = useAppSelector(selectCurrentWeek);
+  // The account's first weekday: every week here, and the "this week" test
+  // (date-fns counts from Sunday unless told), runs on it.
+  const firstWeekday = useWeekStart();
+  const shownWeekIs = (date: Date) =>
+    isSameWeek(currentWeek, date, { weekStartsOn: weekStartsOn(firstWeekday) });
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
@@ -341,19 +347,19 @@ export default function MealPlanner() {
 
           <div className="flex flex-col items-center">
             <h2 className="text-lg font-semibold">
-              {isSameWeek(currentWeek, new Date())
+              {shownWeekIs(new Date())
                 ? t("mealPlanner.thisWeek")
-                : isSameWeek(currentWeek, addWeeks(new Date(), 1))
+                : shownWeekIs(addWeeks(new Date(), 1))
                   ? t("mealPlanner.nextWeek")
-                  : isSameWeek(currentWeek, subWeeks(new Date(), 1))
+                  : shownWeekIs(subWeeks(new Date(), 1))
                     ? t("mealPlanner.lastWeek")
-                    : `${format(getWeekdays(currentWeek)[0], "dd.MM")} - ${format(
-                        getWeekdays(currentWeek)[6],
+                    : `${format(getWeekdays(currentWeek, firstWeekday)[0], "dd.MM")} - ${format(
+                        getWeekdays(currentWeek, firstWeekday)[6],
                         "dd.MM"
                       )}`}
             </h2>
 
-            {!isSameWeek(currentWeek, new Date()) && (
+            {!shownWeekIs(new Date()) && (
               <Button
                 variant="link"
                 size="sm"
@@ -364,7 +370,7 @@ export default function MealPlanner() {
               </Button>
             )}
 
-            {isSameWeek(currentWeek, new Date()) && <div className="h-[16px]"></div>}
+            {shownWeekIs(new Date()) && <div className="h-[16px]"></div>}
           </div>
 
           <Button variant="ghost" size="sm" onClick={goToNextWeek}>
@@ -390,7 +396,7 @@ export default function MealPlanner() {
                 ))}
               </>
             ) : (
-              getWeekdays(currentWeek).map((day) => {
+              getWeekdays(currentWeek, firstWeekday).map((day) => {
                 const items = getItemsByDate(day);
 
                 return (
