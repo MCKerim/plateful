@@ -1,0 +1,5 @@
+# Knowledge — Plateful (Capacitor / Web)
+
+Gemeinsames Repo-Wissen für alle Agenten (Claude Code, Codex, Cloud-Sessions) und Menschen: Gotchas, Mechanismen, getroffene technische Entscheidungen. Ein Fakt pro Datei; bei Änderung die Datei und ihre Zeile hier aktualisieren, Erledigtes löschen. Persönlicher Kontext, Produkt-/Markenentscheidungen und Projekte liegen im PersonalOS (`~/PersonalOS`), nicht hier. Architektur und Betrieb stehen in `AGENTS.md`.
+
+- [Edge-function models and reasoning](edge-function-models.md) — chatbot = `gpt-5.6-terra` with `reasoning: { effort: "low" }` and a one-shot retry without `previous_response_id`; search parser = `gpt-5.6-luna` with `reasoning_effort: "none"`; both since 2026-09-10 (gpt-5.4-nano before); never pass `temperature` to a gpt-5 model; deploy via the Supabase MCP `deploy_edge_function` (no CLI on the Mac), files listed in the note

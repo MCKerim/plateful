@@ -71,13 +71,34 @@ serve(async (req) => {
   });
 
   let proposalCounter = typeof proposal_counter === "number" ? proposal_counter : 0;
-  let answear = await client.responses.create({
-    model: "gpt-5.4-nano",
+  // Terra with a little reasoning (since 2026-09-10, gpt-5.4-nano before):
+  // this is an agentic loop — recipe proposals, edits, and memory of what was
+  // saved via previous_response_id — where nano made frequent mistakes. `low`
+  // is deliberate, not the API default `medium`: unbounded thinking on a
+  // small model leaked English notes into a German answer in the extractor's
+  // Ask route (its docs/knowledge/ask-no-reasoning.md).
+  const MODEL = "gpt-5.6-terra";
+  const REASONING = { effort: "low" as const };
+  const firstRequest = {
+    model: MODEL,
+    reasoning: REASONING,
     tools,
     instructions: DEFAULT_PROMPT,
-    previous_response_id: previous_response_id ?? null,
     input: messages,
-  });
+  };
+  let answear;
+  try {
+    answear = await client.responses.create({
+      ...firstRequest,
+      previous_response_id: previous_response_id ?? null,
+    });
+  } catch (error) {
+    // A thread that started on the previous model, or an expired response id,
+    // must not strand the conversation: retry once without the memory.
+    if (!previous_response_id) throw error;
+    console.error("chatbot: retrying without previous_response_id", error);
+    answear = await client.responses.create(firstRequest);
+  }
   let loopCount = 0;
   let toolOutputs = [];
   const toolOutputsForUI = [];
@@ -163,7 +184,8 @@ serve(async (req) => {
     }
     if (toolOutputs.length !== 0) {
       answear = await client.responses.create({
-        model: "gpt-5.4-nano",
+        model: MODEL,
+        reasoning: REASONING,
         tools,
         instructions: DEFAULT_PROMPT,
         previous_response_id: answear.id,

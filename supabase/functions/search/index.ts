@@ -129,8 +129,11 @@ async function parseQuery(text: string): Promise<{ residual: string; parsed: Par
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         // No explicit temperature: some 5.x tiers reject it, and a rejected
-        // parse degrades SILENTLY to no-chips here.
-        model: "gpt-5.4-nano",
+        // parse degrades SILENTLY to no-chips here. Reasoning off on purpose:
+        // Luna defaults to `medium`, and a 4 s budget with a fixed schema has
+        // no use for thinking (gpt-5.4-nano until 2026-09-10, same price).
+        model: "gpt-5.6-luna",
+        reasoning_effort: "none",
         messages: [
           { role: "system", content: PARSE_PROMPT },
           { role: "user", content: text },
