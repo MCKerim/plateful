@@ -1,5 +1,13 @@
 import { usePostHog } from "posthog-js/react";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
 
+/**
+ * The `screen` of `onboarding_screen_viewed`. A cross-platform contract: the
+ * native iOS app sends the same keys for the same steps
+ * (`Analytics.OnboardingScreen` in `plateful/Core/Analytics.swift`), so one
+ * funnel spans both apps. Keys are immutable once sent — PostHog can't
+ * rename history.
+ */
 export type OnboardingScreen =
   | "welcome"
   | "signup"
@@ -10,6 +18,12 @@ export type OnboardingScreen =
   | "value_meal_planning"
   | "value_chatbot"
   | "value_import_recipes"
+  // Sent by iOS only (its value screens differ; see docs/analytics.md in the
+  // iOS repo). Listed so nobody reuses a key for something else.
+  | "value_make_it_yours"
+  | "value_cooking_mode"
+  | "value_household"
+  | "all_set"
   | "survey_start"
   | "survey_1"
   | "survey_2"
@@ -34,12 +48,12 @@ export function useOnboardingTracking() {
 
   return {
     trackScreenViewed: (screen: OnboardingScreen) =>
-      posthog?.capture("onboarding_screen_viewed", { screen }),
+      posthog?.capture(AnalyticsEvent.onboardingScreenViewed, { screen }),
 
     trackSurveyAnswered: (params: {
       question_number: number;
       question_key: string;
       selected_options: string[];
-    }) => posthog?.capture("survey_question_answered", params),
+    }) => posthog?.capture(AnalyticsEvent.surveyQuestionAnswered, params),
   };
 }

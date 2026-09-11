@@ -10,8 +10,7 @@ import { useNavigate, Link } from "react-router";
 import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
-import { usePostHog } from "posthog-js/react";
-import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { clearPendingSignIn, markPendingSignIn } from "@/lib/pendingSignIn";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { Capacitor } from "@capacitor/core";
 import { reportError } from "@/utils/reportError";
@@ -50,7 +49,6 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const navigate = useNavigate();
   const [showTransition, setShowTransition] = useState(true);
   const { trackScreenViewed } = useOnboardingTracking();
-  const posthog = usePostHog();
   const reduceMotion = useReducedMotion();
 
   // Safari blocks the window.open inside SocialLogin.login once the click
@@ -113,6 +111,10 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
       const idToken = "idToken" in result.result ? result.result.idToken : null;
       if (!idToken) throw new Error("No idToken returned from Google Sign-In");
 
+      // Marked before the request: the `signed_in` event is captured after
+      // `posthog.identify()` in the auth bootstrap (`pendingSignIn.ts`), and
+      // the auth event can get there before this call returns.
+      markPendingSignIn("google");
       const { error } = await supabase.auth.signInWithIdToken({
         provider: "google",
         token: idToken,
@@ -120,9 +122,8 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
       });
 
       if (error) throw error;
-
-      posthog?.capture(AnalyticsEvent.signedIn, { method: "google" });
     } catch (error) {
+      clearPendingSignIn();
       reportError("Unexpected error during sign up", error);
       toast.error("Authentication failed. Please try again.");
     } finally {

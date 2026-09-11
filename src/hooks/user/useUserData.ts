@@ -10,6 +10,8 @@ import posthog from "posthog-js";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { deviceWeekStart } from "@/lib/weekStart";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
+import { AnalyticsEvent } from "@/lib/analyticsEvents";
+import { spendPendingSignIn } from "@/lib/pendingSignIn";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
 import { reportError } from "@/utils/reportError";
@@ -130,6 +132,12 @@ export function useUserData() {
           // previously recorded household.
           ...(userData.household_id ? { household_id: userData.household_id } : {}),
         });
+        // Owed by the sign-in that led here, spent only now that the person
+        // is identified — see `pendingSignIn.ts` for why not at the call site.
+        const signInMethod = spendPendingSignIn();
+        if (signInMethod) {
+          posthog.capture(AnalyticsEvent.signedIn, { method: signInMethod });
+        }
       } catch (error) {
         reportError("Failed to identify user with PostHog", error);
       }

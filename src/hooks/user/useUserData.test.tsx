@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { setUser, setUserWeekStart } from "@/redux/slices/userSlice";
 import { setHousehold, setHouseholdMembers } from "@/redux/slices/householdSlice";
 import { useUserData } from "./useUserData";
+import { markPendingSignIn, spendPendingSignIn } from "@/lib/pendingSignIn";
 
 const mocks = vi.hoisted(() => ({
   dispatch: vi.fn(),
@@ -15,6 +16,7 @@ const mocks = vi.hoisted(() => ({
   posthogIdentify: vi.fn(),
   posthogReset: vi.fn(),
   posthogCaptureException: vi.fn(),
+  posthogCapture: vi.fn(),
   changeLanguage: vi.fn(),
   identifyUser: vi.fn(),
   logoutUser: vi.fn(),
@@ -51,6 +53,7 @@ vi.mock("posthog-js", () => ({
     // `reportError` reports through the same singleton, so every error
     // path exercised here calls this too.
     captureException: mocks.posthogCaptureException,
+    capture: mocks.posthogCapture,
   },
 }));
 
@@ -106,6 +109,9 @@ describe("useUserData", () => {
     mocks.posthogIdentify.mockReset();
     mocks.posthogReset.mockReset();
     mocks.posthogCaptureException.mockReset();
+    mocks.posthogCapture.mockReset();
+    // Drain whatever a previous test left owed.
+    spendPendingSignIn();
     mocks.changeLanguage.mockReset().mockResolvedValue(undefined);
     mocks.identifyUser.mockReset().mockResolvedValue(null);
     mocks.logoutUser.mockReset().mockResolvedValue(null);
@@ -132,6 +138,32 @@ describe("useUserData", () => {
     await act(() => result.current.fetchUserData(authUser));
 
     expect(mocks.seedWeekStart).not.toHaveBeenCalled();
+  });
+
+  it("captures the owed signed_in only after the person is identified", async () => {
+    markPendingSignIn("magic_link");
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+
+    expect(mocks.posthogCapture).toHaveBeenCalledWith("signed_in", { method: "magic_link" });
+    // Person properties are stamped at ingestion: an event captured before
+    // identify keeps `email = null` for good.
+    expect(mocks.posthogIdentify.mock.invocationCallOrder[0]).toBeLessThan(
+      mocks.posthogCapture.mock.invocationCallOrder[0]
+    );
+    // Spent once: a later refresh of the same session is not another sign-in.
+    await act(() => result.current.fetchUserData(authUser));
+    expect(mocks.posthogCapture).toHaveBeenCalledTimes(1);
+  });
+
+  it("reports no sign-in on an ordinary reload", async () => {
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+
+    expect(mocks.posthogIdentify).toHaveBeenCalled();
+    expect(mocks.posthogCapture).not.toHaveBeenCalled();
   });
 
   it("keeps the authenticated user when PostHog identification fails", async () => {
