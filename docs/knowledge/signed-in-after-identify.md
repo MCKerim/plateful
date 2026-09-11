@@ -1,0 +1,9 @@
+# `signed_in` is captured after identify, magic links included
+
+_Why the sign-in event is not captured at the sign-in call site, how a magic-link landing is recognised, and why Supabase's `SIGNED_IN` event is not the trigger_
+
+- **The PostHog project stamps person properties onto an event at ingestion and never rewrites them.** An event captured while the browser is still anonymous keeps `email = null` forever: it drops out of every person-property filter (the project's internal-user filter included) and shows as an anonymous person. So `signed_in` must fire *after* `posthog.identify()`, which happens in `useUserData.fetchUserData`, long after any sign-in call site.
+- **Mechanism (since 2026-09-11, `src/lib/pendingSignIn.ts`):** the call site *marks* the method before the request (`markPendingSignIn("google")` in `SignUp.tsx`, cleared on failure), and `fetchUserData` *spends* it right after `identify()`. Same design as `AuthStore.pendingSignInMethod` in the iOS repo. Google sign-ins before that date were captured at the call site and are anonymous in the way above; PostHog data is immutable.
+- **Magic links have no call site.** The user lands on the app with the session in the URL fragment (`#access_token=…&type=magiclink`, or `type=signup` for a brand-new address from the same `signInWithOtp`) and the Supabase client consumes it on its own. `pendingSignIn.ts` inspects `location.href` once at module load — before the client is even created — and marks `magic_link`. Before this, a magic-link user only ever produced `$identify` and was missing from every signup count.
+- **Do not use the `SIGNED_IN` auth event for this.** In `@supabase/auth-js` 2.95 `_recoverAndRefresh` emits `SIGNED_IN` when a stored session is recovered on load and on every tab-focus refresh, so it would count reloads as sign-ins.
+- Contract for `method` values and the rest of the event catalog: `docs/analytics.md` in the iOS repo (`~/programming/ios-native/plateful`).
