@@ -14,13 +14,11 @@
  *   import sends `photo` even though the DB row says `source_type: "image"`.
  *   "Succeeded" means the submission (the `recipe_imports` insert) was
  *   accepted; extraction runs async and reports its own failures.
- * - `signed_in`: `method` is "google" | "apple" | "password" | "magic_link".
- *   Since 2026-09-11 both apps report a completed magic link too (before,
- *   that user only ever produced an `$identify` and was missing from every
- *   signup count). Captured *after* `posthog.identify()` — see
- *   `src/lib/pendingSignIn.ts` — because person properties are stamped on an
- *   event at ingestion and an event sent while still anonymous keeps
- *   `email = null` for good.
+ * - `signed_in`: `method` is a `SignInMethod` (src/lib/pendingSignIn.ts);
+ *   `apple` and `password` are iOS-only values kept for the shared contract.
+ *   Captured after `posthog.identify()`, never at the call site — see
+ *   pendingSignIn.ts for the mechanism and its limits. `magic_link` on both
+ *   apps since 2026-09-11.
  * - `onboarding_screen_viewed`: `screen` is an `OnboardingScreen` key from
  *   `src/hooks/analytics/useOnboardingTracking.ts`; iOS sends the same keys
  *   (plus a few for screens only it has) from `Analytics.OnboardingScreen`.

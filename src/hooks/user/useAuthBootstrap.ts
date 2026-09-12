@@ -14,6 +14,7 @@ import {
   storedDeletionRequest,
 } from "@/lib/accountDeletion";
 import { cancelAllAccountNotifications } from "@/lib/notifications";
+import { markIfMagicLinkSession } from "@/lib/pendingSignIn";
 import i18n from "@/i18n";
 import { toast } from "sonner";
 import { reportError } from "@/utils/reportError";
@@ -146,6 +147,10 @@ export function useAuthBootstrap() {
     const pendingTimers = new Set<ReturnType<typeof globalThis.setTimeout>>();
     const { data: { subscription } = { subscription: undefined } } =
       supabase.auth.onAuthStateChange((_event, session) => {
+        // A session that carries the access token of an email-link landing is
+        // the sign-in that link completed — owed a `signed_in`, spent after
+        // identify in the bootstrap below (see pendingSignIn.ts).
+        markIfMagicLinkSession(session);
         // Supabase holds its auth lock while this callback runs. Keep the
         // callback synchronous and defer any client request until it returns.
         const timer = globalThis.setTimeout(() => {

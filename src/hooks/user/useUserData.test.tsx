@@ -157,6 +157,30 @@ describe("useUserData", () => {
     expect(mocks.posthogCapture).toHaveBeenCalledTimes(1);
   });
 
+  it("cancels an owed sign-in on sign-out so the next account cannot inherit it", async () => {
+    markPendingSignIn("google");
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(null));
+    await act(() => result.current.fetchUserData(authUser));
+
+    expect(mocks.posthogCapture).not.toHaveBeenCalled();
+  });
+
+  it("keeps the owed sign-in when identify fails, for the retry", async () => {
+    markPendingSignIn("magic_link");
+    mocks.posthogIdentify.mockImplementationOnce(() => {
+      throw new Error("PostHog is blocked");
+    });
+    const { result } = renderHook(() => useUserData());
+
+    await act(() => result.current.fetchUserData(authUser));
+    expect(mocks.posthogCapture).not.toHaveBeenCalled();
+
+    await act(() => result.current.fetchUserData(authUser));
+    expect(mocks.posthogCapture).toHaveBeenCalledWith("signed_in", { method: "magic_link" });
+  });
+
   it("reports no sign-in on an ordinary reload", async () => {
     const { result } = renderHook(() => useUserData());
 

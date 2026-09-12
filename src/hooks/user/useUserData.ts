@@ -11,7 +11,7 @@ import { contentLanguage } from "@/lib/contentLanguage";
 import { deviceWeekStart } from "@/lib/weekStart";
 import { identifyUser, logoutUser } from "@/lib/revenuecat";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
-import { spendPendingSignIn } from "@/lib/pendingSignIn";
+import { clearPendingSignIn, spendPendingSignIn } from "@/lib/pendingSignIn";
 import { SocialLogin } from "@capgo/capacitor-social-login";
 import { setCustomerInfo, resetSubscription } from "@/redux/slices/subscriptionSlice";
 import { reportError } from "@/utils/reportError";
@@ -58,6 +58,9 @@ export function useUserData() {
       }
 
       if (!authUser) {
+        // A sign-out or deletion cancels any owed sign-in: nothing from this
+        // account may be spent on whoever signs in next in this page.
+        clearPendingSignIn();
         dispatch(setUser(null));
         dispatch(setHousehold(null));
         dispatch(setHouseholdMembers(null));
@@ -122,6 +125,7 @@ export function useUserData() {
       dispatch(setHousehold(householdData));
       dispatch(setHouseholdMembers(membersData));
 
+      let identified = false;
       try {
         posthog.identify(userData.id, {
           email: userData.email,
@@ -132,14 +136,22 @@ export function useUserData() {
           // previously recorded household.
           ...(userData.household_id ? { household_id: userData.household_id } : {}),
         });
-        // Owed by the sign-in that led here, spent only now that the person
-        // is identified — see `pendingSignIn.ts` for why not at the call site.
-        const signInMethod = spendPendingSignIn();
-        if (signInMethod) {
-          posthog.capture(AnalyticsEvent.signedIn, { method: signInMethod });
-        }
+        identified = true;
       } catch (error) {
         reportError("Failed to identify user with PostHog", error);
+      }
+      // Owed by the sign-in that led here, spent only now that the person is
+      // identified — see `pendingSignIn.ts` for why not at the call site. Left
+      // pending when identify failed, so a retry still reports it.
+      if (identified) {
+        const signInMethod = spendPendingSignIn();
+        if (signInMethod) {
+          try {
+            posthog.capture(AnalyticsEvent.signedIn, { method: signInMethod });
+          } catch (error) {
+            reportError("Failed to capture signed_in with PostHog", error);
+          }
+        }
       }
 
       // Language and billing identity are useful integrations, but neither is

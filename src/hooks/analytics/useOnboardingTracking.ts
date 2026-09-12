@@ -18,12 +18,10 @@ export type OnboardingScreen =
   | "value_meal_planning"
   | "value_chatbot"
   | "value_import_recipes"
-  // Sent by iOS only (its value screens differ; see docs/analytics.md in the
-  // iOS repo). Listed so nobody reuses a key for something else.
-  | "value_make_it_yours"
-  | "value_cooking_mode"
-  | "value_household"
-  | "all_set"
+  // iOS sends further keys for screens only it has (value_make_it_yours,
+  // value_cooking_mode, value_household, all_set); they are deliberately not
+  // in this union — a web screen must never reuse one. The full table lives
+  // in docs/analytics.md of the iOS repo.
   | "survey_start"
   | "survey_1"
   | "survey_2"
