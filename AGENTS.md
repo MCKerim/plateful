@@ -34,6 +34,7 @@ npm run generate-pwa-assets      # Generate PWA icons from logo
 
 - **Version style is `major.minor`, like the native iOS app: `1.0`, `1.1`, `1.2` … no patch number** (Kerim, 2026-09-09; the earlier `0.0.38` style is history). Every release bumps `versionCode` by one and sets `versionName` in `android/app/build.gradle`.
 - **The version shown on the Settings page is a hardcoded string** (`v1.1` in `src/page/Settings.tsx`, the "About" card) and is not derived from anything. It MUST change in the same commit as `versionName`, and the web deploy shows it too, so the two never drift.
+- **Release builds are R8-minified** (`minifyEnabled`, `shrinkResources`, plus a keep-rule filter for RevenueCat's Amazon module) because Google Play requires ≥ 25 % optimisation, obfuscation and shrinking from February 2027. The mapping file ships inside the AAB, so nothing is uploaded by hand. If a native plugin misbehaves only in release, test the release APK signed with the debug keystore before adding a keep rule; details and numbers in `docs/knowledge/android-r8.md`.
 
 ## Architecture
 
