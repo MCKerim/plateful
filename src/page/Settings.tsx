@@ -285,7 +285,7 @@ export default function Settings() {
           </div>
 
           <div className="flex py-2 justify-evenly">
-            <NavLink to="https://x.com/MCKerim5" target="_blank">
+            <NavLink to="https://x.com/KBlanks_com" target="_blank">
               <FaXTwitter size={24} />
             </NavLink>
 
