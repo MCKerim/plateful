@@ -283,6 +283,16 @@
       "loginFailed": "Failed to send magic link. Please try again."
     }
   },
+  "reviewSignIn": {
+    "hint": "Enter the review account password",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Review account password",
+    "signInButton": "Sign in",
+    "loading": "Signing in...",
+    "errors": {
+      "passwordFailed": "That password didn't work. Check it and try again."
+    }
+  },
   "list": {
     "title": "Shopping list"
   },

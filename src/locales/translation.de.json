@@ -102,6 +102,16 @@
       "loginFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
     }
   },
+  "reviewSignIn": {
+    "hint": "Passwort des Review-Kontos eingeben",
+    "passwordLabel": "Passwort",
+    "passwordPlaceholder": "Passwort des Review-Kontos",
+    "signInButton": "Anmelden",
+    "loading": "Anmeldung läuft...",
+    "errors": {
+      "passwordFailed": "Das Passwort hat nicht funktioniert. Bitte prüfen und erneut versuchen."
+    }
+  },
   "welcome": {
     "title": "Glückwunsch,",
     "subtitle": "smarte Essensplanung beginnt jetzt!",
