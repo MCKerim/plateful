@@ -27,6 +27,9 @@
  *   They never open this app on purpose: they connect the MCP server, and the
  *   OAuth consent page (`/oauth/consent`) drops them here to sign in first.
  *   Same dead end as a store reviewer, so the same hidden password field.
+ * - `claudereview@` — Anthropic's reviewers for the Claude Connectors
+ *   Directory, who arrive the same way. Its own account because both reviews
+ *   can run at once and each is invited to write and delete freely.
  *
  * The App Store's `iosreview@plateful.test` is not listed here — App Review
  * uses the native app, which carries its own copy of this mechanism.
@@ -34,7 +37,11 @@
  * Details and the Play Console text: docs/knowledge/review-accounts.md.
  * Seeding (all accounts): `scripts/seed-review-account.mjs` in the iOS repo.
  */
-export const REVIEW_EMAILS = ["androidreview@plateful.test", "chatgptreview@plateful.test"] as const;
+export const REVIEW_EMAILS = [
+  "androidreview@plateful.test",
+  "chatgptreview@plateful.test",
+  "claudereview@plateful.test",
+] as const;
 
 /** `true` when `email` is one of the review accounts — case- and
  * whitespace-insensitive, because reviewers paste the address in from a
