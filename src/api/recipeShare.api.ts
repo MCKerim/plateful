@@ -10,6 +10,7 @@ import { reportError } from "@/utils/reportError";
 import { isTrustedRecipeImageUrl, recipeImageApi } from "@/api/recipeImage.api";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
 import imageCompression from "browser-image-compression";
+import { randomId } from "@/utils/randomId";
 
 const MAX_SHARED_IMAGE_BYTES = 5 * 1024 * 1024;
 
@@ -169,7 +170,7 @@ export const recipeShareApi = {
     // Minted here rather than by the database: the step annotations refer to
     // ingredients by snapshot position, and the row ids must be known to
     // write them (`ingredientIds[i]` is the row for `ingredients[i]`).
-    const ingredientIds = snapshot.ingredients.map(() => crypto.randomUUID());
+    const ingredientIds = snapshot.ingredients.map(() => randomId());
 
     // 2+3. Insert ingredients and copy images in parallel
     const ingredientInsert =

@@ -1,10 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { randomId } from "@/utils/randomId";
 
 const BUCKET = "recipeimages";
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
 
-export function buildRecipeImagePath(recipeId: string, fileId = crypto.randomUUID()): string {
+export function buildRecipeImagePath(recipeId: string, fileId = randomId()): string {
   if (!UUID_RE.test(recipeId) || !UUID_RE.test(fileId)) {
     throw new Error("Invalid recipe image identifier");
   }

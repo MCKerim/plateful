@@ -1,4 +1,5 @@
 import { SupabaseClient } from "@supabase/supabase-js";
+import { randomId } from "@/utils/randomId";
 
 /**
  * Client for the insert-based recipe-import pipeline (the same one iOS uses).
@@ -37,7 +38,7 @@ export const recipeImportApi = {
     supabase: SupabaseClient,
     params: { files: File[]; householdId: string; language: string }
   ): Promise<void> {
-    const batch = crypto.randomUUID();
+    const batch = randomId();
     const folder = `${params.householdId}/${batch}`;
     const paths: string[] = [];
 

@@ -20,6 +20,7 @@ import { useNoteSuggestions } from "@/hooks/meal-planning/useNoteSuggestions";
 import { mergeNoteSuggestions } from "@/lib/mealPlanHelper/mealPlanHelper";
 import { reportError } from "@/utils/reportError";
 import { PlannedNote } from "@/types/meal-planning.types";
+import { randomId } from "@/utils/randomId";
 
 /** A new note for a day (or the pool), or an existing note's text. */
 export type NoteDialogState =
@@ -34,7 +35,7 @@ type Props = {
 const SUGGESTIONS = ["eatingOut", "birthday", "leftovers", "atFamilys"] as const;
 
 function mintDraftIds() {
-  return { noteId: crypto.randomUUID(), entryId: crypto.randomUUID() };
+  return { noteId: randomId(), entryId: randomId() };
 }
 
 /**

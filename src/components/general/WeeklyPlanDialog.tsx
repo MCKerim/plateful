@@ -19,6 +19,7 @@ import { useApplyPlannerChanges } from "@/hooks/meal-planning/useApplyPlannerCha
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { planSubjectKey } from "@/lib/mealPlanHelper/mealPlanHelper";
 import { PlannedItemSummary, PlanSubject } from "@/types/meal-planning.types";
+import { randomId } from "@/utils/randomId";
 
 type Props = {
   /** The recipe or note being planned; `null` keeps a closed dialog mounted without loading anything. */
@@ -289,7 +290,7 @@ export default function WeeklyPlanDialog({
     ];
     const signature = JSON.stringify([plannedDates, planIdsToRemove]);
     if (insertionIds.current.signature !== signature) {
-      insertionIds.current = { signature, ids: plannedDates.map(() => crypto.randomUUID()) };
+      insertionIds.current = { signature, ids: plannedDates.map(() => randomId()) };
     }
     const insertions = plannedDates.map((planned_date, index) => ({
       id: insertionIds.current.ids[index],

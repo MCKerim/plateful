@@ -7,6 +7,7 @@ import {
   storeDeletionRequest,
   storedDeletionRequest,
 } from "@/lib/accountDeletion";
+import { randomId } from "@/utils/randomId";
 
 export function useDeleteAccount(enabled: boolean) {
   const { supabase } = useSupabase();
@@ -26,7 +27,7 @@ export function useDeleteAccount(enabled: boolean) {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("unauthorized");
 
-      const requestId = storedDeletionRequest(user.id)?.requestId ?? crypto.randomUUID();
+      const requestId = storedDeletionRequest(user.id)?.requestId ?? randomId();
       // Persist before the destructive request. If the response is lost after
       // the database commit, bootstrap resumes this exact idempotent request.
       storeDeletionRequest(user.id, requestId);
