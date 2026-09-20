@@ -276,7 +276,24 @@ export default function Recipe() {
           </PhotoProvider>
         )}
 
-        <div className="absolute top-1 right-1 z-10">
+        {/* Sharing sits outside the menu, left of the dots, the way the
+            native iOS app has it — one tap instead of two. */}
+        <div className="absolute top-1 right-1 z-10 flex items-center">
+          <Button
+            variant="ghost"
+            className="text-white"
+            size="icon"
+            onClick={() => createShareMutation.mutate(recipe.id)}
+            disabled={createShareMutation.isPending}
+            aria-label={t("share.shareRecipe")}
+          >
+            {createShareMutation.isPending ? (
+              <Loader2 className="!size-5 animate-spin" />
+            ) : (
+              <Share2 className="!size-5" />
+            )}
+          </Button>
+
           <Button
             variant="ghost"
             className="text-white"
@@ -302,22 +319,6 @@ export default function Recipe() {
                 <div className="flex justify-start gap-4 w-full h-full items-center">
                   <Pencil />
                   <p className="font-semibold">{t("recipe.editRecipe")}</p>
-                </div>
-              </Button>
-
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  if (!recipe) return;
-                  setActionsDrawerOpen(false);
-                  createShareMutation.mutate(recipe.id);
-                }}
-                disabled={createShareMutation.isPending}
-              >
-                <div className="flex justify-start gap-4 w-full h-full items-center">
-                  <Share2 />
-                  <p className="font-semibold">{t("share.shareRecipe")}</p>
                 </div>
               </Button>
 
