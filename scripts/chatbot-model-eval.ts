@@ -9,7 +9,8 @@
  * known_recipe_ids check as supabase/functions/chatbot/index.ts) against each
  * model and scores what the user would see.
  *
- * Usage (Node ≥ 23.6, runs the .ts directly):
+ * Usage (Node ≥ 23.6, runs the .ts directly). The key comes from the
+ * environment or from OPENAI_API_KEY=… in the repo's git-ignored `.env`:
  *   OPENAI_API_KEY=sk-... node scripts/chatbot-model-eval.ts
  *   OPENAI_API_KEY=sk-... node scripts/chatbot-model-eval.ts --runs 5 \
  *     --models gpt-5.6-terra:low,gpt-6-sol:low,gpt-6-sol:none
@@ -56,9 +57,16 @@ const MODELS: ModelConfig[] = (argValue("--models") ?? "gpt-5.6-terra:low,gpt-6-
     return { model, effort: effort as Effort };
   });
 
+// The key can live in the repo's git-ignored `.env` (never VITE_-prefixed,
+// so the web build cannot pick it up); an exported variable wins.
+try {
+  process.loadEnvFile(new URL("../.env", import.meta.url));
+} catch {
+  // no .env — fine when the key is exported
+}
 const API_KEY = process.env.OPENAI_API_KEY;
 if (!API_KEY) {
-  console.error("OPENAI_API_KEY is not set.");
+  console.error("OPENAI_API_KEY is not set (export it or add it to .env).");
   process.exit(1);
 }
 
