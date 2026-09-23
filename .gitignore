@@ -35,3 +35,6 @@ coverage/
 
 # Supabase
 supabase/.temp/
+
+# scripts/chatbot-model-eval.ts output
+chatbot-model-eval-*.json
