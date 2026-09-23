@@ -71,13 +71,15 @@ serve(async (req) => {
   });
 
   let proposalCounter = typeof proposal_counter === "number" ? proposal_counter : 0;
-  // Terra with a little reasoning (since 2026-09-10, gpt-5.4-nano before):
-  // this is an agentic loop — recipe proposals, edits, and memory of what was
-  // saved via previous_response_id — where nano made frequent mistakes. `low`
-  // is deliberate, not the API default `medium`: unbounded thinking on a
-  // small model leaked English notes into a German answer in the extractor's
-  // Ask route (its docs/knowledge/ask-no-reasoning.md).
-  const MODEL = "gpt-5.6-terra";
+  // GPT-6 Sol with a little reasoning (since 2026-09-23; gpt-5.6-terra from
+  // 2026-09-10, gpt-5.4-nano before): this is an agentic loop — recipe
+  // proposals, edits, and memory of what was saved via previous_response_id —
+  // where nano made frequent mistakes. Sol matched Terra's tool choice in
+  // scripts/chatbot-model-eval.ts (39/39 each), was faster and ~20% cheaper.
+  // `low` is deliberate, not the API default `medium`: unbounded thinking on
+  // a small model leaked English notes into a German answer in the
+  // extractor's Ask route (its docs/knowledge/ask-no-reasoning.md).
+  const MODEL = "gpt-6-sol";
   const REASONING = { effort: "low" as const };
   const firstRequest = {
     model: MODEL,
