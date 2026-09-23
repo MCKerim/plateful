@@ -262,6 +262,14 @@ const SCENARIOS: Scenario[] = [
     expect: { kind: "edit", recipeId: BOLOGNESE_ID },
   },
   {
+    id: "ctx-resumed-change",
+    note: "recipe context sent turns ago (chat resumed from the recipe page), then a change",
+    knownIds: [BOLOGNESE_ID],
+    setup: [{ message: bologneseContext + "Wie lange schmort die Soße?", expect: { kind: "none" }, afterSetup: null }],
+    message: "Mach das bitte vegetarisch",
+    expect: { kind: "edit", recipeId: BOLOGNESE_ID },
+  },
+  {
     id: "unsaved-then-change",
     note: "proposal NOT saved, then a change → propose_recipe again is correct",
     knownIds: [],

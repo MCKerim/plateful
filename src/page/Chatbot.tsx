@@ -19,6 +19,13 @@ import {
   appendToLastMessage,
   finalizeLastMessage,
   setRecipeId,
+  addKnownRecipeId,
+  addPendingFeedback,
+  clearPendingFeedback,
+  addToProposalCounter,
+  selectKnownRecipeIds,
+  selectPendingFeedback,
+  selectProposalCounter,
   NewRecipeProposal,
   EditRecipeProposal,
 } from "@/redux/slices/chatbotSlice";
@@ -78,12 +85,10 @@ export default function Chatbot() {
 
   const [inputValue, setInputValue] = useState("");
   const [selectedImagesAsbase64, setSelectedImagesAsbase64] = useState<string[]>([]);
-  const [pendingFeedback, setPendingFeedback] = useState<string[]>([]);
-  const [knownRecipeIds, setKnownRecipeIds] = useState<string[]>(() =>
-    recipeId ? [recipeId] : []
-  );
+  const pendingFeedback = useAppSelector(selectPendingFeedback);
+  const knownRecipeIds = useAppSelector(selectKnownRecipeIds);
+  const proposalCounter = useAppSelector(selectProposalCounter);
 
-  const proposalCounterRef = useRef(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -136,7 +141,12 @@ export default function Chatbot() {
     if (isFirstMessageWithContext) {
       setSearchParams({}, { replace: true });
       dispatch(setRecipeId(recipeId));
+      dispatch(addKnownRecipeId(recipeContext.id));
     }
+    // This render's selector value predates the dispatch above.
+    const requestKnownRecipeIds = isFirstMessageWithContext
+      ? [...new Set([...knownRecipeIds, recipeContext.id])]
+      : knownRecipeIds;
     dispatch(setIsTyping(true));
 
     incrementMission.mutate({ missionId: "chat_with_chef" });
@@ -176,7 +186,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
       if (pendingFeedback.length > 0) {
         const feedbackBlock = `[Proposal Outcomes]\n${pendingFeedback.join("\n")}\n[End Proposal Outcomes]\n\n`;
         textContent = feedbackBlock + textContent;
-        setPendingFeedback([]);
+        dispatch(clearPendingFeedback());
       }
 
       // Build vision content parts for the server
@@ -208,8 +218,8 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         },
         body: JSON.stringify({
           previous_response_id: previousResponseId,
-          known_recipe_ids: knownRecipeIds,
-          proposal_counter: proposalCounterRef.current,
+          known_recipe_ids: requestKnownRecipeIds,
+          proposal_counter: proposalCounter,
           available_collections: availableCollections.map(({ id, name }) => ({ id, name })),
           messages: [
             {
@@ -254,7 +264,7 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
               }
               dispatch(setPreviousResponseId(event.id));
               const toolOutputs = JSON.parse(event.tool_outputs_for_ui);
-              proposalCounterRef.current += toolOutputs.length;
+              dispatch(addToProposalCounter(toolOutputs.length));
               dispatch(finalizeLastMessage(toolOutputs));
             } else if (event.delta) {
               if (!assistantMessageAdded) {
@@ -281,8 +291,6 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
 
   const handleResetChat = () => {
     dispatch(resetChat());
-    setPendingFeedback([]);
-    setKnownRecipeIds(recipeId ? [recipeId] : []);
   };
 
   function handleMessageSuggestionButton(suggestion: string) {
@@ -360,11 +368,12 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         });
       }
 
-      setKnownRecipeIds((prev) => [...prev, newRecipe.id]);
-      setPendingFeedback((prev) => [
-        ...prev,
-        `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`,
-      ]);
+      dispatch(addKnownRecipeId(newRecipe.id));
+      dispatch(
+        addPendingFeedback(
+          `Proposal ${proposalId} accepted. Saved as new recipe (id: ${newRecipe.id}, title: "${title}").`,
+        ),
+      );
       toast.success(t("chatbot.recipeSaved"), {
         action: {
           label: t("common.open"),
@@ -419,10 +428,9 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         });
       }
 
-      setPendingFeedback((prev) => [
-        ...prev,
-        `Proposal ${proposalId} accepted. Recipe ${recipeId} ("${title}") updated.`,
-      ]);
+      dispatch(
+        addPendingFeedback(`Proposal ${proposalId} accepted. Recipe ${recipeId} ("${title}") updated.`),
+      );
       toast.success(t("chatbot.recipeUpdated"), {
         action: {
           label: t("common.open"),

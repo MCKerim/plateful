@@ -43,11 +43,23 @@ export interface ChatMessage {
   previous_response_id?: string;
 }
 
+// Everything the conversation's memory depends on lives here, next to the
+// messages and previous_response_id — never in Chatbot.tsx component state.
+// The page remounts on every navigation while the conversation survives; local
+// state reset the saved-recipe ids and dropped unsent save outcomes, so the
+// model's correct edit was rejected by the edge function and came back as a
+// new recipe (duplicates on save). scripts/chatbot-model-eval.ts reproduced it.
 interface ChatbotState {
   messages: ChatMessage[];
   previous_response_id: string | null;
   isTyping: boolean;
   recipeId: string | null;
+  /** Saved recipe ids the model may edit — the edge function rejects any other. */
+  knownRecipeIds: string[];
+  /** [Proposal Outcomes] lines waiting to be prepended to the next message. */
+  pendingFeedback: string[];
+  /** Proposals shown so far; the edge function numbers new ones p_<n+1>. */
+  proposalCounter: number;
 }
 
 const initialState: ChatbotState = {
@@ -55,6 +67,9 @@ const initialState: ChatbotState = {
   previous_response_id: null,
   isTyping: false,
   recipeId: null,
+  knownRecipeIds: [],
+  pendingFeedback: [],
+  proposalCounter: 0,
 };
 
 export const chatbotSlice = createSlice({
@@ -77,12 +92,21 @@ export const chatbotSlice = createSlice({
     setRecipeId: (state, action: PayloadAction<string | null>) => {
       state.recipeId = action.payload;
     },
-    resetChat: (state) => {
-      state.messages = [];
-      state.previous_response_id = null;
-      state.isTyping = false;
-      state.recipeId = null;
+    addKnownRecipeId: (state, action: PayloadAction<string>) => {
+      if (!state.knownRecipeIds.includes(action.payload)) {
+        state.knownRecipeIds.push(action.payload);
+      }
     },
+    addPendingFeedback: (state, action: PayloadAction<string>) => {
+      state.pendingFeedback.push(action.payload);
+    },
+    clearPendingFeedback: (state) => {
+      state.pendingFeedback = [];
+    },
+    addToProposalCounter: (state, action: PayloadAction<number>) => {
+      state.proposalCounter += action.payload;
+    },
+    resetChat: () => initialState,
     appendToLastMessage: (state, action: PayloadAction<string>) => {
       const last = state.messages[state.messages.length - 1];
       if (last) {
@@ -104,6 +128,10 @@ export const {
   setPreviousResponseId,
   setIsTyping,
   setRecipeId,
+  addKnownRecipeId,
+  addPendingFeedback,
+  clearPendingFeedback,
+  addToProposalCounter,
   resetChat,
   appendToLastMessage,
   finalizeLastMessage,
@@ -117,3 +145,6 @@ export const selectVisibleMessages = (state: RootState) =>
   state.chatbot.messages.filter((message: ChatMessage) => message.role !== "tool");
 export const selectPreviousResponseId = (state: RootState) => state.chatbot.previous_response_id;
 export const selectRecipeId = (state: RootState) => state.chatbot.recipeId;
+export const selectKnownRecipeIds = (state: RootState) => state.chatbot.knownRecipeIds;
+export const selectPendingFeedback = (state: RootState) => state.chatbot.pendingFeedback;
+export const selectProposalCounter = (state: RootState) => state.chatbot.proposalCounter;
