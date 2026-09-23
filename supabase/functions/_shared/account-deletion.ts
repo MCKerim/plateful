@@ -176,11 +176,21 @@ export async function erasePostHogIdentity(
   const body = await safeJSON(response, "posthog_invalid_response");
   const personsFound = nonnegativeInteger(body.persons_found);
   const personsDeleted = nonnegativeInteger(body.persons_deleted);
+  // Since 2026-09 PostHog queues the persons it finds for asynchronous
+  // deletion instead of deleting them within the request (response gained
+  // `persons_queued_for_deletion`, `persons_deleted` stays 0). Every found
+  // person must be either deleted or queued; the field is absent on older
+  // responses, which counts as nothing queued.
+  const personsQueued =
+    body.persons_queued_for_deletion === undefined
+      ? 0
+      : nonnegativeInteger(body.persons_queued_for_deletion);
   const deletionErrors = body.deletion_errors ?? [];
   if (
     personsFound === null ||
     personsDeleted === null ||
-    personsDeleted !== personsFound ||
+    personsQueued === null ||
+    personsDeleted + personsQueued !== personsFound ||
     !Array.isArray(deletionErrors) ||
     deletionErrors.length > 0
   ) {

@@ -197,6 +197,50 @@ describe("account deletion providers", () => {
     ).rejects.toMatchObject({ code: "posthog_invalid_response" });
   });
 
+  it("accepts persons PostHog queued for asynchronous deletion", async () => {
+    // PostHog's answer since 2026-09: found persons are queued, not deleted
+    // within the request. Both forms count as erased.
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            persons_found: 2,
+            persons_deleted: 0,
+            persons_queued_for_deletion: 2,
+            events_queued_for_deletion: true,
+            recordings_queued_for_deletion: true,
+            deletion_errors: [],
+          }),
+          { status: 202 }
+        )
+    );
+
+    await expect(
+      erasePostHogIdentity(config().postHog, userID, 10_000, fetchMock as typeof fetch)
+    ).resolves.toBeUndefined();
+  });
+
+  it("rejects a PostHog answer that neither deleted nor queued a found person", async () => {
+    const fetchMock = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            persons_found: 2,
+            persons_deleted: 1,
+            persons_queued_for_deletion: 0,
+            events_queued_for_deletion: true,
+            recordings_queued_for_deletion: true,
+            deletion_errors: [],
+          }),
+          { status: 202 }
+        )
+    );
+
+    await expect(
+      erasePostHogIdentity(config().postHog, userID, 10_000, fetchMock as typeof fetch)
+    ).rejects.toMatchObject({ code: "posthog_invalid_response" });
+  });
+
   it("rejects an incomplete PostHog bulk deletion response", async () => {
     const fetchMock = vi.fn(
       async () =>
