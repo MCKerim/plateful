@@ -57,8 +57,11 @@ export class AccountDeletionFailure extends Error {
 
 /** Claims and advances one durable deletion job. Every provider operation is
  * idempotent; a crash after the HTTP response but before the RPC commit is safe
- * to retry. The Auth user is deleted only after both provider erasures were
- * accepted. */
+ * to retry. The Auth user goes FIRST (since 2026-09-24): the person is signed
+ * out and the address is free the moment the request returns, while the
+ * PostHog and RevenueCat erasures follow and retry in the background. The job
+ * keeps `subject_user_id` for them; `record_account_deletion_step` completes
+ * the job after whichever step comes last. */
 export async function processAccountDeletionJob(
   admin: AccountDeletionAdminClient,
   configuration: AccountDeletionConfiguration,
@@ -75,6 +78,20 @@ export async function processAccountDeletionJob(
   if (!claim) return requestID ? await serviceStatus(admin, requestID) : null;
 
   try {
+    if (claim.auth_status !== "succeeded") {
+      const { error } = await admin.auth.admin.deleteUser(claim.subject_user_id, false);
+      if (error && error.status !== 404) {
+        const status = error.status ?? null;
+        throw new AccountDeletionFailure(
+          isRetryableStatus(status) ? "auth_temporarily_unavailable" : "auth_delete_rejected",
+          retryDelay(claim.attempt_count),
+          status
+        );
+      }
+      await recordStep(admin, claim, "auth", error?.status ?? 200);
+      claim.auth_status = "succeeded";
+    }
+
     if (claim.posthog_status !== "succeeded") {
       await erasePostHogIdentity(
         configuration.postHog,
@@ -95,19 +112,6 @@ export async function processAccountDeletionJob(
       );
       await recordStep(admin, claim, "revenuecat", status);
       claim.revenuecat_status = "succeeded";
-    }
-
-    if (claim.auth_status !== "succeeded") {
-      const { error } = await admin.auth.admin.deleteUser(claim.subject_user_id, false);
-      if (error && error.status !== 404) {
-        const status = error.status ?? null;
-        throw new AccountDeletionFailure(
-          isRetryableStatus(status) ? "auth_temporarily_unavailable" : "auth_delete_rejected",
-          retryDelay(claim.attempt_count),
-          status
-        );
-      }
-      await recordStep(admin, claim, "auth", error?.status ?? 200);
     }
   } catch (error) {
     const failure = normalizeFailure(error, claim.attempt_count);

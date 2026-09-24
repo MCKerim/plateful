@@ -41,7 +41,7 @@ function config(): AccountDeletionConfiguration {
 }
 
 describe("account deletion worker", () => {
-  it("erases providers before Auth and records every durable step", async () => {
+  it("deletes Auth first, then erases the providers, recording every durable step", async () => {
     const events: string[] = [];
     const rpc = vi.fn(async (name: string) => {
       if (name === "claim_account_deletion_job") return { data: [claim()], error: null };
@@ -110,6 +110,8 @@ describe("account deletion worker", () => {
 
     expect(status?.status).toBe("completed");
     expect(events).toEqual([
+      "auth",
+      "record",
       "posthog",
       "record",
       "revenuecat-get-lower",
@@ -117,15 +119,18 @@ describe("account deletion worker", () => {
       "revenuecat-aliases",
       "revenuecat-delete",
       "record",
-      "auth",
-      "record",
     ]);
   });
 
-  it("keeps the job retryable and does not delete Auth when provider config is missing", async () => {
+  it("deletes Auth first and keeps the provider steps retryable when provider config is missing", async () => {
     const retry = vi.fn();
+    const steps: string[] = [];
     const rpc = vi.fn(async (name: string, parameters?: Record<string, unknown>) => {
       if (name === "claim_account_deletion_job") return { data: [claim()], error: null };
+      if (name === "record_account_deletion_step") {
+        steps.push(String(parameters?.p_step));
+        return { data: true, error: null };
+      }
       if (name === "retry_account_deletion_job") {
         retry(parameters);
         return { data: true, error: null };
@@ -135,7 +140,7 @@ describe("account deletion worker", () => {
       }
       throw new Error(name);
     });
-    const deleteUser = vi.fn();
+    const deleteUser = vi.fn(async () => ({ data: null, error: null }));
     const admin = { rpc, auth: { admin: { deleteUser } } } as AccountDeletionAdminClient;
 
     const status = await processAccountDeletionJob(
@@ -144,8 +149,11 @@ describe("account deletion worker", () => {
       requestID
     );
 
+    // The person is gone from Auth right away; PostHog and RevenueCat wait
+    // for the next drain instead of holding the account hostage.
     expect(status?.status).toBe("pending");
-    expect(deleteUser).not.toHaveBeenCalled();
+    expect(deleteUser).toHaveBeenCalledOnce();
+    expect(steps).toEqual(["auth"]);
     expect(retry.mock.calls[0][0]).toMatchObject({
       p_error_code: "posthog_configuration_missing",
       p_retry_after_seconds: 3600,
