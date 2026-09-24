@@ -1,22 +1,28 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "@/types/database.types";
 import {
   AccountDeletionRequestError,
-  clearStoredDeletionRequest,
-  isAccountDeletionRequestNotFound,
-  isAccountDeletionUnauthorized,
   parseAccountDeletionContext,
-  parseAccountDeletionStatus,
-  storeDeletionRequest,
-  storedDeletionRequest,
+  requestAccountDeletion,
 } from "./accountDeletion";
 
-describe("account deletion contract", () => {
-  beforeEach(clearStoredDeletionRequest);
+function fakeSupabase(invokeResult: { data: unknown; error: unknown }, session = true) {
+  const invoke = vi.fn().mockResolvedValue(invokeResult);
+  const supabase = {
+    auth: {
+      getSession: vi
+        .fn()
+        .mockResolvedValue({ data: { session: session ? { access_token: "token" } : null } }),
+    },
+    functions: { invoke },
+  } as unknown as SupabaseClient<Database>;
+  return { supabase, invoke };
+}
 
+describe("account deletion contract", () => {
   it("parses owner transfer and subscription preflight", () => {
     const context = parseAccountDeletionContext({
-      request_id: null,
-      status: null,
       household_name: "Home",
       is_owner: true,
       requires_successor: true,
@@ -31,52 +37,52 @@ describe("account deletion contract", () => {
     expect(context.isSubscriptionPayer).toBe(true);
   });
 
-  it("parses processing and completed worker receipts", () => {
-    const processing = parseAccountDeletionContext({
-      request_id: "f0040000-0000-4000-8000-000000000050",
-      status: "processing",
-      retry_after_seconds: 12,
+  it("rejects a preflight without the successor list", () => {
+    // The shape the RPC answered with for a job still in flight under the old
+    // auth-last flow. This client never resumes a deletion, so it is invalid.
+    expect(() =>
+      parseAccountDeletionContext({
+        request_id: "f0040000-0000-4000-8000-000000000050",
+        status: "processing",
+        retry_after_seconds: 12,
+      })
+    ).toThrow("invalid_account_deletion_response");
+  });
+
+  it("treats any 2xx as the account being gone, whatever the body says", async () => {
+    const { supabase, invoke } = fakeSupabase({
+      data: { request_id: "r", status: "processing", retry_after_seconds: 30 },
+      error: null,
     });
-    const completed = parseAccountDeletionStatus({
-      request_id: "f0040000-0000-4000-8000-000000000050",
-      status: "completed",
-      retry_after_seconds: 1,
-    });
 
-    expect(processing.retryAfterSeconds).toBe(12);
-    expect(completed.status).toBe("completed");
-  });
-
-  it("scopes the recovery receipt to the account that requested deletion", () => {
-    storeDeletionRequest(
-      "f0040000-0000-4000-8000-000000000001",
-      "f0040000-0000-4000-8000-000000000050"
-    );
-
-    expect(storedDeletionRequest("f0040000-0000-4000-8000-000000000001")?.requestId).toBe(
-      "f0040000-0000-4000-8000-000000000050"
-    );
-    expect(storedDeletionRequest("f0040000-0000-4000-8000-000000000099")).toBeNull();
-  });
-
-  it("only treats an Auth 401 as deletion completion", () => {
-    expect(
-      isAccountDeletionUnauthorized(new AccountDeletionRequestError("unauthorized", 401))
-    ).toBe(true);
-    expect(isAccountDeletionUnauthorized(new AccountDeletionRequestError("forbidden", 403))).toBe(
-      false
-    );
-    expect(isAccountDeletionUnauthorized(new AccountDeletionRequestError("missing", 404))).toBe(
-      false
+    await expect(requestAccountDeletion(supabase, "request-1", null)).resolves.toBeUndefined();
+    expect(invoke).toHaveBeenCalledWith(
+      "delete-account",
+      expect.objectContaining({
+        body: { operation: "request", request_id: "request-1", successor_user_id: null },
+      })
     );
   });
 
-  it("distinguishes an orphaned local receipt from completed Auth deletion", () => {
-    expect(
-      isAccountDeletionRequestNotFound(new AccountDeletionRequestError("missing", 404))
-    ).toBe(true);
-    expect(
-      isAccountDeletionRequestNotFound(new AccountDeletionRequestError("unauthorized", 401))
-    ).toBe(false);
+  it("surfaces the HTTP status when the server refused", async () => {
+    const { supabase } = fakeSupabase({ data: null, error: { context: { status: 409 } } });
+
+    const failure = await requestAccountDeletion(supabase, "request-1", null).catch(
+      (error: unknown) => error
+    );
+
+    expect(failure).toBeInstanceOf(AccountDeletionRequestError);
+    expect((failure as AccountDeletionRequestError).status).toBe(409);
+  });
+
+  it("does not call the server without a session", async () => {
+    const { supabase, invoke } = fakeSupabase({ data: null, error: null }, false);
+
+    const failure = await requestAccountDeletion(supabase, "request-1", null).catch(
+      (error: unknown) => error
+    );
+
+    expect((failure as AccountDeletionRequestError).status).toBe(401);
+    expect(invoke).not.toHaveBeenCalled();
   });
 });
