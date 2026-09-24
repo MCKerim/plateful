@@ -573,10 +573,6 @@
         "confirmationPlaceholder": "löschen",
         "confirm": "Konto löschen",
         "cancel": "Abbrechen",
-        "processingTitle": "Dein Konto wird gelöscht",
-        "processingDescription": "Deine persönlichen Daten werden aus Plateful und den verbundenen Diensten entfernt. Das kann einen Moment dauern.",
-        "processingCanClose": "Du kannst die App schließen. Die Löschung läuft sicher weiter und wird hier bei Bedarf fortgesetzt.",
-        "processingRetry": "Die Löschung ist weiterhin sicher vorgemerkt, aber der letzte Statusabruf konnte keine Verbindung herstellen.",
         "completed": "Dein Plateful-Konto wurde gelöscht."
       }
     },

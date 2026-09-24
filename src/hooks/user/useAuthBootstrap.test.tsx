@@ -9,21 +9,12 @@ type AuthCallback = (
 
 const mocks = vi.hoisted(() => ({
   fetchUserData: vi.fn(),
-  onAuthStateChange: vi.fn(),
   unsubscribe: vi.fn(),
   closeBrowser: vi.fn(),
-  rpc: vi.fn(),
-  getSession: vi.fn(),
-  signOut: vi.fn(),
-  invoke: vi.fn(),
   authCallback: undefined as AuthCallback | undefined,
   supabase: {
-    rpc: vi.fn(),
-    functions: { invoke: vi.fn() },
     auth: {
       onAuthStateChange: vi.fn(),
-      getSession: vi.fn(),
-      signOut: vi.fn(),
     },
   },
 }));
@@ -38,10 +29,6 @@ vi.mock("./useUserData", () => ({
 
 vi.mock("@/utils/nativeBrowser", () => ({
   closeBrowser: mocks.closeBrowser,
-}));
-
-vi.mock("@/lib/notifications", () => ({
-  cancelAllAccountNotifications: vi.fn().mockResolvedValue(undefined),
 }));
 
 const userA = {
@@ -62,24 +49,6 @@ describe("useAuthBootstrap", () => {
     mocks.fetchUserData.mockReset();
     mocks.unsubscribe.mockReset();
     mocks.closeBrowser.mockReset().mockResolvedValue(undefined);
-    localStorage.clear();
-    mocks.supabase.rpc.mockReset().mockResolvedValue({
-      data: {
-        request_id: null,
-        status: null,
-        household_name: "Test household",
-        is_owner: false,
-        requires_successor: false,
-        eligible_successors: [],
-        deletes_household: false,
-        is_subscription_payer: false,
-        subscription_expires_at: null,
-      },
-      error: null,
-    });
-    mocks.supabase.auth.getSession.mockReset().mockResolvedValue({ data: { session: null } });
-    mocks.supabase.auth.signOut.mockReset().mockResolvedValue({ error: null });
-    mocks.supabase.functions.invoke.mockReset();
     mocks.authCallback = undefined;
     mocks.supabase.auth.onAuthStateChange
       .mockReset()
@@ -182,79 +151,45 @@ describe("useAuthBootstrap", () => {
     expect(result.current.state).toEqual({ status: "error", stage: "household" });
   });
 
-  it("gates the app in a resumable deletion state before loading a sanitized profile", async () => {
-    mocks.supabase.rpc.mockResolvedValue({
-      data: {
-        request_id: "f0040000-0000-4000-8000-000000000050",
-        status: "pending",
-        retry_after_seconds: 60,
-      },
-      error: null,
+  it("resets the analytics identity when a known user signs out", async () => {
+    // Account deletion ends in a local `signOut`, so this is the path that
+    // clears the deleted person from PostHog, RevenueCat and Redux.
+    mocks.fetchUserData
+      .mockResolvedValueOnce({ status: "ready" })
+      .mockResolvedValueOnce({ status: "signed_out" });
+    const { result } = renderHook(() => useAuthBootstrap());
+
+    await act(async () => {
+      mocks.authCallback?.("INITIAL_SESSION", { user: userA });
+      vi.runOnlyPendingTimers();
+      await Promise.resolve();
     });
+    expect(result.current.state).toEqual({ status: "ready" });
+
+    await act(async () => {
+      mocks.authCallback?.("SIGNED_OUT", null);
+      vi.runOnlyPendingTimers();
+      await Promise.resolve();
+    });
+    expect(result.current.state).toEqual({ status: "ready" });
+    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(null, expect.any(Function), {
+      resetAnalyticsIdentity: true,
+    });
+  });
+
+  it("does not reset the analytics identity for a visitor who was never signed in", async () => {
     mocks.fetchUserData.mockResolvedValue({ status: "signed_out" });
     const { result } = renderHook(() => useAuthBootstrap());
 
     await act(async () => {
-      mocks.authCallback?.("INITIAL_SESSION", { user: userA });
+      mocks.authCallback?.("INITIAL_SESSION", null);
       vi.runOnlyPendingTimers();
       await Promise.resolve();
-      await Promise.resolve();
-    });
-
-    expect(result.current.state).toEqual({
-      status: "deleting",
-      requestId: "f0040000-0000-4000-8000-000000000050",
-      retryAfterSeconds: 60,
-      retrying: false,
-    });
-    expect(mocks.fetchUserData).toHaveBeenCalledWith(null, expect.any(Function), {
-      resetAnalyticsIdentity: true,
-    });
-    expect(JSON.parse(localStorage.getItem("plateful.accountDeletionRequest") ?? "null")).toEqual({
-      userId: userA.id,
-      requestId: "f0040000-0000-4000-8000-000000000050",
-    });
-  });
-
-  it("discards an orphaned local receipt when the server has no deletion job", async () => {
-    localStorage.setItem(
-      "plateful.accountDeletionRequest",
-      JSON.stringify({
-        userId: userA.id,
-        requestId: "f0040000-0000-4000-8000-000000000050",
-      })
-    );
-    mocks.supabase.rpc.mockRejectedValueOnce(new Error("offline"));
-    mocks.supabase.auth.getSession.mockResolvedValue({
-      data: { session: { access_token: "test-token" } },
-    });
-    mocks.supabase.functions.invoke.mockResolvedValue({
-      data: null,
-      error: { context: { status: 404 } },
-    });
-    mocks.fetchUserData
-      .mockResolvedValueOnce({ status: "signed_out" })
-      .mockResolvedValueOnce({ status: "ready" });
-    const { result } = renderHook(() => useAuthBootstrap());
-
-    await act(async () => {
-      mocks.authCallback?.("INITIAL_SESSION", { user: userA });
-      vi.runOnlyPendingTimers();
-      await Promise.resolve();
-      await Promise.resolve();
-    });
-    expect(result.current.state.status).toBe("deleting");
-
-    await act(async () => {
-      await vi.advanceTimersByTimeAsync(1_000);
     });
 
     expect(result.current.state).toEqual({ status: "ready" });
-    expect(localStorage.getItem("plateful.accountDeletionRequest")).toBeNull();
-    // The deletion flow already recorded userA as loaded, and the orphaned
-    // receipt leaves them signed in as the same person — no identity change, so
-    // the analytics identity must survive the recovery.
-    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(userA, expect.any(Function), {
+    expect(mocks.fetchUserData).toHaveBeenCalledTimes(1);
+    expect(mocks.fetchUserData).toHaveBeenLastCalledWith(null, expect.any(Function), {
       resetAnalyticsIdentity: false,
     });
   });
