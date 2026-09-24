@@ -39,6 +39,21 @@ function supabaseUserId(...ids: unknown[]): string | undefined {
     .find((id): id is string => typeof id === "string" && UUID_RE.test(id));
 }
 
+/** RevenueCat sends sandbox and production events to the same webhook, and
+ * the two live side by side on one customer: a device test with a fresh app
+ * account moves the *sandbox* subscription of the phone's sandbox Apple ID
+ * between customers (TRANSFER), while the losing customer's real purchase is
+ * untouched. On 2026-09-24 exactly that TRANSFER overwrote a paying user's row
+ * as inactive/SANDBOX and paywalled his household. A sandbox event may still
+ * create and update rows of test accounts, but it never touches a row that a
+ * production event has written. */
+function isSandboxAgainstProduction(
+  event: Record<string, unknown>,
+  existing: { environment?: string | null } | null
+): boolean {
+  return event.environment === "SANDBOX" && existing?.environment === "PRODUCTION";
+}
+
 /** Points the user's own entitlement at `isActive`, carrying the event's
  * expiry/store/environment for support visibility. No-op when the user is
  * unknown or the event is older than the last applied one (a retried/stale
@@ -63,7 +78,7 @@ async function setUserSubscription(
 
   const { data: existing } = await supabase
     .from("user_subscriptions")
-    .select("last_event_at")
+    .select("last_event_at, environment")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -71,6 +86,11 @@ async function setUserSubscription(
     console.log(
       `skipping stale event (${eventAt.toISOString()} < ${existing.last_event_at})`
     );
+    return {};
+  }
+
+  if (isSandboxAgainstProduction(event, existing)) {
+    console.log(`skipping SANDBOX event for PRODUCTION row user=${userId}`);
     return {};
   }
 
@@ -125,7 +145,7 @@ async function setAutoRenewOff(
 
   const { data: existing } = await supabase
     .from("user_subscriptions")
-    .select("last_event_at")
+    .select("last_event_at, environment")
     .eq("user_id", userId)
     .maybeSingle();
 
@@ -133,6 +153,11 @@ async function setAutoRenewOff(
     console.log(
       `skipping stale cancellation (${eventAt.toISOString()} < ${existing.last_event_at})`
     );
+    return {};
+  }
+
+  if (isSandboxAgainstProduction(event, existing)) {
+    console.log(`skipping SANDBOX cancellation for PRODUCTION row user=${userId}`);
     return {};
   }
 
