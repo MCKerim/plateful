@@ -396,19 +396,19 @@ function App() {
         {/* Onboarding */}
         <Route path="/" element={isLoggedIn() ? <PostSignInLanding /> : <Welcome />} />
 
-        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/home" /> : <SignUp />} />
+        <Route path="/signup" element={isLoggedIn() ? <Navigate to="/" replace /> : <SignUp />} />
 
         <Route
           path="/signup/email"
-          element={isLoggedIn() ? <Navigate to="/home" /> : <EmailSignUp />}
+          element={isLoggedIn() ? <Navigate to="/" replace /> : <EmailSignUp />}
         />
 
         <Route
           path="/signup/verify"
-          element={isLoggedIn() ? <Navigate to="/home" /> : <EmailVerification />}
+          element={isLoggedIn() ? <Navigate to="/" replace /> : <EmailVerification />}
         />
 
-        <Route path="/login" element={isLoggedIn() ? <Navigate to="/home" /> : <Login />} />
+        <Route path="/login" element={isLoggedIn() ? <Navigate to="/" replace /> : <Login />} />
 
         <Route path="/values" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/1" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
