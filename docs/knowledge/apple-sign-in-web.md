@@ -1,0 +1,18 @@
+# Sign in with Apple on the web
+
+**Why (2026-09-30):** The MCP connector (Claude, ChatGPT) authenticates through `app.plateful.cloud/oauth/consent`. Signed out, that route renders `SignUp` in its `connect` variant, which offered only Google and magic link. Anyone who created their account on iPhone with their Apple ID (9 of 57 accounts, 7 of them new in the last 30 days) had no way in, and magic link is no fallback: Apple's "Hide my email" relay addresses only receive mail from sender domains registered with Apple's relay service. Todoist `6hWvxgMHvqG6623C`.
+
+**Mechanism:** Same ID-token flow as Google, in `src/page/onboarding/signUp/SignUp.tsx` (`signInWith("apple")`). `@capgo/capacitor-social-login` loads Apple's JS SDK, opens the popup and returns `id_token`; the screen calls `supabase.auth.signInWithIdToken({ provider: "apple" })`. The provider receives the SHA-256 of the nonce, Supabase the raw value (GoTrue accepts the raw nonce or its hash in the token). No Supabase Secret Key and no redirect: the page never leaves `/oauth/consent`, so the pending authorization survives without `pendingOAuthConsent`. Apple's user id (`sub`) is stable per developer team, so Supabase finds the existing `apple` identity from iOS and the person lands in their own account.
+
+**Configuration (all three must match):**
+- Apple Developer: Services ID `com.kblanks.plateful.web`, Sign in with Apple enabled, primary App ID `com.kblanks.plateful`, domain `app.plateful.cloud`, Return URL `https://app.plateful.cloud/signup`. Apple validates `redirectUrl` against the registered Return URLs even in popup mode, so the screen always passes `/signup` (the consent URL with its `authorization_id` could never be registered). No localhost: on a dev server the popup ends in `invalid_request`; the logic is covered by `SignUp.test.tsx`.
+- Supabase → Authentication → Providers → Apple → Client IDs: `com.kblanks.plateful,com.kblanks.plateful.web`. The bundle ID must stay, or the iOS app's sign-in breaks. Secret Key stays empty. A missing Services ID surfaces as `Unacceptable audience in id_token` (toast plus PostHog `Unexpected error during sign up`).
+- `VITE_APPLE_SERVICES_ID=com.kblanks.plateful.web` in Vercel (Production and Preview) and the local `.env`. Unset, the button is not rendered rather than broken; CI sets it so the e2e visibility check runs.
+
+**Gotchas:**
+- Web only. Android hides the button (`Capacitor.isNativePlatform()`): it would need the plugin's Broadcast Channel flow plus a device test, and Google Play does not require Apple sign-in. The native iOS app has its own (`AuthStore.swift` in the iOS repo).
+- Apple sends the name only on the *first* authorization for this team. The screen stores it to `user_metadata.full_name` best-effort (mirrors iOS `storeFullName`); read today only by Settings (Canny). iOS users who already authorized get no name on the web, so nothing is overwritten.
+- Closing the popup or cancelling inside it rejects with `{ error: "popup_closed_by_user" | "user_cancelled_authorize" }`; both are silent, like `.canceled` on iOS.
+- `SocialLogin.logout` for Apple is a no-op on the web, so sign-out still only calls the Google logout.
+
+**Verification:** `SignUp.test.tsx` (providers offered per platform, nonce relation, cancel, name storage, error path, Google regression); e2e `signup.spec.ts` checks the three buttons. Production check after the console steps: sign in with an Apple ID that already has an iOS account → same `auth.users` row, `auth.identities` count for `apple` unchanged; reconnect the Plateful connector in Claude → Apple button on `/oauth/consent` → consent screen appears directly; PostHog `signed_in` with `method = apple`, `platform = web`.

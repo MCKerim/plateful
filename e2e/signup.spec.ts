@@ -17,11 +17,14 @@ test.describe("Sign Up Page", () => {
     await expect(title).toBeVisible();
     await expect(title).toContainText("Plateful");
 
-    // Check for the two signup buttons
+    // Check for the three signup buttons. Apple is web-only and renders only
+    // with VITE_APPLE_SERVICES_ID set (CI sets it; see ci.yml).
     const googleButton = page.getByRole("button", { name: /google/i });
+    const appleButton = page.getByRole("button", { name: /apple/i });
     const emailButton = page.getByRole("button", { name: /e-?mail/i });
 
     await expect(googleButton).toBeVisible();
+    await expect(appleButton).toBeVisible();
     await expect(emailButton).toBeVisible();
   });
 

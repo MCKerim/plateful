@@ -11,7 +11,7 @@ import EmailOutlinedIcon from "@mui/icons-material/EmailOutlined";
 import { toast } from "sonner";
 import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 import { clearPendingSignIn, markPendingSignIn } from "@/lib/pendingSignIn";
-import { SocialLogin } from "@capgo/capacitor-social-login";
+import { SocialLogin, type AppleProviderResponse } from "@capgo/capacitor-social-login";
 import { Capacitor } from "@capacitor/core";
 import { reportError } from "@/utils/reportError";
 
@@ -28,6 +28,25 @@ async function sha256(message: string): Promise<string> {
   return Array.from(new Uint8Array(buffer))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
+}
+
+/** The two providers this screen exchanges an ID token with Supabase for. */
+type SocialProvider = "google" | "apple";
+
+/**
+ * Apple's JS SDK rejects with `{ error }` when the person closes the popup or
+ * cancels inside it. Neither is a failure worth a toast or a PostHog error —
+ * the same silence as `.canceled` on iOS.
+ */
+const APPLE_CANCELLATIONS = new Set(["popup_closed_by_user", "user_cancelled_authorize"]);
+
+function isAppleCancellation(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "error" in error &&
+    APPLE_CANCELLATIONS.has(String((error as { error: unknown }).error))
+  );
 }
 
 /**
@@ -50,6 +69,14 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const [showTransition, setShowTransition] = useState(true);
   const { trackScreenViewed } = useOnboardingTracking();
   const reduceMotion = useReducedMotion();
+
+  // Sign in with Apple is web-only here. Android would need the plugin's
+  // Broadcast Channel flow (and Google Play does not require Apple sign-in),
+  // and the native iOS app has its own. The web needs it because the MCP
+  // consent screen runs here, and people who created their account on iPhone
+  // with their Apple ID have no other way in: docs/knowledge/apple-sign-in-web.md.
+  const appleServicesId: string | undefined = import.meta.env.VITE_APPLE_SERVICES_ID;
+  const appleAvailable = !Capacitor.isNativePlatform() && Boolean(appleServicesId);
 
   // Safari blocks the window.open inside SocialLogin.login once the click
   // handler has awaited real async work (crypto.subtle.digest), so the nonce
@@ -75,24 +102,56 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   }, [generateNonce]);
 
   useEffect(() => {
+    const native = Capacitor.isNativePlatform();
     SocialLogin.initialize({
       google: {
         webClientId: import.meta.env.VITE_GOOGLE_WEB_CLIENT_ID,
-        iOSClientId: Capacitor.isNativePlatform()
-          ? import.meta.env.VITE_GOOGLE_IOS_CLIENT_ID
-          : undefined,
-        redirectUrl: Capacitor.isNativePlatform()
-          ? undefined
-          : `${globalThis.location?.origin}/signup`,
+        iOSClientId: native ? import.meta.env.VITE_GOOGLE_IOS_CLIENT_ID : undefined,
+        redirectUrl: native ? undefined : `${globalThis.location?.origin}/signup`,
       },
+      // Apple validates `redirectUrl` against the Services ID's registered
+      // Return URLs even in popup mode. Left unset, the plugin sends the
+      // current page URL, and `/oauth/consent?authorization_id=…` can never
+      // be registered — so it is always `/signup`, like Google's.
+      ...(appleAvailable && {
+        apple: {
+          clientId: appleServicesId,
+          redirectUrl: `${globalThis.location?.origin}/signup`,
+        },
+      }),
+    }).catch((error) => {
+      // Loading Apple's script can fail (blocked CDN); the buttons then fail
+      // on click with the toast below, but the screen itself must render.
+      reportError("Social login initialization failed", error);
     });
-  }, []);
+  }, [appleAvailable, appleServicesId]);
 
   const handleTransitionComplete = () => {
     setShowTransition(false);
   };
 
-  const signUp = async () => {
+  /**
+   * Apple sends the user's name only on the *first* authorization; persist it
+   * to user metadata or it is lost for good. Best-effort, like
+   * `AuthStore.storeFullName` on iOS: the session is already established, so a
+   * failure here only costs the display name.
+   */
+  const storeAppleName = async (profile: {
+    givenName: string | null;
+    familyName: string | null;
+  }) => {
+    const name = [profile.givenName, profile.familyName].filter(Boolean).join(" ");
+    if (!name) return;
+    const { error } = await supabase.auth.updateUser({ data: { full_name: name } });
+    if (error) reportError("Failed to store the name from Sign in with Apple", error);
+  };
+
+  /**
+   * One flow for both providers: the provider receives the SHA-256 of the
+   * nonce and Supabase the raw value (GoTrue accepts either the raw nonce or
+   * its hash in the token), then the ID token becomes a Supabase session.
+   */
+  const signInWith = async (provider: SocialProvider) => {
     try {
       let nonce = nonceRef.current;
       if (!nonce) {
@@ -103,27 +162,35 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
         nonce = { raw, digest: await sha256(raw) };
       }
 
-      const result = await SocialLogin.login({
-        provider: "google",
-        options: { nonce: nonce.digest },
-      });
+      const result = await SocialLogin.login(
+        provider === "google"
+          ? { provider: "google", options: { nonce: nonce.digest } }
+          : { provider: "apple", options: { nonce: nonce.digest, scopes: ["name", "email"] } },
+      );
 
       const idToken = "idToken" in result.result ? result.result.idToken : null;
-      if (!idToken) throw new Error("No idToken returned from Google Sign-In");
+      if (!idToken) throw new Error(`No idToken returned from ${provider} sign-in`);
 
       // Marked before the request: the `signed_in` event is captured after
       // `posthog.identify()` in the auth bootstrap (`pendingSignIn.ts`), and
       // the auth event can get there before this call returns.
-      markPendingSignIn("google");
+      markPendingSignIn(provider);
       const { error } = await supabase.auth.signInWithIdToken({
-        provider: "google",
+        provider,
         token: idToken,
         nonce: nonce.raw,
       });
 
       if (error) throw error;
+
+      // `login` is typed by the union of providers passed in, so `result.result`
+      // is not discriminated by `provider`; the check above makes the cast safe.
+      if (result.provider === "apple") {
+        await storeAppleName((result.result as AppleProviderResponse).profile);
+      }
     } catch (error) {
       clearPendingSignIn();
+      if (provider === "apple" && isAppleCancellation(error)) return;
       reportError("Unexpected error during sign up", error);
       toast.error("Authentication failed. Please try again.");
     } finally {
@@ -180,7 +247,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
 
           <OnboardingButton
             label={t("signup.continueWithGoogle")}
-            onClick={signUp}
+            onClick={() => signInWith("google")}
             icon={
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                 <path
@@ -190,6 +257,21 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
               </svg>
             }
           />
+
+          {appleAvailable && (
+            <OnboardingButton
+              label={t("signup.continueWithApple")}
+              onClick={() => signInWith("apple")}
+              icon={
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path
+                    d="M12.152 6.896c-.948 0-2.415-1.078-3.96-1.04-2.04.027-3.91 1.183-4.961 3.014-2.117 3.675-.546 9.103 1.519 12.09 1.013 1.454 2.208 3.09 3.792 3.039 1.52-.065 2.09-.987 3.935-.987 1.831 0 2.35.987 3.96.948 1.637-.026 2.676-1.48 3.676-2.948 1.156-1.688 1.636-3.325 1.662-3.415-.039-.013-3.182-1.221-3.22-4.857-.026-3.04 2.48-4.494 2.597-4.559-1.429-2.09-3.623-2.324-4.39-2.376-2-.156-3.675 1.09-4.61 1.09zM15.53 3.83c.843-1.012 1.4-2.427 1.245-3.83-1.207.052-2.662.805-3.532 1.818-.78.896-1.454 2.338-1.273 3.714 1.338.104 2.715-.688 3.559-1.701"
+                    fill="currentColor"
+                  />
+                </svg>
+              }
+            />
+          )}
 
           <OnboardingButton
             label={t("signup.continueWithEMail")}

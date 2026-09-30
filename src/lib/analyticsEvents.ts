@@ -15,7 +15,9 @@
  *   "Succeeded" means the submission (the `recipe_imports` insert) was
  *   accepted; extraction runs async and reports its own failures.
  * - `signed_in`: `method` is a `SignInMethod` (src/lib/pendingSignIn.ts);
- *   `apple` and `password` are iOS-only values kept for the shared contract.
+ *   `apple` comes from iOS and, since 2026-09-30, from the web (never Android:
+ *   the button is web-only); `password` is iOS plus the web's review accounts.
+ *   `platform` tells them apart.
  *   Captured after `posthog.identify()`, never at the call site — see
  *   pendingSignIn.ts for the mechanism and its limits. `magic_link` on both
  *   apps since 2026-09-11.
