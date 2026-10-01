@@ -30,6 +30,8 @@
  * - `claudereview@` — Anthropic's reviewers for the Claude Connectors
  *   Directory, who arrive the same way. Its own account because both reviews
  *   can run at once and each is invited to write and delete freely.
+ * - `musereview@` — Meta's reviewers for the Muse connector directory, who
+ *   test the MCP server end to end and arrive the same way.
  *
  * The App Store's `iosreview@plateful.test` is not listed here — App Review
  * uses the native app, which carries its own copy of this mechanism.
@@ -41,6 +43,7 @@ export const REVIEW_EMAILS = [
   "androidreview@plateful.test",
   "chatgptreview@plateful.test",
   "claudereview@plateful.test",
+  "musereview@plateful.test",
 ] as const;
 
 /** `true` when `email` is one of the review accounts — case- and

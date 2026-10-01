@@ -11,6 +11,7 @@ describe("isReviewEmail", () => {
   it("matches a pasted address with different case and stray whitespace", () => {
     expect(isReviewEmail("  AndroidReview@Plateful.Test ")).toBe(true);
     expect(isReviewEmail(" ChatGPTReview@Plateful.Test  ")).toBe(true);
+    expect(isReviewEmail("MuseReview@Plateful.Test\n")).toBe(true);
   });
 
   it("does not match anyone else", () => {
