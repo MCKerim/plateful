@@ -433,8 +433,16 @@ function normalizeIngredientName(name: string): string {
     "klein",
   ];
 
+  // Whole words only, with letter-aware boundaries: JS `\b` is ASCII-only, so
+  // "ß" and umlauts count as non-word characters — `\bgroß\b` matched exactly
+  // when a letter followed ("große tomaten" → "e tomaten") and never the bare
+  // word. The leading boundary is a captured character rather than the
+  // extractor's lookbehind, which Safari only supports from 16.4.
   for (const descriptor of descriptors) {
-    normalized = normalized.replace(new RegExp(`\\b${descriptor}\\b`, "gi"), "");
+    normalized = normalized.replace(
+      new RegExp(`(^|[^\\p{L}\\p{N}_])${descriptor}(?![\\p{L}\\p{N}_])`, "giu"),
+      "$1",
+    );
   }
 
   // Clean up extra spaces

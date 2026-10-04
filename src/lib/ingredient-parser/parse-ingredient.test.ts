@@ -27,3 +27,25 @@ describe("parseIngredient cross-platform fixtures", () => {
     }).toEqual(fixture.expected);
   });
 });
+
+// Same cases as the extractor's parse-ingredient.test.ts — real rows were
+// stored as "e tomaten", "er gemischter salat", "es ei".
+describe("parseIngredient normalized name", () => {
+  const normalized = (line: string) => parseIngredient(line).ingredientNameNormalized;
+
+  it("drops descriptors as whole words", () => {
+    expect(normalized("1 large onion")).toBe("onion");
+    expect(normalized("500 g tiefgekühlt Spinat")).toBe("spinat");
+    expect(normalized("1 groß Zwiebel")).toBe("zwiebel");
+    expect(normalized("2 fresh ripe tomatoes")).toBe("tomatoes");
+  });
+
+  it("never cuts a descriptor out of a longer word", () => {
+    expect(normalized("2 große Tomaten")).toBe("große tomaten");
+    expect(normalized("Großer gemischter Salat")).toBe("großer gemischter salat");
+    expect(normalized("1 großes Ei")).toBe("großes ei");
+    expect(normalized("1 Großpackung Chips")).toBe("großpackung chips");
+    expect(normalized("200 g Süßmittel")).toBe("süßmittel");
+    expect(normalized("2 kleine Zwiebeln")).toBe("kleine zwiebeln");
+  });
+});
