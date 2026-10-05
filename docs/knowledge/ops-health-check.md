@@ -1,0 +1,32 @@
+# Daily ops health check
+
+_A Claude cloud routine that reads Supabase and the extractor once a day and speaks up only when something is off. Set up 2026-10-05 after a failing job looped for a week, the project sat on Nano compute for 25 days and a Supabase warning went unseen for 17 hours._
+
+**Where it lives.** The cloud routine "Plateful Health-Check (täglich)", `trig_016p78o9moDVxxe6ww9ZRnff`, at https://claude.ai/code/routines/trig_016p78o9moDVxxe6ww9ZRnff. Cron `30 6 * * *` in UTC: 08:30 in summer, 07:30 in winter, with a few minutes of jitter. It runs in Anthropic's cloud whether or not any Mac is on. Model `claude-sonnet-5-5`, no repository attached, connectors Supabase and Todoist. Its whole definition, SQL included, is the routine's prompt — that prompt is the source of truth, this note only explains it. Nothing was added to the database for it. A run takes about half a minute.
+
+**The desktop version is gone.** The first version was a scheduled task in the Claude desktop app; it only ran while the app was open, so the check moved to the cloud the same day and the task was deleted. Its prompt file is still on disk at `~/.claude/scheduled-tasks/plateful-health-check/SKILL.md` and is not scheduled; it is older than the routine's prompt (no date on the Todoist task, a desktop notification), so do not copy from it.
+
+**It is a daily review, not an alarm.** A database that goes down at 10:00 is reported the next morning. Real-time alerting (Supabase's own emails to an inbox that is read, or Grafana on the metrics endpoint for RAM, swap and IO budget) is a separate, open step.
+
+**What it checks, read-only:**
+
+1. `get_project` — status must be `ACTIVE_HEALTHY`.
+2. One SQL statement with 22 checks, each returning `ok` or `red` with value and threshold: worker alive (last `enrich-sweep` ≤ 10 min), failed pg-boss jobs per queue (≤ 20 in 24 h), the same job failing repeatedly (≤ 5 — the signature of the enrichment loop), jobs stuck active or overdue, pg_cron failures and stale cron jobs, failed `pg_net` calls, database and job-table size, client connections (≤ 50 of 60), long-running queries, sessions idle in a transaction, replication-slot lag (≤ 256 MB; the slots are capped at 512 MB), temp files per day (≤ 20 GB; ≈ 3 GB a day from reads of `pg_stat_statements` is known and harmless, see [supabase-disk-io-budget.md](supabase-disk-io-budget.md)), cache hit rate, transaction-ID age, dead tuples, failed and stuck imports, account deletions open for more than a day, and `shared_buffers` ≥ 256 MB (smaller means the project is back on Nano).
+3. Postgres log errors of the last 24 h, grouped by message. Any `FATAL`/`PANIC` is a finding; any unknown `ERROR` from 21 occurrences.
+4. API responses ≥ 400 from the edge logs: 5xx over 20, 401 over 3,000, 429 over 50.
+5. Security advisor: any `ERROR`-level lint, or more than the six known `SECURITY DEFINER` functions callable by `anon`.
+6. `GET https://extractor.plateful.cloud/api/health` must say `healthy` (reachable from the cloud sandbox, verified in the first run).
+
+A step that cannot run (missing tool, expired connector login) counts as a finding, so a run that checked nothing is never green. What that cannot catch: a routine that does not fire at all, or a Todoist connector that is down at the moment of a finding. The routine's page lists every run with its one-line result.
+
+**Known noise, with its own thresholds (baseline 2026-10-05):** `duplicate key value violates unique constraint "job_common_i3"` ≈ 140 a day (pg-boss singleton, expected; recipe-extractor `docs/knowledge/pgboss-stately-retry-collision.md`). `permission denied` for `collections`, `recipe_collections` and `recipes_with_rating` ≈ 90 a day each: an iOS development build (`plateful/1`, one IP) queries with the `anon` role. ≈ 560 `401` a day on `rpc/get_current_profile` from one web client (`supabase-js-web`, Windows) that kept polling with a dead session until 2026-10-05 14:34 UTC. If either client is fixed, lower the thresholds in the prompt.
+
+**How it reports.** All green: one line in the run, nothing else. Any finding: one Todoist task in 🥗 Plateful → Backlog titled `Plateful Health-Check: …`, due the day of the run so that it shows up in the 🎯 Fokus filter. The date is a standing exception Kerim granted on 2026-10-05 to the rule that agents set no dates (recorded in PersonalOS `system/truth-systems/todoist.md`). While that task is open, later runs add a comment instead of a second task. The run never repairs anything. **Not exercised yet:** every run so far was green, so the Todoist path has never fired.
+
+**What the routine may touch.** The Supabase connector is Kerim's ordinary one, so the run holds the same rights as an interactive session, `execute_sql` with write access included. The routine lists only `get_project`, `execute_sql`, `query_logs` and `get_advisors` (and three Todoist tools) as `permitted_tools`, but the run's tool search still showed the other Supabase tools, so do not rely on that list as a lock. The prompt forbids changes and treats everything read from the database and the logs as data. A read-only connector (`https://mcp.supabase.com/mcp?read_only=true`, added on claude.ai and attached here instead) would enforce it.
+
+**Two fixed dates in the prompt** (`2026-10-05 14:22` in the SQL, `2026-10-05 14:30` in the log queries) hide the incident and the restart of that day from the first runs. They are inert from 2026-10-07 and can stay.
+
+**Changing it.** Edit the prompt on the routine's page, or through the `schedule` skill / `RemoteTrigger` (`update`), then run it once and read the run log (`list_runs`, `get_run_log`). Routines cannot be deleted through the API, only on claude.ai.
+
+Source: set up and test-run in a Claude session with Kerim, 2026-10-05 (local run green at 20:22 UTC, cloud run `cse_0146hXrj1vHTkPaHzFC8jZPW` green at 20:33 UTC); thresholds from that day's production values via the Supabase MCP.
