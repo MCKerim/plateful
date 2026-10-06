@@ -128,7 +128,7 @@ test.describe("Settings Page", () => {
     // Should see confirmation dialog
     await expect(page.getByRole("dialog")).toBeVisible({ timeout: 5000 });
     await expect(page.getByRole("heading", { name: /delete account/i })).toBeVisible();
-    await expect(page.getByText(/this action is permanent and cannot be undone/i)).toBeVisible();
+    await expect(page.getByText(/this is permanent/i)).toBeVisible();
 
     // Should have text input for confirmation
     await expect(page.getByPlaceholder(/delete/i)).toBeVisible();
@@ -247,8 +247,8 @@ test.describe("Settings Page", () => {
     // Should see Info section
     await expect(page.getByText("Info")).toBeVisible({ timeout: 10000 });
 
-    // Should see version number
-    await expect(page.getByText(/v0\.0\.\d+/)).toBeVisible();
+    // Should see version number (major.minor, like the native app)
+    await expect(page.getByText(/^v\d+\.\d+$/)).toBeVisible();
 
     // Should see Privacy Policy and Terms of Service buttons
     await expect(page.getByRole("button", { name: /privacy policy/i })).toBeVisible();
@@ -301,11 +301,12 @@ test.describe("Household Settings Page", () => {
     await page.goto("/householdSettings");
     await page.waitForLoadState("networkidle");
 
-    // Should see the current user's name and email in the members list
-    await expect(page.getByText(/HouseholdMember/)).toBeVisible({
-      timeout: 10000,
-    });
-    await expect(page.getByText(/member@example\.com/)).toBeVisible();
+    // The members list shows names and the owner badge. Email addresses of
+    // household members are not exposed to the client any more.
+    const member = page.getByRole("button", { name: /HouseholdMember/ });
+    await expect(member).toBeVisible({ timeout: 10000 });
+    await expect(member).toContainText("Owner");
+    await expect(page.getByText(/member@example\.com/)).toHaveCount(0);
   });
 
   test("should have invite member button", async ({ page, setupAuth }) => {
@@ -377,11 +378,13 @@ test.describe("Household Settings Page", () => {
     // Click leave household button
     await page.getByRole("button", { name: /leave household/i }).click();
 
-    // Should see confirmation dialog
-    await expect(page.getByText(/are you sure you want to leave/i)).toBeVisible({ timeout: 5000 });
+    // The scenario's user is the only member, so leaving deletes the household
+    const dialog = page.getByRole("dialog", { name: /leave household/i });
+    await expect(dialog).toBeVisible({ timeout: 5000 });
+    await expect(dialog.getByText(/you are the last member/i)).toBeVisible();
 
     // Should have cancel and confirm buttons
-    await expect(page.getByRole("button", { name: /cancel/i })).toBeVisible();
-    await expect(page.getByRole("button", { name: /leave/i })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: /cancel/i })).toBeVisible();
+    await expect(dialog.getByRole("button", { name: /leave & delete/i })).toBeVisible();
   });
 });

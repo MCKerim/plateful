@@ -41,7 +41,9 @@ test.describe("Recipe Edit Page", () => {
     await page.goto(`/recipe/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
-    await expect(page.getByRole("heading", { name: "Test Recipe" })).toBeVisible({
+    // `.first()`: the print view repeats the title in a second h1 that is
+    // only hidden once the stylesheet has loaded.
+    await expect(page.getByRole("heading", { name: "Test Recipe" }).first()).toBeVisible({
       timeout: 10000,
     });
 

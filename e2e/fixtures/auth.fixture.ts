@@ -1,5 +1,6 @@
 import { Page } from "@playwright/test";
 import { MockSession, MockUser } from "./types";
+import { E2E_SUPABASE_URL } from "./backend";
 
 export function createMockSession(user: MockUser): MockSession {
   return {
@@ -45,16 +46,17 @@ export async function setupAuthRoutes(page: Page, session: MockSession): Promise
       return;
     }
 
-    await route.continue();
-  });
+    if (url.includes("/logout")) {
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
 
-  // Abort realtime connections to prevent hanging
-  await page.route("**/realtime/**", async (route) => {
-    await route.abort();
+    // Anything else is not mocked: hand it to the backend guard.
+    await route.fallback();
   });
 }
 
 export function getSupabaseStorageKey(): string {
-  const supabaseUrl = process.env.VITE_SUPABASE_URL || "https://upupcsgufoejppoietiu.supabase.co";
-  return `sb-${supabaseUrl.split("//")[1].split(".")[0]}-auth-token`;
+  // supabase-js names its storage entry after the first label of the host.
+  return `sb-${new URL(E2E_SUPABASE_URL).hostname.split(".")[0]}-auth-token`;
 }

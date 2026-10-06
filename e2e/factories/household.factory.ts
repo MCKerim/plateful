@@ -6,6 +6,7 @@ export function createHousehold(overrides?: Partial<MockHousehold>): MockHouseho
   return {
     id,
     name: overrides?.name ?? "Test Household",
+    owner_id: overrides?.owner_id ?? null,
     created_at: overrides?.created_at ?? new Date().toISOString(),
   };
 }

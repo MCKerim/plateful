@@ -163,6 +163,8 @@ test.describe("Meal Planner Page", () => {
     await page.getByRole("button", { name: "Leftovers" }).click();
     await page.getByRole("button", { name: /^add$/i }).click();
 
-    await expect(page.getByText("Leftovers")).toBeVisible({ timeout: 10000 });
+    // The note lands on the day's card; the dialog still shows the same text
+    // while it closes, so look inside the plan.
+    await expect(page.getByRole("listitem").getByText("Leftovers")).toBeVisible({ timeout: 10000 });
   });
 });

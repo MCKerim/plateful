@@ -14,6 +14,8 @@ export type MockUser = {
 export type MockHousehold = {
   id: string;
   name: string;
+  // Null means the scenario's own user, which is what almost every test wants.
+  owner_id: string | null;
   created_at: string;
 };
 
@@ -98,6 +100,8 @@ export type AuthenticatedFixtureOptions = {
 
 // Custom fixtures interface
 export interface CustomFixtures {
+  /** The backend requests of this test that no mock answered. */
+  backendGuard: string[];
   authenticatedPage: Page;
   setupAuth: (options?: AuthenticatedFixtureOptions) => Promise<void>;
 }

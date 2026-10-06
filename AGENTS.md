@@ -223,6 +223,8 @@ npm run test:e2e -- --project=chromium              # Chromium only
 npm run test:e2e -- --project=chromium e2e/cookbook.spec.ts  # Single file
 ```
 
+The run starts its own dev server on port 5174 (`playwright.config.ts`), pointed at a backend host that cannot resolve. A dev server you have open on 5173 is left alone, and no test can reach the production project.
+
 ### Test Architecture
 
 E2E tests use Playwright with custom fixtures for authenticated testing:
@@ -231,6 +233,7 @@ E2E tests use Playwright with custom fixtures for authenticated testing:
 e2e/
 ├── fixtures/
 │   ├── index.ts              # Extended test with setupAuth fixture
+│   ├── backend.ts            # The fake backend host and the guard for unmocked requests
 │   ├── types.ts              # Mock data types (MockUser, MockRecipe, etc.)
 │   ├── auth.fixture.ts       # Session creation, auth route handlers
 │   └── api-mocks.fixture.ts  # REST API route interception
@@ -244,7 +247,7 @@ e2e/
 
 ### Writing Authenticated Tests
 
-Import from `./fixtures` instead of `@playwright/test`:
+Every spec imports `test` and `expect` from `./fixtures`, never from `@playwright/test`, signed in or not: the import is what installs the backend guard (see API Mocking).
 
 ```typescript
 import { test, expect } from "./fixtures";
@@ -268,11 +271,15 @@ test("should display recipes", async ({ page, setupAuth }) => {
 
 ### API Mocking
 
-The `setupAuth` fixture automatically mocks:
+**Every backend request a test causes must be answered by a mock.** A request to Supabase (`/rest/v1`, `/auth/v1`, `/functions/v1`, `/storage/v1`) or to the recipe-extractor that no mock claims gets a 501 from the `backendGuard` fixture, and the test fails afterwards with the list (`backend requests without an E2E mock: POST /rest/v1/rpc/…`). When the app starts calling a new table or RPC, add its mock to `e2e/fixtures/api-mocks.fixture.ts` in the same change. Why this is strict: `docs/knowledge/e2e-never-reaches-the-backend.md`.
 
-- `/auth/v1/**` - Supabase auth endpoints
-- `/rest/v1/users` - User data with household join
-- `/rest/v1/recipes` - Recipes list and single recipe fetch
-- `/rest/v1/meal_planning` - Meal plans
-- `/rest/v1/recipe_ratings` - Recipe ratings
-- `/rest/v1/recipe_ingredients` - Recipe ingredients
+The `setupAuth` fixture mocks, from the scenario you pass:
+
+- `/auth/v1/**` - session, token refresh, sign-out
+- `/rest/v1/rpc/get_current_profile` - the signed-in person's profile
+- `/rest/v1/users`, `/rest/v1/household`, `/rest/v1/household_entitlements` - members, household row, premium
+- `/rest/v1/recipes`, `recipe_ingredients`, `recipe_instructions`, `recipe_ratings`, `collections`, `recipe_collections` - the cookbook
+- `/rest/v1/meal_planning`, `planner_notes` and the planner RPCs - the plan
+- `/rest/v1/recipe_imports`, `mission_definitions`, `household_missions`, `household_rewards` - empty lists
+- `/rest/v1/rpc/get_account_deletion_context`, `create_household_invite`, `increment_household_mission`
+- `/storage/v1/**` - recipe images

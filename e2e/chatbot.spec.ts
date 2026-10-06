@@ -44,7 +44,9 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify recipe is loaded
-    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" })).toBeVisible({
+    // `.first()`: the print view repeats the title in a second h1 that is
+    // only hidden once the stylesheet has loaded.
+    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" }).first()).toBeVisible({
       timeout: 10000,
     });
 
@@ -56,6 +58,10 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     // Verify navigation to chatbot with recipeId param
     await page.waitForURL(new RegExp(`/chatbot\\?recipeId=${recipeId}`));
     expect(page.url()).toContain(`/chatbot?recipeId=${recipeId}`);
+
+    // The recipe page stays mounted for a moment after the URL changes. Wait
+    // until its title is gone, so the name left on screen is the chip's.
+    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" })).toHaveCount(0);
 
     // Verify recipe context chip is visible in the chat input area
     await expect(page.getByText("Spaghetti Carbonara")).toBeVisible({

@@ -18,7 +18,9 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should display recipe name
-    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" })).toBeVisible({
+    // `.first()`: the print view repeats the title in a second h1 that is
+    // only hidden once the stylesheet has loaded.
+    await expect(page.getByRole("heading", { name: "Spaghetti Carbonara" }).first()).toBeVisible({
       timeout: 10000,
     });
 
@@ -44,7 +46,7 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should display recipe name
-    await expect(page.getByRole("heading", { name: "New Recipe" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "New Recipe" }).first()).toBeVisible({
       timeout: 10000,
     });
 
@@ -65,7 +67,7 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should display recipe name
-    await expect(page.getByRole("heading", { name: "Editable Recipe" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Editable Recipe" }).first()).toBeVisible({
       timeout: 10000,
     });
 
@@ -93,7 +95,7 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should display recipe name
-    await expect(page.getByRole("heading", { name: "Plannable Recipe" })).toBeVisible({
+    await expect(page.getByRole("heading", { name: "Plannable Recipe" }).first()).toBeVisible({
       timeout: 10000,
     });
 
@@ -126,9 +128,11 @@ test.describe("Recipe Detail Page", () => {
     await page.waitForURL(new RegExp(`/recipe/${recipeId}`));
 
     // Verify we're on the recipe page
-    await expect(page.getByRole("heading", { name: "Navigation Test Recipe" })).toBeVisible({
-      timeout: 10000,
-    });
+    await expect(page.getByRole("heading", { name: "Navigation Test Recipe" }).first()).toBeVisible(
+      {
+        timeout: 10000,
+      }
+    );
 
     // Go back using browser back
     await page.goBack();

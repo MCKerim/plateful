@@ -34,12 +34,38 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     }
   });
 
-  // Households endpoint
-  await page.route("**/rest/v1/households?*", async (route) => {
+  // The signed-in person's own profile. Since the profile hardening of
+  // 2026-07-26 the app reads it through this RPC, not from `users`.
+  await page.route("**/rest/v1/rpc/get_current_profile", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(scenario.household ? [scenario.household] : []),
+      body: JSON.stringify({
+        id: scenario.user.id,
+        username: scenario.user.username,
+        household_id: scenario.user.household_id,
+        language: scenario.user.language,
+        has_completed_survey: scenario.user.has_completed_survey,
+        notification_preferences: null,
+        week_start: 1,
+      }),
+    });
+  });
+
+  // The household row, fetched with `.single()`
+  await page.route("**/rest/v1/household?*", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    await route.fulfill({
+      status: scenario.household ? 200 : 406,
+      contentType: "application/json",
+      body: JSON.stringify(
+        scenario.household
+          ? { ...scenario.household, owner_id: scenario.household.owner_id ?? scenario.user.id }
+          : { code: "PGRST116", message: "JSON object requested, multiple (or no) rows returned" }
+      ),
     });
   });
 
@@ -325,6 +351,68 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
           expires_at: null,
         },
       ]),
+    });
+  });
+
+  // Lists that are empty in every scenario so far: running imports, and the
+  // household's missions and rewards.
+  for (const table of [
+    "recipe_imports",
+    "mission_definitions",
+    "household_missions",
+    "household_rewards",
+  ]) {
+    await page.route(`**/rest/v1/${table}?*`, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify([]),
+      });
+    });
+  }
+
+  // Mission progress is bumped as a side effect of many actions; the app
+  // ignores the returned row.
+  await page.route("**/rest/v1/rpc/increment_household_mission", async (route) => {
+    const body = route.request().postDataJSON();
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        id: crypto.randomUUID(),
+        household_id: body.p_household_id,
+        mission_id: body.p_mission_id,
+        progress: 1,
+        completed_at: null,
+        created_at: new Date().toISOString(),
+      }),
+    });
+  });
+
+  // What the delete-account dialog needs to know before it asks: the sole
+  // member and owner of the scenario's household, without a subscription.
+  await page.route("**/rest/v1/rpc/get_account_deletion_context", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        household_name: scenario.household?.name ?? null,
+        is_owner: scenario.household !== null,
+        requires_successor: false,
+        eligible_successors: [],
+        deletes_household: scenario.household !== null,
+        is_subscription_payer: false,
+        subscription_expires_at: null,
+      }),
+    });
+  });
+
+  // The invite dialog's link is built from this token
+  await page.route("**/rest/v1/rpc/create_household_invite", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify("e2e-invite-token"),
     });
   });
 
