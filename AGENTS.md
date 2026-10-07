@@ -223,7 +223,7 @@ npm run test:e2e -- --project=chromium              # Chromium only
 npm run test:e2e -- --project=chromium e2e/cookbook.spec.ts  # Single file
 ```
 
-The run starts its own dev server on port 5174 (`playwright.config.ts`), pointed at a backend host that cannot resolve. A dev server you have open on 5173 is left alone, and no test can reach the production project.
+The run starts its own dev server on port 5174 (`playwright.config.ts`), pointed at a backend host that cannot resolve and with `VITE_E2E=true`, under which `src/main.tsx` mounts no React Query devtools (their toggle covered the bottom navigation at phone widths; `docs/knowledge/e2e-no-query-devtools.md`). A dev server you have open on 5173 is left alone, and no test can reach the production project.
 
 ### Test Architecture
 

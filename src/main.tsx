@@ -81,6 +81,12 @@ if ("serviceWorker" in navigator) {
 
 const isDevelopment = import.meta.env.MODE === "development";
 
+// The Playwright suite runs the dev server (`playwright.config.ts` sets
+// VITE_E2E). The React Query devtools' floating toggle sits bottom-right, on
+// top of the bottom navigation's Planner link at mobile viewports, and would
+// intercept the click; the tests see the app as a user does, without it.
+const showQueryDevtools = isDevelopment && !import.meta.env.VITE_E2E;
+
 /**
  * Which product this bundle is running as, sent on every event as a super
  * property. `web` and `android_app` both come from this one codebase, and until
@@ -151,9 +157,7 @@ createRoot(document.getElementById("root")!).render(
 
               <App />
 
-              {import.meta.env.MODE === "development" && (
-                <ReactQueryDevtools initialIsOpen={false} />
-              )}
+              {showQueryDevtools && <ReactQueryDevtools initialIsOpen={false} />}
 
               <Toaster />
             </AppProviders>

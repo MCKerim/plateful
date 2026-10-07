@@ -54,6 +54,10 @@ export default defineConfig({
       VITE_SUPABASE_ANON_KEY: E2E_SUPABASE_ANON_KEY,
       // Public Services ID; only decides whether the web renders the Apple button.
       VITE_APPLE_SERVICES_ID: "com.kblanks.plateful.web",
+      // Tells main.tsx not to mount the React Query devtools: their floating
+      // toggle sits bottom-right, on top of the bottom navigation's Planner
+      // link at mobile viewports, and intercepts the click.
+      VITE_E2E: "true",
     },
   },
 });
