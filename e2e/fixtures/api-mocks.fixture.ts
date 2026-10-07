@@ -125,6 +125,7 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
         category: recipe.category,
         created_at: recipe.created_at,
         status: "ready",
+        image_path: null,
         recipe_ratings: recipe.avg_rating ? [{ stars: recipe.avg_rating }] : [],
         recipe_collections: recipe.collectionIds.map((collectionId) => ({
           collection_id: collectionId,

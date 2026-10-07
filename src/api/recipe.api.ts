@@ -74,7 +74,7 @@ export const recipeApi = {
 
     if (error || !data?.image_path) return null;
 
-    return supabase.storage.from("recipeimages").getPublicUrl(data.image_path).data.publicUrl;
+    return recipeImageUrl(supabase, data.image_path);
   },
 
   // One cover image per recipe now, so this returns the cover (or nothing).
@@ -164,3 +164,12 @@ export const recipeApi = {
     if (error) throw error;
   },
 };
+
+/** The public URL of a recipe cover in the `recipeimages` bucket, null when the recipe has none. */
+export function recipeImageUrl(
+  supabase: SupabaseClient,
+  imagePath: string | null | undefined
+): string | null {
+  if (!imagePath) return null;
+  return supabase.storage.from("recipeimages").getPublicUrl(imagePath).data.publicUrl;
+}

@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
 import { cookbookApi } from "@/api/cookbook.api";
+import { recipeImageUrl } from "@/api/recipe.api";
 import { transformCookbookRecipes } from "@/lib/transformers/cookbook.transformer";
 import { useRef, useEffect } from "react";
 import { CookbookRecipe } from "@/types/cookbook.types";
@@ -15,7 +16,7 @@ export function useRecipes() {
     queryKey: queryKeys.recipes.list,
     queryFn: async () => {
       const data = await cookbookApi.getRecipesWithRatings(supabase);
-      return transformCookbookRecipes(data);
+      return transformCookbookRecipes(data, (imagePath) => recipeImageUrl(supabase, imagePath));
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchInterval: (q) => {

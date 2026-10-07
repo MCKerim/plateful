@@ -76,6 +76,59 @@ export function lastPlannedDates(
 }
 
 /**
+ * One recipe's plan status from its placements, the reading `getMealPlanStatus`
+ * shows: the earliest placement from today on is the active plan; without one,
+ * an uncooked pool copy is ("planned", no day); otherwise the most recent past
+ * day is remembered. Pool copies already checked off count for nothing. The
+ * same rule the recipe page gets from `mealPlanningApi.getInfoByRecipe`.
+ */
+export function recipeMealPlanInfo(
+  rows: RecipePlacementRow[],
+  todayStr: string
+): RecipeMealPlanInfo {
+  let nextDay: string | null = null;
+  let lastDay: string | null = null;
+  let openInPool = false;
+  for (const row of rows) {
+    if (row.planned_date === null) {
+      if (!row.eaten) openInPool = true;
+    } else if (row.planned_date >= todayStr) {
+      if (nextDay === null || row.planned_date < nextDay) nextDay = row.planned_date;
+    } else if (lastDay === null || row.planned_date > lastDay) {
+      lastDay = row.planned_date;
+    }
+  }
+  const activePlan =
+    nextDay !== null ? { planned_date: nextDay } : openInPool ? { planned_date: null } : null;
+  return { activePlan, lastPlannedDate: lastDay };
+}
+
+/**
+ * `recipeMealPlanInfo` for every recipe in the household's plan history at
+ * once, keyed by recipe id: one request for all cookbook cards instead of one
+ * per card (454 of them once exhausted the database's connection slots,
+ * docs/knowledge/supabase-connection-limit.md). Rows without a recipe (notes)
+ * are skipped; recipes never on the plan are absent.
+ */
+export function recipeMealPlanInfos(
+  rows: RecipePlacementRow[],
+  todayStr: string
+): Record<string, RecipeMealPlanInfo> {
+  const byRecipe = new Map<string, RecipePlacementRow[]>();
+  for (const row of rows) {
+    if (!row.recipe_id) continue;
+    const list = byRecipe.get(row.recipe_id);
+    if (list) list.push(row);
+    else byRecipe.set(row.recipe_id, [row]);
+  }
+  const infos: Record<string, RecipeMealPlanInfo> = {};
+  for (const [recipeId, recipeRows] of byRecipe) {
+    infos[recipeId] = recipeMealPlanInfo(recipeRows, todayStr);
+  }
+  return infos;
+}
+
+/**
  * Sort key for "not planned in a while": the last day on the plan, else the
  * day the recipe was added, so yesterday's import doesn't top the list just
  * because nobody has planned it yet. `created_at` is an ISO timestamp; its

@@ -79,11 +79,8 @@ export type RecipePlacementRow = {
   eaten: boolean;
 };
 
+/** What a card says about the plan: the next placement (`planned_date` null = an uncooked pool copy), else the last day the recipe was on the plan. */
 export type RecipeMealPlanInfo = {
-  activePlan: {
-    id: string;
-    planned_date: string | null;
-    eaten: boolean;
-  } | null;
+  activePlan: { planned_date: string | null } | null;
   lastPlannedDate: string | null;
 };

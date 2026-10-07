@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { isSameDay } from "date-fns";
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
+import { useRecipeMealPlanInfos } from "@/hooks/meal-planning/useRecipeMealPlanInfos";
 import RecipeCard from "@/components/general/RecipeCard";
 import TodaysMealCard from "@/components/home/TodaysMealCard";
 import TodaysNoteCard from "@/components/home/TodaysNoteCard";
@@ -24,6 +25,7 @@ export default function Home() {
 
   // Fetch recipes for "recently added" section
   const { data: recipes = [] } = useRecipes();
+  const { data: planInfos } = useRecipeMealPlanInfos();
 
   // Today's plan, recipes first and then notes: a note ("Eating out") is the
   // plan's word for the day too, so the "nothing planned" line stays away.
@@ -124,6 +126,8 @@ export default function Home() {
                 name={recipe.recipeName}
                 averageRating={recipe.avg_rating}
                 status={recipe.status}
+                imageUrl={recipe.imageUrl}
+                mealPlanInfo={planInfos?.[recipe.id] ?? null}
               />
             ))}
           </div>

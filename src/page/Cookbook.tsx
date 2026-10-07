@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { filterRecipesByCollection } from "@/lib/collectionFiltering";
 import { reportError } from "@/utils/reportError";
 import { useLastPlannedDates } from "@/hooks/meal-planning/useLastPlannedDates";
+import { useRecipeMealPlanInfos } from "@/hooks/meal-planning/useRecipeMealPlanInfos";
 import { leastRecentlyPlannedKey } from "@/lib/mealPlanHelper/mealPlanHelper";
 
 /** One stable empty map, so an unloaded sort key doesn't re-sort on every render. */
@@ -58,6 +59,7 @@ export default function Cookbook() {
   const { data: lastPlanned = NO_PLAN_DATES } = useLastPlannedDates(
     sorting === "leastRecentlyPlanned"
   );
+  const { data: planInfos } = useRecipeMealPlanInfos();
 
   const fuse = useMemo(
     () =>
@@ -257,6 +259,8 @@ export default function Cookbook() {
                     name={recipe.recipeName}
                     averageRating={recipe.avg_rating}
                     status={recipe.status}
+                    imageUrl={recipe.imageUrl}
+                    mealPlanInfo={planInfos?.[recipe.id] ?? null}
                   />
                 ))}
               </div>
@@ -292,6 +296,8 @@ export default function Cookbook() {
               name={recipe.recipeName}
               averageRating={recipe.avg_rating}
               status={recipe.status}
+              imageUrl={recipe.imageUrl}
+              mealPlanInfo={planInfos?.[recipe.id] ?? null}
             />
           ))}
         </div>

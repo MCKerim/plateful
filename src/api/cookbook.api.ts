@@ -9,6 +9,7 @@ export const cookbookApi = {
         description,
         created_at,
         status,
+        image_path,
         recipe_ratings(stars),
         recipe_collections(collection_id)
       `);

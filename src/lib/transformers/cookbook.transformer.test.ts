@@ -8,13 +8,16 @@ const baseRecipe: CookbookRecipeRaw = {
   description: null,
   created_at: "2026-01-01T00:00:00Z",
   status: "ready",
+  image_path: null,
   recipe_ratings: [],
   recipe_collections: [],
 };
 
+const noUrl = () => null;
+
 describe("transformCookbookRecipes", () => {
   it("returns no collection IDs for an unassigned recipe", () => {
-    expect(transformCookbookRecipes([baseRecipe])[0].collectionIds).toEqual([]);
+    expect(transformCookbookRecipes([baseRecipe], noUrl)[0].collectionIds).toEqual([]);
   });
 
   it("returns every collection membership", () => {
@@ -23,6 +26,17 @@ describe("transformCookbookRecipes", () => {
       recipe_collections: [{ collection_id: "one" }, { collection_id: "two" }],
     };
 
-    expect(transformCookbookRecipes([recipe])[0].collectionIds).toEqual(["one", "two"]);
+    expect(transformCookbookRecipes([recipe], noUrl)[0].collectionIds).toEqual(["one", "two"]);
+  });
+
+  it("turns the cover path into its URL and leaves a recipe without one empty", () => {
+    const withCover = { ...baseRecipe, id: "recipe-2", image_path: "recipe_2/cover.jpeg" };
+
+    const [plain, covered] = transformCookbookRecipes([baseRecipe, withCover], (path) =>
+      path === null ? null : `https://cdn.test/${path}`
+    );
+
+    expect(plain.imageUrl).toBeNull();
+    expect(covered.imageUrl).toBe("https://cdn.test/recipe_2/cover.jpeg");
   });
 });

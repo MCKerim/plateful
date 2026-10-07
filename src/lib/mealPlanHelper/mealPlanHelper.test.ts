@@ -4,8 +4,10 @@ import {
   lastPlannedDates,
   leastRecentlyPlannedKey,
   mergeNoteSuggestions,
+  recipeMealPlanInfo,
+  recipeMealPlanInfos,
 } from "./mealPlanHelper";
-import type { RecipeMealPlanInfo } from "@/types/meal-planning.types";
+import type { RecipeMealPlanInfo, RecipePlacementRow } from "@/types/meal-planning.types";
 
 describe("mealPlanHelper", () => {
   // Create a mock translation function that returns the key with count if provided
@@ -42,9 +44,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.planned" for active plan without date', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: null,
-          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -54,9 +54,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.today" for plan scheduled today', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: "2024-06-15",
-          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -66,9 +64,7 @@ describe("mealPlanHelper", () => {
     it('should return "common.tomorrow" for plan scheduled tomorrow', () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: "2024-06-16",
-          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -78,9 +74,7 @@ describe("mealPlanHelper", () => {
     it("should return days count for future plans (3 days)", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: "2024-06-18", // 3 days from now
-          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -91,9 +85,7 @@ describe("mealPlanHelper", () => {
     it("should return days count for future plans (5 days)", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: "2024-06-20", // 5 days from now
-          eaten: false,
         },
         lastPlannedDate: null,
       };
@@ -175,9 +167,7 @@ describe("mealPlanHelper", () => {
     it("should prioritize active plan over last planned date", () => {
       const info: RecipeMealPlanInfo = {
         activePlan: {
-          id: "1",
           planned_date: "2024-06-16",
-          eaten: false,
         },
         lastPlannedDate: "2024-06-10", // This should be ignored
       };
@@ -281,5 +271,75 @@ describe("mergeNoteSuggestions", () => {
         leastRecentlyPlannedKey({ id: "a", created_at: "2025-11-30T23:10:00+00:00" }, {})
       ).toBe("2025-11-30");
     });
+  });
+});
+
+describe("recipeMealPlanInfo", () => {
+  const today = "2026-09-09";
+  const row = (
+    recipe_id: string,
+    planned_date: string | null,
+    eaten = false
+  ): RecipePlacementRow => ({ recipe_id, planned_date, eaten });
+
+  it("takes the earliest placement from today on as the active plan", () => {
+    expect(
+      recipeMealPlanInfo(
+        [row("a", "2026-09-12"), row("a", "2026-09-10"), row("a", "2026-09-01")],
+        today
+      )
+    ).toEqual({ activePlan: { planned_date: "2026-09-10" }, lastPlannedDate: "2026-09-01" });
+  });
+
+  it("counts today as the active plan, not as the past", () => {
+    expect(recipeMealPlanInfo([row("a", "2026-09-09")], today)).toEqual({
+      activePlan: { planned_date: "2026-09-09" },
+      lastPlannedDate: null,
+    });
+  });
+
+  it("falls back to an uncooked pool copy, which a checked-off copy is not", () => {
+    expect(recipeMealPlanInfo([row("a", null), row("a", "2026-09-01")], today)).toEqual({
+      activePlan: { planned_date: null },
+      lastPlannedDate: "2026-09-01",
+    });
+    expect(recipeMealPlanInfo([row("a", null, true)], today)).toEqual({
+      activePlan: null,
+      lastPlannedDate: null,
+    });
+  });
+
+  it("remembers only the most recent past day without an active plan", () => {
+    expect(
+      recipeMealPlanInfo(
+        [row("a", "2026-08-01"), row("a", "2026-09-05"), row("a", "2026-09-03")],
+        today
+      )
+    ).toEqual({ activePlan: null, lastPlannedDate: "2026-09-05" });
+  });
+
+  it("says nothing about a recipe never on the plan", () => {
+    expect(recipeMealPlanInfo([], today)).toEqual({ activePlan: null, lastPlannedDate: null });
+  });
+});
+
+describe("recipeMealPlanInfos", () => {
+  it("groups the household's rows by recipe and skips notes", () => {
+    const note = { recipe_id: null, planned_date: "2026-09-10", eaten: null };
+    const rows = [
+      { recipe_id: "a", planned_date: "2026-09-10", eaten: false },
+      { recipe_id: "b", planned_date: null, eaten: false },
+      { recipe_id: "a", planned_date: "2026-09-01", eaten: true },
+      note as unknown as RecipePlacementRow,
+    ];
+
+    const infos = recipeMealPlanInfos(rows, "2026-09-09");
+
+    expect(Object.keys(infos).sort()).toEqual(["a", "b"]);
+    expect(infos.a).toEqual({
+      activePlan: { planned_date: "2026-09-10" },
+      lastPlannedDate: "2026-09-01",
+    });
+    expect(infos.b).toEqual({ activePlan: { planned_date: null }, lastPlannedDate: null });
   });
 });

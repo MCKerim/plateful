@@ -8,6 +8,7 @@ import {
   RecipePlacementRow,
 } from "@/types/meal-planning.types";
 import { toPlannedDateString } from "@/lib/dateHelper/dateHelper";
+import { recipeMealPlanInfo } from "@/lib/mealPlanHelper/mealPlanHelper";
 
 export type CreateNoteParams = {
   householdId: string;
@@ -204,47 +205,21 @@ export const mealPlanningApi = {
     return (data ?? []) as RecipePlacementRow[];
   },
 
+  /**
+   * One recipe's plan status, for the recipe page. The cookbook does not call
+   * this per card: it reads `getAllRecipePlacements` once and derives every
+   * card's status with `recipeMealPlanInfos`.
+   */
   async getInfoByRecipe(supabase: SupabaseClient, recipeId: string): Promise<RecipeMealPlanInfo> {
-    const todayStr = toPlannedDateString(new Date());
-
     const { data, error } = await supabase
       .from("meal_planning")
-      .select("*")
-      .eq("recipe_id", recipeId)
-      .order("planned_date", { ascending: true, nullsFirst: true });
+      .select("recipe_id, planned_date, eaten")
+      .eq("recipe_id", recipeId);
 
     if (error) throw error;
-
-    if (!data || data.length === 0) {
-      return { activePlan: null, lastPlannedDate: null };
-    }
-
-    const plansWithoutDate = data.filter((p) => p.planned_date === null);
-    const futurePlans = data.filter((p) => p.planned_date !== null && p.planned_date >= todayStr);
-
-    let activePlan = futurePlans.length > 0 ? futurePlans[0] : null;
-
-    if (!activePlan) {
-      activePlan = plansWithoutDate.find((plan) => !plan.eaten) ?? null;
-    }
-
-    const pastPlansWithDates = data.filter(
-      (p) => p.planned_date !== null && p.planned_date < todayStr
+    return recipeMealPlanInfo(
+      (data ?? []) as RecipePlacementRow[],
+      toPlannedDateString(new Date())
     );
-    const lastPlannedDate =
-      pastPlansWithDates.length > 0
-        ? pastPlansWithDates[pastPlansWithDates.length - 1].planned_date
-        : null;
-
-    return {
-      activePlan: activePlan
-        ? {
-            id: activePlan.id,
-            planned_date: activePlan.planned_date,
-            eaten: activePlan.eaten,
-          }
-        : null,
-      lastPlannedDate,
-    };
   },
 };

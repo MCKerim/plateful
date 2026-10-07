@@ -5,7 +5,8 @@ import {
 } from "@/types/cookbook.types";
 
 export function transformCookbookRecipes(
-  raw: CookbookRecipeRaw[]
+  raw: CookbookRecipeRaw[],
+  imageUrlOf: (imagePath: string | null) => string | null
 ): CookbookRecipe[] {
   return raw.map((recipe) => ({
     id: recipe.id,
@@ -19,5 +20,6 @@ export function transformCookbookRecipes(
         ? recipe.recipe_ratings.reduce((sum, rating) => sum + rating.stars, 0) /
           recipe.recipe_ratings.length
         : null,
+    imageUrl: imageUrlOf(recipe.image_path ?? null),
   }));
 }
