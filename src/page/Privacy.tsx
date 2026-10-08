@@ -207,7 +207,8 @@ export default function Privacy() {
               </li>
               <li>
                 Google may process your data outside the EU, including in the United States, under
-                Standard Contractual Clauses (SCCs). See Google's privacy policy for details.
+                Standard Contractual Clauses (SCCs). Google does not use this data to train its
+                models. See Google's privacy policy for details.
               </li>
             </ul>
             <p>
@@ -357,7 +358,7 @@ export default function Privacy() {
                   generate cover images, the title, description, and ingredients of recipes without
                   a photo to Google's Gemini API, as described in "AI-Powered Features". Google may
                   process this data outside the EU, including in the United States, under Standard
-                  Contractual Clauses (SCCs).{" "}
+                  Contractual Clauses (SCCs). Google does not use this data to train its models.{" "}
                   <a
                     href="https://policies.google.com/privacy"
                     target="_blank"

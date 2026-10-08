@@ -10,7 +10,6 @@
 
 From the 2026-10-08 rewrite of the AI section (branch `privacy-ai-processors`):
 
-- **Google transfer basis:** the PP now says Google processes Gemini data under SCCs, mirroring OpenAI. Confirm the Gemini API account runs on paid terms with Google's data processing terms; on the free tier Google may use content to improve its products. No "no training" claim is made for Google.
 - **Legal basis for AI features:** "Legal Basis" still lists only "AI chatbot features" under consent, while "AI-Powered Features" asks consent for all AI features. Imports and background processing may fit contract performance (Art. 6(1)(b)) better.
 - **Scraping providers without a transfer basis:** ScrapeCreators (US) and ScrapingAnt (Poland, US proxy) receive only the link, no account data; the PP names them but states no SCCs or DPA. Decide whether a DPA is needed.
 
@@ -26,6 +25,7 @@ From the 2026-10-08 rewrite of the AI section (branch `privacy-ai-processors`):
 | A4  | Privacy    | Automated decision-making not addressed (GDPR Art. 22) | ✅ "Automated Decision-Making" section added to PP |
 | A5  | Privacy    | AI section named GPT-4.1-mini for the chatbot and Gemini for all imports; chat history claimed stored in the account | ✅ 2026-10-08: provider per feature (OpenAI / Google Gemini) without model names, checked against code; chat history is not stored in the account |
 | A6  | Privacy    | ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner (extractor host) and the MCP connector undisclosed | ✅ 2026-10-08: added to "Third-Party Services" and "AI-Powered Features" |
+| A7  | Privacy    | Google transfer basis and training use for Gemini unconfirmed | ✅ 2026-10-08: Gemini API is paid (Kerim). Under the Gemini API terms, paid services are not used to improve Google's products and are processed under Google's Data Processing Addendum; PP says SCCs and no training |
 
 ---
 
