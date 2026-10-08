@@ -6,14 +6,13 @@
 
 ---
 
-## Open Issues (Require Code Changes)
+## Open Questions (Kerim's decision)
 
-### 1. Recipe extraction service uses unencrypted HTTP
+From the 2026-10-08 rewrite of the AI section (branch `privacy-ai-processors`):
 
-- **Problem:** User data (recipe URLs, food images, language preference) is transmitted over plain HTTP — no TLS/encryption in transit
-- **Risk:** Man-in-the-middle attacks, data interception, violates GDPR Art. 32 (security of processing)
-- **Fix:** Migrate the service to HTTPS with a valid certificate. Also consider using a domain name instead of a bare IP.
-
+- **Google transfer basis:** the PP now says Google processes Gemini data under SCCs, mirroring OpenAI. Confirm the Gemini API account runs on paid terms with Google's data processing terms; on the free tier Google may use content to improve its products. No "no training" claim is made for Google.
+- **Legal basis for AI features:** "Legal Basis" still lists only "AI chatbot features" under consent, while "AI-Powered Features" asks consent for all AI features. Imports and background processing may fit contract performance (Art. 6(1)(b)) better.
+- **Scraping providers without a transfer basis:** ScrapeCreators (US) and ScrapingAnt (Poland, US proxy) receive only the link, no account data; the PP names them but states no SCCs or DPA. Decide whether a DPA is needed.
 
 ---
 
@@ -25,6 +24,8 @@
 | A2  | Privacy    | Google Gemini undisclosed (used in recipe extraction server) | ✅ Disclosed in "AI-Powered Features" and "Third-Party Services" sections of PP |
 | A3  | Privacy    | Controller name missing (KBlanks)                  | ✅ Full legal name and address added to PP introduction, contact, and ToS |
 | A4  | Privacy    | Automated decision-making not addressed (GDPR Art. 22) | ✅ "Automated Decision-Making" section added to PP |
+| A5  | Privacy    | AI section named GPT-4.1-mini for the chatbot and Gemini for all imports; chat history claimed stored in the account | ✅ 2026-10-08: provider per feature (OpenAI / Google Gemini) without model names, checked against code; chat history is not stored in the account |
+| A6  | Privacy    | ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner (extractor host) and the MCP connector undisclosed | ✅ 2026-10-08: added to "Third-Party Services" and "AI-Powered Features" |
 
 ---
 
@@ -32,7 +33,7 @@
 
 | #   | Priority     | Area       | Issue                                                 | Resolution |
 | --- | ------------ | ---------- | ----------------------------------------------------- | ---------- |
-| 1   | **CRITICAL** | Security   | HTTP recipe extraction (no TLS)                       | ❌ Open — needs code |
+| 1   | **CRITICAL** | Security   | HTTP recipe extraction (no TLS)                       | ✅ All clients call `https://extractor.plateful.cloud` (verified 2026-10-08) |
 | 2   | **CRITICAL** | Privacy    | OpenAI training opt-out unconfirmed                   | ✅ Confirmed OFF in OpenAI settings |
 | 3   | **CRITICAL** | Compliance | No in-app account deletion (Apple/Google requirement) | ✅ Implemented Settings > Delete Account flow |
 | 4   | **CRITICAL** | Compliance | Data export claimed but doesn't exist                 | ✅ PP now documents manual email export process (GDPR Art. 20) |

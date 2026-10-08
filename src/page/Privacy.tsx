@@ -214,6 +214,20 @@ export default function Privacy() {
               By using AI features, you consent to this data being transmitted to the respective
               third-party services as described above.
             </p>
+            <div className="space-y-2">
+              <h3 className="font-medium">Connecting an AI assistant</h3>
+              <p>
+                You can connect Plateful to an AI assistant of your choice through our connector (an
+                MCP server). The assistant gets access only after you sign in and approve the
+                connection on Plateful's own page. On your instructions it can then search, read,
+                import, create, change, rate, and delete recipes and manage collections in your
+                household, just as you could in the app. Recipe content the assistant reads from
+                Plateful is processed by the assistant's provider under your own agreement with that
+                provider and its privacy policy; we do not choose or control which assistant you
+                use. Recipes imported this way are processed as described above. You can revoke
+                access at any time in your assistant's connector settings.
+              </p>
+            </div>
           </section>
 
           <section className="space-y-3">
@@ -351,6 +365,79 @@ export default function Privacy() {
                     className="underline text-primary"
                   >
                     Google Privacy Policy
+                  </a>
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium">YouTube API Services (Google)</h3>
+                <p>
+                  When you import a YouTube video, Plateful uses YouTube API Services to fetch the
+                  video's title and description; the video's ID is sent to Google.{" "}
+                  <a
+                    href="https://www.youtube.com/t/terms"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    YouTube Terms of Service
+                  </a>
+                  ,{" "}
+                  <a
+                    href="https://policies.google.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Google Privacy Policy
+                  </a>
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium">ScrapeCreators (United States)</h3>
+                <p>
+                  When you import a TikTok or Instagram post, its link is sent to ScrapeCreators
+                  (Web Scraping Guy LLC), which retrieves the post's caption and media for us. No
+                  account information is sent.{" "}
+                  <a
+                    href="https://scrapecreators.com/privacy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium">ScrapingAnt</h3>
+                <p>
+                  If a recipe website blocks our server, the link to that page is sent to
+                  ScrapingAnt (DATAANT Sp. z o.o., Poland), which loads the page and its photo for
+                  us through a proxy in the United States. No account information is sent.{" "}
+                  <a
+                    href="https://scrapingant.com/legal/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
+                  </a>
+                </p>
+              </div>
+              <div className="space-y-1">
+                <h3 className="font-medium">Hetzner (Germany)</h3>
+                <p>
+                  Our recipe extraction service and the connector for AI assistants run on servers
+                  we rent from Hetzner Online GmbH in Germany. Data you use with these features
+                  (links, pasted text, photos, questions, and recipe content) passes through these
+                  servers.{" "}
+                  <a
+                    href="https://www.hetzner.com/legal/privacy-policy"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="underline text-primary"
+                  >
+                    Privacy Policy
                   </a>
                 </p>
               </div>
