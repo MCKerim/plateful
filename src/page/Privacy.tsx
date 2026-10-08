@@ -211,10 +211,6 @@ export default function Privacy() {
                 models. See Google's privacy policy for details.
               </li>
             </ul>
-            <p>
-              By using AI features, you consent to this data being transmitted to the respective
-              third-party services as described above.
-            </p>
             <div className="space-y-2">
               <h3 className="font-medium">Connecting an AI assistant</h3>
               <p>
@@ -453,16 +449,20 @@ export default function Privacy() {
                 <h3 className="font-medium">Contract performance (Art. 6(1)(b))</h3>
                 <p>
                   Processing necessary to provide the core service: account management, recipe and
-                  meal plan storage, sync across devices, subscription management.
+                  meal plan storage, sync across devices, subscription management, and the AI
+                  features you use (recipe import, chatbot, cooking assistant, recipe adaptation,
+                  search, and background recipe processing), including passing the data described in
+                  "AI-Powered Features" to OpenAI, Google, and the other providers these features
+                  use (ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner).
                 </p>
               </div>
               <div>
                 <h3 className="font-medium">Consent (Art. 6(1)(a))</h3>
                 <p>
-                  Analytics (PostHog), onboarding survey, AI chatbot features, and Canny feedback
-                  are processed on the basis of your consent. You may withdraw consent at any time
-                  by contacting us or adjusting your settings; withdrawal does not affect the
-                  lawfulness of prior processing.
+                  Analytics (PostHog), onboarding survey, and Canny feedback are processed on the
+                  basis of your consent. You may withdraw consent at any time by contacting us or
+                  adjusting your settings; withdrawal does not affect the lawfulness of prior
+                  processing.
                 </p>
               </div>
               <div>

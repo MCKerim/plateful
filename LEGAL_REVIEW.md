@@ -6,12 +6,9 @@
 
 ---
 
-## Open Questions (Kerim's decision)
+## Open Issues
 
-From the 2026-10-08 rewrite of the AI section (branch `privacy-ai-processors`):
-
-- **Legal basis for AI features:** "Legal Basis" still lists only "AI chatbot features" under consent, while "AI-Powered Features" asks consent for all AI features. Imports and background processing may fit contract performance (Art. 6(1)(b)) better.
-- **Scraping providers without a transfer basis:** ScrapeCreators (US) and ScrapingAnt (Poland, US proxy) receive only the link, no account data; the PP names them but states no SCCs or DPA. Decide whether a DPA is needed.
+None.
 
 ---
 
@@ -26,6 +23,9 @@ From the 2026-10-08 rewrite of the AI section (branch `privacy-ai-processors`):
 | A5  | Privacy    | AI section named GPT-4.1-mini for the chatbot and Gemini for all imports; chat history claimed stored in the account | ✅ 2026-10-08: provider per feature (OpenAI / Google Gemini) without model names, checked against code; chat history is not stored in the account |
 | A6  | Privacy    | ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner (extractor host) and the MCP connector undisclosed | ✅ 2026-10-08: added to "Third-Party Services" and "AI-Powered Features" |
 | A7  | Privacy    | Google transfer basis and training use for Gemini unconfirmed | ✅ 2026-10-08: Gemini API is paid (Kerim). Under the Gemini API terms, paid services are not used to improve Google's products and are processed under Google's Data Processing Addendum; PP says SCCs and no training |
+| A8  | Privacy    | AI features listed under consent ("by using AI features, you consent") though no consent dialog exists and imports cannot work without the providers | ✅ 2026-10-08 (Kerim): AI features moved to contract performance (Art. 6(1)(b)) incl. the transfer to OpenAI, Google, ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner; the "by using" consent sentence removed |
+| A9  | Privacy    | DPA (AVV) with ScrapeCreators / ScrapingAnt? | ✅ 2026-10-08 (Kerim): none. Both receive only the link from our server, no account data, no user IP, so no user personal data is processed on our behalf. Revisit if they ever get more than the link |
+| A10 | Compliance | App Store guideline 5.1.2(i) asks for explicit permission before personal data goes to third-party AI; neither app shows such a screen | Accepted 2026-10-08 (Kerim): no permission screen, as in comparable AI apps. Add one only if App Review flags it |
 
 ---
 
