@@ -24,7 +24,7 @@ export default function Privacy() {
       <div className="space-y-2 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Privacy Policy</h1>
-          <p className="text-sm text-muted-foreground">Last updated: March 29, 2026</p>
+          <p className="text-sm text-muted-foreground">Last updated: October 8, 2026</p>
         </div>
 
         <Separator />
@@ -76,11 +76,12 @@ export default function Privacy() {
             <div className="space-y-2">
               <h3 className="font-medium">Camera and Photos</h3>
               <p>
-                When you use features that involve images (such as adding a recipe photo or
-                importing a recipe from an image), the app requests access to your device's camera
-                and photo library. Images are compressed on your device before being uploaded to our
-                servers. Depending on the feature used, images may also be transmitted to OpenAI or
-                our recipe extraction service. You can revoke camera and photo access at any time in
+                When you use features that involve images (such as adding a recipe photo, importing
+                a recipe from a photo, or attaching a photo in the chatbot or cooking assistant),
+                the app requests access to your device's camera and photo library. Images are
+                compressed on your device before being uploaded to our servers. Photos you use with
+                an AI feature are also transmitted to OpenAI for processing, as described in
+                "AI-Powered Features" below. You can revoke camera and photo access at any time in
                 your device settings.
               </p>
             </div>
@@ -110,7 +111,7 @@ export default function Privacy() {
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>Provide and maintain the Plateful service</li>
               <li>Sync your data across devices</li>
-              <li>Power AI chatbot features (recipe suggestions, cooking assistance)</li>
+              <li>Power AI features (recipe import, chatbot, cooking assistance, search)</li>
               <li>Improve our app features and functionality</li>
               <li>
                 Send you email notifications and push notifications about important updates, feature
@@ -125,32 +126,90 @@ export default function Privacy() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">AI-Powered Features</h2>
             <p>
-              Plateful includes an AI chatbot powered by OpenAI's API (GPT-4.1-mini). When you use
-              the chatbot:
+              Plateful uses AI models from OpenAI and Google (Gemini) for several features. The
+              specific models change as the providers release new versions; this section names the
+              provider that processes your data for each feature and what data it receives. Recipe
+              imports, the cooking assistant, recipe adaptation and background recipe processing run
+              on our recipe extraction service, which we operate ourselves and which forwards the
+              data described below to the respective provider.
+            </p>
+            <div className="space-y-2">
+              <h3 className="font-medium">OpenAI</h3>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>
+                  <span className="font-medium">AI chatbot:</span> Your chat messages and any photos
+                  you attach. If you start the chat from a recipe, that recipe (name, description,
+                  ingredients, instructions) is included.
+                </li>
+                <li>
+                  <span className="font-medium">
+                    Recipe import from text, websites, and photos:
+                  </span>{" "}
+                  The text you paste, the content of the web page you import (we fetch the page and
+                  send its text), or the photo you take or choose.
+                </li>
+                <li>
+                  <span className="font-medium">
+                    Recipe import from TikTok and Instagram posts:
+                  </span>{" "}
+                  The post's caption and images. Videos go to Google, see below.
+                </li>
+                <li>
+                  <span className="font-medium">Cooking assistant:</span> Your question, any photo
+                  you attach, and the recipe you are cooking.
+                </li>
+                <li>
+                  <span className="font-medium">Recipe adaptation:</span> The recipe and the change
+                  you ask for.
+                </li>
+                <li>
+                  <span className="font-medium">Search:</span> The text you search for.
+                </li>
+                <li>
+                  <span className="font-medium">Background recipe processing:</span> The content of
+                  your recipes (title, description, ingredients, steps), to estimate nutrition and
+                  servings, add tags, mark ingredients and timers in cooking steps, suggest
+                  collections, and make recipes searchable.
+                </li>
+              </ul>
+            </div>
+            <div className="space-y-2">
+              <h3 className="font-medium">Google (Gemini)</h3>
+              <ul className="list-disc list-inside space-y-1 ml-4">
+                <li>
+                  <span className="font-medium">
+                    Recipe import from videos (TikTok, Instagram, YouTube):
+                  </span>{" "}
+                  The video at the link you import, together with its caption or title and
+                  description.
+                </li>
+                <li>
+                  <span className="font-medium">Cover images:</span> When a recipe has no photo, its
+                  title, description, and ingredients, to generate a cover image.
+                </li>
+              </ul>
+            </div>
+            <p>
+              When you import a recipe, your language preference and the names of your collections
+              are sent along to the provider handling the import, so the recipe is written in your
+              language and can be sorted into your collections.
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
-                Your chat messages are transmitted to OpenAI's servers for processing. This includes
-                any recipe context (name, ingredients, instructions) provided to the chatbot.
-              </li>
-              <li>
-                Images you upload in the chat are transmitted to OpenAI's servers in base64 format.
-              </li>
-              <li>
-                Conversation IDs are stored to enable continuity across sessions. Chat history is
-                stored in your account and deleted when you delete your account.
+                Plateful does not store your chat history in your account. The conversation stays in
+                the app until you start a new chat or close the app. OpenAI keeps the conversation
+                for a limited period so that follow-up messages can refer to earlier ones.
               </li>
               <li>
                 OpenAI processes your data in the United States under Standard Contractual Clauses
                 (SCCs). OpenAI does not use API data to train its models. See OpenAI's privacy
                 policy for details.
               </li>
+              <li>
+                Google may process your data outside the EU, including in the United States, under
+                Standard Contractual Clauses (SCCs). See Google's privacy policy for details.
+              </li>
             </ul>
-            <p>
-              When you import a recipe from a URL or image, the URL, image, and your language
-              preference are transmitted to our recipe extraction service, which uses Google Gemini
-              API to extract the recipe data. Your content is therefore also processed by Google.
-            </p>
             <p>
               By using AI features, you consent to this data being transmitted to the respective
               third-party services as described above.
@@ -167,9 +226,8 @@ export default function Privacy() {
               <div className="space-y-1">
                 <h3 className="font-medium">Supabase (EU region)</h3>
                 <p>
-                  All app data (recipes, meal plans, user accounts, images, chat history) is stored
-                  on Supabase servers located in the European Union. Data does not leave the EU via
-                  Supabase.{" "}
+                  All app data (recipes, meal plans, user accounts, images) is stored on Supabase
+                  servers located in the European Union. Data does not leave the EU via Supabase.{" "}
                   <a
                     href="https://supabase.com/privacy"
                     target="_blank"
@@ -183,9 +241,9 @@ export default function Privacy() {
               <div className="space-y-1">
                 <h3 className="font-medium">OpenAI (United States)</h3>
                 <p>
-                  Chat messages, recipe context, and uploaded images are sent to OpenAI for AI
-                  chatbot functionality. Transfer is governed by Standard Contractual Clauses
-                  (SCCs).{" "}
+                  Chat messages, pasted text, imported web pages, photos, search queries, and recipe
+                  content are sent to OpenAI for the AI features described in "AI-Powered Features".
+                  Transfer is governed by Standard Contractual Clauses (SCCs).{" "}
                   <a
                     href="https://openai.com/policies/privacy-policy"
                     target="_blank"
@@ -278,13 +336,14 @@ export default function Privacy() {
                 </p>
               </div>
               <div className="space-y-1">
-                <h3 className="font-medium">Recipe Extraction Service + Google Gemini</h3>
+                <h3 className="font-medium">Google Gemini (via our recipe extraction service)</h3>
                 <p>
-                  When importing recipes from URLs or images, the URL, image data, and your language
-                  preference are sent to our recipe extraction service for processing. This service
-                  is operated by us and uses Google Gemini API to extract recipe data from the
-                  provided content. This means your URL or image is also transmitted to Google's
-                  servers for processing.{" "}
+                  Our recipe extraction service, which we operate ourselves, sends videos you import
+                  from TikTok, Instagram, or YouTube (with their captions or descriptions) and, to
+                  generate cover images, the title, description, and ingredients of recipes without
+                  a photo to Google's Gemini API, as described in "AI-Powered Features". Google may
+                  process this data outside the EU, including in the United States, under Standard
+                  Contractual Clauses (SCCs).{" "}
                   <a
                     href="https://policies.google.com/privacy"
                     target="_blank"
@@ -334,8 +393,7 @@ export default function Privacy() {
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
                 <span className="font-medium">
-                  Account data, recipes, meal plans, cookbooks, chat history, images, and survey
-                  responses:
+                  Account data, recipes, meal plans, cookbooks, images, and survey responses:
                 </span>{" "}
                 Deleted immediately upon account deletion.
               </li>
@@ -411,8 +469,8 @@ export default function Privacy() {
               </li>
               <li>
                 <span className="font-medium">Data portability (Art. 20):</span> Request an export
-                of your data in a machine-readable format. Please contact us at support@plateful.cloud and
-                we will provide your data within 30 days.
+                of your data in a machine-readable format. Please contact us at
+                support@plateful.cloud and we will provide your data within 30 days.
               </li>
               <li>
                 <span className="font-medium">Withdraw consent:</span> Withdraw consent for any
