@@ -374,7 +374,7 @@ export default function TermsOfService() {
             <h2 className="text-lg font-semibold">Dispute Resolution</h2>
             <p>
               Any disputes arising from these Terms or your use of the App shall be subject to the
-              exclusive jurisdiction of the competent courts in Weseke, Germany, unless applicable
+              exclusive jurisdiction of the competent courts in Borken, Germany, unless applicable
               EU law requires otherwise.
             </p>
             <p>

@@ -15,7 +15,7 @@ export default function Impressum() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Verantwortlich</h2>
             <div className="bg-muted p-4 rounded-lg space-y-1">
-              <p className="font-medium">Kerim Ismail</p>
+              <p className="font-medium">Kerim Ismail Oglou</p>
               <p>(handelnd als KBlanks, Einzelunternehmen)</p>
               <p>Im Kassemänneken 5</p>
               <p>46325 Borken (Weseke)</p>
@@ -32,7 +32,7 @@ export default function Impressum() {
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Inhaltlich verantwortlich</h2>
-            <p>Kerim Ismail (Anschrift wie oben)</p>
+            <p>Kerim Ismail Oglou (Anschrift wie oben)</p>
           </section>
 
           <section className="space-y-3">
