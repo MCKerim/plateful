@@ -24,7 +24,7 @@ export default function TermsOfService() {
       <div className="space-y-6 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Terms of Service</h1>
-          <p className="text-sm text-muted-foreground">Last updated: February 27, 2026</p>
+          <p className="text-sm text-muted-foreground">Last updated: October 8, 2026</p>
         </div>
 
         <Separator />
@@ -53,11 +53,18 @@ export default function TermsOfService() {
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>Create, store, and organize recipes</li>
               <li>Plan meals</li>
-              <li>Import recipes from various sources</li>
+              <li>
+                Import recipes from websites, text, photos, and social media videos with the help of
+                AI
+              </li>
               <li>Share recipes with other users</li>
               <li>Rate and review recipes</li>
               <li>Sync data across multiple devices</li>
-              <li>Use AI-powered cooking assistance via the in-app chatbot</li>
+              <li>
+                Use AI-powered features such as the chatbot, the cooking assistant, recipe
+                adaptation, and nutrition estimates
+              </li>
+              <li>Connect an AI assistant of their choice to their recipes</li>
             </ul>
           </section>
 
@@ -78,7 +85,10 @@ export default function TermsOfService() {
             <div className="space-y-2">
               <h3 className="font-medium">Account Responsibility</h3>
               <ul className="list-disc list-inside space-y-1 ml-4">
-                <li>You are responsible for all activities that occur under your account</li>
+                <li>
+                  You are responsible for all activities that occur under your account, including
+                  actions taken on your instructions by an AI assistant you connect to Plateful
+                </li>
                 <li>Notify us immediately of any unauthorized use of your account</li>
                 <li>We are not liable for any loss or damage from unauthorized account access</li>
               </ul>
@@ -122,27 +132,35 @@ export default function TermsOfService() {
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">AI-Generated Content</h2>
             <p>
-              Plateful includes an AI chatbot that can suggest recipes, propose edits, and provide
-              cooking assistance. Please be aware of the following:
+              Plateful uses AI to import and structure recipes, estimate nutrition and servings,
+              adapt recipes, answer cooking questions, generate cover images, and power the chatbot.
+              Please be aware of the following:
             </p>
             <ul className="list-disc list-inside space-y-1 ml-4">
               <li>
-                AI-generated recipes and suggestions are provided for convenience only and may
-                contain errors, inaccurate quantities, incorrect cooking times, or unsafe
-                combinations.
+                AI-generated content, including imported recipes, adapted recipes, answers, and
+                suggestions, is provided for convenience only and may contain errors, inaccurate
+                quantities, incorrect cooking times or temperatures, or unsafe combinations. When
+                importing a recipe, the AI may fill in details that are missing from the source.
               </li>
               <li>
                 Always verify ingredients, quantities, allergens, and cooking instructions
-                independently before preparing any AI-generated recipe.
+                independently before preparing any recipe that was created, imported, or changed
+                with AI.
               </li>
+              <li>
+                Nutrition values and serving sizes are estimates and are not a basis for medical or
+                dietary decisions.
+              </li>
+              <li>AI-generated cover images are illustrations and do not show the actual dish.</li>
               <li>
                 We are not responsible for the accuracy, safety, or suitability of AI-generated
                 content. Users with food allergies or dietary restrictions should exercise
                 particular caution.
               </li>
               <li>
-                Your chat messages and uploaded images are transmitted to OpenAI for processing. See
-                our Privacy Policy for details.
+                Content you use with AI features is processed by our AI providers (OpenAI and
+                Google). See our Privacy Policy for details.
               </li>
             </ul>
           </section>
@@ -240,6 +258,23 @@ export default function TermsOfService() {
             <p>
               Your privacy is important to us. Please review our Privacy Policy, which explains how
               we collect, use, and protect your information when you use our App.
+            </p>
+          </section>
+
+          <section className="space-y-3">
+            <h2 className="text-lg font-semibold">YouTube</h2>
+            <p>
+              Plateful uses YouTube API Services to import recipes from YouTube videos. By using
+              Plateful, you agree to be bound by the{" "}
+              <a
+                href="https://www.youtube.com/t/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-primary"
+              >
+                YouTube Terms of Service
+              </a>
+              .
             </p>
           </section>
 
@@ -343,18 +378,8 @@ export default function TermsOfService() {
               EU law requires otherwise.
             </p>
             <p>
-              In accordance with EU Regulation No. 524/2013, we are required to inform you of the EU
-              Online Dispute Resolution platform, which is available at{" "}
-              <a
-                href="https://ec.europa.eu/consumers/odr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-primary"
-              >
-                https://ec.europa.eu/consumers/odr
-              </a>
-              . We are not obliged to and do not participate in dispute resolution proceedings
-              before a consumer arbitration board.
+              We are not obliged to and do not participate in dispute resolution proceedings before
+              a consumer arbitration board.
             </p>
             <p>
               Nothing in these Terms limits any rights you may have under applicable EU consumer

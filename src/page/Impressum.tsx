@@ -6,7 +6,7 @@ export default function Impressum() {
       <div className="space-y-2 pb-8">
         <div className="space-y-2">
           <h1 className="text-2xl font-bold">Impressum</h1>
-          <p className="text-sm text-muted-foreground">Angaben gemäß § 5 TMG</p>
+          <p className="text-sm text-muted-foreground">Angaben gemäß § 5 DDG</p>
         </div>
 
         <Separator />
@@ -37,18 +37,6 @@ export default function Impressum() {
 
           <section className="space-y-3">
             <h2 className="text-lg font-semibold">Streitschlichtung</h2>
-            <p>
-              Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS)
-              bereit:{" "}
-              <a
-                href="https://ec.europa.eu/consumers/odr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline text-primary"
-              >
-                https://ec.europa.eu/consumers/odr
-              </a>
-            </p>
             <p>
               Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer
               Verbraucherschlichtungsstelle teilzunehmen.

@@ -26,6 +26,9 @@ None.
 | A8  | Privacy    | AI features listed under consent ("by using AI features, you consent") though no consent dialog exists and imports cannot work without the providers | ✅ 2026-10-08 (Kerim): AI features moved to contract performance (Art. 6(1)(b)) incl. the transfer to OpenAI, Google, ScrapeCreators, ScrapingAnt, YouTube API Services, Hetzner; the "by using" consent sentence removed |
 | A9  | Privacy    | DPA (AVV) with ScrapeCreators / ScrapingAnt? | ✅ 2026-10-08 (Kerim): none. Both receive only the link from our server, no account data, no user IP, so no user personal data is processed on our behalf. Revisit if they ever get more than the link |
 | A10 | Compliance | App Store guideline 5.1.2(i) asks for explicit permission before personal data goes to third-party AI; neither app shows such a screen | Accepted 2026-10-08 (Kerim): no permission screen, as in comparable AI apps. Add one only if App Review flags it |
+| A11 | ToS        | AI disclaimer covered only the chatbot; ToS said chat data goes to OpenAI only | ✅ 2026-10-08: covers all AI output (imports that may fill in missing details, adaptation, answers, nutrition and serving estimates, AI cover images); providers OpenAI and Google; connected AI assistant listed in the service description and under account responsibility |
+| A12 | ToS        | YouTube API Services Developer Policies III.A require a link to the YouTube ToS and a statement that users agree to be bound by it | ✅ 2026-10-08: "YouTube" section added to ToS |
+| A13 | Legal      | EU ODR platform discontinued 20 July 2025 (Regulation (EU) 2024/3228); Impressum cited the repealed TMG | ✅ 2026-10-08: ODR link removed from ToS and Impressum (the no-arbitration statement stays); Impressum cites § 5 DDG |
 
 ---
 
