@@ -1132,6 +1132,7 @@ export type Database = {
           base_servings: number
           calories_kcal: number | null
           carbs_g: number | null
+          content_updated_at: string
           cookbook_id: string | null
           cover_pending: boolean
           created_at: string
@@ -1165,6 +1166,7 @@ export type Database = {
           base_servings?: number
           calories_kcal?: number | null
           carbs_g?: number | null
+          content_updated_at?: string
           cookbook_id?: string | null
           cover_pending?: boolean
           created_at?: string
@@ -1198,6 +1200,7 @@ export type Database = {
           base_servings?: number
           calories_kcal?: number | null
           carbs_g?: number | null
+          content_updated_at?: string
           cookbook_id?: string | null
           cover_pending?: boolean
           created_at?: string
@@ -1289,6 +1292,95 @@ export type Database = {
         }
         Relationships: []
       }
+      shopping_list_items: {
+        Row: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          added_at?: string
+          bought_at?: string | null
+          bought_count?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          household_id: string
+          id?: string
+          ingredient_slug?: string | null
+          name: string
+          name_key?: string | null
+          on_list?: boolean
+          quantity_display?: string | null
+          quantity_value?: number | null
+          sources?: Json
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          added_at?: string
+          bought_at?: string | null
+          bought_count?: number
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          household_id?: string
+          id?: string
+          ingredient_slug?: string | null
+          name?: string
+          name_key?: string | null
+          on_list?: boolean
+          quantity_display?: string | null
+          quantity_value?: number | null
+          sources?: Json
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shopping_list_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "household_entitlements"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "shopping_list_items_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_list_items_household_id_fkey"
+            columns: ["household_id"]
+            isOneToOne: false
+            referencedRelation: "household"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_list_items_ingredient_slug_fkey"
+            columns: ["ingredient_slug"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       survey_answers: {
         Row: {
           created_at: string
@@ -1330,6 +1422,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tags: {
+        Row: {
+          name_de: string
+          name_en: string
+          slug: string
+        }
+        Insert: {
+          name_de: string
+          name_en: string
+          slug: string
+        }
+        Update: {
+          name_de?: string
+          name_en?: string
+          slug?: string
+        }
+        Relationships: []
       }
       user_missions: {
         Row: {
@@ -1595,9 +1705,113 @@ export type Database = {
           },
         ]
       }
+      search_synonyms: {
+        Row: {
+          label: string | null
+          slug: string | null
+          substitute: unknown
+          target: unknown
+        }
+        Relationships: []
+      }
     }
     Functions: {
       accept_household_invite: { Args: { p_token: string }; Returns: Json }
+      add_ingredients_to_shopping_list: {
+        Args: { p_household_id: string; p_lines: Json }
+        Returns: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shopping_list_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      add_recipe_to_shopping_list: {
+        Args: {
+          p_household_id: string
+          p_ingredient_ids: string[]
+          p_scale?: number
+        }
+        Returns: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shopping_list_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      add_shopping_list_item: {
+        Args: {
+          p_household_id: string
+          p_id: string
+          p_name: string
+          p_quantity_display?: string
+          p_quantity_value?: number
+          p_unit?: string
+        }
+        Returns: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shopping_list_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       apply_planner_changes: {
         Args: {
           p_delete_ids: string[]
@@ -1753,6 +1967,34 @@ export type Database = {
         Args: { p_member_id: string }
         Returns: undefined
       }
+      remove_recipe_from_shopping_list: {
+        Args: { p_household_id: string; p_recipe_id: string }
+        Returns: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shopping_list_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       replace_recipe_collections: {
         Args: { p_collection_ids?: string[]; p_recipe_id: string }
         Returns: undefined
@@ -1827,6 +2069,41 @@ export type Database = {
         Returns: undefined
       }
       unregister_push_token: { Args: { p_token: string }; Returns: undefined }
+      update_shopping_list_item: {
+        Args: {
+          p_category: string
+          p_id: string
+          p_name: string
+          p_quantity_display?: string
+          p_quantity_value?: number
+          p_unit?: string
+        }
+        Returns: {
+          added_at: string
+          bought_at: string | null
+          bought_count: number
+          category: string
+          created_at: string
+          created_by: string | null
+          household_id: string
+          id: string
+          ingredient_slug: string | null
+          name: string
+          name_key: string | null
+          on_list: boolean
+          quantity_display: string | null
+          quantity_value: number | null
+          sources: Json
+          unit: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "shopping_list_items"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
     }
     Enums: {
       [_ in never]: never
