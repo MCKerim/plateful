@@ -388,6 +388,15 @@
       "openList": "Open list",
       "loadFailed": "Couldn’t load ingredients.",
       "retry": "Retry"
+    },
+    "planAdd": {
+      "addWeek": "Add week to shopping list",
+      "pickMeals": "Pick meals",
+      "pickIngredients": "Pick ingredients",
+      "nothingToCook": "Nothing left to cook.",
+      "also": "Also {{days}}",
+      "noIngredients": "No ingredients",
+      "back": "Back"
     }
   },
   "mealPlanner": {

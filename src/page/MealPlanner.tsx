@@ -21,6 +21,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
+  ShoppingCart,
   StickyNote,
 } from "lucide-react";
 import { useNavigate } from "react-router";
@@ -59,6 +60,8 @@ import MealPlannerIllustration from "@/components/onboarding/illustrations/MealP
 import PlannerEntryChooser from "@/components/mealPlanner/plannerEntryChooser/PlannerEntryChooser";
 import NoteDialog, { NoteDialogState } from "@/components/mealPlanner/noteDialog/NoteDialog";
 import { orderForDisplay, planSubjectOf } from "@/lib/mealPlanHelper/mealPlanHelper";
+import ShoppingPlanAddSheet from "@/components/shoppingList/ShoppingPlanAddSheet";
+import { planMeals, type PlanMeal } from "@/lib/shopping-list/planAdd";
 
 const locales = {
   en: enUS,
@@ -99,9 +102,15 @@ export default function MealPlanner() {
   /** The day whose "+" opened the recipe-or-note chooser. */
   const [chooserDay, setChooserDay] = useState<Date | null>(null);
   const [noteDialog, setNoteDialog] = useState<NoteDialogState | null>(null);
+  /** The week's meals as they were when the cart was tapped; null while its sheet is closed. */
+  const [shoppingMeals, setShoppingMeals] = useState<PlanMeal[] | null>(null);
 
   // React Query hooks - clean and simple!
-  const { data: plannedItems = [], isLoading } = useMealPlannerItems(currentWeek);
+  const {
+    data: plannedItems = [],
+    isLoading,
+    isPlaceholderData,
+  } = useMealPlannerItems(currentWeek);
   const deleteMutation = useDeletePlannedItem();
   const updateDateMutation = useUpdatePlannedItemDate();
   const setEatenMutation = useSetEaten();
@@ -128,6 +137,8 @@ export default function MealPlanner() {
     )
   );
   const isDraggingFromDrawer = activeItem?.planned_date === null;
+  // What the cart puts on the list: the shown week from today on; nothing in a past week.
+  const weekMeals = planMeals(plannedItems, getWeekdays(currentWeek, firstWeekday), new Date());
 
   // Auto-open drawer when there are unplanned items
   useEffect(() => {
@@ -339,11 +350,19 @@ export default function MealPlanner() {
 
         <NoteDialog state={noteDialog} onClose={() => setNoteDialog(null)} />
 
+        <ShoppingPlanAddSheet meals={shoppingMeals} onClose={() => setShoppingMeals(null)} />
+
         {/* Week Navigation */}
         <div className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10">
-          <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
-            <ChevronLeft size={20} />
-          </Button>
+          <div className="flex items-center">
+            <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+              <ChevronLeft size={20} />
+            </Button>
+            {/* The cart's invisible twin keeps the title centred. */}
+            <Button variant="ghost" size="sm" className="invisible" aria-hidden tabIndex={-1}>
+              <ShoppingCart size={20} />
+            </Button>
+          </div>
 
           <div className="flex flex-col items-center">
             <h2 className="text-lg font-semibold">
@@ -373,9 +392,20 @@ export default function MealPlanner() {
             {shownWeekIs(new Date()) && <div className="h-[16px]"></div>}
           </div>
 
-          <Button variant="ghost" size="sm" onClick={goToNextWeek}>
-            <ChevronRight size={20} />
-          </Button>
+          <div className="flex items-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={t("shoppingList.planAdd.addWeek")}
+              disabled={weekMeals.length === 0 || isPlaceholderData}
+              onClick={() => setShoppingMeals(weekMeals)}
+            >
+              <ShoppingCart size={20} />
+            </Button>
+            <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+              <ChevronRight size={20} />
+            </Button>
+          </div>
         </div>
 
         {/* Calendar Days */}

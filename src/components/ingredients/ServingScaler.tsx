@@ -9,6 +9,8 @@ type Props = {
   showSetDefault?: boolean;
   onSetDefault?: () => void;
   isSettingDefault?: boolean;
+  /** The count alone, for a row that has its own context (the week's add-to-list sheet). */
+  compact?: boolean;
 };
 
 export function ServingScaler({
@@ -18,6 +20,7 @@ export function ServingScaler({
   showSetDefault = false,
   onSetDefault,
   isSettingDefault = false,
+  compact = false,
 }: Props) {
   const { t } = useTranslation();
 
@@ -43,8 +46,9 @@ export function ServingScaler({
         <Minus />
       </Button>
 
-      <span className="min-w-[100px] text-center font-medium">
-        {value} {t(`ingredients.units.${unit}`, { defaultValue: unit })}
+      <span className={`${compact ? "min-w-6" : "min-w-[100px]"} text-center font-medium`}>
+        {value}
+        {!compact && ` ${t(`ingredients.units.${unit}`, { defaultValue: unit })}`}
       </span>
 
       <Button

@@ -99,9 +99,7 @@ export function ShoppingCheckMark({ isSelected }: Readonly<{ isSelected: boolean
     <span
       className={cn(
         "flex size-6 shrink-0 items-center justify-center rounded-full border-2",
-        isSelected
-          ? "border-accent bg-accent text-accent-foreground"
-          : "border-muted-foreground/50"
+        isSelected ? "border-accent bg-accent text-accent-foreground" : "border-muted-foreground/50"
       )}
       aria-hidden
     >
@@ -125,11 +123,7 @@ export function ShoppingAddButton({
       disabled={count === 0 || isAdding}
       onClick={onAdd}
     >
-      {isAdding ? (
-        <Loader2 className="animate-spin" />
-      ) : (
-        t("shoppingList.checklist.add", { count })
-      )}
+      {isAdding ? <Loader2 className="animate-spin" /> : t("shoppingList.checklist.add", { count })}
     </Button>
   );
 }

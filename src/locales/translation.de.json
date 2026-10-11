@@ -388,6 +388,15 @@
       "openList": "Liste öffnen",
       "loadFailed": "Zutaten konnten nicht geladen werden.",
       "retry": "Erneut versuchen"
+    },
+    "planAdd": {
+      "addWeek": "Woche auf die Einkaufsliste setzen",
+      "pickMeals": "Wähle Gerichte",
+      "pickIngredients": "Wähle Zutaten",
+      "nothingToCook": "Nichts mehr zu kochen.",
+      "also": "Auch {{days}}",
+      "noIngredients": "Keine Zutaten",
+      "back": "Zurück"
     }
   },
   "mealPlanner": {
