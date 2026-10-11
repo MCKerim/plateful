@@ -417,8 +417,8 @@ export function editItem(
   };
 }
 
-/** What taking a recipe off does: the new list and the touched rows the server will return. */
-export type RecipeRemoval = { items: ShoppingListItem[]; keptIds: string[] };
+/** Taking a recipe off: the new list, how many rows it touched, the touched rows the server returns. */
+export type RecipeRemoval = { items: ShoppingListItem[]; touchedCount: number; keptIds: string[] };
 
 /**
  * Takes a recipe off: its entries leave every ledger and each amount is rebuilt
@@ -441,6 +441,7 @@ export function removeRecipe(items: ShoppingListItem[], recipeId: string): Recip
   });
   return {
     items: next,
+    touchedCount: touched.size,
     keptIds: next.filter((item) => touched.has(item.id)).map((item) => item.id),
   };
 }

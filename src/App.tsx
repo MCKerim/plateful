@@ -286,6 +286,23 @@ function App() {
       }, 300);
     };
 
+    // The shopping list the same way, so a partner's ticks show mid-shop. A
+    // refetch waits while a list write is in flight: it would fetch the
+    // state before the write and undo the optimistic change on screen.
+    let shoppingRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleShoppingRefresh = () => {
+      if (shoppingRefreshTimer) return;
+      const refresh = () => {
+        if (queryClient.isMutating({ mutationKey: queryKeys.shoppingList.all }) > 0) {
+          shoppingRefreshTimer = setTimeout(refresh, 300);
+          return;
+        }
+        shoppingRefreshTimer = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.shoppingList.all });
+      };
+      shoppingRefreshTimer = setTimeout(refresh, 300);
+    };
+
     const channel = supabase
       .channel("recipes-changes")
       .on(
@@ -314,11 +331,17 @@ function App() {
         { event: "*", schema: "public", table: "planner_notes" },
         schedulePlanRefresh
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "shopping_list_items" },
+        scheduleShoppingRefresh
+      )
       .subscribe();
 
     return () => {
       if (refreshTimer) clearTimeout(refreshTimer);
       if (planRefreshTimer) clearTimeout(planRefreshTimer);
+      if (shoppingRefreshTimer) clearTimeout(shoppingRefreshTimer);
       supabase.removeChannel(channel);
     };
   }, [householdId, queryClient, supabase]);

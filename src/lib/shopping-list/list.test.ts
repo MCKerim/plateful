@@ -345,7 +345,8 @@ describe("recipes on the trip", () => {
     expect(trip[0]).toMatchObject({ timesAdded: 2, addedAt: 500 });
     expect(trip[0].items.map((item) => item.id)).toEqual(["a", "b"]);
     expect(text(keeping(tomatoes, (entry) => isFromRecipe(entry, "lasagne")))).toBe("600 g");
-    const { items, keptIds } = removeRecipe([tomatoes, sheets], "lasagne");
+    const { items, keptIds, touchedCount } = removeRecipe([tomatoes, sheets], "lasagne");
+    expect(touchedCount).toBe(2);
     expect(tripRecipes(aisleSections(items))).toEqual([]);
     expect(items.map((item) => item.id)).toEqual(["a"]);
     expect(keptIds).toEqual(["a"]);

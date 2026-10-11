@@ -39,6 +39,12 @@ export const queryKeys = {
   subscription: {
     byHousehold: (householdId: string) => ["subscription", "household", householdId] as const,
   },
+  shoppingList: {
+    all: ["shopping-list"] as const,
+    items: (householdId: string) => ["shopping-list", "items", householdId] as const,
+  },
+  /** The global `ingredients` dictionary; outside `shoppingList` so list events don't refetch it. */
+  ingredientDictionary: ["ingredient-dictionary"] as const,
   missions: {
     householdMissions: (householdId: string) => ["missions", "household", householdId] as const,
     householdRewards: (householdId: string) => ["missions", "rewards", householdId] as const,

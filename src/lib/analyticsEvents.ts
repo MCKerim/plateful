@@ -34,6 +34,9 @@
  * - `household_created` / `household_joined`: `household_id`, lowercase —
  *   Postgres ids already are; never uppercase them.
  * - `household_left`: `outcome` is the `leave_household` RPC result string.
+ * - `shopping_list_items_added`: `source` is "manual" | "recipe" | "plan",
+ *   `count` is 1 for a typed line, else the items touched.
+ * - `shopping_list_recipe_removed`: `count` is the items the recipe touched.
  */
 export const AnalyticsEvent = {
   magicLinkRequested: "magic_link_requested",
@@ -61,6 +64,8 @@ export const AnalyticsEvent = {
   householdMemberRemoved: "household_member_removed",
   pushPermissionGranted: "push_permission_granted",
   pushPermissionDenied: "push_permission_denied",
+  shoppingListItemsAdded: "shopping_list_items_added",
+  shoppingListRecipeRemoved: "shopping_list_recipe_removed",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvent)[keyof typeof AnalyticsEvent];
