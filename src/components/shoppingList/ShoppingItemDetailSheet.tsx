@@ -32,8 +32,7 @@ type Props = {
   onOpenRecipe: (recipeId: string) => void;
 };
 
-const GLYPHS: Record<ShoppingItemSource["kind"], string> = {
-  recipe: "🍽️",
+const GLYPHS: Record<Exclude<ShoppingItemSource["kind"], "recipe">, string> = {
   manual: "✋",
   set: "✍️",
 };
@@ -81,7 +80,7 @@ export default function ShoppingItemDetailSheet({
           <RecipeCover
             url={recipeId ? coverUrls.get(recipeId) : null}
             exists={opens}
-            placeholder={GLYPHS[source.kind]}
+            glyph={source.kind === "recipe" ? undefined : GLYPHS[source.kind]}
           />
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">

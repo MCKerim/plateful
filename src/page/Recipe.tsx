@@ -13,6 +13,7 @@ import {
   Share2,
   Loader2,
   MoreVertical,
+  ShoppingCart,
   Trash2,
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
@@ -110,6 +111,7 @@ export default function Recipe() {
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [actionsDrawerOpen, setActionsDrawerOpen] = useState(false);
+  const [addToListOpen, setAddToListOpen] = useState(false);
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
@@ -308,6 +310,22 @@ export default function Recipe() {
         <Drawer open={actionsDrawerOpen} onOpenChange={setActionsDrawerOpen}>
           <DrawerContent>
             <DrawerFooter className="gap-4 mb-8 mt-4">
+              {scaledIngredients.length > 0 && (
+                <Button
+                  variant="secondary"
+                  size="lg"
+                  onClick={() => {
+                    setActionsDrawerOpen(false);
+                    setAddToListOpen(true);
+                  }}
+                >
+                  <div className="flex justify-start gap-4 w-full h-full items-center">
+                    <ShoppingCart />
+                    <p className="font-semibold">{t("shoppingList.addToList")}</p>
+                  </div>
+                </Button>
+              )}
+
               <Button
                 variant="secondary"
                 size="lg"
@@ -400,6 +418,8 @@ export default function Recipe() {
           baseServings={recipe.base_servings}
           servingsUnit={recipe.servings_unit ?? "servings"}
           showScalingControls={recipe.base_servings !== null}
+          addToListOpen={addToListOpen}
+          onAddToListOpenChange={setAddToListOpen}
         />
       )}
 

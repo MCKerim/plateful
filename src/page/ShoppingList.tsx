@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
-import { Plus } from "lucide-react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import Layout from "@/components/layout/Layout";
-import { Button } from "@/components/ui/button";
+import Fab from "@/components/general/Fab";
 import ShoppingItemCard from "@/components/shoppingList/ShoppingItemCard";
 import ShoppingTripHeadline from "@/components/shoppingList/ShoppingTripHeadline";
 import ShoppingEmptyState from "@/components/shoppingList/ShoppingEmptyState";
@@ -41,6 +41,7 @@ type Sheet =
   | { kind: "recipe"; recipeId: string; fromList: boolean };
 
 const HIGHLIGHT_MS = 1500;
+const SMOOTH = { type: "spring", duration: 0.3, bounce: 0 } as const;
 
 /**
  * The household's one shared list: what is left grouped by aisle in the order
@@ -105,19 +106,38 @@ export default function ShoppingList() {
 
   function section(title: string, sectionItems: ShoppingListItem[], dimmed = false) {
     return (
-      <section key={title} className="flex flex-col gap-2.5">
+      <motion.section
+        key={title}
+        layout="position"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={SMOOTH}
+        className="relative flex flex-col gap-2.5"
+      >
         <h3 className="font-semibold">{title}</h3>
-        {sectionItems.map((item) => (
-          <ShoppingItemCard
-            key={item.id}
-            item={item}
-            dimmed={dimmed}
-            highlighted={highlightedId === item.id}
-            onClick={() => tap(item)}
-            onDetails={() => setSheet({ kind: "detail", itemId: item.id })}
-          />
-        ))}
-      </section>
+        <AnimatePresence initial={false} mode="popLayout">
+          {sectionItems.map((item) => (
+            // The shared layoutId carries a bought row into its new section.
+            <motion.div
+              key={item.id}
+              layoutId={item.id}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              transition={SMOOTH}
+            >
+              <ShoppingItemCard
+                item={item}
+                dimmed={dimmed}
+                highlighted={highlightedId === item.id}
+                onClick={() => tap(item)}
+                onDetails={() => setSheet({ kind: "detail", itemId: item.id })}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </motion.section>
     );
   }
 
@@ -137,7 +157,7 @@ export default function ShoppingList() {
       {isPending ? null : empty ? (
         <ShoppingEmptyState onAdd={() => setSheet({ kind: "add" })} />
       ) : (
-        <div className="flex flex-col gap-6 pb-20">
+        <div className="relative flex flex-col gap-6 pb-20">
           {/* The first rows sit in thumb reach, not under the status bar. */}
           <div className="flex min-h-[36dvh] flex-col justify-end">
             {openCount === 0 && (
@@ -160,25 +180,19 @@ export default function ShoppingList() {
               }
             />
           </div>
-          {sections.map(({ aisle, items: aisleItems }) =>
-            section(t(aisleInfo(aisle).labelKey), aisleItems)
-          )}
-          {bought.length > 0 && section(t("shoppingList.recentlyBought"), bought, true)}
+          <MotionConfig reducedMotion="user">
+            <AnimatePresence initial={false} mode="popLayout">
+              {sections.map(({ aisle, items: aisleItems }) =>
+                section(t(aisleInfo(aisle).labelKey), aisleItems)
+              )}
+              {bought.length > 0 && section(t("shoppingList.recentlyBought"), bought, true)}
+            </AnimatePresence>
+          </MotionConfig>
         </div>
       )}
 
       {!isPending && !empty && (
-        <div className="pointer-events-none fixed bottom-[5.5rem] z-30 flex w-full max-w-lg justify-center px-4 -mx-4">
-          <Button
-            variant="accent"
-            size="lg"
-            className="pointer-events-auto rounded-full shadow-lg"
-            onClick={() => setSheet({ kind: "add" })}
-          >
-            <Plus />
-            {t("shoppingList.add")}
-          </Button>
-        </div>
+        <Fab aria-label={t("shoppingList.add")} onClick={() => setSheet({ kind: "add" })} />
       )}
 
       <ShoppingAddSheet

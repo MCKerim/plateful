@@ -1,5 +1,6 @@
 import { ArrowRight, Info } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { shoppingEmoji } from "@/lib/shopping-list/emoji";
@@ -54,9 +55,11 @@ export default function ShoppingItemCard({
           : undefined
       }
     >
-      <button
+      <motion.button
         type="button"
-        className="flex min-w-0 flex-1 items-center gap-2.5 text-left active:scale-[0.98] transition-transform"
+        className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
         onClick={onClick}
       >
         <span
@@ -95,7 +98,7 @@ export default function ShoppingItemCard({
             {t("shoppingList.alreadyOnList")}
           </span>
         )}
-      </button>
+      </motion.button>
       {onDetails && (
         <button
           type="button"

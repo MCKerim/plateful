@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "../ui/button";
 import { Drawer, DrawerContent, DrawerFooter, DrawerTrigger } from "../ui/drawer";
 import { Camera, FolderPlus, Link, Plus } from "lucide-react";
-import { motion } from "motion/react";
+import Fab from "./Fab";
 import { useState } from "react";
 
 type Props = {
@@ -54,15 +54,7 @@ export default function AddNewRecipeDrawer({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <motion.button
-          type="button"
-          aria-label={t("addRecipeDrawer.open")}
-          className="p-2.5 fixed bottom-[5rem] right-[1rem] z-50 rounded-full bg-accent text-accent-foreground flex items-center justify-center shadow-lg"
-          whileTap={{ scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-        >
-          <Plus size={34} />
-        </motion.button>
+        <Fab aria-label={t("addRecipeDrawer.open")} />
       </DrawerTrigger>
 
       <DrawerContent>

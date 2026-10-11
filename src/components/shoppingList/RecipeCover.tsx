@@ -1,18 +1,26 @@
 type Props = {
   url: string | null | undefined;
-  /** False for a recipe deleted since it was added: a placeholder instead. */
+  /** False for a recipe deleted since it was added: the no-image picture. */
   exists: boolean;
-  placeholder?: string;
+  /** A glyph tile instead of a picture, for a source that is no recipe. */
+  glyph?: string;
 };
 
-/** A recipe's cover filling its frame, or a quiet placeholder tile. */
-export default function RecipeCover({ url, exists, placeholder = "🍽️" }: Readonly<Props>) {
-  if (exists && url) {
-    return <img src={url} alt="" loading="lazy" className="size-full object-cover" />;
+/** A recipe's cover filling its frame, the app's no-image picture without one. */
+export default function RecipeCover({ url, exists, glyph }: Readonly<Props>) {
+  if (glyph) {
+    return (
+      <span className="flex size-full items-center justify-center bg-muted text-xl" aria-hidden>
+        {glyph}
+      </span>
+    );
   }
   return (
-    <span className="flex size-full items-center justify-center bg-muted text-xl" aria-hidden>
-      {placeholder}
-    </span>
+    <img
+      src={(exists && url) || "/no-img.jpg"}
+      alt=""
+      loading="lazy"
+      className="size-full object-cover"
+    />
   );
 }

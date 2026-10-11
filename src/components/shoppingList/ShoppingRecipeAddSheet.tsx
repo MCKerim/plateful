@@ -37,29 +37,33 @@ type Props = {
   onServingsChange: (servings: number) => void;
 };
 
+type SheetProps = Props & {
+  /** Owned by the recipe page, whose actions menu opens the same sheet. */
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+};
+
 /**
  * "Add to list" under a recipe's ingredients, and its sheet: a checklist of the
  * recipe's rows at the detail's serving count, everything on except the
  * staples. Adding merges each line into the household's items on the server;
  * then the sheet says what happened and offers the list.
  */
-export default function ShoppingRecipeAddSheet(props: Readonly<Props>) {
+export default function ShoppingRecipeAddSheet({
+  open,
+  onOpenChange,
+  ...props
+}: Readonly<SheetProps>) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
 
   return (
-    <Drawer open={open} onOpenChange={setOpen}>
-      <Button
-        variant="secondary"
-        size="lg"
-        className="mt-4 w-full rounded-full"
-        onClick={() => setOpen(true)}
-      >
+    <Drawer open={open} onOpenChange={onOpenChange}>
+      <Button variant="secondary" className="mt-4 mb-2 w-full" onClick={() => onOpenChange(true)}>
         <ShoppingCart />
         {t("shoppingList.addToList")}
       </Button>
       <DrawerContent className="max-h-[90dvh]">
-        <Checklist {...props} onClose={() => setOpen(false)} />
+        <Checklist {...props} onClose={() => onOpenChange(false)} />
       </DrawerContent>
     </Drawer>
   );

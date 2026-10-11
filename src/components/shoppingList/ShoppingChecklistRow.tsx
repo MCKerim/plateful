@@ -78,7 +78,7 @@ export default function ShoppingChecklistRow({
                   !isSelected && "grayscale"
                 )}
               >
-                <RecipeCover url={url} exists placeholder="" />
+                <RecipeCover url={url} exists />
               </span>
             ))}
           </span>

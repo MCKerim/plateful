@@ -20,6 +20,8 @@ type Props = {
   baseServings: number | null;
   servingsUnit?: string;
   showScalingControls?: boolean;
+  addToListOpen: boolean;
+  onAddToListOpenChange: (open: boolean) => void;
 };
 
 export function IngredientList({
@@ -28,6 +30,8 @@ export function IngredientList({
   baseServings,
   servingsUnit = "servings",
   showScalingControls = true,
+  addToListOpen,
+  onAddToListOpenChange,
 }: Props) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -114,6 +118,8 @@ export function IngredientList({
         recipeName={recipeName}
         servings={targetServings}
         onServingsChange={handleServingsChange}
+        open={addToListOpen}
+        onOpenChange={onAddToListOpenChange}
       />
     </div>
   );
