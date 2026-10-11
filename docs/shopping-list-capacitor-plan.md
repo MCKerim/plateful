@@ -1,6 +1,7 @@
 # Shopping list on Capacitor (web + Android)
 
-Plan, 2026-10-11. Status: in progress. Parity port of the iOS shopping
+Plan, 2026-10-11. Status: built on branch `shopping-list` (2026-10-11),
+versioned 1.4 / 43, not yet uploaded to Play. Parity port of the iOS shopping
 list (iOS 1.2 and 1.3, built 2026-09-14 to 10-08). The iOS repo is the
 spec; this file names what is copied, what is adapted, and the order.
 
@@ -82,14 +83,19 @@ RPCs (all `security invoker`, household-scoped by RLS):
 - **Recipe sheet** (from the header's "N Rezepte"): the recipe's items with
   its share, cover and name open the recipe, "Von der Liste entfernen".
   One recipe opens its sheet directly, several open a recipe list first.
-- **Recipe → list** on the recipe page next to `IngredientList`: checklist
-  of the recipe's lines, staples (`ingredients.is_staple`) deselected,
-  scale from the serving scaler, preview rows, Add.
+- **Recipe → list** under `IngredientList` ("Zur Liste"): checklist of
+  the recipe's lines, staples (`ingredients.is_staple`) deselected and
+  marked "Vorrat", lines on the list marked, scale = the detail's servings
+  over the rows' own base (one query, `useIngredientsBundles`), the
+  sheet's stepper and the detail's in step, Add, "Liste öffnen".
 - **Week → list** in the planner's bar: the shown week's uncooked meals
-  from today plus the pool, one row per recipe ("2×"), a serving count per
-  meal (sheet-only state), recipes already on the list deselected, merged
-  ingredient checklist with summed, rounded amounts (port
-  `ShoppingPlanAdd.meals` and `roundScaled`). Port `ShoppingPlanAddTests`.
+  from today plus the pool (first), one row per placement like iOS since
+  10-08 (a recipe's later placement is a repeat, off by default; on, its
+  scales add up), a serving count per meal (sheet-only state), recipes
+  already on the list deselected, then the merged ingredient checklist
+  (`planLines`, the server's merge order). Ported from
+  `ShoppingPlanAdd` with `ShoppingPlanAddTests` in
+  `src/lib/shopping-list/planAdd.ts`.
 - **Realtime**: one more `postgres_changes` subscription in `App.tsx` on
   `shopping_list_items` that invalidates `queryKeys.shoppingList.all`.
 - **Strings** DE and EN in `src/locales`, same wording as the iOS string
