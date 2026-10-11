@@ -268,6 +268,17 @@ describe("the list", () => {
     expect(parseTypedLine("   ")).toBeNull();
   });
 
+  it("matches the dictionary with umlauts folded, like the server", () => {
+    const dictionary = [
+      entry("apple", "apple", "Apfel", "produce"),
+      entry("tissue", "tissue", "Taschentuch", "care"),
+    ];
+    expect(preview([], dictionary, "10 Äpfel")).toMatchObject({ slug: "apple", aisle: "produce" });
+    expect(preview([], dictionary, "Taschentücher")).toMatchObject({ slug: "tissue", aisle: "care" });
+    const items = [makeItem("a", "Apfel", "produce", { slug: "apple" })];
+    expect(addsNothing(preview(items, dictionary, "Äpfel"))).toBe(true);
+  });
+
   it("holds an edited aisle across buying and putting back", () => {
     let items = edit([makeItem("a", "Klopapier", "other")], "a", "Klopapier", "", "household");
     expect(aisleSections(items).map((section) => section.aisle)).toEqual(["household"]);

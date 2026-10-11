@@ -97,16 +97,21 @@ export function tripRecipes(sections: AisleSection[]): TripRecipe[] {
   });
 }
 
+/** The server compares names with ä/ö/ü as a/o/u, so "Äpfel" is Apfel + nothing. */
+const fold = (name: string) =>
+  name.toLowerCase().replace(/[äöü]/g, (c) => ({ ä: "a", ö: "o", ü: "u" })[c] ?? c);
+
 /** The server's dictionary match: exact name in either language, else a plural ending. */
 function dictionaryMatch(
   dictionary: ShoppingDictionaryEntry[],
-  key: string
+  rawKey: string
 ): ShoppingDictionaryEntry | null {
+  const key = fold(rawKey);
   let exact: ShoppingDictionaryEntry | null = null;
   let plural: ShoppingDictionaryEntry | null = null;
   for (const entry of dictionary) {
-    const en = entry.nameEn.toLowerCase();
-    const de = entry.nameDe.toLowerCase();
+    const en = fold(entry.nameEn);
+    const de = fold(entry.nameDe);
     if (key === en || key === de) {
       if (!exact || entry.slug < exact.slug) exact = entry;
     } else if (

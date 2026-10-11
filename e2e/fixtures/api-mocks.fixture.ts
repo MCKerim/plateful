@@ -372,6 +372,29 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   }
 
+  // The shopping list is empty in every scenario so far: the household's
+  // rows, the ingredient dictionary, and the RPCs that return touched rows.
+  for (const table of ["shopping_list_items", "ingredients"]) {
+    await page.route(`**/rest/v1/${table}?*`, async (route) => {
+      const method = route.request().method();
+      await route.fulfill({
+        status: method === "DELETE" || method === "PATCH" ? 204 : 200,
+        contentType: "application/json",
+        body: method === "DELETE" || method === "PATCH" ? "" : JSON.stringify([]),
+      });
+    });
+  }
+  for (const rpc of [
+    "add_shopping_list_item",
+    "add_ingredients_to_shopping_list",
+    "update_shopping_list_item",
+    "remove_recipe_from_shopping_list",
+  ]) {
+    await page.route(`**/rest/v1/rpc/${rpc}`, async (route) => {
+      await route.fulfill({ status: 200, contentType: "application/json", body: "[]" });
+    });
+  }
+
   // Mission progress is bumped as a side effect of many actions; the app
   // ignores the returned row.
   await page.route("**/rest/v1/rpc/increment_household_mission", async (route) => {

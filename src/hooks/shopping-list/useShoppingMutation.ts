@@ -34,7 +34,10 @@ export function useShoppingMutation<TVariables extends Variables, TResult>(optio
     onSuccess: options.onSuccess,
     onError: (error, variables, context) => {
       const queryKey = queryKeys.shoppingList.items(variables.householdId);
-      if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
+      // Another write's optimistic rows live in the cache; restoring this
+      // snapshot would drop them. The refetch below shows the server's truth.
+      const alone = queryClient.isMutating({ mutationKey: queryKeys.shoppingList.all }) === 1;
+      if (alone && context?.previous) queryClient.setQueryData(queryKey, context.previous);
       void queryClient.invalidateQueries({ queryKey });
       options.onError?.(error);
     },
