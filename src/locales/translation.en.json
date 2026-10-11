@@ -294,8 +294,88 @@
       "passwordFailed": "That password didn't work. Check it and try again."
     }
   },
-  "list": {
-    "title": "Shopping list"
+  "shoppingList": {
+    "headline": {
+      "count_one": "**{{count}} thing** to buy",
+      "count_other": "**{{count}} things** to buy",
+      "withRecipes_one": "**{{count}} thing** to buy, {recipes} included",
+      "withRecipes_other": "**{{count}} things** to buy, {recipes} included",
+      "recipes_one": "**{{count}} recipe**",
+      "recipes_other": "**{{count}} recipes**",
+      "done": "**everything bought**,\nthe list is empty",
+      "showRecipes": "Show recipes"
+    },
+    "recentlyBought": "Recently bought",
+    "details": "Details",
+    "alreadyOnList": "Already on the list",
+    "amountChange": "from {{before}} to {{after}}",
+    "add": "Add",
+    "empty": {
+      "title": "Nothing on your list yet",
+      "add": "Add Something"
+    },
+    "addSheet": {
+      "title": "What's missing?",
+      "placeholder": "e.g. 10 apples",
+      "clear": "Clear",
+      "added": "Added “{{name}}”",
+      "alreadyOnList": "“{{name}}” is already on the list"
+    },
+    "detail": {
+      "addedFrom": "Added from",
+      "nothingRecorded": "Nothing recorded yet.",
+      "recipe": "Recipe",
+      "byHand": "Added by hand",
+      "amountSet": "Amount set by hand",
+      "amountCleared": "Amount cleared by hand",
+      "you": "You",
+      "removeTitle": "Remove for good?",
+      "removeMessage": "The item and its history are deleted. Bought items stay in “Recently bought” on their own."
+    },
+    "edit": {
+      "title": "Edit item",
+      "name": "Name",
+      "amount": "Amount",
+      "amountPlaceholder": "e.g. 2 kg",
+      "boughtHint": "Comes back onto the list with this amount.",
+      "aisle": "Aisle",
+      "saveError": "Couldn’t save",
+      "duplicateName": "You already have an item with this name.",
+      "nameRequired": "Name is required."
+    },
+    "recipes": {
+      "title": "Recipes on the list",
+      "items_one": "{{count}} item",
+      "items_other": "{{count}} items",
+      "times": "{{count}}×"
+    },
+    "recipe": {
+      "onList": "On the list",
+      "remove": "Remove from list",
+      "removeTitle": "Remove from the list?",
+      "removeMessage": "The amounts for {{name}} come off the list. Items nothing else needs go too.",
+      "removeMessageTimes": "{{name}} was added {{count}} times; all of it comes off the list. Items nothing else needs go too.",
+      "addedTimes": "added {{count}}×",
+      "stays": "Stays on the list",
+      "staysWith": "Stays with {{amount}}",
+      "open": "Opens the recipe"
+    },
+    "aisle": {
+      "produce": "Fruit & vegetables",
+      "bakery": "Bread & pastries",
+      "dairy": "Dairy & eggs",
+      "meatFish": "Meat & fish",
+      "spices": "Ingredients & spices",
+      "grains": "Grains & pasta",
+      "frozen": "Frozen & convenience",
+      "drinks": "Drinks",
+      "snacks": "Snacks & sweets",
+      "household": "Household",
+      "care": "Health & care",
+      "pets": "Pets",
+      "garden": "DIY & garden",
+      "other": "Other"
+    }
   },
   "mealPlanner": {
     "title": "Meal planner",
@@ -701,7 +781,7 @@
     "explore": "Explore",
     "cookbook": "Recipes",
     "planner": "Planner",
-    "list": "List"
+    "shopping": "Shopping"
   },
   "rating": {
     "rate": "Rate",

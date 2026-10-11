@@ -294,8 +294,88 @@
     "signInAgain": "Erneut anmelden",
     "decisionFailed": "Die Verbindung konnte nicht abgeschlossen werden. Bitte versuche es erneut."
   },
-  "list": {
-    "title": "Einkaufsliste"
+  "shoppingList": {
+    "headline": {
+      "count_one": "**{{count}} Sache** zu kaufen",
+      "count_other": "**{{count}} Sachen** zu kaufen",
+      "withRecipes_one": "**{{count}} Sache** zu kaufen, {recipes} dabei",
+      "withRecipes_other": "**{{count}} Sachen** zu kaufen, {recipes} dabei",
+      "recipes_one": "**{{count}} Rezept**",
+      "recipes_other": "**{{count}} Rezepte**",
+      "done": "**alles eingekauft**,\ndie Liste ist leer",
+      "showRecipes": "Rezepte zeigen"
+    },
+    "recentlyBought": "Zuletzt gekauft",
+    "details": "Details",
+    "alreadyOnList": "Schon auf der Liste",
+    "amountChange": "von {{before}} auf {{after}}",
+    "add": "Hinzufügen",
+    "empty": {
+      "title": "Noch nichts auf deiner Liste",
+      "add": "Etwas hinzufügen"
+    },
+    "addSheet": {
+      "title": "Was fehlt?",
+      "placeholder": "z. B. 10 Äpfel",
+      "clear": "Löschen",
+      "added": "„{{name}}“ hinzugefügt",
+      "alreadyOnList": "„{{name}}“ steht schon auf der Liste"
+    },
+    "detail": {
+      "addedFrom": "Hinzugefügt aus",
+      "nothingRecorded": "Noch nichts vermerkt.",
+      "recipe": "Rezept",
+      "byHand": "Von Hand hinzugefügt",
+      "amountSet": "Menge von Hand gesetzt",
+      "amountCleared": "Menge von Hand entfernt",
+      "you": "Du",
+      "removeTitle": "Endgültig entfernen?",
+      "removeMessage": "Der Artikel und seine Historie werden gelöscht. Gekaufte Artikel bleiben von selbst unter „Zuletzt gekauft“."
+    },
+    "edit": {
+      "title": "Artikel bearbeiten",
+      "name": "Name",
+      "amount": "Menge",
+      "amountPlaceholder": "z. B. 2 kg",
+      "boughtHint": "Kommt mit dieser Menge zurück auf die Liste.",
+      "aisle": "Kategorie",
+      "saveError": "Konnte nicht speichern",
+      "duplicateName": "Einen Artikel mit diesem Namen gibt es schon.",
+      "nameRequired": "Ein Name wird gebraucht."
+    },
+    "recipes": {
+      "title": "Rezepte auf der Liste",
+      "items_one": "{{count}} Artikel",
+      "items_other": "{{count}} Artikel",
+      "times": "{{count}}×"
+    },
+    "recipe": {
+      "onList": "Auf der Liste",
+      "remove": "Von der Liste entfernen",
+      "removeTitle": "Von der Liste nehmen?",
+      "removeMessage": "Die Mengen für {{name}} kommen von der Liste. Was sonst nichts braucht, fällt ganz weg.",
+      "removeMessageTimes": "{{name}} wurde {{count}}-mal hinzugefügt, alles davon kommt von der Liste. Was sonst nichts braucht, fällt ganz weg.",
+      "addedTimes": "{{count}}× hinzugefügt",
+      "stays": "Bleibt auf der Liste",
+      "staysWith": "Bleibt mit {{amount}}",
+      "open": "Öffnet das Rezept"
+    },
+    "aisle": {
+      "produce": "Obst & Gemüse",
+      "bakery": "Brot & Gebäck",
+      "dairy": "Milch & Käse",
+      "meatFish": "Fleisch & Fisch",
+      "spices": "Zutaten & Gewürze",
+      "grains": "Getreideprodukte",
+      "frozen": "Fertig- & Tiefkühlprodukte",
+      "drinks": "Getränke",
+      "snacks": "Snacks & Süßwaren",
+      "household": "Haushalt",
+      "care": "Pflege & Gesundheit",
+      "pets": "Tierbedarf",
+      "garden": "Baumarkt & Garten",
+      "other": "Sonstige"
+    }
   },
   "mealPlanner": {
     "title": "Essens Planer",
@@ -672,7 +752,7 @@
     "explore": "Erkunden",
     "cookbook": "Rezepte",
     "planner": "Planer",
-    "list": "Liste"
+    "shopping": "Einkauf"
   },
   "chatbot": {
     "greeting": "Wie kann ich dir helfen?",

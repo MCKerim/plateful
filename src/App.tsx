@@ -26,6 +26,7 @@ import NotFound from "./page/NotFound";
 import Home from "./page/Home";
 import Cookbook from "./page/Cookbook";
 import Chatbot from "./page/Chatbot";
+import ShoppingList from "./page/ShoppingList";
 import LoadingScreen from "./components/general/LoadingScreen";
 import EmotionalHook from "./page/onboarding/valueScreen/emotionalHook/EmotionalHook";
 import ImportRecipes from "./page/onboarding/valueScreen/importRecipes/ImportRecipes";
@@ -500,6 +501,7 @@ function App() {
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />
         <Route path="/cookbook" element={routeToCorrectPage(<Cookbook />)} />
         <Route path="/chatbot" element={routeToCorrectPage(<Chatbot />)} />
+        <Route path="/shopping" element={routeToCorrectPage(<ShoppingList />)} />
         <Route path="/home" element={routeToCorrectPage(<Home />)} />
 
         <Route path="/recipe/:recipeId" element={routeToCorrectPage(<Recipe />)} />

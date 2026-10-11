@@ -15,6 +15,7 @@ export default function BottomNav() {
     if (location.pathname.startsWith("/cookbook") || location.pathname.startsWith("/recipe"))
       return 2;
     if (location.pathname.startsWith("/planner")) return 3;
+    if (location.pathname.startsWith("/shopping")) return 4;
     return null;
   };
 
@@ -57,6 +58,13 @@ export default function BottomNav() {
             icon="planner"
             link="/planner"
             active={activeIndex === 3}
+          />
+
+          <BottomNavButton
+            label={t("bottomNav.shopping")}
+            icon="shopping"
+            link="/shopping"
+            active={activeIndex === 4}
           />
         </div>
       </div>

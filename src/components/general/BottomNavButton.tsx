@@ -1,10 +1,10 @@
 import { NavLink } from "react-router";
-import { BookOpen, Calendar, ChefHat, House, List, Search } from "lucide-react";
+import { BookOpen, Calendar, ChefHat, House, Search, ShoppingCart } from "lucide-react";
 import { motion } from "motion/react";
 
 type Props = {
   label: string;
-  icon: "home" | "chatbot" | "explore" | "cookbook" | "planner" | "lists";
+  icon: "home" | "chatbot" | "explore" | "cookbook" | "planner" | "shopping";
   link: string;
   active?: boolean;
   onClick?: () => void;
@@ -37,8 +37,8 @@ export default function BottomNavButton({
         return <BookOpen size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       case "planner":
         return <Calendar size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
-      case "lists":
-        return <List size={ICON_SIZE} strokeWidth={active ? 3 : 1.5} />;
+      case "shopping":
+        return <ShoppingCart size={ICON_SIZE} fill={active ? "currentColor" : "none"} />;
       default:
         return null;
     }
