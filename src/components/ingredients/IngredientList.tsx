@@ -1,8 +1,8 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { ServingScaler } from "./ServingScaler";
+import ShoppingRecipeAddSheet from "@/components/shoppingList/ShoppingRecipeAddSheet";
 import { IngredientRow } from "./IngredientRow";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
@@ -16,6 +16,7 @@ import { toast } from "sonner";
 
 type Props = {
   recipeId: string;
+  recipeName: string;
   baseServings: number | null;
   servingsUnit?: string;
   showScalingControls?: boolean;
@@ -23,6 +24,7 @@ type Props = {
 
 export function IngredientList({
   recipeId,
+  recipeName,
   baseServings,
   servingsUnit = "servings",
   showScalingControls = true,
@@ -31,15 +33,13 @@ export function IngredientList({
   const dispatch = useAppDispatch();
   const effectiveBaseServings = baseServings ?? 1;
 
+  // Read from the store, not copied into state: the add-to-list sheet changes it too.
   const savedServings = useAppSelector(selectTargetServings(recipeId));
-  const [targetServings, setTargetServings] = useState(
-    savedServings ?? effectiveBaseServings
-  );
+  const targetServings = savedServings ?? effectiveBaseServings;
 
   const updateBaseServings = useUpdateBaseServings();
 
   const handleServingsChange = (value: number) => {
-    setTargetServings(value);
     dispatch(setTargetServingsAction({ recipeId, servings: value }));
   };
 
@@ -108,6 +108,13 @@ export function IngredientList({
           </ul>
         </div>
       ))}
+
+      <ShoppingRecipeAddSheet
+        recipeId={recipeId}
+        recipeName={recipeName}
+        servings={targetServings}
+        onServingsChange={handleServingsChange}
+      />
     </div>
   );
 }

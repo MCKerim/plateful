@@ -26,6 +26,19 @@ export type RecipeIngredient = {
   groupName: string | null;
   sortOrder: number;
   isScalable: boolean;
+  /** The dictionary slug the enrichment worker gave the line; the shopping list merges and files by it. */
+  ingredientSlug: string | null;
+};
+
+/**
+ * A recipe's rows with the serving count they are written for, read in one
+ * query: scaling against `recipes.base_servings` from another cache can use a
+ * base that already changed under rescaled rows.
+ */
+export type IngredientsBundle = {
+  baseServings: number | null;
+  servingsUnit: string | null;
+  ingredients: RecipeIngredient[];
 };
 
 // Grouped ingredients for display

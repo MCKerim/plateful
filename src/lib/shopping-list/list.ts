@@ -446,6 +446,36 @@ export function removeRecipe(items: ShoppingListItem[], recipeId: string): Recip
   };
 }
 
+/** What an add checklist (a recipe's, the planner week's) looks up per row. */
+export type ChecklistIndex = {
+  /** The dictionary's staples (salt, oil, flour …): off by default. */
+  staples: Set<string>;
+  /** The aisle a line with this slug files under; Other without one. */
+  aisle: (slug: string | null) => ShoppingAisle;
+  isStaple: (slug: string | null) => boolean;
+  /** On the list now, by the server's identity rule: the slug, else the name. */
+  isOnList: (slug: string | null, name: string) => boolean;
+};
+
+export function checklistIndex(
+  items: ShoppingListItem[],
+  dictionary: ShoppingDictionaryEntry[]
+): ChecklistIndex {
+  const aisles = new Map<string, ShoppingAisle>();
+  for (const entry of dictionary) if (!aisles.has(entry.slug)) aisles.set(entry.slug, entry.aisle);
+  const staples = new Set(dictionary.filter((entry) => entry.isStaple).map((entry) => entry.slug));
+  const onList = items.filter((item) => item.onList);
+  const onListSlugs = new Set(onList.map((item) => item.ingredientSlug));
+  const onListKeys = new Set(onList.map((item) => nameKey(item.name)));
+  return {
+    staples,
+    aisle: (slug) => (slug && aisles.get(slug)) || "other",
+    isStaple: (slug) => slug !== null && staples.has(slug),
+    isOnList: (slug, name) =>
+      (slug !== null && onListSlugs.has(slug)) || onListKeys.has(nameKey(name)),
+  };
+}
+
 /** The server's rows replace the ones they touched; new ones join. */
 export function mergeRows(items: ShoppingListItem[], rows: ShoppingListItem[]): ShoppingListItem[] {
   const byId = new Map(rows.map((row) => [row.id, row]));

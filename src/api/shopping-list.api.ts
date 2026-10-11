@@ -63,6 +63,24 @@ export const shoppingListApi = {
     return data ?? [];
   },
 
+  /**
+   * Recipe ingredient rows onto the list, each at its own scale; the rows may
+   * span recipes (the planner's week). The server merges every line into the
+   * household's items and answers with the rows it touched.
+   */
+  async addIngredients(
+    supabase: Client,
+    householdId: string,
+    lines: { ingredientId: string; scale: number }[]
+  ): Promise<ShoppingListItemRow[]> {
+    const { data, error } = await supabase.rpc("add_ingredients_to_shopping_list", {
+      p_household_id: householdId,
+      p_lines: lines.map((line) => ({ ingredient_id: line.ingredientId, scale: line.scale })),
+    });
+    if (error) throw error;
+    return data ?? [];
+  },
+
   /** The edit sheet: name, aisle and the amount as it should be stored. */
   async updateItem(
     supabase: Client,

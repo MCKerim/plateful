@@ -19,6 +19,7 @@ export const queryKeys = {
     ingredients: (id: string) => ["recipes", id, "ingredients"] as const,
     instructions: (id: string) => ["recipes", id, "instructions"] as const,
     images: (id: string) => ["recipes", id, "images"] as const,
+    bundles: (ids: string[]) => ["recipes", "bundles", ...ids] as const,
   },
   collections: {
     all: ["collections"] as const,

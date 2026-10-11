@@ -376,6 +376,18 @@
       "pets": "Tierbedarf",
       "garden": "Baumarkt & Garten",
       "other": "Sonstige"
+    },
+    "addToList": "Zur Liste",
+    "checklist": {
+      "staple": "Vorrat",
+      "onList": "Auf der Liste",
+      "add_one": "{{count}} Artikel hinzufügen",
+      "add_other": "{{count}} Artikel hinzufügen",
+      "added_one": "{{count}} Artikel zur Liste hinzugefügt",
+      "added_other": "{{count}} Artikel zur Liste hinzugefügt",
+      "openList": "Liste öffnen",
+      "loadFailed": "Zutaten konnten nicht geladen werden.",
+      "retry": "Erneut versuchen"
     }
   },
   "mealPlanner": {

@@ -14,6 +14,17 @@ import {
 type TypedSupabaseClient = SupabaseClient<Database>;
 
 export const ingredientsApi = {
+  /** Several recipes' rows with their serving config, one query; a recipe gone since is absent. */
+  async getBundles(supabase: TypedSupabaseClient, recipeIds: string[]) {
+    if (recipeIds.length === 0) return [];
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("id, base_servings, servings_unit, recipe_ingredients(*)")
+      .in("id", recipeIds);
+    if (error) throw error;
+    return data ?? [];
+  },
+
   /**
    * Get all ingredients for a recipe
    */

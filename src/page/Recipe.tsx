@@ -396,6 +396,7 @@ export default function Recipe() {
       {scaledIngredients.length > 0 && (
         <IngredientList
           recipeId={recipe.id}
+          recipeName={recipe.name}
           baseServings={recipe.base_servings}
           servingsUnit={recipe.servings_unit ?? "servings"}
           showScalingControls={recipe.base_servings !== null}

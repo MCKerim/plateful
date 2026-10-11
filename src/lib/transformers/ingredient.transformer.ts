@@ -1,4 +1,5 @@
 import type {
+  IngredientsBundle,
   RecipeIngredient,
   RecipeIngredientRow,
 } from "@/types/ingredient.types";
@@ -24,6 +25,7 @@ export function transformIngredient(row: RecipeIngredientRow): RecipeIngredient 
     groupName: row.group_name,
     sortOrder: row.sort_order,
     isScalable: row.is_scalable ?? true,
+    ingredientSlug: row.ingredient_slug,
   };
 }
 
@@ -34,6 +36,24 @@ export function transformIngredients(
   rows: RecipeIngredientRow[]
 ): RecipeIngredient[] {
   return rows.map(transformIngredient);
+}
+
+/** Sort order, the id breaking ties: the order the shopping list's add RPC walks rows in. */
+export function bySortOrder(a: RecipeIngredient, b: RecipeIngredient): number {
+  if (a.sortOrder !== b.sortOrder) return a.sortOrder - b.sortOrder;
+  return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+}
+
+export function transformIngredientsBundle(row: {
+  base_servings: number | null;
+  servings_unit: string | null;
+  recipe_ingredients: RecipeIngredientRow[];
+}): IngredientsBundle {
+  return {
+    baseServings: row.base_servings,
+    servingsUnit: row.servings_unit,
+    ingredients: transformIngredients(row.recipe_ingredients).sort(bySortOrder),
+  };
 }
 
 /**

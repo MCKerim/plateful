@@ -45,6 +45,7 @@ function toDisplayIngredient(ing: SnapshotIngredient, index: number): RecipeIngr
     groupName: ing.group_name,
     sortOrder: ing.sort_order,
     isScalable: ing.is_scalable ?? true,
+    ingredientSlug: null,
   };
 }
 
