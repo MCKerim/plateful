@@ -11,7 +11,7 @@ for 1.4 fold iOS 1.2 and 1.3 into one release.
 Die Einkaufsliste ist da.
 
 • Zutaten mit einem Tipp aus dem Rezept auf die Liste, passend zu deiner Portionszahl.
-• Der Einkaufswagen im Wochenplan setzt die ganze Woche drauf: Gerichte wählen, Portionen anpassen, fertig.
+• Der Einkaufswagen im Wochenplan setzt die ganze Woche auf die Liste.
 • Sortiert nach Regalen wie im Supermarkt. Was mehrere Rezepte brauchen, steht einmal drauf, die Mengen rechnen sich zusammen.
 • Gekauftes behält seine Menge, ein Tipp legt es zurück.
 • Dein Haushalt sieht dieselbe Liste in Echtzeit.
