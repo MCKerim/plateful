@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence, MotionConfig, motion } from "motion/react";
+import { ChevronDown } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import Fab from "@/components/general/Fab";
 import ShoppingItemCard from "@/components/shoppingList/ShoppingItemCard";
@@ -62,6 +63,7 @@ export default function ShoppingList() {
   const removeRecipe = useRemoveRecipeFromShoppingList(() => setWriteFailed(true));
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [boughtCollapsed, setBoughtCollapsed] = useState(readBoughtCollapsed);
 
   useEffect(() => {
     if (!highlightedId) return;
@@ -104,7 +106,18 @@ export default function ShoppingList() {
     navigate(`/recipe/${recipeId}`);
   }
 
-  function section(title: string, sectionItems: ShoppingListItem[], dimmed = false) {
+  function toggleBought() {
+    const next = !boughtCollapsed;
+    setBoughtCollapsed(next);
+    writeBoughtCollapsed(next);
+  }
+
+  function section(
+    title: string,
+    sectionItems: ShoppingListItem[],
+    dimmed = false,
+    collapse?: { collapsed: boolean; onToggle: () => void }
+  ) {
     return (
       <motion.section
         key={title}
@@ -115,27 +128,46 @@ export default function ShoppingList() {
         transition={SMOOTH}
         className="relative flex flex-col gap-2.5"
       >
-        <h3 className="font-semibold">{title}</h3>
-        <AnimatePresence initial={false} mode="popLayout">
-          {sectionItems.map((item) => (
-            // The shared layoutId carries a bought row into its new section.
-            <motion.div
-              key={item.id}
-              layoutId={item.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              transition={SMOOTH}
+        {collapse ? (
+          <h3 className="font-semibold">
+            <button
+              type="button"
+              aria-expanded={!collapse.collapsed}
+              onClick={collapse.onToggle}
+              className="flex w-full items-center gap-1 py-1 text-left"
             >
-              <ShoppingItemCard
-                item={item}
-                dimmed={dimmed}
-                highlighted={highlightedId === item.id}
-                onClick={() => tap(item)}
-                onDetails={() => setSheet({ kind: "detail", itemId: item.id })}
+              {title}
+              <ChevronDown
+                size={18}
+                aria-hidden
+                className={`transition-transform duration-200 ${collapse.collapsed ? "-rotate-90" : ""}`}
               />
-            </motion.div>
-          ))}
+            </button>
+          </h3>
+        ) : (
+          <h3 className="font-semibold">{title}</h3>
+        )}
+        <AnimatePresence initial={false} mode="popLayout">
+          {!collapse?.collapsed &&
+            sectionItems.map((item) => (
+              // The shared layoutId carries a bought row into its new section.
+              <motion.div
+                key={item.id}
+                layoutId={item.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={SMOOTH}
+              >
+                <ShoppingItemCard
+                  item={item}
+                  dimmed={dimmed}
+                  highlighted={highlightedId === item.id}
+                  onClick={() => tap(item)}
+                  onDetails={() => setSheet({ kind: "detail", itemId: item.id })}
+                />
+              </motion.div>
+            ))}
         </AnimatePresence>
       </motion.section>
     );
@@ -185,7 +217,11 @@ export default function ShoppingList() {
               {sections.map(({ aisle, items: aisleItems }) =>
                 section(t(aisleInfo(aisle).labelKey), aisleItems)
               )}
-              {bought.length > 0 && section(t("shoppingList.recentlyBought"), bought, true)}
+              {bought.length > 0 &&
+                section(t("shoppingList.recentlyBought"), bought, true, {
+                  collapsed: boughtCollapsed,
+                  onToggle: toggleBought,
+                })}
             </AnimatePresence>
           </MotionConfig>
         </div>
@@ -242,4 +278,23 @@ export default function ShoppingList() {
       />
     </Layout>
   );
+}
+
+// Per device, not per user: a display preference, and in a shared household each person folds it on their own phone.
+const BOUGHT_COLLAPSED_KEY = "plateful.shoppingList.boughtCollapsed";
+
+function readBoughtCollapsed(): boolean {
+  try {
+    return localStorage.getItem(BOUGHT_COLLAPSED_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function writeBoughtCollapsed(collapsed: boolean): void {
+  try {
+    localStorage.setItem(BOUGHT_COLLAPSED_KEY, String(collapsed));
+  } catch {
+    // Storage blocked: the fold still works until the page is left.
+  }
 }
