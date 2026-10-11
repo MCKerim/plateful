@@ -14,6 +14,8 @@ export function useShoppingMutation<TVariables extends Variables, TResult>(optio
   mutationFn: (variables: TVariables) => Promise<TResult>;
   optimistic: (items: ShoppingListItem[], variables: TVariables) => ShoppingListItem[];
   onSuccess?: (result: TResult, variables: TVariables) => void;
+  /** After the rollback, for a screen that tells the user. */
+  onError?: (error: Error) => void;
 }) {
   const queryClient = useQueryClient();
 
@@ -30,10 +32,11 @@ export function useShoppingMutation<TVariables extends Variables, TResult>(optio
       return { previous };
     },
     onSuccess: options.onSuccess,
-    onError: (_error, variables, context) => {
+    onError: (error, variables, context) => {
       const queryKey = queryKeys.shoppingList.items(variables.householdId);
       if (context?.previous) queryClient.setQueryData(queryKey, context.previous);
       void queryClient.invalidateQueries({ queryKey });
+      options.onError?.(error);
     },
   });
 }

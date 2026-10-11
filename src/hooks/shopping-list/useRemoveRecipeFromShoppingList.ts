@@ -15,7 +15,7 @@ type Variables = { householdId: string; recipeId: string; keptIds: string[] };
  * item nothing else needs leaves the list. Shows at once; the server's answer
  * replaces the touched rows.
  */
-export function useRemoveRecipeFromShoppingList() {
+export function useRemoveRecipeFromShoppingList(onError?: (error: Error) => void) {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const posthog = usePostHog();
@@ -24,6 +24,7 @@ export function useRemoveRecipeFromShoppingList() {
     mutationFn: ({ householdId, recipeId }: Variables) =>
       shoppingListApi.removeRecipe(supabase, householdId, recipeId),
     optimistic: (items, { recipeId }) => removeRecipe(items, recipeId).items,
+    onError,
     onSuccess: (rows, { householdId, keptIds }) => {
       const queryKey = queryKeys.shoppingList.items(householdId);
       const savedIds = new Set(rows.map((row) => row.id));

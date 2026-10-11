@@ -305,6 +305,7 @@
       "done": "**everything bought**,\nthe list is empty",
       "showRecipes": "Show recipes"
     },
+    "writeError": "Couldn’t save",
     "recentlyBought": "Recently bought",
     "details": "Details",
     "alreadyOnList": "Already on the list",
@@ -781,7 +782,7 @@
     "explore": "Explore",
     "cookbook": "Recipes",
     "planner": "Planner",
-    "shopping": "Shopping"
+    "shopping": "List"
   },
   "rating": {
     "rate": "Rate",

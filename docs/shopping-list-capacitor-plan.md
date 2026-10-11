@@ -57,7 +57,7 @@ RPCs (all `security invoker`, household-scoped by RLS):
 
 ## Scope (parity with iOS 1.3)
 
-- **Tab "Einkauf" / "Shopping"**, fifth in `BottomNav` after Plan, route
+- **Tab "Liste" / "List"** (the native `Tab("List")`), fifth in `BottomNav` after Plan, route
   `/shopping`. (Kerim's call 2026-10-11: five tabs, Chatbot stays.)
 - **List screen**: header sentence ("**12 Sachen** zu kaufen, [cover fan]
   **2 Rezepte** dabei"), open items grouped by aisle in the iOS store-walk

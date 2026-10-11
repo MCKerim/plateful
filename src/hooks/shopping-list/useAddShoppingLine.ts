@@ -30,7 +30,7 @@ type Variables = {
  * applies the add at once and reports whether it wrote anything: a bare name
  * already on the list adds nothing (the screen flashes it instead).
  */
-export function useAddShoppingLine() {
+export function useAddShoppingLine(onError?: (error: Error) => void) {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const posthog = usePostHog();
@@ -42,6 +42,7 @@ export function useAddShoppingLine() {
     mutationFn: ({ householdId, line, rowId }: Variables) =>
       shoppingListApi.addItem(supabase, { id: rowId, householdId, line }),
     optimistic: (_items, { items }) => items,
+    onError,
     onSuccess: (rows, { householdId, rowId, isNewRow }) => {
       const saved = rows[0];
       if (!saved) return;

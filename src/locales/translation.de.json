@@ -305,6 +305,7 @@
       "done": "**alles eingekauft**,\ndie Liste ist leer",
       "showRecipes": "Rezepte zeigen"
     },
+    "writeError": "Konnte nicht speichern",
     "recentlyBought": "Zuletzt gekauft",
     "details": "Details",
     "alreadyOnList": "Schon auf der Liste",
@@ -752,7 +753,7 @@
     "explore": "Erkunden",
     "cookbook": "Rezepte",
     "planner": "Planer",
-    "shopping": "Einkauf"
+    "shopping": "Liste"
   },
   "chatbot": {
     "greeting": "Wie kann ich dir helfen?",

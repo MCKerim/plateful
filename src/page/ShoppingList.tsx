@@ -53,10 +53,12 @@ export default function ShoppingList() {
   const { data: items, isPending } = useShoppingList();
   const { data: dictionary = [] } = useShoppingDictionary();
   const { data: recipes } = useRecipes();
+  // A refused add or removal, said above the list until the next one or a tap.
+  const [writeFailed, setWriteFailed] = useState(false);
   const setOnList = useSetOnList();
-  const addLine = useAddShoppingLine();
+  const addLine = useAddShoppingLine(() => setWriteFailed(true));
   const deleteItem = useDeleteShoppingItem();
-  const removeRecipe = useRemoveRecipeFromShoppingList();
+  const removeRecipe = useRemoveRecipeFromShoppingList(() => setWriteFailed(true));
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
@@ -92,6 +94,7 @@ export default function ShoppingList() {
   function add(line: TypedLine) {
     const existing = previewLine(list, dictionary, line).existing;
     if (existing) setHighlightedId(existing.id);
+    setWriteFailed(false);
     addLine(line);
   }
 
@@ -122,6 +125,15 @@ export default function ShoppingList() {
 
   return (
     <Layout showHeader={false}>
+      {writeFailed && (
+        <button
+          type="button"
+          className="w-full py-1 text-left text-xs text-destructive"
+          onClick={() => setWriteFailed(false)}
+        >
+          {t("shoppingList.writeError")}
+        </button>
+      )}
       {isPending ? null : empty ? (
         <ShoppingEmptyState onAdd={() => setSheet({ kind: "add" })} />
       ) : (
@@ -210,6 +222,7 @@ export default function ShoppingList() {
         onOpenRecipe={openRecipe}
         onRemove={(recipe) => {
           setSheet(null);
+          setWriteFailed(false);
           removeRecipe(householdId, recipe.id, list);
         }}
       />

@@ -7,7 +7,7 @@ import { markBought } from "@/lib/shopping-list/list";
 import { makeItem } from "@/lib/shopping-list/testItems";
 import { useShoppingMutation } from "@/hooks/shopping-list/useShoppingMutation";
 
-function setup(write: () => Promise<void>) {
+function setup(write: () => Promise<void>, onError?: (error: Error) => void) {
   const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
   const key = queryKeys.shoppingList.items("h1");
   queryClient.setQueryData(key, [makeItem("a", "Milch", "dairy")]);
@@ -20,6 +20,7 @@ function setup(write: () => Promise<void>) {
         mutationFn: write,
         optimistic: (items, { id }: { householdId: string; id: string }) =>
           markBought(items, id, 5),
+        onError,
       }),
     { wrapper }
   );
@@ -42,11 +43,20 @@ describe("useShoppingMutation", () => {
     expect(queryClient.getQueryState(key)?.isInvalidated).toBe(false);
   });
 
-  it("restores the list and refetches when the write fails", async () => {
-    const { queryClient, key, result } = setup(() => Promise.reject(new Error("offline")));
+  it("restores the list, refetches and tells the screen when the write fails", async () => {
+    const failures: { message: string; onList: boolean | undefined }[] = [];
+    const { queryClient, key, result } = setup(
+      () => Promise.reject(new Error("offline")),
+      (error) =>
+        failures.push({
+          message: error.message,
+          onList: queryClient.getQueryData<{ onList: boolean }[]>(key)?.[0].onList,
+        })
+    );
     act(() => result.current.mutate({ householdId: "h1", id: "a" }));
     await waitFor(() => expect(result.current.isError).toBe(true));
     expect(queryClient.getQueryData<{ onList: boolean }[]>(key)?.[0].onList).toBe(true);
     expect(queryClient.getQueryState(key)?.isInvalidated).toBe(true);
+    expect(failures).toEqual([{ message: "offline", onList: true }]);
   });
 });
