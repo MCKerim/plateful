@@ -160,8 +160,8 @@ export default function ShoppingItemEditSheet({
         </form>
         <DrawerFooter className="pb-8">
           <Button
-            size="lg"
-            className="rounded-full"
+            variant="accent"
+            className="w-full"
             onClick={() => void save()}
             disabled={!name.trim() || editItem.isPending}
           >

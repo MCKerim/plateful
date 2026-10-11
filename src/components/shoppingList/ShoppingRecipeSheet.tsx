@@ -131,7 +131,7 @@ export default function ShoppingRecipeSheet({
             confirmText={t("common.remove")}
             onDelete={() => onRemove(shown)}
             customTrigger={
-              <Button variant="secondary" size="lg" className="rounded-full text-destructive">
+              <Button variant="secondary" size="lg" className="text-destructive">
                 <ShoppingCart />
                 {t("shoppingList.recipe.remove")}
               </Button>

@@ -146,14 +146,14 @@ export default function ShoppingItemDetailSheet({
               <Button
                 variant="secondary"
                 size="lg"
-                className="flex-1 rounded-full text-destructive"
+                className="flex-1 text-destructive"
               >
                 <Trash2 />
                 {t("common.remove")}
               </Button>
             }
           />
-          <Button size="lg" className="flex-1 rounded-full" onClick={() => onEdit(shown)}>
+          <Button variant="secondary" size="lg" className="flex-1" onClick={() => onEdit(shown)}>
             <Pencil />
             {t("common.edit")}
           </Button>

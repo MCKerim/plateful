@@ -118,8 +118,7 @@ export function ShoppingAddButton({
   return (
     <Button
       variant="accent"
-      size="lg"
-      className="w-full rounded-full"
+      className="w-full"
       disabled={count === 0 || isAdding}
       onClick={onAdd}
     >
@@ -144,7 +143,7 @@ export function ShoppingAddedConfirmation({
       <p className="text-center text-lg font-semibold">
         {t("shoppingList.checklist.added", { count })}
       </p>
-      <Button variant="accent" size="lg" className="mt-6 w-full rounded-full" onClick={onOpenList}>
+      <Button variant="accent" className="mt-6 w-full" onClick={onOpenList}>
         {t("shoppingList.checklist.openList")}
       </Button>
     </div>

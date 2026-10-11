@@ -305,8 +305,7 @@ function Steps({ meals, onClose }: Readonly<{ meals: PlanMeal[]; onClose: () => 
       <DrawerFooter className="pb-8">
         <Button
           variant="accent"
-          size="lg"
-          className="w-full rounded-full"
+          className="w-full"
           disabled={!bundles || selectedMeals.length === 0}
           onClick={() => setStep("ingredients")}
         >
