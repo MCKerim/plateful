@@ -1,7 +1,7 @@
 # Shopping list on Capacitor (web + Android)
 
-Plan, 2026-10-11. Status: built on branch `shopping-list` (2026-10-11),
-versioned 1.4 / 43, not yet uploaded to Play. Parity port of the iOS shopping
+Plan, 2026-10-11. Status: merged to `main` on 2026-10-11 as 1.4 / 43 after
+Kerim's phone test; the Play upload is his. Parity port of the iOS shopping
 list (iOS 1.2 and 1.3, built 2026-09-14 to 10-08). The iOS repo is the
 spec; this file names what is copied, what is adapted, and the order.
 
