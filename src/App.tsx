@@ -6,7 +6,6 @@ import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/signUp/SignUp";
 import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
 import EmailVerification from "./page/onboarding/emailVerification/EmailVerification";
-import Login from "./page/onboarding/login/Login";
 import React, { useEffect, useState } from "react";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
@@ -474,7 +473,6 @@ function App() {
           element={isLoggedIn() ? <Navigate to="/" replace /> : <EmailVerification />}
         />
 
-        <Route path="/login" element={isLoggedIn() ? <Navigate to="/" replace /> : <Login />} />
 
         <Route path="/values" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />
         <Route path="/values/1" element={guardOnboardingRoute(<EmotionalHook />, "survey")} />

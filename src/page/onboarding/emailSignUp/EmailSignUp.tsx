@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { reportError } from "@/utils/reportError";
 import { isReviewEmail } from "@/lib/reviewSignIn";
 import { clearPendingSignIn, markPendingSignIn } from "@/lib/pendingSignIn";
+import { devAccount } from "@/lib/devSignIn";
 
 export default function EmailSignUp() {
   const { supabase } = useSupabase();
@@ -24,8 +25,22 @@ export default function EmailSignUp() {
 
   // The store-review account signs in with a password instead of a magic link;
   // see src/lib/reviewSignIn.ts. This is the screen a reviewer reaches from
-  // "Continue with email", so the mode has to live here as well as on /login.
+  // "Continue with email".
   const isReviewAccount = isReviewEmail(email);
+
+  // Off the dev server with `.env.local` credentials: one tap into the test household.
+  const handleDevLogin = async () => {
+    if (!devAccount) return;
+    setError(null);
+    setLoading(true);
+    markPendingSignIn("password");
+    const { error: devError } = await supabase.auth.signInWithPassword(devAccount);
+    if (devError) {
+      clearPendingSignIn();
+      setError(devError.message);
+      setLoading(false);
+    }
+  };
 
   const isFormValid = () => {
     if (email.trim() === "" || !email.includes("@")) return false;
@@ -153,6 +168,17 @@ export default function EmailSignUp() {
           />
         </div>
       </form>
+
+      {devAccount && (
+        <button
+          type="button"
+          onClick={handleDevLogin}
+          disabled={loading}
+          className="mt-4 text-xs text-muted-foreground underline underline-offset-4 disabled:opacity-50"
+        >
+          Dev-Login ({devAccount.email})
+        </button>
+      )}
     </div>
   );
 }

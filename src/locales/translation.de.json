@@ -88,22 +88,11 @@
     }
   },
   "login": {
-    "title": "Willkommen zurück",
-    "subtitle": "Melden Sie sich bei Ihrem Konto an",
-    "emailLabel": "E-Mail",
-    "emailPlaceholder": "ihre@email.de",
-    "loginButton": "Magic Link senden",
-    "loading": "Magic Link wird gesendet...",
-    "dontHaveAccount": "Noch nicht registriert? Jetzt anmelden",
     "termsPrefix": "Indem du dich anmeldest, stimmst du unseren",
     "termsOfService": "Nutzungsbedingungen",
     "termsAnd": "und",
     "privacyPolicy": "Datenschutzrichtlinien",
-    "termsSuffix": " zu",
-    "errors": {
-      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-      "loginFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
-    }
+    "termsSuffix": " zu"
   },
   "reviewSignIn": {
     "hint": "Passwort des Review-Kontos eingeben",

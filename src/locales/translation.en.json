@@ -269,22 +269,11 @@
     }
   },
   "login": {
-    "title": "Welcome Back",
-    "subtitle": "Sign in to your account",
-    "emailLabel": "Email",
-    "emailPlaceholder": "your@email.com",
-    "loginButton": "Send Magic Link",
-    "loading": "Sending magic link...",
-    "dontHaveAccount": "Don't have an account? Sign up",
     "termsPrefix": "By signing up, you agree to our",
     "termsOfService": "Terms of Service",
     "termsAnd": "and",
     "privacyPolicy": "Privacy Policy",
-    "termsSuffix": "",
-    "errors": {
-      "invalidEmail": "Please enter a valid email address",
-      "loginFailed": "Failed to send magic link. Please try again."
-    }
+    "termsSuffix": ""
   },
   "reviewSignIn": {
     "hint": "Enter the review account password",
