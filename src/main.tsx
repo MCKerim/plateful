@@ -85,7 +85,9 @@ const isDevelopment = import.meta.env.MODE === "development";
 // VITE_E2E). The React Query devtools' floating toggle sits bottom-right, on
 // top of the bottom navigation's Planner link at mobile viewports, and would
 // intercept the click; the tests see the app as a user does, without it.
-const showQueryDevtools = isDevelopment && !import.meta.env.VITE_E2E;
+// Not in the native app either: with live reload its toggle covered the
+// cooking screen's Next button on the emulator.
+const showQueryDevtools = isDevelopment && !import.meta.env.VITE_E2E && !Capacitor.isNativePlatform();
 
 /**
  * Which product this bundle is running as, sent on every event as a super
