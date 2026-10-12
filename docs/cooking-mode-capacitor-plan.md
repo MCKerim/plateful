@@ -1,6 +1,9 @@
 # Cooking mode on Capacitor (web + Android)
 
-Plan, 2026-10-12. Status: planned, nothing built yet. Parity port of the
+Plan, 2026-10-12. Status: built on branch `cooking-mode` the same day as
+Android 1.5 / 44, verified against production with the dev account; Kerim's
+device test (alarms through Doze and a reboot, scroll snap) and the Play
+upload are pending. Parity port of the
 iOS cooking mode (iOS 1.0, built 2026-07-10 to 07-21 in four stages). The
 iOS repo is the spec; this file names what is copied, what is adapted,
 what Android cannot do, and the order.

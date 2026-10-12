@@ -4,6 +4,32 @@ Per language 500 characters (Play Console limit). Same voice as the iOS
 What's New in the iOS repo's `docs/app-store-listing.md`; the Android notes
 for 1.4 fold iOS 1.2 and 1.3 into one release.
 
+## 1.5 (versionCode 44), 2026-10-12
+
+**DE**
+
+Der Kochmodus ist da.
+
+• Ein Tipp auf „Kochen“ zeigt deinen aktuellen Schritt groß und lesbar, Wischen ist die Navigation.
+• Zutaten stehen direkt im Schritt, die skalierte Menge auf Tipp. Zeitangaben werden zu Timern.
+• Timer laufen für den ganzen Haushalt und klingeln auf jedem beteiligten Gerät, auch bei dunklem Bildschirm.
+• Kocht jemand aus deinem Haushalt, kochst du von der Startseite aus mit, mit eigenem Schritt.
+• Portionen und Häkchen teilt ihr euch live.
+
+Dazu kleinere Verbesserungen.
+
+**EN**
+
+Cooking mode is here.
+
+• Tap “Cook” and your current step fills the screen, big and readable; swiping is the navigation.
+• Ingredients sit right in the step, with the scaled amount on tap. Durations become timers.
+• Timers run for the whole household and ring on every device that's cooking, screen off included.
+• When someone in your household cooks, Home shows it and you cook along at your own step.
+• Servings and checked-off ingredients are shared live.
+
+Plus smaller improvements and fixes.
+
 ## 1.4 (versionCode 43), 2026-10-11
 
 **DE**
