@@ -30,7 +30,7 @@ const PLACEHOLDER = /\{(\d+)\}/g;
  * equal the step text character for character. Mirrors the extractor's
  * validator and the iOS `StepAnnotation.validated(against:)`.
  */
-function reconstructs(template: string, texts: string[], stepText: string): boolean {
+export function reconstructs(template: string, texts: string[], stepText: string): boolean {
   const seen = new Set<number>();
   for (const match of template.matchAll(PLACEHOLDER)) {
     const index = Number(match[1]);
@@ -39,6 +39,46 @@ function reconstructs(template: string, texts: string[], stepText: string): bool
   }
   if (seen.size !== texts.length) return false;
   return template.replace(PLACEHOLDER, (_, digits: string) => texts[Number(digits)] ?? "") === stepText;
+}
+
+/**
+ * The stored annotation as typed data, or `null` when this client cannot read
+ * it: a version it doesn't know, an entity type it doesn't know, or an entity
+ * missing a field. Shape only; the reconstruction invariant is the caller's.
+ */
+export function parseStoredAnnotation(stored: Json | null | undefined): StoredStepAnnotation | null {
+  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return null;
+  const { v, template, entities } = stored as { v?: unknown; template?: unknown; entities?: unknown };
+  if (v !== 1 || typeof template !== "string" || !Array.isArray(entities)) return null;
+
+  const parsed: StoredAnnotationEntity[] = [];
+  for (const raw of entities) {
+    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
+    const entity = raw as Record<string, unknown>;
+    if (typeof entity.text !== "string") return null;
+    if (entity.t === "ing") {
+      if (typeof entity.ingredient_id !== "string") return null;
+      parsed.push({
+        t: "ing",
+        ingredient_id: entity.ingredient_id,
+        text: entity.text,
+        emoji: typeof entity.emoji === "string" ? entity.emoji : "",
+        amount: entity.amount === true,
+      });
+    } else if (entity.t === "timer") {
+      if (typeof entity.seconds !== "number" || typeof entity.label !== "string") return null;
+      parsed.push({
+        t: "timer",
+        seconds: entity.seconds,
+        ...(typeof entity.seconds_max === "number" ? { seconds_max: entity.seconds_max } : {}),
+        text: entity.text,
+        label: entity.label,
+      });
+    } else {
+      return null;
+    }
+  }
+  return { v: 1, template, entities: parsed };
 }
 
 /**
@@ -57,39 +97,30 @@ export function toSnapshotAnnotation(
   stepText: string,
   ingredientIndexById: ReadonlyMap<string, number>
 ): SnapshotStepAnnotation | null {
-  if (!stored || typeof stored !== "object" || Array.isArray(stored)) return null;
-  const { v, template, entities } = stored as { v?: unknown; template?: unknown; entities?: unknown };
-  if (v !== 1 || typeof template !== "string" || !Array.isArray(entities)) return null;
+  const parsed = parseStoredAnnotation(stored);
+  if (!parsed) return null;
+  const { template } = parsed;
 
   const rewritten: SnapshotAnnotationEntity[] = [];
-  for (const raw of entities) {
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
-    const entity = raw as Record<string, unknown>;
-    if (typeof entity.text !== "string") return null;
+  for (const entity of parsed.entities) {
     if (entity.t === "ing") {
-      const index =
-        typeof entity.ingredient_id === "string"
-          ? ingredientIndexById.get(entity.ingredient_id)
-          : undefined;
+      const index = ingredientIndexById.get(entity.ingredient_id);
       if (index === undefined) return null;
       rewritten.push({
         t: "ing",
         ingredient_index: index,
         text: entity.text,
-        emoji: typeof entity.emoji === "string" ? entity.emoji : "",
-        amount: entity.amount === true,
+        emoji: entity.emoji,
+        amount: entity.amount,
       });
-    } else if (entity.t === "timer") {
-      if (typeof entity.seconds !== "number" || typeof entity.label !== "string") return null;
+    } else {
       rewritten.push({
         t: "timer",
         seconds: entity.seconds,
-        seconds_max: typeof entity.seconds_max === "number" ? entity.seconds_max : null,
+        seconds_max: entity.seconds_max ?? null,
         text: entity.text,
         label: entity.label,
       });
-    } else {
-      return null;
     }
   }
 
