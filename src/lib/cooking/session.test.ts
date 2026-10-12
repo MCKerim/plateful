@@ -9,6 +9,7 @@ import {
   parseSessionRow,
   resumeStepId,
   scaleFactor,
+  splitSessions,
   STALE_AFTER_MS,
   toggleIngredient,
   type CookingSessionRow,
@@ -128,5 +129,11 @@ describe("cooking state", () => {
 
   it("lets mine win over a stray joinable one", () => {
     expect(cookingState(RECIPE, mine, joinable)).toEqual({ kind: "mine", sessionId: "sess-1" });
+  });
+
+  it("splits the household's sessions by whether I cook in them", () => {
+    const own = { id: "a", cookIds: ["me", "partner"] };
+    const theirs = { id: "b", cookIds: ["partner"] };
+    expect(splitSessions([own, theirs], "me")).toEqual({ mine: [own], joinable: [theirs] });
   });
 });

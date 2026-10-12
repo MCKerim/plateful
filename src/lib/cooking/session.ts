@@ -101,6 +101,17 @@ export function toggleIngredient(checked: ReadonlySet<string>, ingredientId: str
   return next;
 }
 
+/** The household's sessions split into the ones I am in and the ones I could join. */
+export function splitSessions<T extends { cookIds: string[] }>(
+  sessions: readonly T[],
+  userId: string
+): { mine: T[]; joinable: T[] } {
+  const mine: T[] = [];
+  const joinable: T[] = [];
+  for (const session of sessions) (session.cookIds.includes(userId) ? mine : joinable).push(session);
+  return { mine, joinable };
+}
+
 /** What the recipe's cook button reads: "Cook", "Continue" (mine) or "Join" (a member's I haven't joined). */
 export type RecipeCookingState =
   | { kind: "none" }

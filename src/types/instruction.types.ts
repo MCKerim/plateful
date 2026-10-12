@@ -1,4 +1,4 @@
-import type { Database } from "./database.types";
+import type { Database, Json } from "./database.types";
 
 // Database row types from Supabase
 export type RecipeInstructionRow =
@@ -13,6 +13,8 @@ export type RecipeInstruction = {
   stepText: string;
   groupName: string | null;
   sortOrder: number;
+  /** The cooking-mode annotation as stored; the extractor writes it, `validatedAnnotation` reads it. */
+  annotation: Json | null;
 };
 
 // For creating/replacing instruction steps

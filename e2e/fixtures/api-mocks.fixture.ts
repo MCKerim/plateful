@@ -384,6 +384,24 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       });
     });
   }
+  // Nobody cooks in any scenario so far: the four session tables answer
+  // empty, and writes succeed without a body.
+  for (const table of [
+    "cooking_sessions",
+    "cooking_session_participants",
+    "cooking_session_checks",
+    "cooking_session_timers",
+  ]) {
+    await page.route(`**/rest/v1/${table}?*`, async (route) => {
+      const method = route.request().method();
+      await route.fulfill({
+        status: method === "DELETE" || method === "PATCH" ? 204 : 200,
+        contentType: "application/json",
+        body: method === "DELETE" || method === "PATCH" ? "" : JSON.stringify([]),
+      });
+    });
+  }
+
   for (const rpc of [
     "add_shopping_list_item",
     "add_ingredients_to_shopping_list",
@@ -447,5 +465,11 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       contentType: "application/json",
       body: JSON.stringify([]),
     });
+  });
+
+  // The extractor's cooking-mode annotator, asked after every save; the app
+  // ignores the answer and the annotation arrives through realtime.
+  await page.route("**/api/annotate", async (route) => {
+    await route.fulfill({ status: 202, contentType: "application/json", body: "{}" });
   });
 }

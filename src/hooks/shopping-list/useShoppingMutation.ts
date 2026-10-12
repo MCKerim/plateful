@@ -1,15 +1,10 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
 import type { ShoppingListItem } from "@/lib/shopping-list/item";
+import { useOptimisticMutation } from "@/hooks/general/useOptimisticMutation";
 
 type Variables = { householdId: string };
 
-/**
- * A list write shown at once: `optimistic` rewrites the cached list before the
- * request, a failure restores it and refetches. Shares one mutation key, which
- * the realtime handler in App waits on, so a refetch never lands older than
- * the screen while a write is in flight.
- */
+/** A list write shown at once; see `useOptimisticMutation`. */
 export function useShoppingMutation<TVariables extends Variables, TResult>(options: {
   mutationFn: (variables: TVariables) => Promise<TResult>;
   optimistic: (items: ShoppingListItem[], variables: TVariables) => ShoppingListItem[];
@@ -17,29 +12,12 @@ export function useShoppingMutation<TVariables extends Variables, TResult>(optio
   /** After the rollback, for a screen that tells the user. */
   onError?: (error: Error) => void;
 }) {
-  const queryClient = useQueryClient();
-
-  return useMutation({
+  return useOptimisticMutation<ShoppingListItem[], TVariables, TResult>({
     mutationKey: queryKeys.shoppingList.all,
+    queryKey: (variables) => queryKeys.shoppingList.items(variables.householdId),
     mutationFn: options.mutationFn,
-    onMutate: async (variables: TVariables) => {
-      const queryKey = queryKeys.shoppingList.items(variables.householdId);
-      await queryClient.cancelQueries({ queryKey });
-      const previous = queryClient.getQueryData<ShoppingListItem[]>(queryKey);
-      queryClient.setQueryData<ShoppingListItem[]>(queryKey, (items) =>
-        options.optimistic(items ?? [], variables)
-      );
-      return { previous };
-    },
+    optimistic: (items, variables) => options.optimistic(items ?? [], variables),
     onSuccess: options.onSuccess,
-    onError: (error, variables, context) => {
-      const queryKey = queryKeys.shoppingList.items(variables.householdId);
-      // Another write's optimistic rows live in the cache; restoring this
-      // snapshot would drop them. The refetch below shows the server's truth.
-      const alone = queryClient.isMutating({ mutationKey: queryKeys.shoppingList.all }) === 1;
-      if (alone && context?.previous) queryClient.setQueryData(queryKey, context.previous);
-      void queryClient.invalidateQueries({ queryKey });
-      options.onError?.(error);
-    },
+    onError: options.onError,
   });
 }

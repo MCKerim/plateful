@@ -37,6 +37,9 @@
  * - `shopping_list_items_added`: `source` is "manual" | "recipe" | "plan",
  *   `count` is 1 for a typed line, else the items touched.
  * - `shopping_list_recipe_removed`: `count` is the items the recipe touched.
+ * - `cooking_started` (a session created, not resumed or joined),
+ *   `cooking_finished` / `cooking_abandoned` (this cook left through Finish
+ *   or the close button), `cooking_timer_started`: no properties, as on iOS.
  */
 export const AnalyticsEvent = {
   magicLinkRequested: "magic_link_requested",
@@ -66,6 +69,10 @@ export const AnalyticsEvent = {
   pushPermissionDenied: "push_permission_denied",
   shoppingListItemsAdded: "shopping_list_items_added",
   shoppingListRecipeRemoved: "shopping_list_recipe_removed",
+  cookingStarted: "cooking_started",
+  cookingFinished: "cooking_finished",
+  cookingAbandoned: "cooking_abandoned",
+  cookingTimerStarted: "cooking_timer_started",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvent)[keyof typeof AnalyticsEvent];

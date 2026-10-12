@@ -35,6 +35,7 @@ import mascotSalad from "@/assets/mascot-filled-salad.webp";
 import { useTranslation } from "react-i18next";
 import { useSupabase } from "@/utils/supabase";
 import { nutritionApi } from "@/api/nutrition.api";
+import { annotationApi } from "@/api/annotation.api";
 import { useImageSourcePicker } from "@/hooks/general/useImageSourcePicker";
 import { useCreateRecipe } from "@/hooks/recipe/useCreateRecipe";
 import { Field } from "@/components/ui/field";
@@ -357,6 +358,9 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
           recipeId: newRecipe.id,
           inputs: parseInstructionsMarkdown(instructions),
         });
+        annotationApi.request(supabase, newRecipe.id).catch((error) => {
+          reportError("Annotation request failed", error);
+        });
       }
 
       // First nutrition estimate, now that the ingredient rows exist.
@@ -417,6 +421,10 @@ instructions: ${recipeContext.instructions ?? "No instructions"}
         await replaceInstructionsMutation.mutateAsync({
           recipeId,
           inputs: parseInstructionsMarkdown(instructions),
+        });
+        // The fresh step rows carry no cooking-mode annotations yet.
+        annotationApi.request(supabase, recipeId).catch((error) => {
+          reportError("Annotation request failed", error);
         });
       }
 

@@ -44,6 +44,13 @@ export const queryKeys = {
     all: ["shopping-list"] as const,
     items: (householdId: string) => ["shopping-list", "items", householdId] as const,
   },
+  cooking: {
+    all: ["cooking"] as const,
+    /** Active sessions with recipe and cooks: cook button, pill, invite card. */
+    household: (householdId: string) => ["cooking", "household", householdId] as const,
+    /** One session's participants, checks and timers. */
+    session: (sessionId: string) => ["cooking", "session", sessionId] as const,
+  },
   /** The global `ingredients` dictionary; outside `shoppingList` so list events don't refetch it. */
   ingredientDictionary: ["ingredient-dictionary"] as const,
   missions: {

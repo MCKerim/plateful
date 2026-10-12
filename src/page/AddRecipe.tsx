@@ -40,6 +40,7 @@ import {
 } from "@/lib/transformers/instruction.transformer";
 import NutritionEditor from "@/components/recipe/NutritionEditor";
 import { nutritionApi, NutritionValues } from "@/api/nutrition.api";
+import { annotationApi } from "@/api/annotation.api";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import CollectionMultiSelect from "@/components/collections/CollectionMultiSelect";
@@ -451,6 +452,12 @@ export default function AddRecipe() {
           reportError("Nutrition refresh request failed", error);
         }
       }
+
+      // The save rebuilt the step rows, which dropped their cooking-mode
+      // annotations; the worker derives them again from the rows just written.
+      annotationApi.request(supabase, targetRecipeId).catch((error) => {
+        reportError("Annotation request failed", error);
+      });
 
       await replaceCollectionsMutation.mutateAsync({
         recipeId: targetRecipeId,

@@ -6,6 +6,7 @@ import {
   toStoredAnnotation,
 } from "@/lib/transformers/recipeShare.transformer";
 import { nutritionApi } from "@/api/nutrition.api";
+import { annotationApi } from "@/api/annotation.api";
 import { reportError } from "@/utils/reportError";
 import { isTrustedRecipeImageUrl, recipeImageApi } from "@/api/recipeImage.api";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
@@ -242,6 +243,13 @@ export const recipeShareApi = {
     if (!nutrition && nutritionAuto && snapshot.ingredients.length > 0) {
       nutritionApi.refresh(supabase, newRecipeId).catch((error) => {
         reportError("Shared recipe nutrition refresh request failed", error);
+      });
+    }
+
+    // Likewise for the cooking-mode chips when the snapshot brought none.
+    if (steps.length > 0 && steps.every((step) => step.annotation === null)) {
+      annotationApi.request(supabase, newRecipeId).catch((error) => {
+        reportError("Shared recipe annotation request failed", error);
       });
     }
 

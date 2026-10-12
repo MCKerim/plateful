@@ -304,6 +304,22 @@ function App() {
       shoppingRefreshTimer = setTimeout(refresh, 300);
     };
 
+    // Cooking the same way: a partner's timer, check or servings change shows
+    // on this phone, and a refetch waits while a cooking write is in flight.
+    let cookingRefreshTimer: ReturnType<typeof setTimeout> | null = null;
+    const scheduleCookingRefresh = () => {
+      if (cookingRefreshTimer) return;
+      const refresh = () => {
+        if (queryClient.isMutating({ mutationKey: queryKeys.cooking.all }) > 0) {
+          cookingRefreshTimer = setTimeout(refresh, 300);
+          return;
+        }
+        cookingRefreshTimer = null;
+        queryClient.invalidateQueries({ queryKey: queryKeys.cooking.all });
+      };
+      cookingRefreshTimer = setTimeout(refresh, 300);
+    };
+
     const channel = supabase
       .channel("recipes-changes")
       .on(
@@ -337,12 +353,33 @@ function App() {
         { event: "*", schema: "public", table: "shopping_list_items" },
         scheduleShoppingRefresh
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "cooking_sessions" },
+        scheduleCookingRefresh
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "cooking_session_participants" },
+        scheduleCookingRefresh
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "cooking_session_timers" },
+        scheduleCookingRefresh
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "cooking_session_checks" },
+        scheduleCookingRefresh
+      )
       .subscribe();
 
     return () => {
       if (refreshTimer) clearTimeout(refreshTimer);
       if (planRefreshTimer) clearTimeout(planRefreshTimer);
       if (shoppingRefreshTimer) clearTimeout(shoppingRefreshTimer);
+      if (cookingRefreshTimer) clearTimeout(cookingRefreshTimer);
       supabase.removeChannel(channel);
     };
   }, [householdId, queryClient, supabase]);

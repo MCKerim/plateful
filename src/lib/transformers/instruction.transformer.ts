@@ -14,6 +14,7 @@ export function transformInstruction(row: RecipeInstructionRow): RecipeInstructi
     stepText: row.step_text,
     groupName: row.group_name,
     sortOrder: row.sort_order,
+    annotation: row.annotation,
   };
 }
 
