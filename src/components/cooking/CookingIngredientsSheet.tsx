@@ -1,5 +1,6 @@
 import { Circle, CircleCheck } from "lucide-react";
-import { Drawer, DrawerContent } from "@/components/ui/drawer";
+import { useTranslation } from "react-i18next";
+import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
 import { ServingScaler } from "@/components/ingredients/ServingScaler";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { cn } from "@/lib/utils";
@@ -30,11 +31,13 @@ export default function CookingIngredientsSheet({
   checked,
   onToggle,
 }: Readonly<Props>) {
+  const { t } = useTranslation();
   const groups = groupIngredients(ingredients);
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
+        <DrawerTitle className="sr-only">{t("cooking.ingredients")}</DrawerTitle>
         <div className="max-h-[75vh] overflow-y-auto px-4 pb-10 pt-4">
           <div className="mb-4 flex justify-center">
             <ServingScaler value={servings} onChange={onServingsChange} unit={servingsUnit} />

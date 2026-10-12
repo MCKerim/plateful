@@ -147,9 +147,10 @@ Same on iOS; no client guard.
   active session I have not joined, with cover, "Anna kocht …" (names from
   `users.username`) and a Join button. Nothing ambient for a session I
   have not joined, as on iOS.
-- **Realtime**: four more `postgres_changes` subscriptions in `App.tsx`
-  (`cooking_sessions`, `cooking_session_participants`,
-  `cooking_session_timers`, `cooking_session_checks`), no column filter,
+- **Realtime**: three more `postgres_changes` subscriptions in `App.tsx`
+  (`cooking_sessions`, `cooking_session_timers`, `cooking_session_checks`;
+  `cooking_session_participants` is not in the publication, and one
+  unpublished table fails the whole channel), no column filter,
   debounced invalidation of `queryKeys.cooking.*`, skipped while a cooking
   mutation is in flight (the shopping-list pattern).
 - **Analytics**: `cooking_started`, `cooking_finished`,

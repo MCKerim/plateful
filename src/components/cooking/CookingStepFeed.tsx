@@ -74,10 +74,12 @@ export default function CookingStepFeed<T extends { id: string }>({
     centeredOnce.current = true;
   }, [currentStepId, height]);
 
+  // Absolute inside a relative parent: a percentage height in a flex child
+  // resolved against the wrong box and let the feed paint over the bar.
   return (
     <div
       ref={containerRef}
-      className="relative h-full overflow-y-auto [scroll-snap-type:y_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="absolute inset-0 overflow-y-auto [scroll-snap-type:y_mandatory] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       style={{ paddingTop: height / 2, paddingBottom: height / 2 }}
     >
       <div className="flex flex-col gap-8 px-6">

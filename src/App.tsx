@@ -307,6 +307,9 @@ function App() {
 
     // Cooking the same way: a partner's timer, check or servings change shows
     // on this phone, and a refetch waits while a cooking write is in flight.
+    // Only tables in the realtime publication (sessions, checks, timers):
+    // one table outside it fails the whole channel, every subscription with
+    // it. Participants are not published, as on iOS; joins show on refetch.
     let cookingRefreshTimer: ReturnType<typeof setTimeout> | null = null;
     const scheduleCookingRefresh = () => {
       if (cookingRefreshTimer) return;
@@ -357,11 +360,6 @@ function App() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "cooking_sessions" },
-        scheduleCookingRefresh
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "cooking_session_participants" },
         scheduleCookingRefresh
       )
       .on(

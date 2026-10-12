@@ -17,7 +17,8 @@ export default function CookingPill({ name, imageUrl, countdown, onClick }: Read
       type="button"
       onClick={onClick}
       aria-label={t("cooking.returnTo", { name })}
-      className="fixed bottom-[84px] left-1/2 z-40 flex w-[calc(100%-2rem)] max-w-[30rem] -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card/95 py-2 pl-2 pr-4 text-left shadow-lg backdrop-blur"
+      // Leaves the right column free for the pages' add button (Home, cookbook).
+      className="fixed bottom-[84px] left-4 right-[5.5rem] z-40 flex max-w-[26rem] items-center gap-3 rounded-full border border-border bg-card/95 py-2 pl-2 pr-4 text-left shadow-lg backdrop-blur"
     >
       {imageUrl ? (
         <img src={imageUrl} alt="" className="size-9 shrink-0 rounded-full object-cover" />

@@ -143,7 +143,7 @@ export default function Cooking() {
         </Button>
       </header>
 
-      <main className="min-h-0 flex-1">
+      <main className="relative min-h-0 flex-1">
         {cooking.status === "loading" && (
           <div className="flex h-full items-center justify-center">
             <Loader2 className="size-8 animate-spin text-muted-foreground" />
