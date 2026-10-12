@@ -1,6 +1,7 @@
 import { Route, Routes, Navigate, useNavigate } from "react-router";
 import MealPlanner from "./page/MealPlanner";
 import Recipe from "./page/Recipe";
+import Cooking from "@/page/Cooking";
 import AddRecipe from "./page/AddRecipe";
 import SignUp from "./page/onboarding/signUp/SignUp";
 import EmailSignUp from "./page/onboarding/emailSignUp/EmailSignUp";
@@ -542,6 +543,7 @@ function App() {
         <Route path="/home" element={routeToCorrectPage(<Home />)} />
 
         <Route path="/recipe/:recipeId" element={routeToCorrectPage(<Recipe />)} />
+        <Route path="/cooking/:recipeId" element={routeToCorrectPage(<Cooking />)} />
         <Route path="/recipe/add" element={routeToCorrectPage(<AddRecipe />)} />
         <Route path="/recipe/edit/:recipeId" element={routeToCorrectPage(<AddRecipe />)} />
 

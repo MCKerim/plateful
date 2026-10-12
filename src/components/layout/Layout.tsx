@@ -1,4 +1,5 @@
 import BottomNav from "../general/BottomNav";
+import CookingPillHost from "@/components/cooking/CookingPillHost";
 import Header from "../general/Header";
 
 type Props = {
@@ -27,6 +28,7 @@ export default function Layout({
       </div>
 
       {footer ?? (showFooter && <BottomNav />)}
+      {!footer && showFooter && <CookingPillHost />}
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addTime,
+  countdownText,
   hasFired,
   isRunning,
   parseTimerRow,
@@ -37,6 +38,15 @@ describe("timer rows", () => {
     expect(timer.endsAt).toBeNull();
     expect(isRunning(timer)).toBe(false);
     expect(timer.durationSeconds).toBe(600);
+  });
+});
+
+describe("countdownText", () => {
+  it("formats minutes and seconds, hours when needed", () => {
+    expect(countdownText(272)).toBe("4:32");
+    expect(countdownText(5)).toBe("0:05");
+    expect(countdownText(3723)).toBe("1:02:03");
+    expect(countdownText(-4)).toBe("0:00");
   });
 });
 

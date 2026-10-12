@@ -60,6 +60,16 @@ export type MockMealPlan = {
   planner_notes: { id: string; text: string } | null;
 };
 
+// One `recipe_instructions` row.
+export type MockInstruction = {
+  id: string;
+  recipe_id: string;
+  step_text: string;
+  group_name: string | null;
+  sort_order: number;
+  annotation: null;
+};
+
 export type MockSession = {
   access_token: string;
   token_type: string;
@@ -87,6 +97,7 @@ export type TestScenario = {
   recipes: MockRecipe[];
   collections: MockCollection[];
   mealPlans: MockMealPlan[];
+  instructions: MockInstruction[];
 };
 
 // Fixture options for setupAuth
@@ -96,6 +107,7 @@ export type AuthenticatedFixtureOptions = {
   recipes?: MockRecipe[];
   collections?: MockCollection[];
   mealPlans?: MockMealPlan[];
+  instructions?: MockInstruction[];
 };
 
 // Custom fixtures interface

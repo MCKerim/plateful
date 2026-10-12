@@ -69,6 +69,7 @@ export function useCookingSession(recipeId: string | null, preferredServings: nu
   // as "not resolved yet" without a reset.
   const [resolved, setResolved] = useState<{ recipeId: string; sessionId: string | null } | null>(null);
   const resolvedFor = useRef<string | null>(null);
+  const [attempt, setAttempt] = useState(0);
   const sessionId = resolved?.recipeId === recipeId ? resolved.sessionId : null;
   const resolveFailed = resolved?.recipeId === recipeId && resolved.sessionId === null;
 
@@ -86,7 +87,14 @@ export function useCookingSession(recipeId: string | null, preferredServings: nu
         reportError("Cooking session resolve failed", error);
         setResolved({ recipeId, sessionId: null });
       });
-  }, [recipeId, householdId, userId, preferredServings, supabase, posthog, queryClient]);
+  }, [recipeId, householdId, userId, preferredServings, supabase, posthog, queryClient, attempt]);
+
+  /** After a failed resolve: try again from the top. */
+  const retry = useCallback(() => {
+    resolvedFor.current = null;
+    setResolved(null);
+    setAttempt((count) => count + 1);
+  }, []);
 
   const queryKey = queryKeys.cooking.session(sessionId ?? "");
   const stateQuery = useQuery({
@@ -278,6 +286,7 @@ export function useCookingSession(recipeId: string | null, preferredServings: nu
 
   return {
     status,
+    retry,
     sessionId,
     session: state?.session ?? null,
     steps,

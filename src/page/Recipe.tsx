@@ -9,6 +9,7 @@ import {
   Link,
   CalendarDays,
   ChefHat,
+  CookingPot,
   Printer,
   Share2,
   Loader2,
@@ -59,6 +60,7 @@ import DeleteDialog from "@/components/general/DeleteDialog";
 import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
 import { Capacitor } from "@capacitor/core";
 import { recipeImageApi } from "@/api/recipeImage.api";
+import { useRecipeCookingState } from "@/hooks/cooking/useRecipeCookingState";
 
 export default function Recipe() {
   const { t } = useTranslation();
@@ -93,6 +95,7 @@ export default function Recipe() {
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
+  const cookingState = useRecipeCookingState(recipeId);
   const savedServings = useAppSelector((state) =>
     recipeId != null ? selectTargetServings(recipeId)(state) : undefined
   );
@@ -209,9 +212,14 @@ export default function Recipe() {
       <div className="h-safe-b-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
-        <Button variant="secondary" className="w-full" onClick={handleAskChatbot}>
+        <Button
+          variant="secondary"
+          size="icon"
+          className="shrink-0"
+          onClick={handleAskChatbot}
+          aria-label={t("recipe.askChatbot")}
+        >
           <ChefHat style={{ transform: "rotate(16deg) translateY(-1px)" }} />
-          {t("recipe.askChatbot")}
         </Button>
 
         {recipe && (
@@ -220,6 +228,22 @@ export default function Recipe() {
             navigateOnSuccess={true}
           />
         )}
+
+        {/* One word per state, as on iOS: Cook, Cook along (a member's
+            session), Continue (one this user is in). All three open cooking
+            mode; the session hook resolves fresh-vs-resume on the server. */}
+        <Button
+          className="w-full"
+          onClick={() => navigate(`/cooking/${recipeId}`)}
+          disabled={instructionSteps.length === 0}
+        >
+          <CookingPot />
+          {cookingState.kind === "mine"
+            ? t("cooking.continue")
+            : cookingState.kind === "joinable"
+              ? t("cooking.cookAlong")
+              : t("cooking.cook")}
+        </Button>
       </div>
     </>
   );

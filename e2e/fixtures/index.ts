@@ -56,6 +56,7 @@ function createDefaultScenario(): TestScenario {
     recipes: [],
     collections,
     mealPlans: [],
+    instructions: [],
   };
 }
 
@@ -78,6 +79,7 @@ function createScenarioFromOptions(options?: AuthenticatedFixtureOptions): TestS
     recipes: options?.recipes ?? [],
     collections,
     mealPlans: options?.mealPlans ?? [],
+    instructions: options?.instructions ?? [],
   };
 }
 

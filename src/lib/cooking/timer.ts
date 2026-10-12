@@ -109,6 +109,16 @@ export function stopTimer(timers: readonly CookingTimer[], id: string): CookingT
   return timers.filter((timer) => timer.id !== id);
 }
 
+/** "4:32", or "1:02:03" past an hour. */
+export function countdownText(seconds: number): string {
+  const s = Math.max(0, seconds);
+  const hours = Math.floor(s / 3600);
+  const minutes = Math.floor((s % 3600) / 60);
+  const rest = s % 60;
+  const mmss = `${hours > 0 ? String(minutes).padStart(2, "0") : minutes}:${String(rest).padStart(2, "0")}`;
+  return hours > 0 ? `${hours}:${mmss}` : mmss;
+}
+
 /**
  * The running timer that fires next, for the pill and the bottom bar. A fired
  * timer is never the soonest: its `endsAt` is in the past, and a countdown to

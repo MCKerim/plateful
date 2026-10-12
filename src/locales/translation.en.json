@@ -38,7 +38,9 @@
     "send": "Send",
     "next": "Next",
     "apply": "Apply",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "retry": "Try again",
+    "close": "Close"
   },
   "update": {
     "title": "New Update Available!",
@@ -1051,5 +1053,28 @@
     "stepPlaceholder": "Describe the step…",
     "sectionPlaceholder": "Section name (e.g. Sauce, Dough)",
     "step": "Step"
+  },
+  "cooking": {
+    "cook": "Cook",
+    "cookAlong": "Cook along",
+    "continue": "Continue",
+    "cookingNow": "Cooking now",
+    "returnTo": "Return to cooking: {{name}}",
+    "isCooking": "{{name}} is cooking",
+    "someoneIsCooking": "Someone is cooking",
+    "minimize": "Minimize",
+    "endCooking": "End cooking",
+    "endMessage": "Finish to log this meal as cooked, or cancel to discard this session's progress.",
+    "finishCooking": "Finish cooking",
+    "cancelCooking": "Cancel cooking",
+    "keepCooking": "Keep cooking",
+    "ingredients": "Ingredients",
+    "timers": "Timers",
+    "next": "Next",
+    "finish": "Finish",
+    "enjoy": "Enjoy your meal!",
+    "noSteps": "This recipe has no instructions to cook from.",
+    "couldNotStart": "Couldn't start cooking",
+    "checkConnection": "Check your connection and try again."
   }
 }

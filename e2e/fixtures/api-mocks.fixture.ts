@@ -222,15 +222,25 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     await route.fulfill({ status: 204, body: "" });
   });
 
-  for (const table of ["recipe_ingredients", "recipe_instructions"]) {
-    await page.route(`**/rest/v1/${table}?*`, async (route) => {
-      await route.fulfill({
-        status: route.request().method() === "DELETE" ? 204 : 200,
-        contentType: "application/json",
-        body: route.request().method() === "DELETE" ? "" : JSON.stringify([]),
-      });
+  await page.route("**/rest/v1/recipe_ingredients?*", async (route) => {
+    await route.fulfill({
+      status: route.request().method() === "DELETE" ? 204 : 200,
+      contentType: "application/json",
+      body: route.request().method() === "DELETE" ? "" : JSON.stringify([]),
     });
-  }
+  });
+
+  // The scenario's step rows, by recipe; writes succeed without a body.
+  await page.route("**/rest/v1/recipe_instructions?*", async (route) => {
+    const method = route.request().method();
+    if (method !== "GET") {
+      await route.fulfill({ status: method === "DELETE" ? 204 : 201, contentType: "application/json", body: "" });
+      return;
+    }
+    const match = route.request().url().match(/recipe_id=eq\.([a-f0-9-]+)/i);
+    const rows = scenario.instructions.filter((step) => !match || step.recipe_id === match[1]);
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rows) });
+  });
 
   // Meal plans endpoint (meal_plans table)
   await page.route("**/rest/v1/meal_plans?*", async (route) => {
@@ -384,10 +394,58 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       });
     });
   }
-  // Nobody cooks in any scenario so far: the four session tables answer
-  // empty, and writes succeed without a body.
+  // Cooking: a session the test starts is remembered so the single read,
+  // the household list (with the recipe and this cook embedded) and the
+  // status update see it; the other three tables answer empty, writes
+  // succeed without a body.
+  let cookingSession: Record<string, unknown> | null = null;
+  await page.route("**/rest/v1/cooking_sessions?*", async (route) => {
+    const request = route.request();
+    const method = request.method();
+    if (method === "POST") {
+      const body = request.postDataJSON() as Record<string, unknown>;
+      cookingSession = {
+        id: "cooking-session-1",
+        household_id: body.household_id,
+        recipe_id: body.recipe_id,
+        started_by: body.started_by,
+        target_servings: body.target_servings ?? null,
+        status: "active",
+        started_at: new Date().toISOString(),
+        ended_at: null,
+      };
+      await route.fulfill({ status: 201, contentType: "application/json", body: JSON.stringify(cookingSession) });
+      return;
+    }
+    if (method === "PATCH") {
+      if (cookingSession) Object.assign(cookingSession, request.postDataJSON());
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    if (method === "DELETE") {
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    const url = request.url();
+    const active = cookingSession?.status === "active" ? cookingSession : null;
+    if (/[?&]id=eq\./.test(url)) {
+      await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(active) });
+      return;
+    }
+    const recipe = active ? scenario.recipes.find((r) => r.id === active.recipe_id) : undefined;
+    const rows =
+      active && recipe
+        ? [
+            {
+              ...active,
+              recipes: { id: recipe.id, name: recipe.name, image_path: null, base_servings: null, servings_unit: null },
+              cooking_session_participants: [{ user_id: scenario.user.id }],
+            },
+          ]
+        : [];
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rows) });
+  });
   for (const table of [
-    "cooking_sessions",
     "cooking_session_participants",
     "cooking_session_checks",
     "cooking_session_timers",

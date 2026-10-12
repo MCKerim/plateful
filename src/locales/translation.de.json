@@ -38,7 +38,9 @@
     "send": "Senden",
     "next": "Weiter",
     "apply": "Anwenden",
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "retry": "Erneut versuchen",
+    "close": "Schließen"
   },
   "update": {
     "title": "Neues Update verfügbar!",
@@ -1051,5 +1053,28 @@
     "stepPlaceholder": "Schritt beschreiben…",
     "sectionPlaceholder": "Abschnittsname (z.B. Soße, Teig)",
     "step": "Schritt"
+  },
+  "cooking": {
+    "cook": "Kochen",
+    "cookAlong": "Mitkochen",
+    "continue": "Weiterkochen",
+    "cookingNow": "Kocht gerade",
+    "returnTo": "Zurück zum Kochen: {{name}}",
+    "isCooking": "{{name}} kocht gerade",
+    "someoneIsCooking": "Jemand kocht gerade",
+    "minimize": "Minimieren",
+    "endCooking": "Kochen beenden",
+    "endMessage": "Fertig schließt das Gericht ab, Abbrechen verwirft den Fortschritt dieser Session.",
+    "finishCooking": "Fertig kochen",
+    "cancelCooking": "Kochen abbrechen",
+    "keepCooking": "Weiterkochen",
+    "ingredients": "Zutaten",
+    "timers": "Timer",
+    "next": "Weiter",
+    "finish": "Fertig",
+    "enjoy": "Guten Appetit!",
+    "noSteps": "Dieses Rezept hat keine Zubereitungsschritte.",
+    "couldNotStart": "Kochen konnte nicht starten",
+    "checkConnection": "Prüfe deine Verbindung und versuche es noch einmal."
   }
 }

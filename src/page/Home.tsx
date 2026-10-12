@@ -15,6 +15,10 @@ import NoteDialog, { NoteDialogState } from "@/components/mealPlanner/noteDialog
 import { orderForDisplay } from "@/lib/mealPlanHelper/mealPlanHelper";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import GettingStartedCard from "@/components/home/GettingStartedCard";
+import CookingInviteCard from "@/components/cooking/CookingInviteCard";
+import { useHouseholdCookingSessions } from "@/hooks/cooking/useHouseholdCookingSessions";
+import { useAppSelector } from "@/redux/hooks";
+import { selectHouseholdMembers } from "@/redux/slices/householdSlice";
 
 export default function Home() {
   const { t } = useTranslation();
@@ -26,6 +30,12 @@ export default function Home() {
   // Fetch recipes for "recently added" section
   const { data: recipes = [] } = useRecipes();
   const { data: planInfos } = useRecipeMealPlanInfos();
+
+  // A member cooking something this cook hasn't joined: the passive nudge
+  // above today's plan, as on iOS. Nothing shows for a session already joined.
+  const { data: cooking } = useHouseholdCookingSessions();
+  const members = useAppSelector(selectHouseholdMembers);
+  const invites = cooking?.joinable ?? [];
 
   // Today's plan, recipes first and then notes: a note ("Eating out") is the
   // plan's word for the day too, so the "nothing planned" line stays away.
@@ -71,6 +81,21 @@ export default function Home() {
     >
       {/* Getting started */}
       <GettingStartedCard />
+
+      {invites.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {invites.map((invite) => (
+            <CookingInviteCard
+              key={invite.session.id}
+              name={invite.recipe.name}
+              imageUrl={invite.recipe.imageUrl}
+              cookName={members?.find((member) => member.id === invite.cookIds[0])?.username ?? null}
+              onJoin={() => navigate(`/cooking/${invite.recipe.id}`)}
+              onOpen={() => navigate(`/recipe/${invite.recipe.id}`)}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Today's planned meals */}
       <div className="mb-36">
