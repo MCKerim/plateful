@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   addTime,
   countdownText,
+  durationLabel,
   hasFired,
+  newlyFired,
   isRunning,
   parseTimerRow,
   remainingSeconds,
@@ -47,6 +49,22 @@ describe("countdownText", () => {
     expect(countdownText(5)).toBe("0:05");
     expect(countdownText(3723)).toBe("1:02:03");
     expect(countdownText(-4)).toBe("0:00");
+  });
+});
+
+describe("newlyFired and durationLabel", () => {
+  it("reports a timer once, on the tick that passes its end", () => {
+    let timers = start([], "t1", 60, "a");
+    timers = start(timers, "t2", 120, "b");
+    expect(newlyFired(timers, NOW, NOW + 59_000)).toEqual([]);
+    expect(newlyFired(timers, NOW + 59_000, NOW + 60_000).map((t) => t.label)).toEqual(["a"]);
+    expect(newlyFired(timers, NOW + 60_000, NOW + 61_000)).toEqual([]);
+  });
+
+  it("names a hand-made timer by its length", () => {
+    expect(durationLabel(45)).toBe("45s");
+    expect(durationLabel(300)).toBe("5:00");
+    expect(durationLabel(605)).toBe("10:05");
   });
 });
 

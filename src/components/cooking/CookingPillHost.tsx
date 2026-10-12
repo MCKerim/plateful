@@ -1,12 +1,16 @@
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router";
+import { useTranslation } from "react-i18next";
 import CookingPill from "@/components/cooking/CookingPill";
 import { useHouseholdCookingSessions } from "@/hooks/cooking/useHouseholdCookingSessions";
 import { useClock } from "@/hooks/cooking/useClock";
 import { lastOpenedRecipeId } from "@/lib/cooking/lastOpened";
 import { countdownText, remainingSeconds, soonestRunningTimer } from "@/lib/cooking/timer";
+import { reconcileTimerAlarms } from "@/lib/cooking/timerAlarms";
 
 /** Mounts the pill while this cook is in a session, except on the cooking screen itself. */
 export default function CookingPillHost() {
+  const { t } = useTranslation();
   const { data } = useHouseholdCookingSessions();
   const navigate = useNavigate();
   const location = useLocation();
@@ -16,6 +20,20 @@ export default function CookingPillHost() {
   const timers = data?.timers.filter((timer) => timer.sessionId === shown?.session.id) ?? [];
   const now = useClock(timers.some((timer) => timer.endsAt !== null));
   const next = soonestRunningTimer(timers, now);
+
+  // A partner's timer started while this screen is elsewhere still rings
+  // here: every joined device keeps its own alarms, from any tab.
+  useEffect(() => {
+    if (!data) return;
+    for (const item of data.mine) {
+      const own = data.timers.filter((timer) => timer.sessionId === item.session.id);
+      void reconcileTimerAlarms(own, {
+        recipeId: item.recipe.id,
+        recipeName: item.recipe.name,
+        title: t("cooking.timerUp"),
+      });
+    }
+  }, [data, t]);
 
   if (!shown || location.pathname.startsWith("/cooking")) return null;
   return (

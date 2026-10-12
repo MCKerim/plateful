@@ -31,6 +31,21 @@ test.describe("Cooking mode", () => {
     await expect(page.getByRole("button", { name: "10 minutes" })).toBeVisible();
     await page.screenshot({ path: "test-results/cooking-screen.png" });
 
+    // Tapping the chip starts a shared timer: the chip counts down, so does
+    // the Timers button, and the sheet lists it with its step and a Stop.
+    await page.getByRole("button", { name: "10 minutes" }).click();
+    await expect(page.getByRole("button", { name: /10 minutes · (10:00|9:5\d)/ })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Timers" })).toContainText(/10:00|9:5\d/);
+    await page.getByRole("button", { name: "Timers" }).click();
+    const sheet = page.getByRole("dialog");
+    await expect(sheet).toContainText("10 minutes");
+    await expect(sheet).toContainText("Step 1");
+    await sheet.getByRole("button", { name: "Timer options" }).click();
+    await page.getByRole("menuitem", { name: "Stop" }).click();
+    await expect(sheet).toContainText("No timers");
+    await page.keyboard.press("Escape");
+    await expect(page.getByRole("button", { name: "10 minutes", exact: true })).toBeVisible();
+
     await page.getByRole("button", { name: "Next" }).click();
     await expect(current).toContainText("Simmer the dashi");
 

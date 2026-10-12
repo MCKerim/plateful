@@ -445,12 +445,13 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
         : [];
     await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify(rows) });
   });
+  // A plain insert carries no query string, so both spellings are answered.
   for (const table of [
     "cooking_session_participants",
     "cooking_session_checks",
     "cooking_session_timers",
   ]) {
-    await page.route(`**/rest/v1/${table}?*`, async (route) => {
+    await page.route(`**/rest/v1/${table}{,?*}`, async (route) => {
       const method = route.request().method();
       await route.fulfill({
         status: method === "DELETE" || method === "PATCH" ? 204 : 200,

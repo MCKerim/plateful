@@ -109,6 +109,17 @@ export function stopTimer(timers: readonly CookingTimer[], id: string): CookingT
   return timers.filter((timer) => timer.id !== id);
 }
 
+/** The timers that ran out after `since` and by `now`: what rings on this device once. */
+export function newlyFired(timers: readonly CookingTimer[], since: number, now: number): CookingTimer[] {
+  return timers.filter((timer) => timer.endsAt !== null && timer.endsAt > since && timer.endsAt <= now);
+}
+
+/** A hand-made timer's name: "45s" under a minute, else "5:00". */
+export function durationLabel(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
 /** "4:32", or "1:02:03" past an hour. */
 export function countdownText(seconds: number): string {
   const s = Math.max(0, seconds);

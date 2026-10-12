@@ -1075,6 +1075,21 @@
     "enjoy": "Enjoy your meal!",
     "noSteps": "This recipe has no instructions to cook from.",
     "couldNotStart": "Couldn't start cooking",
-    "checkConnection": "Check your connection and try again."
+    "checkConnection": "Check your connection and try again.",
+    "timersEmpty": "No timers",
+    "timersEmptyHint": "Tap a duration in a step, or add one below.",
+    "startTimer": "Start timer",
+    "minutesShort": "min",
+    "addMinute": "Add 1 min",
+    "addFiveMinutes": "Add 5 min",
+    "subtractMinute": "Subtract 1 min",
+    "reset": "Reset",
+    "repeat": "Repeat",
+    "stop": "Stop",
+    "dismiss": "Dismiss",
+    "timerUp": "Timer's up",
+    "timerDone": "Done",
+    "stepN": "Step {{n}}",
+    "timerOptions": "Timer options"
   }
 }

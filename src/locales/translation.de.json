@@ -1075,6 +1075,21 @@
     "enjoy": "Guten Appetit!",
     "noSteps": "Dieses Rezept hat keine Zubereitungsschritte.",
     "couldNotStart": "Kochen konnte nicht starten",
-    "checkConnection": "Prüfe deine Verbindung und versuche es noch einmal."
+    "checkConnection": "Prüfe deine Verbindung und versuche es noch einmal.",
+    "timersEmpty": "Keine Timer",
+    "timersEmptyHint": "Tippe auf eine Dauer im Schritt oder leg unten einen an.",
+    "startTimer": "Timer starten",
+    "minutesShort": "Min",
+    "addMinute": "1 Min hinzufügen",
+    "addFiveMinutes": "5 Min hinzufügen",
+    "subtractMinute": "1 Min abziehen",
+    "reset": "Zurücksetzen",
+    "repeat": "Wiederholen",
+    "stop": "Beenden",
+    "dismiss": "Verwerfen",
+    "timerUp": "Timer abgelaufen",
+    "timerDone": "Fertig",
+    "stepN": "Schritt {{n}}",
+    "timerOptions": "Timer-Optionen"
   }
 }

@@ -187,6 +187,12 @@ function App() {
       async (event) => {
         const notificationType = event.notification.extra?.type as string | undefined;
 
+        if (notificationType === "cooking_timer") {
+          const recipeId = event.notification.extra?.recipe_id as string | undefined;
+          navigate(recipeId ? `/cooking/${recipeId}` : "/home");
+          return;
+        }
+
         if (notificationType === "daily_meal_reminder") {
           try {
             const today = new Date();

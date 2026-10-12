@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { App } from "@capacitor/app";
-import { Carrot, ChevronDown, Loader2, X } from "lucide-react";
+import { Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,9 +15,12 @@ import {
 import CookingStep from "@/components/cooking/CookingStep";
 import CookingStepFeed from "@/components/cooking/CookingStepFeed";
 import CookingIngredientsSheet from "@/components/cooking/CookingIngredientsSheet";
+import CookingTimersSheet from "@/components/cooking/CookingTimersSheet";
 import { rememberOpenedCooking } from "@/lib/cooking/lastOpened";
 import { useCookingSession } from "@/hooks/cooking/useCookingSession";
 import { useAmbientColor } from "@/hooks/cooking/useAmbientColor";
+import { useClock } from "@/hooks/cooking/useClock";
+import { useTimerRing } from "@/hooks/cooking/useTimerRing";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
@@ -27,6 +30,8 @@ import { selectTargetServings } from "@/redux/slices/servingsSlice";
 import { ambientGradient } from "@/lib/cooking/ambientColor";
 import { isOnLastStep } from "@/lib/cooking/session";
 import { prepareStep, type PreparedStep } from "@/lib/cooking/stepTokens";
+import { countdownText, hasFired, remainingSeconds, soonestRunningTimer } from "@/lib/cooking/timer";
+import { cancelTimerAlarms, ensureTimerAlarmPermission, reconcileTimerAlarms } from "@/lib/cooking/timerAlarms";
 import { cn } from "@/lib/utils";
 
 type FeedStep = PreparedStep & { id: string; stepText: string; sectionName: string | null };
@@ -71,8 +76,35 @@ export default function Cooking() {
     }));
   }, [cooking.steps, ingredientsById]);
 
+  // Timers: the clock ticks while any timer exists, so countdowns move and a
+  // fired chip re-renders; every device of a joined cook keeps its own alarms.
+  const timers = cooking.timers;
+  const now = useClock(timers.some((timer) => timer.endsAt !== null));
+  const soonest = soonestRunningTimer(timers, now);
+  const recipeName = recipe?.name ?? "";
+  const stopTimer = useCallback(
+    (id: string) => {
+      void cancelTimerAlarms([id]);
+      cooking.stopTimer(id);
+    },
+    [cooking]
+  );
+  useTimerRing(timers, now, recipeName, stopTimer);
+  useEffect(() => {
+    if (!recipeId || !recipe) return;
+    void reconcileTimerAlarms(timers, { recipeId, recipeName: recipe.name, title: t("cooking.timerUp") });
+  }, [timers, recipeId, recipe, t]);
+  const startTimer = useCallback(
+    (seconds: number, label: string, stepId: string | null) => {
+      void ensureTimerAlarmPermission();
+      cooking.startTimer(seconds, label, stepId);
+    },
+    [cooking]
+  );
+
   const ambient = useAmbientColor(coverUrl);
   const [showIngredients, setShowIngredients] = useState(false);
+  const [showTimers, setShowTimers] = useState(false);
   const [confirmingEnd, setConfirmingEnd] = useState(false);
   const [celebrating, setCelebrating] = useState(false);
 
@@ -94,24 +126,30 @@ export default function Cooking() {
 
   const onLastStep = isOnLastStep(cooking.steps, cooking.currentStepId);
 
+  async function leave(status: "finished" | "abandoned") {
+    void cancelTimerAlarms(timers.map((timer) => timer.id));
+    await cooking.leave(status);
+  }
+
   async function finish() {
     setCelebrating(true);
-    await Promise.all([
-      cooking.leave("finished"),
-      new Promise((resolve) => setTimeout(resolve, CELEBRATION_MS)),
-    ]);
+    await Promise.all([leave("finished"), new Promise((resolve) => setTimeout(resolve, CELEBRATION_MS))]);
     minimize();
   }
 
   async function cancelCooking() {
     setConfirmingEnd(false);
-    await cooking.leave("abandoned");
+    await leave("abandoned");
     minimize();
   }
 
   const servingsLabel = `${targetServings} ${t(`ingredients.units.${recipe?.servings_unit ?? "servings"}`, {
     defaultValue: recipe?.servings_unit ?? "servings",
   })}`;
+  const stepNumber = (stepId: string | null) => {
+    const index = stepId ? cooking.steps.findIndex((step) => step.id === stepId) : -1;
+    return index === -1 ? null : index + 1;
+  };
 
   return (
     <div
@@ -182,19 +220,33 @@ export default function Cooking() {
                 </div>
               ) : undefined
             }
-            renderStep={(step, isCurrent) => (
-              <CookingStep
-                stepText={step.stepText}
-                sectionName={step.sectionName}
-                tokens={step.tokens}
-                isCurrent={isCurrent}
-                ingredientsById={ingredientsById}
-                onTimerChip={(seconds, label, state) => {
-                  if (state === "idle") cooking.startTimer(seconds, label, step.id);
-                }}
-                onSelect={() => cooking.setCurrentStepId(step.id)}
-              />
-            )}
+            renderStep={(step, isCurrent) => {
+              // Chip and timer meet on the label the timer was started with.
+              const timerFor = (label: string) =>
+                timers.find((timer) => timer.stepId === step.id && timer.label === label);
+              return (
+                <CookingStep
+                  stepText={step.stepText}
+                  sectionName={step.sectionName}
+                  tokens={step.tokens}
+                  isCurrent={isCurrent}
+                  ingredientsById={ingredientsById}
+                  chipState={(label) => {
+                    const timer = timerFor(label);
+                    return !timer ? "idle" : hasFired(timer, now) ? "finished" : "running";
+                  }}
+                  chipCountdown={(label) => {
+                    const timer = timerFor(label);
+                    return timer ? countdownText(remainingSeconds(timer, now)) : null;
+                  }}
+                  onTimerChip={(seconds, label, state) => {
+                    if (state === "idle") startTimer(seconds, label, step.id);
+                    else setShowTimers(true);
+                  }}
+                  onSelect={() => cooking.setCurrentStepId(step.id)}
+                />
+              );
+            }}
           />
         )}
       </main>
@@ -209,6 +261,16 @@ export default function Cooking() {
           aria-label={t("cooking.ingredients")}
         >
           <Carrot className="!size-5" />
+        </Button>
+        <Button
+          variant="secondary"
+          className={cn("rounded-full", soonest ? "px-3" : "w-10 px-0")}
+          onClick={() => setShowTimers(true)}
+          disabled={cooking.status !== "ready"}
+          aria-label={t("cooking.timers")}
+        >
+          <Timer className="!size-5" />
+          {soonest && <span className="tabular-nums">{countdownText(remainingSeconds(soonest, now))}</span>}
         </Button>
         <div className="flex-1" />
         <Button
@@ -231,6 +293,18 @@ export default function Cooking() {
         onServingsChange={cooking.setServings}
         checked={cooking.checkedIngredientIds}
         onToggle={cooking.toggleIngredient}
+      />
+
+      <CookingTimersSheet
+        open={showTimers}
+        onOpenChange={setShowTimers}
+        timers={timers}
+        now={now}
+        stepNumber={stepNumber}
+        onAddTime={cooking.addTime}
+        onReset={cooking.resetTimer}
+        onStop={stopTimer}
+        onStart={(seconds, label) => startTimer(seconds, label, null)}
       />
 
       <Dialog open={confirmingEnd} onOpenChange={setConfirmingEnd}>
