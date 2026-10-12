@@ -11,6 +11,7 @@ import { useOnboardingTracking } from "@/hooks/analytics/useOnboardingTracking";
 import { reportError } from "@/utils/reportError";
 import { isReviewEmail } from "@/lib/reviewSignIn";
 import { clearPendingSignIn, markPendingSignIn } from "@/lib/pendingSignIn";
+import { devAccount } from "@/lib/devSignIn";
 
 export default function Login() {
   const { supabase } = useSupabase();
@@ -35,6 +36,20 @@ export default function Login() {
   const isFormValid = () => {
     if (email.trim() === "" || !email.includes("@")) return false;
     return !isReviewAccount || password !== "";
+  };
+
+  // Dev builds with `.env.local` credentials: one tap into the test household.
+  const handleDevLogin = async () => {
+    if (!devAccount) return;
+    setError(null);
+    setLoading(true);
+    markPendingSignIn("password");
+    const { error: devError } = await supabase.auth.signInWithPassword(devAccount);
+    if (devError) {
+      clearPendingSignIn();
+      setError(devError.message);
+      setLoading(false);
+    }
   };
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -163,6 +178,17 @@ export default function Login() {
         >
           {t("login.dontHaveAccount")}
         </button>
+
+        {devAccount && (
+          <button
+            type="button"
+            onClick={handleDevLogin}
+            disabled={loading}
+            className="text-xs text-muted-foreground underline underline-offset-4 disabled:opacity-50"
+          >
+            Dev-Login ({devAccount.email})
+          </button>
+        )}
       </div>
 
       <div className="mt-auto mb-8 text-center text-xs text-muted-foreground">
