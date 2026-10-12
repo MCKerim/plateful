@@ -499,7 +499,9 @@
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
     "askChatbot": "KI-Koch fragen",
     "instructions": "Zubereitung",
-    "printPdf": "Rezept drucken"
+    "printPdf": "Rezept drucken",
+    "ask": "Fragen",
+    "plan": "Planen"
   },
   "addRecipeDrawer": {
     "open": "Rezept oder Sammlung hinzufügen",

@@ -8,10 +8,9 @@ import {
   Pencil,
   Link,
   CalendarDays,
-  ChefHat,
-  CookingPot,
   Printer,
   Share2,
+  Sparkles,
   Loader2,
   MoreVertical,
   ShoppingCart,
@@ -212,20 +211,20 @@ export default function Recipe() {
       <div className="h-safe-b-[100px]"></div>
 
       <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
-        <Button
-          variant="secondary"
-          size="icon"
-          className="shrink-0"
-          onClick={handleAskChatbot}
-          aria-label={t("recipe.askChatbot")}
-        >
-          <ChefHat style={{ transform: "rotate(16deg) translateY(-1px)" }} />
+        <Button variant="secondary" className="flex-1" onClick={handleAskChatbot}>
+          <Sparkles />
+          {t("recipe.ask")}
         </Button>
 
         {recipe && (
           <WeeklyPlanDialog
             subject={{ kind: "recipe", id: recipe.id, name: recipe.name }}
             navigateOnSuccess={true}
+            trigger={
+              <Button variant="accent" className="flex-1">
+                {t("recipe.plan")}
+              </Button>
+            }
           />
         )}
 
@@ -233,11 +232,10 @@ export default function Recipe() {
             session), Continue (one this user is in). All three open cooking
             mode; the session hook resolves fresh-vs-resume on the server. */}
         <Button
-          className="w-full"
+          className="flex-1"
           onClick={() => navigate(`/cooking/${recipeId}`)}
           disabled={instructionSteps.length === 0}
         >
-          <CookingPot />
           {cookingState.kind === "mine"
             ? t("cooking.continue")
             : cookingState.kind === "joinable"
