@@ -2,6 +2,7 @@ import { parseISO } from "date-fns";
 import {
   MealPlannerItem,
   MealPlannerItemRaw,
+  MealType,
   PlannedItemSummary,
   PlannedItemSummaryRaw,
 } from "@/types/meal-planning.types";
@@ -17,6 +18,14 @@ export function parsePlannedDate(value: string | null): Date | null {
 }
 
 /**
+ * NULL comes from clients that set no type (this app, older iOS versions) and
+ * reads as dinner, as does a value this version doesn't know.
+ */
+export function parseMealType(value: string | null): MealType {
+  return value === "breakfast" || value === "lunch" || value === "snack" ? value : "dinner";
+}
+
+/**
  * Splits the plan's rows by what they carry. A row with neither a recipe nor
  * a note is a placement whose content is gone (nothing to show); it used to
  * render as a "-" line.
@@ -25,6 +34,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
   const items: MealPlannerItem[] = [];
   for (const row of raw) {
     const planned_date = parsePlannedDate(row.planned_date);
+    const mealType = parseMealType(row.meal_type);
     if (row.planner_notes) {
       items.push({
         kind: "note",
@@ -32,6 +42,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         noteId: row.planner_notes.id,
         text: row.planner_notes.text,
         planned_date,
+        mealType,
       });
     } else if (row.recipes) {
       items.push({
@@ -40,6 +51,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         recipeId: row.recipes.id,
         recipeName: row.recipes.name,
         planned_date,
+        mealType,
         eaten: row.eaten ?? false,
       });
     }

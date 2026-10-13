@@ -1,3 +1,6 @@
+/** When in the day a placement is eaten; a day lists them in this order. */
+export type MealType = "breakfast" | "lunch" | "dinner" | "snack";
+
 /**
  * The plan as the client uses it. Every entry is one `meal_planning` row (a
  * placement on a day or in the pool) carrying exactly one kind of content: a
@@ -11,6 +14,7 @@ export type PlannedRecipe = {
   recipeId: string;
   recipeName: string;
   planned_date: Date | null;
+  mealType: MealType;
   eaten: boolean;
 };
 
@@ -25,6 +29,7 @@ export type PlannedNote = {
   noteId: string;
   text: string;
   planned_date: Date | null;
+  mealType: MealType;
 };
 
 export type MealPlannerItem = PlannedRecipe | PlannedNote;
@@ -34,6 +39,7 @@ export type MealPlannerItemRaw = {
   id: string;
   planned_date: string | null;
   eaten: boolean | null;
+  meal_type: string | null;
   recipes: { id: string; name: string } | null;
   planner_notes: { id: string; text: string } | null;
 };

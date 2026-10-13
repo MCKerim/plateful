@@ -604,6 +604,7 @@ export type Database = {
           eaten: boolean | null
           household_id: string
           id: string
+          meal_type: string | null
           note_id: string | null
           owner_id: string | null
           planned_date: string | null
@@ -615,6 +616,7 @@ export type Database = {
           eaten?: boolean | null
           household_id: string
           id?: string
+          meal_type?: string | null
           note_id?: string | null
           owner_id?: string | null
           planned_date?: string | null
@@ -626,6 +628,7 @@ export type Database = {
           eaten?: boolean | null
           household_id?: string
           id?: string
+          meal_type?: string | null
           note_id?: string | null
           owner_id?: string | null
           planned_date?: string | null

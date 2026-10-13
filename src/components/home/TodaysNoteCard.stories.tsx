@@ -11,6 +11,7 @@ const meta = {
       noteId: "note-1",
       text: "Eating out",
       planned_date: new Date(),
+      mealType: "dinner",
     },
     onEdit: () => {},
   },
@@ -29,6 +30,7 @@ export const LongText: Story = {
       noteId: "note-2",
       text: "Leftovers from the birthday, then a long walk along the river before it gets dark",
       planned_date: new Date(),
+      mealType: "dinner",
     },
   },
 };

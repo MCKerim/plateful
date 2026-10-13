@@ -140,6 +140,7 @@ function meal(recipeId: string, day: number | null, eaten = false): MealPlannerI
     recipeId,
     recipeName: recipeId,
     planned_date: day === null ? null : october(day),
+    mealType: "dinner",
     eaten,
   };
 }
@@ -182,6 +183,7 @@ describe("planMeals", () => {
       noteId: "note",
       text: "Eating out",
       planned_date: october(8),
+      mealType: "dinner",
     };
     const offered = meals([
       meal("cooked", 8, true),

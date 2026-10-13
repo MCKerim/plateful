@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import {
+  parseMealType,
   parsePlannedDate,
   transformMealPlannerItems,
   transformPlannedItemsSummary,
@@ -10,6 +11,7 @@ const recipeRow: MealPlannerItemRaw = {
   id: "placement-1",
   planned_date: "2026-09-13",
   eaten: false,
+  meal_type: null,
   recipes: { id: "recipe-1", name: "Pasta" },
   planner_notes: null,
 };
@@ -18,6 +20,7 @@ const noteRow: MealPlannerItemRaw = {
   id: "placement-2",
   planned_date: "2026-09-14",
   eaten: null,
+  meal_type: null,
   recipes: null,
   planner_notes: { id: "note-1", text: "Eating out" },
 };
@@ -31,6 +34,7 @@ describe("transformMealPlannerItems", () => {
         recipeId: "recipe-1",
         recipeName: "Pasta",
         planned_date: new Date(2026, 8, 13),
+        mealType: "dinner",
         eaten: false,
       },
     ]);
@@ -44,6 +48,7 @@ describe("transformMealPlannerItems", () => {
         noteId: "note-1",
         text: "Eating out",
         planned_date: new Date(2026, 8, 14),
+        mealType: "dinner",
       },
     ]);
   });
@@ -53,6 +58,7 @@ describe("transformMealPlannerItems", () => {
       id: "placement-3",
       planned_date: "2026-09-15",
       eaten: null,
+      meal_type: null,
       recipes: null,
       planner_notes: null,
     };
@@ -61,9 +67,31 @@ describe("transformMealPlannerItems", () => {
     ]);
   });
 
+  it("carries the meal type of recipes and notes alike", () => {
+    const items = transformMealPlannerItems([
+      { ...recipeRow, meal_type: "breakfast" },
+      { ...noteRow, meal_type: "snack" },
+    ]);
+    expect(items.map((item) => item.mealType)).toEqual(["breakfast", "snack"]);
+  });
+
   it("keeps a pool row dateless", () => {
     const pooled = transformMealPlannerItems([{ ...noteRow, planned_date: null }]);
     expect(pooled[0].planned_date).toBeNull();
+  });
+});
+
+describe("parseMealType", () => {
+  it("keeps the three types that show a chip", () => {
+    expect(["breakfast", "lunch", "snack"].map(parseMealType)).toEqual([
+      "breakfast",
+      "lunch",
+      "snack",
+    ]);
+  });
+
+  it("reads NULL and an unknown value as dinner", () => {
+    expect([null, "dinner", "dessert"].map(parseMealType)).toEqual(["dinner", "dinner", "dinner"]);
   });
 });
 
