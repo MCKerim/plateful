@@ -1,10 +1,13 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
+  courseMealType,
   getMealPlanStatus,
   lastPlannedDates,
   leastRecentlyPlannedKey,
   mergeNoteSuggestions,
+  MEAL_TYPES,
   orderForDisplay,
+  preselectedMealType,
   recipeMealPlanInfo,
   recipeMealPlanInfos,
 } from "./mealPlanHelper";
@@ -388,5 +391,56 @@ describe("orderForDisplay", () => {
       "dinner-note",
       "snack",
     ]);
+  });
+});
+
+describe("courseMealType", () => {
+  it.each([
+    [["main"], "dinner"],
+    [["breakfast"], "breakfast"],
+    [["snack"], "snack"],
+    [["dessert"], "snack"],
+    [["drink"], "snack"],
+    [["side"], "dinner"],
+    [[], "dinner"],
+    [["vegetarian", "quick"], "dinner"],
+  ])("maps %j to %s", (tags, expected) => {
+    expect(courseMealType(tags)).toBe(expected);
+  });
+
+  it("lets main beat breakfast, and breakfast beat the snack courses", () => {
+    expect(courseMealType(["breakfast", "main"])).toBe("dinner");
+    expect(courseMealType(["dessert", "breakfast"])).toBe("breakfast");
+  });
+
+  it("never derives lunch, whatever the tags", () => {
+    const tags = ["main", "breakfast", "snack", "dessert", "drink", "side", "lunch", "vegan"];
+    const subsets = Array.from({ length: 2 ** tags.length }, (_, mask) =>
+      tags.filter((_, index) => mask & (1 << index))
+    );
+    expect(subsets.map(courseMealType)).not.toContain("lunch");
+  });
+});
+
+describe("preselectedMealType", () => {
+  it("takes the last choice over the course tags", () => {
+    expect(preselectedMealType("lunch", ["breakfast"])).toBe("lunch");
+    expect(preselectedMealType("snack", ["main"])).toBe("snack");
+  });
+
+  it("falls back to the course tags without a typed placement", () => {
+    expect(preselectedMealType(null, ["breakfast"])).toBe("breakfast");
+  });
+
+  it("treats a value this version doesn't know as no choice", () => {
+    expect(preselectedMealType("brunch", ["dessert"])).toBe("snack");
+  });
+
+  it("starts a note, which has no tags, as dinner", () => {
+    expect(preselectedMealType(null, [])).toBe("dinner");
+  });
+
+  it("accepts every stored type as a last choice", () => {
+    expect(MEAL_TYPES.map((type) => preselectedMealType(type, ["main"]))).toEqual(MEAL_TYPES);
   });
 });

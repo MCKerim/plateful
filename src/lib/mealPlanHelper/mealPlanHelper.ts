@@ -40,7 +40,8 @@ export function mergeNoteSuggestions(own: string[], defaults: string[], limit = 
   return chips;
 }
 
-const MEAL_TYPE_RANK: Record<MealType, number> = { breakfast: 0, lunch: 1, dinner: 2, snack: 3 };
+/** The four meal types in a day's order, which is also the picker's order. */
+export const MEAL_TYPES: readonly MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 
 /**
  * A day's (or the pool's) order on screen: by meal type, breakfast first and
@@ -50,7 +51,41 @@ export function orderForDisplay<T extends MealPlannerItem>(items: T[]): T[] {
   return [
     ...items.filter((item) => item.kind === "recipe"),
     ...items.filter((item) => item.kind === "note"),
-  ].sort((a, b) => MEAL_TYPE_RANK[a.mealType] - MEAL_TYPE_RANK[b.mealType]);
+  ].sort((a, b) => MEAL_TYPES.indexOf(a.mealType) - MEAL_TYPES.indexOf(b.mealType));
+}
+
+/**
+ * The tagger's course tags, in precedence order: the first one a recipe
+ * carries decides. `main` beats `breakfast` (shakshuka carries both). Lunch is
+ * an occasion, not a dish, so no tag leads to it. The native app's
+ * `MagicPlanner.courseMealTypes`.
+ */
+const COURSE_MEAL_TYPES: readonly (readonly [tag: string, mealType: MealType])[] = [
+  ["main", "dinner"],
+  ["breakfast", "breakfast"],
+  ["snack", "snack"],
+  ["dessert", "snack"],
+  ["drink", "snack"],
+  ["side", "dinner"],
+];
+
+/**
+ * What a recipe's course tags suggest, dinner without one (and for a note,
+ * which has no tags). Also the baseline `planner_meal_type_set` compares a
+ * pick against, to learn how often the tagger is wrong.
+ */
+export function courseMealType(tags: readonly string[]): MealType {
+  return COURSE_MEAL_TYPES.find(([tag]) => tags.includes(tag))?.[1] ?? "dinner";
+}
+
+/**
+ * The type a new placement gets unless the user picks another: the last
+ * choice, i.e. the stored type of the subject's newest placement that has
+ * one (a correction lands on that placement, so it sticks), else the course
+ * tags. A value this version doesn't know counts as no choice.
+ */
+export function preselectedMealType(lastChoice: string | null, tags: readonly string[]): MealType {
+  return MEAL_TYPES.find((type) => type === lastChoice) ?? courseMealType(tags);
 }
 
 /**
