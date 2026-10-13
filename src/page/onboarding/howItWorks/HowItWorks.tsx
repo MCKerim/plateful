@@ -48,7 +48,7 @@ export default function HowItWorks() {
               {/* Icon column with connecting line */}
               <div className="flex flex-col items-center">
                 <motion.div
-                  className="w-12 h-12 rounded-full bg-[var(--accent-color)] flex items-center justify-center shrink-0"
+                  className="w-12 h-12 rounded-full bg-accent flex items-center justify-center shrink-0"
                   initial={{ scale: 0, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   transition={{
@@ -65,7 +65,7 @@ export default function HowItWorks() {
                     className="w-0.5 origin-top"
                     style={{
                       height: 32,
-                      backgroundColor: "var(--accent-color)",
+                      backgroundColor: "rgb(var(--accent-color))",
                       opacity: 0,
                     }}
                     initial={{ scaleY: 0, opacity: 0 }}

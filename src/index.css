@@ -30,11 +30,12 @@ body {
 }
 
 @layer base {
+  /* Colors are R G B channels so Tailwind's opacity modifiers (bg-primary/10) work; use them as rgb(var(--x)). */
   :root {
-    --background-color: #faf9f5;
-    --primary-color: #1b1602;
-    --secondary-color: #edece8;
-    --accent-color: #ff9d00;
+    --background-color: 250 249 245; /* #faf9f5 */
+    --primary-color: 27 22 2; /* #1b1602 */
+    --secondary-color: 237 236 232; /* #edece8 */
+    --accent-color: 255 157 0; /* #ff9d00 */
 
     --background: var(--background-color);
     --foreground: var(--primary-color);
@@ -45,14 +46,14 @@ body {
     --accent: var(--accent-color);
     --accent-foreground: var(--background-color);
 
-    --card: #edece8;
+    --card: 237 236 232; /* #edece8 */
     --card-foreground: var(--primary-color);
-    --popover: #edece8;
+    --popover: 237 236 232; /* #edece8 */
     --popover-foreground: var(--primary-color);
-    --muted: #e3e2de;
-    --muted-foreground: #8f8f8f;
-    --destructive: #cb5e52;
-    --destructive-foreground: #faf9f5;
+    --muted: 227 226 222; /* #e3e2de */
+    --muted-foreground: 143 143 143; /* #8f8f8f */
+    --destructive: 203 94 82; /* #cb5e52 */
+    --destructive-foreground: 250 249 245; /* #faf9f5 */
 
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
@@ -65,10 +66,10 @@ body {
     --radius: 0.5rem;
   }
   .dark {
-    --background-color: #0a0905;
-    --primary-color: #fdf8e3;
-    --secondary-color: #151410;
-    --accent-color: #ff9d00;
+    --background-color: 10 9 5; /* #0a0905 */
+    --primary-color: 253 248 227; /* #fdf8e3 */
+    --secondary-color: 21 20 16; /* #151410 */
+    --accent-color: 255 157 0; /* #ff9d00 */
 
     --background: var(--background-color);
     --foreground: var(--primary-color);
@@ -79,14 +80,14 @@ body {
     --accent: var(--accent-color);
     --accent-foreground: var(--primary-color);
 
-    --card: #151410;
+    --card: 21 20 16; /* #151410 */
     --card-foreground: var(--primary-color);
-    --popover: #0a0905;
+    --popover: 10 9 5; /* #0a0905 */
     --popover-foreground: var(--primary-color);
-    --muted: #36332b;
-    --muted-foreground: #8a867d;
-    --destructive: #ad4034;
-    --destructive-foreground: #fdf8e3;
+    --muted: 54 51 43; /* #36332b */
+    --muted-foreground: 138 134 125; /* #8a867d */
+    --destructive: 173 64 52; /* #ad4034 */
+    --destructive-foreground: 253 248 227; /* #fdf8e3 */
 
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;

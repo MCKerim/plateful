@@ -26,7 +26,7 @@ export default function MealPlannerIllustration() {
             y={day.y + 10}
             fontSize="10"
             fontWeight="600"
-            fill={day.isTarget ? "var(--accent-color)" : "var(--muted-foreground)"}
+            fill={day.isTarget ? "rgb(var(--accent-color))" : "rgb(var(--muted-foreground))"}
             fontFamily="sans-serif"
           >
             {day.label}
@@ -39,8 +39,8 @@ export default function MealPlannerIllustration() {
             width="190"
             height="28"
             rx="8"
-            fill={day.isTarget ? "none" : "var(--secondary)"}
-            stroke={day.isTarget ? "var(--accent-color)" : "var(--border)"}
+            fill={day.isTarget ? "none" : "rgb(var(--secondary))"}
+            stroke={day.isTarget ? "rgb(var(--accent-color))" : "var(--border)"}
             strokeWidth={day.isTarget ? "1.5" : "0.5"}
             strokeDasharray={day.isTarget ? "5 3" : "none"}
           />
@@ -58,15 +58,15 @@ export default function MealPlannerIllustration() {
                 width="182"
                 height="20"
                 rx="5"
-                fill="var(--card)"
+                fill="rgb(var(--card))"
                 stroke="var(--border)"
                 strokeWidth="0.5"
               />
               {/* Thumbnail placeholder */}
-              <rect x="57" y={day.y + 6} width="16" height="16" rx="4" fill="var(--muted-foreground)" opacity="0.15" />
+              <rect x="57" y={day.y + 6} width="16" height="16" rx="4" fill="rgb(var(--muted-foreground))" opacity="0.15" />
               {/* Recipe name line */}
-              <rect x="78" y={day.y + 10} width={i === 0 ? "60" : "45"} height="3" rx="1.5" fill="var(--foreground)" opacity="0.4" />
-              <rect x="78" y={day.y + 16} width={i === 0 ? "40" : "30"} height="2.5" rx="1" fill="var(--muted-foreground)" opacity="0.25" />
+              <rect x="78" y={day.y + 10} width={i === 0 ? "60" : "45"} height="3" rx="1.5" fill="rgb(var(--foreground))" opacity="0.4" />
+              <rect x="78" y={day.y + 16} width={i === 0 ? "40" : "30"} height="2.5" rx="1" fill="rgb(var(--muted-foreground))" opacity="0.25" />
             </motion.g>
           )}
         </motion.g>
@@ -79,7 +79,7 @@ export default function MealPlannerIllustration() {
         width="190"
         height="28"
         rx="8"
-        fill="var(--accent-color)"
+        fill="rgb(var(--accent-color))"
         animate={{ opacity: [0.05, 0.12, 0.05] }}
         transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
       />
@@ -87,7 +87,7 @@ export default function MealPlannerIllustration() {
       {/* Curved dashed arrow from above into the target row */}
       <motion.path
         d="M 220 50 Q 230 60 200 72 Q 180 78 160 82"
-        stroke="var(--muted-foreground)"
+        stroke="rgb(var(--muted-foreground))"
         strokeWidth="1.2"
         strokeLinecap="round"
         strokeDasharray="4 3"
@@ -115,7 +115,7 @@ export default function MealPlannerIllustration() {
             width="182"
             height="20"
             rx="5"
-            fill="var(--accent-color)"
+            fill="rgb(var(--accent-color))"
             opacity="0.12"
             transform="translate(1.5, 1.5)"
           />
@@ -126,7 +126,7 @@ export default function MealPlannerIllustration() {
             width="182"
             height="20"
             rx="5"
-            fill="var(--accent-color)"
+            fill="rgb(var(--accent-color))"
           />
           {/* Thumbnail */}
           <rect x="57" y="82" width="16" height="16" rx="4" fill="white" opacity="0.3" />
@@ -141,7 +141,7 @@ export default function MealPlannerIllustration() {
         cx="145"
         cy="76"
         r="3"
-        fill="var(--foreground)"
+        fill="rgb(var(--foreground))"
         initial={{ opacity: 0 }}
         animate={{ opacity: [0, 0.2, 0] }}
         transition={{ duration: 1.5, delay: 0.8, repeat: Infinity, ease: "easeInOut" }}

@@ -34,7 +34,7 @@ function ReceiptBottom() {
       preserveAspectRatio="none"
       aria-hidden="true"
       className="w-full h-5 block"
-      style={{ marginTop: "-1px", fill: "var(--card)" }}
+      style={{ marginTop: "-1px", fill: "rgb(var(--card))" }}
     >
       <path d={BOTTOM_PATH} />
     </svg>

@@ -12,7 +12,7 @@ export default function ChatbotIllustration() {
         width="130"
         height="56"
         rx="16"
-        fill="var(--secondary)"
+        fill="rgb(var(--secondary))"
         stroke="var(--border)"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8 }}
@@ -28,7 +28,7 @@ export default function ChatbotIllustration() {
           cx={75 + i * 20}
           cy={80}
           r="5"
-          fill="var(--muted-foreground)"
+          fill="rgb(var(--muted-foreground))"
           animate={{ y: [0, -4, 0] }}
           transition={{
             duration: 1,
@@ -46,7 +46,7 @@ export default function ChatbotIllustration() {
         width="120"
         height="48"
         rx="16"
-        fill="var(--accent-color)"
+        fill="rgb(var(--accent-color))"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ ...popSpring, delay: 0.6 }}

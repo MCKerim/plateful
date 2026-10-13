@@ -22,7 +22,7 @@
 .thought-question-marks {
   font-family: "Shrikhand", serif;
   font-size: 3rem;
-  color: var(--muted-foreground);
+  color: rgb(var(--muted-foreground));
   user-select: none;
 }
 

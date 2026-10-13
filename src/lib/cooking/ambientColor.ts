@@ -18,5 +18,5 @@ export function averageColor(image: HTMLImageElement): [number, number, number] 
 export function ambientGradient(color: [number, number, number] | null): string | undefined {
   if (!color) return undefined;
   const [r, g, b] = color;
-  return `linear-gradient(180deg, rgba(${r}, ${g}, ${b}, 0.45) 0%, var(--background) 70%)`;
+  return `linear-gradient(180deg, rgba(${r}, ${g}, ${b}, 0.45) 0%, rgb(var(--background)) 70%)`;
 }

@@ -25,10 +25,10 @@
 
   /* Ensure Tailwind CSS vars resolve to print-safe values */
   #recipe-print-view {
-    --primary: #111111;
-    --primary-color: #111111;
-    --foreground: #111111;
-    --muted-foreground: #555555;
+    --primary: 17 17 17; /* #111111 */
+    --primary-color: 17 17 17; /* #111111 */
+    --foreground: 17 17 17; /* #111111 */
+    --muted-foreground: 85 85 85; /* #555555 */
     color: #111111;
   }
 

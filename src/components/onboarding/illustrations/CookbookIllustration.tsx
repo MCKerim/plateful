@@ -12,7 +12,7 @@ export default function CookbookIllustration() {
         width="100"
         height="130"
         rx="12"
-        fill="var(--secondary)"
+        fill="rgb(var(--secondary))"
         stroke="var(--border)"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
@@ -28,7 +28,7 @@ export default function CookbookIllustration() {
         width="100"
         height="130"
         rx="12"
-        fill="var(--card)"
+        fill="rgb(var(--card))"
         stroke="var(--border)"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
@@ -60,8 +60,8 @@ export default function CookbookIllustration() {
             width="110"
             height="136"
             rx="12"
-            fill="var(--background)"
-            stroke="var(--accent-color)"
+            fill="rgb(var(--background))"
+            stroke="rgb(var(--accent-color))"
             strokeWidth="2"
           />
 
@@ -72,25 +72,25 @@ export default function CookbookIllustration() {
             width="90"
             height="55"
             rx="8"
-            fill="var(--secondary)"
+            fill="rgb(var(--secondary))"
           />
 
           {/* Small plate icon in image area */}
-          <ellipse cx="140" cy="44" rx="18" ry="6" fill="var(--muted-foreground)" opacity="0.3" />
-          <ellipse cx="140" cy="43" rx="14" ry="4" fill="var(--muted-foreground)" opacity="0.2" />
+          <ellipse cx="140" cy="44" rx="18" ry="6" fill="rgb(var(--muted-foreground))" opacity="0.3" />
+          <ellipse cx="140" cy="43" rx="14" ry="4" fill="rgb(var(--muted-foreground))" opacity="0.2" />
 
           {/* Title line */}
-          <rect x="95" y="86" width="70" height="5" rx="2.5" fill="var(--foreground)" opacity="0.6" />
+          <rect x="95" y="86" width="70" height="5" rx="2.5" fill="rgb(var(--foreground))" opacity="0.6" />
 
           {/* Description lines */}
-          <rect x="95" y="97" width="90" height="3" rx="1.5" fill="var(--muted-foreground)" opacity="0.4" />
-          <rect x="95" y="105" width="75" height="3" rx="1.5" fill="var(--muted-foreground)" opacity="0.3" />
-          <rect x="95" y="113" width="60" height="3" rx="1.5" fill="var(--muted-foreground)" opacity="0.3" />
+          <rect x="95" y="97" width="90" height="3" rx="1.5" fill="rgb(var(--muted-foreground))" opacity="0.4" />
+          <rect x="95" y="105" width="75" height="3" rx="1.5" fill="rgb(var(--muted-foreground))" opacity="0.3" />
+          <rect x="95" y="113" width="60" height="3" rx="1.5" fill="rgb(var(--muted-foreground))" opacity="0.3" />
 
           {/* Heart/bookmark with draw animation */}
           <motion.path
             d="M 170 125 L 170 140 L 178 135 L 186 140 L 186 125"
-            stroke="var(--accent-color)"
+            stroke="rgb(var(--accent-color))"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -109,7 +109,7 @@ export default function CookbookIllustration() {
         transition={{ ...popSpring, delay: 0.8 }}
         style={{ transformOrigin: "210px 28px" }}
       >
-        <circle cx="210" cy="28" r="16" fill="var(--accent-color)" />
+        <circle cx="210" cy="28" r="16" fill="rgb(var(--accent-color))" />
         <path
           d="M 210 20 L 210 36 M 202 28 L 218 28"
           stroke="white"
@@ -127,7 +127,7 @@ export default function CookbookIllustration() {
       >
         <path
           d="M 224 65 Q 218 65 218 71 Q 218 77 224 77 M 236 65 Q 242 65 242 71 Q 242 77 236 77 M 226 71 L 234 71"
-          stroke="var(--muted-foreground)"
+          stroke="rgb(var(--muted-foreground))"
           strokeWidth="2"
           strokeLinecap="round"
           fill="none"
