@@ -20,7 +20,7 @@ export default function MealTypePicker({
       onValueChange={(next) => onChange(next as MealType)}
       orientation="horizontal"
       aria-label={t("mealType.label")}
-      className="grid grid-cols-4 gap-1 rounded-xl bg-muted p-1"
+      className="grid grid-cols-4 gap-0.5 rounded-xl bg-muted p-1"
     >
       {MEAL_TYPES.map((type) => {
         const Icon = MEAL_TYPE_ICONS[type];
@@ -28,7 +28,7 @@ export default function MealTypePicker({
           <RadioGroupPrimitive.Item
             key={type}
             value={type}
-            className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-1 py-2 text-xs font-semibold text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"
+            className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 py-2 text-[11px] font-semibold text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"
           >
             <Icon size={20} aria-hidden />
             <span className="w-full truncate text-center">{t(`mealType.${type}`)}</span>

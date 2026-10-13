@@ -227,4 +227,21 @@ test.describe("Meal Planner Page", () => {
     await page.keyboard.press("Escape");
     await expect(entries).toHaveText([/Pasta.*Breakfast/, /Omelette/]);
   });
+
+  test("should change a note's meal type from its menu", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [createNotePlan({ text: "Eating out" })] });
+
+    await page.goto("/planner");
+    const note = page.getByRole("listitem").filter({ hasText: "Eating out" });
+    await note.getByRole("button").last().click();
+
+    const patch = page.waitForRequest(
+      (request) => request.method() === "PATCH" && request.url().includes("meal_planning")
+    );
+    await page.getByRole("radio", { name: "Lunch" }).click();
+    expect((await patch).postDataJSON()).toEqual({ meal_type: "lunch" });
+
+    await page.keyboard.press("Escape");
+    await expect(note).toContainText("Lunch");
+  });
 });
