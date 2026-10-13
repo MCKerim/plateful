@@ -1,5 +1,6 @@
 import {
   MealPlannerItem,
+  MealType,
   PlanSubject,
   RecipeMealPlanInfo,
   RecipePlacementRow,
@@ -39,15 +40,17 @@ export function mergeNoteSuggestions(own: string[], defaults: string[], limit = 
   return chips;
 }
 
+const MEAL_TYPE_RANK: Record<MealType, number> = { breakfast: 0, lunch: 1, dinner: 2, snack: 3 };
+
 /**
- * A day's (or the pool's) order on screen: recipes first, then notes, each
- * group in the plan's own order. The native app lists a day the same way.
+ * A day's (or the pool's) order on screen: by meal type, breakfast first and
+ * snack last; within a type recipes before notes, each in the plan's own order.
  */
 export function orderForDisplay<T extends MealPlannerItem>(items: T[]): T[] {
   return [
     ...items.filter((item) => item.kind === "recipe"),
     ...items.filter((item) => item.kind === "note"),
-  ];
+  ].sort((a, b) => MEAL_TYPE_RANK[a.mealType] - MEAL_TYPE_RANK[b.mealType]);
 }
 
 /**

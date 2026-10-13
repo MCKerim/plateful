@@ -4,10 +4,16 @@ import {
   lastPlannedDates,
   leastRecentlyPlannedKey,
   mergeNoteSuggestions,
+  orderForDisplay,
   recipeMealPlanInfo,
   recipeMealPlanInfos,
 } from "./mealPlanHelper";
-import type { RecipeMealPlanInfo, RecipePlacementRow } from "@/types/meal-planning.types";
+import type {
+  MealPlannerItem,
+  MealType,
+  RecipeMealPlanInfo,
+  RecipePlacementRow,
+} from "@/types/meal-planning.types";
 
 describe("mealPlanHelper", () => {
   // Create a mock translation function that returns the key with count if provided
@@ -341,5 +347,46 @@ describe("recipeMealPlanInfos", () => {
       lastPlannedDate: "2026-09-01",
     });
     expect(infos.b).toEqual({ activePlan: { planned_date: null }, lastPlannedDate: null });
+  });
+});
+
+describe("orderForDisplay", () => {
+  const recipe = (id: string, mealType: MealType): MealPlannerItem => ({
+    kind: "recipe",
+    id,
+    recipeId: id,
+    recipeName: id,
+    planned_date: null,
+    mealType,
+    eaten: false,
+  });
+  const note = (id: string, mealType: MealType): MealPlannerItem => ({
+    kind: "note",
+    id,
+    noteId: id,
+    text: id,
+    planned_date: null,
+    mealType,
+  });
+
+  it("orders by meal type, then recipes before notes, then the plan's order", () => {
+    const planOrder = [
+      recipe("snack", "snack"),
+      note("dinner-note", "dinner"),
+      recipe("dinner-1", "dinner"),
+      note("breakfast-note", "breakfast"),
+      recipe("breakfast", "breakfast"),
+      recipe("lunch", "lunch"),
+      recipe("dinner-2", "dinner"),
+    ];
+    expect(orderForDisplay(planOrder).map((item) => item.id)).toEqual([
+      "breakfast",
+      "breakfast-note",
+      "lunch",
+      "dinner-1",
+      "dinner-2",
+      "dinner-note",
+      "snack",
+    ]);
   });
 });

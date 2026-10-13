@@ -37,8 +37,8 @@ export default function Home() {
   const members = useAppSelector(selectHouseholdMembers);
   const invites = cooking?.joinable ?? [];
 
-  // Today's plan, recipes first and then notes: a note ("Eating out") is the
-  // plan's word for the day too, so the "nothing planned" line stays away.
+  // Today's plan in the planner's order, notes included: a note ("Eating out")
+  // is the plan's word for the day too, so the "nothing planned" line stays away.
   const todaysItems = useMemo(
     () =>
       orderForDisplay(
