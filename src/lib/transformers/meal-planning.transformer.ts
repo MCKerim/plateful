@@ -50,6 +50,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         id: row.id,
         recipeId: row.recipes.id,
         recipeName: row.recipes.name,
+        recipeTags: row.recipes.tags,
         planned_date,
         mealType,
         eaten: row.eaten ?? false,

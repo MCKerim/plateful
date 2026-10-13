@@ -15,7 +15,7 @@ export function planSubjectKey(subject: PlanSubject): string {
 /** What the weekly plan dialog edits when opened from a planned entry. */
 export function planSubjectOf(item: MealPlannerItem): PlanSubject {
   return item.kind === "recipe"
-    ? { kind: "recipe", id: item.recipeId, name: item.recipeName }
+    ? { kind: "recipe", id: item.recipeId, name: item.recipeName, tags: item.recipeTags }
     : { kind: "note", noteId: item.noteId, text: item.text };
 }
 

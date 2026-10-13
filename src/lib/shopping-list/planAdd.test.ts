@@ -139,6 +139,7 @@ function meal(recipeId: string, day: number | null, eaten = false): MealPlannerI
     id: `p${placementCount}`,
     recipeId,
     recipeName: recipeId,
+    recipeTags: [],
     planned_date: day === null ? null : october(day),
     mealType: "dinner",
     eaten,

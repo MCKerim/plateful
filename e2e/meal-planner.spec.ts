@@ -32,7 +32,7 @@ test.describe("Meal Planner Page", () => {
     const mealPlan = createMealPlan({
       recipe_id: recipe.id,
       planned_date: formatDate(today),
-      recipes: { id: recipe.id, name: recipe.name },
+      recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
     });
 
     await setupAuth({ recipes: [recipe], mealPlans: [mealPlan] });
@@ -53,7 +53,7 @@ test.describe("Meal Planner Page", () => {
     const mealPlan = createMealPlan({
       recipe_id: recipe.id,
       planned_date: null, // No date = unplanned
-      recipes: { id: recipe.id, name: recipe.name },
+      recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
     });
 
     await setupAuth({ recipes: [recipe], mealPlans: [mealPlan] });
@@ -98,7 +98,7 @@ test.describe("Meal Planner Page", () => {
     const mealPlan = createMealPlan({
       recipe_id: recipe.id,
       planned_date: formatDate(today),
-      recipes: { id: recipe.id, name: recipe.name },
+      recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
     });
 
     await setupAuth({ recipes: [recipe], mealPlans: [mealPlan] });
@@ -166,5 +166,31 @@ test.describe("Meal Planner Page", () => {
     // The note lands on the day's card; the dialog still shows the same text
     // while it closes, so look inside the plan.
     await expect(page.getByRole("listitem").getByText("Leftovers")).toBeVisible({ timeout: 10000 });
+  });
+
+  test("should plan a breakfast-tagged recipe as breakfast", async ({ page, setupAuth }) => {
+    const recipe = createRecipe({ name: "Pancakes", tags: ["breakfast"] });
+    await setupAuth({ recipes: [recipe], mealPlans: [] });
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("radiogroup", { name: "Meal type" })).toBeVisible();
+    await expect(dialog.getByRole("radio", { name: "Breakfast" })).toBeChecked();
+
+    await dialog.getByRole("button", { name: /today/i }).click();
+    const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    const body = (await save).postDataJSON();
+    expect(body.p_insertions.map((entry: { meal_type: string }) => entry.meal_type)).toEqual([
+      "breakfast",
+    ]);
+
+    // Saving goes to the planner, where the new entry carries the chip.
+    await expect(page.getByRole("listitem").filter({ hasText: "Pancakes" })).toContainText(
+      "Breakfast",
+      { timeout: 10000 }
+    );
   });
 });

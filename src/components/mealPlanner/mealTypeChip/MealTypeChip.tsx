@@ -1,18 +1,12 @@
-import { Cookie, Sun, Sunrise, type LucideIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { MealType } from "@/types/meal-planning.types";
-
-const ICONS: Record<Exclude<MealType, "dinner">, LucideIcon> = {
-  breakfast: Sunrise,
-  lunch: Sun,
-  snack: Cookie,
-};
+import { MEAL_TYPE_ICONS } from "../mealTypeIcons";
 
 /** An entry's meal type below its title, as on iOS. Dinner, the plan's usual meal, shows nothing. */
 export default function MealTypeChip({ mealType }: Readonly<{ mealType: MealType }>) {
   const { t } = useTranslation();
   if (mealType === "dinner") return null;
-  const Icon = ICONS[mealType];
+  const Icon = MEAL_TYPE_ICONS[mealType];
 
   return (
     <span className="inline-flex w-fit shrink-0 items-center gap-1 rounded-full bg-muted px-1.5 py-0.5 text-[11px] font-medium text-foreground">

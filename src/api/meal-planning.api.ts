@@ -1,6 +1,7 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import {
   MealPlannerItemRaw,
+  MealType,
   PlacementEntryRaw,
   PlannedItemSummaryRaw,
   PlanSubject,
@@ -20,10 +21,11 @@ export type CreateNoteParams = {
   plannedDate: string | null;
 };
 
-/** One new placement for `apply_planner_changes`: a client-minted id and a local day, `null` for a pool copy. */
+/** One new placement for `apply_planner_changes`: a client-minted id, a local day (`null` for a pool copy) and its meal type. */
 export type PlacementInsertion = {
   id: string;
   planned_date: string | null;
+  meal_type: MealType;
 };
 
 export type ApplyPlannerChangesParams = {
@@ -52,7 +54,7 @@ export const mealPlanningApi = {
         planned_date,
         eaten,
         meal_type,
-        recipes (id, name),
+        recipes (id, name, tags),
         planner_notes (id, text)
       `
       )
@@ -96,6 +98,15 @@ export const mealPlanningApi = {
 
   async setEaten(supabase: SupabaseClient, id: string, eaten: boolean): Promise<void> {
     const { error } = await supabase.from("meal_planning").update({ eaten }).eq("id", id);
+
+    if (error) throw error;
+  },
+
+  async setMealType(supabase: SupabaseClient, id: string, mealType: MealType): Promise<void> {
+    const { error } = await supabase
+      .from("meal_planning")
+      .update({ meal_type: mealType })
+      .eq("id", id);
 
     if (error) throw error;
   },
@@ -191,6 +202,29 @@ export const mealPlanningApi = {
 
     if (error) throw error;
     return data ?? [];
+  },
+
+  /**
+   * The stored meal type of the subject's newest placement that has one, the
+   * last choice the weekly plan dialog preselects; `null` when none has.
+   * Newest by `created_at`, not `updated_at`: a move or a cooked check bumps
+   * that. RLS scopes the rows to the household.
+   */
+  async getLastMealType(supabase: SupabaseClient, subject: PlanSubject): Promise<string | null> {
+    const query = supabase
+      .from("meal_planning")
+      .select("meal_type")
+      .not("meal_type", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    const scoped =
+      subject.kind === "recipe"
+        ? query.eq("recipe_id", subject.id)
+        : query.eq("note_id", subject.noteId);
+    const { data, error } = await scoped;
+
+    if (error) throw error;
+    return data?.[0]?.meal_type ?? null;
   },
 
   /**

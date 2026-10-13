@@ -12,7 +12,7 @@ const recipeRow: MealPlannerItemRaw = {
   planned_date: "2026-09-13",
   eaten: false,
   meal_type: null,
-  recipes: { id: "recipe-1", name: "Pasta" },
+  recipes: { id: "recipe-1", name: "Pasta", tags: ["main"] },
   planner_notes: null,
 };
 
@@ -33,6 +33,7 @@ describe("transformMealPlannerItems", () => {
         id: "placement-1",
         recipeId: "recipe-1",
         recipeName: "Pasta",
+        recipeTags: ["main"],
         planned_date: new Date(2026, 8, 13),
         mealType: "dinner",
         eaten: false,

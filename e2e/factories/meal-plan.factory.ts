@@ -25,8 +25,9 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
         ? (overrides.planned_date ?? null)
         : formatDate(new Date()),
     eaten: overrides?.eaten ?? false,
+    meal_type: overrides?.meal_type ?? null,
     created_at: overrides?.created_at ?? new Date().toISOString(),
-    recipes: overrides?.recipes ?? { id: defaultRecipeId, name: "Test Recipe" },
+    recipes: overrides?.recipes ?? { id: defaultRecipeId, name: "Test Recipe", tags: [] },
     planner_notes: null,
   };
 }
@@ -51,6 +52,7 @@ export function createNotePlan(overrides?: {
         ? (overrides.planned_date ?? null)
         : formatDate(new Date()),
     eaten: null,
+    meal_type: null,
     created_at: new Date().toISOString(),
     recipes: null,
     planner_notes: { id: noteId, text: overrides?.text ?? "Eating out" },
@@ -67,7 +69,7 @@ export function createWeeklyMealPlans(
       recipe_id: recipe.id,
       household_id: householdId,
       planned_date: formatDate(addDays(startDate, index)),
-      recipes: { id: recipe.id, name: recipe.name },
+      recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
     })
   );
 }
@@ -78,7 +80,7 @@ export function createBacklogMealPlans(recipes: MockRecipe[], householdId: strin
       recipe_id: recipe.id,
       household_id: householdId,
       planned_date: null,
-      recipes: { id: recipe.id, name: recipe.name },
+      recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
     })
   );
 }

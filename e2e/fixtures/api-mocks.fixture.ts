@@ -97,6 +97,7 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
             link: recipe.link,
             household_id: recipe.household_id,
             created_at: recipe.created_at,
+            tags: recipe.tags,
             base_servings: null,
             instructions: null,
             calories_kcal: null,
@@ -251,8 +252,16 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
-  // Meal planning endpoint: the week's rows (recipes and notes alike)
+  // Meal planning endpoint: the week's rows (recipes and notes alike); a
+  // PATCH (cooked check, meal type) lands on its row so the refetch shows it
   await page.route("**/rest/v1/meal_planning?*", async (route) => {
+    if (route.request().method() === "PATCH") {
+      const id = route.request().url().match(/id=eq\.([a-f0-9-]+)/i)?.[1];
+      const plan = scenario.mealPlans.find((item) => item.id === id);
+      if (plan) Object.assign(plan, route.request().postDataJSON());
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -270,6 +279,7 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       household_id: body.p_household_id,
       planned_date: body.p_planned_date ?? null,
       eaten: null,
+      meal_type: null,
       created_at: new Date().toISOString(),
       recipes: null,
       planner_notes: { id: body.p_note_id, text: body.p_text },
@@ -309,8 +319,9 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
         household_id: body.p_household_id,
         planned_date: insertion.planned_date ?? null,
         eaten: body.p_recipe_id ? false : null,
+        meal_type: insertion.meal_type ?? null,
         created_at: new Date().toISOString(),
-        recipes: recipe ? { id: recipe.id, name: recipe.name } : null,
+        recipes: recipe ? { id: recipe.id, name: recipe.name, tags: recipe.tags } : null,
         planner_notes: note?.planner_notes ?? null,
       });
     }

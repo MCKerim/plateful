@@ -620,8 +620,10 @@
     "title": "Erkunden"
   },
   "mealType": {
+    "label": "Mahlzeit",
     "breakfast": "Frühstück",
     "lunch": "Mittag",
+    "dinner": "Abendessen",
     "snack": "Snack"
   },
   "mealPlannerItem": {

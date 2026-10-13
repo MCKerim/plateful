@@ -16,10 +16,13 @@ import { setCurrentWeek as setMealPlannerWeek } from "@/redux/slices/mealPlanner
 import { usePlannedItemsSummary } from "@/hooks/meal-planning/usePlannedItemsSummary";
 import { usePlacementsForWeek } from "@/hooks/meal-planning/usePlacementsForWeek";
 import { useApplyPlannerChanges } from "@/hooks/meal-planning/useApplyPlannerChanges";
+import { useLastMealType } from "@/hooks/meal-planning/useLastMealType";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
-import { planSubjectKey } from "@/lib/mealPlanHelper/mealPlanHelper";
-import { PlannedItemSummary, PlanSubject } from "@/types/meal-planning.types";
+import { usePlannerTracking } from "@/hooks/analytics/usePlannerTracking";
+import { planSubjectKey, preselectedMealType } from "@/lib/mealPlanHelper/mealPlanHelper";
+import { MealType, PlannedItemSummary, PlanSubject } from "@/types/meal-planning.types";
 import { randomId } from "@/utils/randomId";
+import MealTypePicker from "@/components/mealPlanner/mealTypePicker/MealTypePicker";
 
 type Props = {
   /** The recipe or note being planned; `null` keeps a closed dialog mounted without loading anything. */
@@ -76,6 +79,9 @@ export default function WeeklyPlanDialog({
   const [selectedDates, setSelectedDates] = useState<Date[]>([]);
   const [withoutDate, setWithoutDate] = useState(false);
   const [withoutDateCount, setWithoutDateCount] = useState(1);
+  // The type the user picked here; until then the preselection, which can
+  // still move while the last choice loads.
+  const [pickedMealType, setPickedMealType] = useState<MealType | null>(null);
   const [currentWeek, setCurrentWeek] = useState(initialWeek ?? new Date());
   // The account's first weekday: every week here, and the "this week" test
   // (date-fns counts from Sunday unless told), runs on it.
@@ -106,6 +112,11 @@ export default function WeeklyPlanDialog({
     isDialogOpen
   );
 
+  const { data: lastMealType = null } = useLastMealType(subject, isDialogOpen);
+  const subjectTags = subject?.kind === "recipe" ? subject.tags : [];
+  const mealType = pickedMealType ?? preselectedMealType(lastMealType, subjectTags);
+  const { trackMealTypeSet } = usePlannerTracking();
+
   const incrementMission = useIncrementMission();
   const applyChanges = useApplyPlannerChanges({
     onSuccess: (result, variables) => {
@@ -131,6 +142,7 @@ export default function WeeklyPlanDialog({
       setSelectedDates([]);
       setWithoutDate(false);
       setWithoutDateCount(1);
+      setPickedMealType(null);
       setCurrentWeek(initialWeek ?? new Date());
       setInitializedWeeks(new Set());
       setPlanIdsByWeek(new Map());
@@ -142,6 +154,7 @@ export default function WeeklyPlanDialog({
   useEffect(() => {
     setSelectedDates([]);
     setWithoutDate(false);
+    setPickedMealType(null);
     setCurrentWeek(initialWeek ?? new Date());
     setInitializedWeeks(new Set());
     setPlanIdsByWeek(new Map());
@@ -283,7 +296,8 @@ export default function WeeklyPlanDialog({
       return;
     }
 
-    // One row per added day, `null` per pool copy; ids reused for an unchanged retry.
+    // One row per added day, `null` per pool copy; ids reused for an unchanged
+    // retry. Only these new rows get the type; existing placements keep theirs.
     const plannedDates: (string | null)[] = [
       ...datesToAdd.map(toPlannedDateString),
       ...Array.from({ length: withoutDate ? withoutDateCount : 0 }, () => null),
@@ -295,6 +309,7 @@ export default function WeeklyPlanDialog({
     const insertions = plannedDates.map((planned_date, index) => ({
       id: insertionIds.current.ids[index],
       planned_date,
+      meal_type: mealType,
     }));
 
     try {
@@ -305,6 +320,7 @@ export default function WeeklyPlanDialog({
         deleteIds: planIdsToRemove,
       });
 
+      if (pickedMealType && insertions.length > 0) trackMealTypeSet(pickedMealType, subjectTags);
       toast.success(
         subject.kind === "recipe" ? t("recipe.planningSuccessful") : t("mealPlanner.planUpdated")
       );
@@ -419,6 +435,10 @@ export default function WeeklyPlanDialog({
               </Button>
             );
           })}
+        </div>
+
+        <div className="mt-2">
+          <MealTypePicker value={mealType} onChange={setPickedMealType} />
         </div>
 
         {/* Without Date Button */}

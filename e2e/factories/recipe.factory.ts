@@ -21,6 +21,7 @@ export function createRecipe(overrides?: Partial<MockRecipe>): MockRecipe {
     created_at: overrides?.created_at ?? new Date().toISOString(),
     avg_rating: overrides?.avg_rating ?? null,
     collectionIds: overrides?.collectionIds ?? [],
+    tags: overrides?.tags ?? [],
   };
 }
 

@@ -13,6 +13,8 @@ export type PlannedRecipe = {
   id: string;
   recipeId: string;
   recipeName: string;
+  /** The recipe's tags; the course tags among them preselect a meal type. */
+  recipeTags: string[];
   planned_date: Date | null;
   mealType: MealType;
   eaten: boolean;
@@ -40,7 +42,7 @@ export type MealPlannerItemRaw = {
   planned_date: string | null;
   eaten: boolean | null;
   meal_type: string | null;
-  recipes: { id: string; name: string } | null;
+  recipes: { id: string; name: string; tags: string[] } | null;
   planner_notes: { id: string; text: string } | null;
 };
 
@@ -59,7 +61,7 @@ export type PlannedItemSummary = {
 
 /** What the weekly plan dialog plans: a recipe, or a note (every copy shares the text). */
 export type PlanSubject =
-  | { kind: "recipe"; id: string; name: string }
+  | { kind: "recipe"; id: string; name: string; tags: string[] }
   | { kind: "note"; noteId: string; text: string };
 
 export type UpdatePlannedItemParams = {

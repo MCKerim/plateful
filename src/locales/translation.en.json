@@ -504,8 +504,10 @@
     "plan": "Plan"
   },
   "mealType": {
+    "label": "Meal type",
     "breakfast": "Breakfast",
     "lunch": "Lunch",
+    "dinner": "Dinner",
     "snack": "Snack"
   },
   "mealPlannerItem": {

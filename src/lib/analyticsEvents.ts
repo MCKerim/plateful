@@ -40,6 +40,10 @@
  * - `cooking_started` (a session created, not resumed or joined),
  *   `cooking_finished` / `cooking_abandoned` (this cook left through Finish
  *   or the close button), `cooking_timer_started`: no properties, as on iOS.
+ * - `planner_meal_type_set`: `meal_type` (the picked type) and
+ *   `differs_from_default` (against the course-tag type, dinner for a note).
+ *   Sent from the weekly plan dialog on a save that inserts, only when the
+ *   user picked a type, and from a planner entry's menu on a change.
  */
 export const AnalyticsEvent = {
   magicLinkRequested: "magic_link_requested",
@@ -73,6 +77,7 @@ export const AnalyticsEvent = {
   cookingFinished: "cooking_finished",
   cookingAbandoned: "cooking_abandoned",
   cookingTimerStarted: "cooking_timer_started",
+  plannerMealTypeSet: "planner_meal_type_set",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvent)[keyof typeof AnalyticsEvent];

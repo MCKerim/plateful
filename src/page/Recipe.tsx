@@ -218,7 +218,7 @@ export default function Recipe() {
 
         {recipe && (
           <WeeklyPlanDialog
-            subject={{ kind: "recipe", id: recipe.id, name: recipe.name }}
+            subject={{ kind: "recipe", id: recipe.id, name: recipe.name, tags: recipe.tags }}
             navigateOnSuccess={true}
             trigger={
               <Button variant="accent" className="flex-1">

@@ -359,6 +359,7 @@ describe("orderForDisplay", () => {
     id,
     recipeId: id,
     recipeName: id,
+    recipeTags: [],
     planned_date: null,
     mealType,
     eaten: false,

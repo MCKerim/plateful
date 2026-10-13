@@ -30,6 +30,7 @@ export type MockRecipe = {
   created_at: string;
   avg_rating: number | null;
   collectionIds: string[];
+  tags: string[];
 };
 
 export type MockCollection = {
@@ -55,8 +56,9 @@ export type MockMealPlan = {
   household_id: string;
   planned_date: string | null;
   eaten: boolean | null;
+  meal_type: string | null;
   created_at: string;
-  recipes: { id: string; name: string } | null;
+  recipes: { id: string; name: string; tags: string[] } | null;
   planner_notes: { id: string; text: string } | null;
 };
 
