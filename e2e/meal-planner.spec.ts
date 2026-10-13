@@ -194,6 +194,31 @@ test.describe("Meal Planner Page", () => {
     );
   });
 
+  test("should preselect the recipe's last meal type over its tags", async ({
+    page,
+    setupAuth,
+  }) => {
+    const recipe = createRecipe({ name: "Shakshuka", tags: ["breakfast"] });
+    const placement = (meal_type: string | null, minute: number) =>
+      createMealPlan({
+        recipe_id: recipe.id,
+        planned_date: null,
+        eaten: true,
+        meal_type,
+        created_at: new Date(2026, 0, 1, 12, minute).toISOString(),
+        recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
+      });
+    // The newest placement has no type (an older client); the one before it holds the choice.
+    await setupAuth({
+      recipes: [recipe],
+      mealPlans: [placement("lunch", 0), placement("snack", 1), placement(null, 2)],
+    });
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    await expect(page.getByRole("dialog").getByRole("radio", { name: "Snack" })).toBeChecked();
+  });
+
   test("should change an entry's meal type from its menu", async ({ page, setupAuth }) => {
     const omelette = createRecipe({ name: "Omelette" });
     const pasta = createRecipe({ name: "Pasta" });

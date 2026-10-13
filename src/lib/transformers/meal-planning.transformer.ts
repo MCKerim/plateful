@@ -1,4 +1,5 @@
 import { parseISO } from "date-fns";
+import { MEAL_TYPES } from "@/lib/mealPlanHelper/mealPlanHelper";
 import {
   MealPlannerItem,
   MealPlannerItemRaw,
@@ -22,7 +23,7 @@ export function parsePlannedDate(value: string | null): Date | null {
  * reads as dinner, as does a value this version doesn't know.
  */
 export function parseMealType(value: string | null): MealType {
-  return value === "breakfast" || value === "lunch" || value === "snack" ? value : "dinner";
+  return MEAL_TYPES.find((type) => type === value) ?? "dinner";
 }
 
 /**

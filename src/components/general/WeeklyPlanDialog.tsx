@@ -112,7 +112,7 @@ export default function WeeklyPlanDialog({
     isDialogOpen
   );
 
-  const { data: lastMealType = null } = useLastMealType(subject, isDialogOpen);
+  const { data: lastMealType = null } = useLastMealType(subject);
   const subjectTags = subject?.kind === "recipe" ? subject.tags : [];
   const mealType = pickedMealType ?? preselectedMealType(lastMealType, subjectTags);
   const { trackMealTypeSet } = usePlannerTracking();

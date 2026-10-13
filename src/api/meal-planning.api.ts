@@ -208,7 +208,9 @@ export const mealPlanningApi = {
    * The stored meal type of the subject's newest placement that has one, the
    * last choice the weekly plan dialog preselects; `null` when none has.
    * Newest by `created_at`, not `updated_at`: a move or a cooked check bumps
-   * that. RLS scopes the rows to the household.
+   * that. `updated_at` only breaks the tie between copies one save inserted
+   * together, so a type changed on one of them wins. RLS scopes the rows to
+   * the household.
    */
   async getLastMealType(supabase: SupabaseClient, subject: PlanSubject): Promise<string | null> {
     const query = supabase
@@ -216,6 +218,7 @@ export const mealPlanningApi = {
       .select("meal_type")
       .not("meal_type", "is", null)
       .order("created_at", { ascending: false })
+      .order("updated_at", { ascending: false })
       .limit(1);
     const scoped =
       subject.kind === "recipe"

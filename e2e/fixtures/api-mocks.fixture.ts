@@ -256,10 +256,31 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
   // PATCH (cooked check, meal type) lands on its row so the refetch shows it
   await page.route("**/rest/v1/meal_planning?*", async (route) => {
     if (route.request().method() === "PATCH") {
-      const id = route.request().url().match(/id=eq\.([a-f0-9-]+)/i)?.[1];
+      const id = route
+        .request()
+        .url()
+        .match(/id=eq\.([a-f0-9-]+)/i)?.[1];
       const plan = scenario.mealPlans.find((item) => item.id === id);
       if (plan) Object.assign(plan, route.request().postDataJSON());
       await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    // The weekly plan dialog's last choice: the subject's newest typed row
+    const url = new URL(route.request().url());
+    if (url.searchParams.get("select") === "meal_type") {
+      const recipeId = url.searchParams.get("recipe_id")?.replace("eq.", "");
+      const noteId = url.searchParams.get("note_id")?.replace("eq.", "");
+      const newest = scenario.mealPlans
+        .filter((plan) => plan.meal_type !== null)
+        .filter((plan) => (recipeId ? plan.recipe_id === recipeId : plan.note_id === noteId))
+        .sort((a, b) => b.created_at.localeCompare(a.created_at))
+        .slice(0, 1)
+        .map((plan) => ({ meal_type: plan.meal_type }));
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(newest),
+      });
       return;
     }
     await route.fulfill({
