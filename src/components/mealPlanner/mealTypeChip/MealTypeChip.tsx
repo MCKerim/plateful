@@ -8,7 +8,7 @@ const ICONS: Record<Exclude<MealType, "dinner">, LucideIcon> = {
   snack: Cookie,
 };
 
-/** An entry's meal type above its title. Dinner, the plan's usual meal, shows nothing. */
+/** An entry's meal type below its title, as on iOS. Dinner, the plan's usual meal, shows nothing. */
 export default function MealTypeChip({ mealType }: Readonly<{ mealType: MealType }>) {
   const { t } = useTranslation();
   if (mealType === "dinner") return null;

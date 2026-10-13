@@ -204,12 +204,12 @@ export default function MealPlannerItem({
             e.stopPropagation();
             open();
           }}
-          className="text-left flex-1 px-2.5 min-w-0 h-full flex flex-col justify-center gap-0.5"
+          className="text-left flex-1 px-2.5 min-w-0 h-full flex flex-col justify-center gap-1"
         >
-          <MealTypeChip mealType={item.mealType} />
           <p className="text-md font-semibold break-words leading-tight line-clamp-2 w-full">
             {title}
           </p>
+          <MealTypeChip mealType={item.mealType} />
         </button>
       </div>
 

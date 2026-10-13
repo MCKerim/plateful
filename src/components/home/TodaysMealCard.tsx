@@ -47,10 +47,10 @@ export default function TodaysMealCard({
             onClick={() => navigate(`/recipe/${recipeId}`)}
             className="flex flex-col gap-1 text-left"
           >
-            <MealTypeChip mealType={mealType} />
             <h3 className="font-bold leading-tight text-md line-clamp-2 break-words">
               {recipeName}
             </h3>
+            <MealTypeChip mealType={mealType} />
           </button>
 
           <div className="flex gap-2">

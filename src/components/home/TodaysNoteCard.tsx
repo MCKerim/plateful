@@ -28,8 +28,8 @@ export default function TodaysNoteCard({ note, onEdit }: Readonly<Props>) {
           <StickyNote size={24} />
         </div>
         <div className="flex min-w-0 flex-col gap-1">
-          <MealTypeChip mealType={note.mealType} />
           <h3 className="font-bold leading-tight text-md line-clamp-2 break-words">{note.text}</h3>
+          <MealTypeChip mealType={note.mealType} />
         </div>
       </button>
     </Card>
