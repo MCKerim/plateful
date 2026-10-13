@@ -50,8 +50,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
       timeout: 10000,
     });
 
-    // Click the Ask AI-Chef button
-    const askButton = page.getByRole("button", { name: /ask ai-chef/i });
+    // Click the Ask button
+    const askButton = page.getByRole("button", { name: "Ask", exact: true });
     await expect(askButton).toBeVisible();
     await askButton.click();
 
@@ -113,7 +113,7 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await expect(userMessage).toContainText("What can I substitute for pancetta?");
   });
 
-  test("should have Ask AI-Chef button visible on recipe page", async ({ page, setupAuth }) => {
+  test("should have Ask button visible on recipe page", async ({ page, setupAuth }) => {
     const recipeId = "00000000-0000-0000-0000-000000000003";
     const recipe = createRecipe({
       id: recipeId,
@@ -126,8 +126,8 @@ test.describe("Chatbot - Ask AI-Chef Feature", () => {
     await page.goto(`/recipe/${recipeId}`);
     await page.waitForLoadState("networkidle");
 
-    // Verify the Ask AI-Chef button is present and visible
-    const askButton = page.getByRole("button", { name: /ask ai-chef/i });
+    // Verify the Ask button is present and visible
+    const askButton = page.getByRole("button", { name: "Ask", exact: true });
     await expect(askButton).toBeVisible({ timeout: 10000 });
   });
 
