@@ -1,17 +1,9 @@
-# Opacity modifiers on theme colors produce no CSS
+# Theme colors are R G B channels
 
-**Fact (checked 2026-10-13, Tailwind 3.4.17):** `tailwind.config.js` defines every theme color as a bare CSS variable (`primary: "var(--primary)"`, `muted: { DEFAULT: "var(--muted)", foreground: "var(--muted-foreground)" }` and so on), and `src/index.css` sets those variables to hex values. Tailwind 3 can't split a `var()` into channels, so it emits **nothing** for an opacity modifier on these colors. `text-foreground/70`, `bg-accent/50`, `bg-destructive/5` and `hover:bg-primary/80` make no rule at all, the build gives no warning, and the element keeps whatever color it had without the class.
+**Fact (since 2026-10-13, branch `theme-alpha`, Tailwind 3.4):** the theme colors in `src/index.css` (`--background-color`, `--primary`, `--muted-foreground` and the rest, both themes, plus the print overrides in `recipe-print.css`) hold R G B channels such as `--muted: 227 226 222; /* #e3e2de */`, and `tailwind.config.js` reads them as `rgb(var(--muted) / <alpha-value>)`. Opacity modifiers like `bg-primary/10`, `text-foreground/70` and `hover:bg-accent/90` work. `--border`, `--input`, `--ring` and `--chart-*` are still HSL channels read as `hsl(var(--x))`.
 
-**How it was found:** the meal-type chip needed muted text with enough contrast (`text-muted-foreground` on `bg-muted` is 2.49:1 in light mode, below the 4.5:1 that WCAG AA needs for 11px text). The obvious `text-foreground/70` (5.94:1 on paper) produced no CSS. Probe:
+**Using a theme color outside a Tailwind class:** wrap it. `fill="rgb(var(--card))"`, `color: rgb(var(--muted-foreground));`, `rgb(var(--background))` in a gradient. A bare `var(--card)` is not a color any more and the browser drops the declaration (an SVG fill falls back to black). The same is true for `var(--border)`: the onboarding illustrations use `stroke="var(--border)"`, which has never drawn a stroke.
 
-```bash
-echo '<span class="text-foreground/70 bg-accent/50 bg-accent"></span>' > /tmp/tw.html
-printf '@tailwind utilities;\n' > /tmp/tw.css
-npx tailwindcss -c tailwind.config.js -i /tmp/tw.css --content /tmp/tw.html
-```
+**Why:** before that the variables held hex values and the config used bare `var(--x)`. Tailwind 3 can't split a `var()` into channels, so every opacity modifier on a theme color emitted no CSS and gave no warning. 23 classes were dead, among them the shadcn hover states in `button.tsx` and `badge.tsx`, the idle chip in `CookingStep`, the failed `ImportCard`, the account-deletion boxes in Settings, `CookingPill`'s `bg-card/95`, `NutritionSection`'s `bg-muted/40` and the folder tab of a collection without a color, which rendered black. RGB instead of HSL keeps every existing color bit-identical. `color-mix()` on the hex values was rejected because Safari before 16.2 and WebViews before Chrome 111 would drop the whole declaration.
 
-Only `.bg-accent` comes out.
-
-**Existing dead classes:** on 2026-10-13, 33 uses in `src` had no effect, among them `bg-accent/50`, `bg-accent/90`, `bg-secondary/80`, `bg-muted/50`, `bg-destructive/5`, `border-destructive/40`, `text-destructive/70` and the shadcn defaults in `src/components/ui/`. To list them, grep for `-(primary|secondary|accent|muted|foreground|background|card|popover|destructive|border|input|ring)(-foreground)?/[0-9]+`. Nothing is broken by them today, because the screens were designed while they did nothing.
-
-**Rule:** pick a token that already has the color you need (the meal-type chip uses `text-foreground`). Don't add `/NN` to a theme color. To make the modifiers work, define the variables as channels (`--muted: 40 9% 88%`) and the colors as `hsl(var(--muted) / <alpha-value>)`. That is one change in `index.css` and `tailwind.config.js`, but every dead class above would then start to show, so it needs a visual pass over those screens.
+**How it was checked:** the Tailwind build before and after differs only in the 23 new rules plus a format change on the others (`rgb(var(--x) / var(--tw-bg-opacity, 1))`, same color). A computed-style dump of 18 routes in light and dark (3,282 elements, Playwright with the e2e mocks) changed exactly one element, the colorless collection's folder tab. The print view of a recipe is identical. The newly live classes were reviewed side by side in Storybook in both themes. On dark backgrounds `shadow-primary/20` on the survey buttons is now a soft cream glow.
