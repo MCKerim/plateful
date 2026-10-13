@@ -40,7 +40,7 @@ export default function MealPlannerIllustration() {
             height="28"
             rx="8"
             fill={day.isTarget ? "none" : "rgb(var(--secondary))"}
-            stroke={day.isTarget ? "rgb(var(--accent-color))" : "var(--border)"}
+            stroke={day.isTarget ? "rgb(var(--accent-color))" : "rgb(var(--muted))"}
             strokeWidth={day.isTarget ? "1.5" : "0.5"}
             strokeDasharray={day.isTarget ? "5 3" : "none"}
           />
@@ -59,7 +59,7 @@ export default function MealPlannerIllustration() {
                 height="20"
                 rx="5"
                 fill="rgb(var(--card))"
-                stroke="var(--border)"
+                stroke="rgb(var(--muted))"
                 strokeWidth="0.5"
               />
               {/* Thumbnail placeholder */}

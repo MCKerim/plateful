@@ -13,7 +13,7 @@ export default function CookbookIllustration() {
         height="130"
         rx="12"
         fill="rgb(var(--secondary))"
-        stroke="var(--border)"
+        stroke="rgb(var(--muted))"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8, rotate: -8 }}
         animate={{ opacity: 1, scale: 1, rotate: -8 }}
@@ -29,7 +29,7 @@ export default function CookbookIllustration() {
         height="130"
         rx="12"
         fill="rgb(var(--card))"
-        stroke="var(--border)"
+        stroke="rgb(var(--muted))"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8, rotate: 5 }}
         animate={{ opacity: 1, scale: 1, rotate: 5 }}

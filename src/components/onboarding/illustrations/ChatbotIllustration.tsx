@@ -13,7 +13,7 @@ export default function ChatbotIllustration() {
         height="56"
         rx="16"
         fill="rgb(var(--secondary))"
-        stroke="var(--border)"
+        stroke="rgb(var(--muted))"
         strokeWidth="1.5"
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
