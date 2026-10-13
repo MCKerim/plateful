@@ -47,9 +47,12 @@ import { DroppableDay } from "@/components/mealPlanner/droppableDay/DroppableDay
 import { useDeletePlannedItem } from "@/hooks/meal-planning/useDeletePlannedItem";
 import { useMealPlannerItems } from "@/hooks/meal-planning/useMealPlannerItems";
 import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
+import { useSetMealType } from "@/hooks/meal-planning/useSetMealType";
+import { usePlannerTracking } from "@/hooks/analytics/usePlannerTracking";
 import { useUpdatePlannedItemDate } from "@/hooks/meal-planning/useUpdatePlannedItemDate";
 import {
   MealPlannerItem as MealPlannerItemType,
+  MealType,
   PlannedNote,
   PlannedRecipe,
   PlanSubject,
@@ -114,6 +117,8 @@ export default function MealPlanner() {
   const deleteMutation = useDeletePlannedItem();
   const updateDateMutation = useUpdatePlannedItemDate();
   const setEatenMutation = useSetEaten();
+  const setMealTypeMutation = useSetMealType();
+  const { trackMealTypeSet } = usePlannerTracking();
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -174,6 +179,14 @@ export default function MealPlanner() {
         onError: () => toast.error(t("mealPlanner.updateError")),
       }
     );
+  }
+
+  function handleSetMealType(item: MealPlannerItemType, mealType: MealType) {
+    setMealTypeMutation.mutate(
+      { id: item.id, mealType },
+      { onError: () => toast.error(t("mealPlanner.updateError")) }
+    );
+    trackMealTypeSet(mealType, item.kind === "recipe" ? item.recipeTags : []);
   }
 
   function handleRecipeEaten(item: PlannedRecipe) {
@@ -303,6 +316,7 @@ export default function MealPlanner() {
         onToggleEaten={item.kind === "recipe" ? () => handleToggleEaten(item) : undefined}
         onRemove={() => handleDelete(item.id)}
         onEditPlan={() => handleEditPlan(item)}
+        onSetMealType={(mealType) => handleSetMealType(item, mealType)}
         onEditNote={item.kind === "note" ? () => handleEditNote(item) : undefined}
         onMoveToNoDate={inDay ? () => handleUpdateDate(item.id, null) : undefined}
         isDragging={activeItem?.id === item.id}

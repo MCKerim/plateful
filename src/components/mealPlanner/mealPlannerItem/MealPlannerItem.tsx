@@ -16,8 +16,9 @@ import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 import { isBefore, startOfToday } from "date-fns";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
-import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
+import { MealPlannerItem as MealPlannerItemType, MealType } from "@/types/meal-planning.types";
 import MealTypeChip from "../mealTypeChip/MealTypeChip";
+import MealTypePicker from "../mealTypePicker/MealTypePicker";
 
 type Props = {
   item: MealPlannerItemType;
@@ -27,6 +28,8 @@ type Props = {
   onRemove: () => void;
   /** Opens the weekly plan dialog for the recipe or the note. */
   onEditPlan: () => void;
+  /** Changes this placement's meal type. */
+  onSetMealType: (mealType: MealType) => void;
   /** Notes only: opens the text editor (also the row's tap). */
   onEditNote?: () => void;
   onMoveToNoDate?: () => void;
@@ -43,6 +46,7 @@ export default function MealPlannerItem({
   onToggleEaten,
   onRemove,
   onEditPlan,
+  onSetMealType,
   onEditNote,
   onMoveToNoDate,
   isDragging = false,
@@ -237,6 +241,15 @@ export default function MealPlannerItem({
 
         <DrawerContent>
           <DrawerFooter className="gap-2 mb-8 mt-4">
+            {/* Stays open on a pick: the entry moves to its new place in the
+                day behind the drawer. */}
+            <div className="mb-2 flex flex-col gap-2">
+              <p className="text-sm font-semibold text-muted-foreground" aria-hidden>
+                {t("mealType.label")}
+              </p>
+              <MealTypePicker value={item.mealType} onChange={onSetMealType} />
+            </div>
+
             <DrawerClose asChild>
               <Button className="w-full" onClick={onEditPlan}>
                 <CalendarDays size={20} />

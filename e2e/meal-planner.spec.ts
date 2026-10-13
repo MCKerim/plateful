@@ -193,4 +193,38 @@ test.describe("Meal Planner Page", () => {
       { timeout: 10000 }
     );
   });
+
+  test("should change an entry's meal type from its menu", async ({ page, setupAuth }) => {
+    const omelette = createRecipe({ name: "Omelette" });
+    const pasta = createRecipe({ name: "Pasta" });
+    const today = formatDate(new Date());
+    const plans = [omelette, pasta].map((recipe, index) =>
+      createMealPlan({
+        recipe_id: recipe.id,
+        planned_date: today,
+        created_at: new Date(2026, 0, 1, 12, index).toISOString(),
+        recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
+      })
+    );
+    await setupAuth({ recipes: [omelette, pasta], mealPlans: plans });
+
+    await page.goto("/planner");
+    const entries = page.getByRole("listitem");
+    await expect(entries).toHaveText([/Omelette/, /Pasta/], { timeout: 10000 });
+
+    await entries.filter({ hasText: "Pasta" }).getByRole("button").last().click();
+    const menu = page.getByRole("radiogroup", { name: "Meal type" });
+    await expect(menu.getByRole("radio", { name: "Dinner" })).toBeChecked();
+
+    const patch = page.waitForRequest(
+      (request) => request.method() === "PATCH" && request.url().includes("meal_planning")
+    );
+    await menu.getByRole("radio", { name: "Breakfast" }).click();
+    expect((await patch).postDataJSON()).toEqual({ meal_type: "breakfast" });
+    await expect(menu.getByRole("radio", { name: "Breakfast" })).toBeChecked();
+
+    // Breakfast leads the day, ahead of the older dinner.
+    await page.keyboard.press("Escape");
+    await expect(entries).toHaveText([/Pasta.*Breakfast/, /Omelette/]);
+  });
 });
