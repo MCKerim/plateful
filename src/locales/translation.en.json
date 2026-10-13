@@ -503,6 +503,11 @@
     "ask": "Ask",
     "plan": "Plan"
   },
+  "mealType": {
+    "breakfast": "Breakfast",
+    "lunch": "Lunch",
+    "snack": "Snack"
+  },
   "mealPlannerItem": {
     "editPlan": "Edit Plan",
     "moveToNoDate": "Move to no date",

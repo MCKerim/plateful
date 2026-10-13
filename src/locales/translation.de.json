@@ -619,6 +619,11 @@
   "explore": {
     "title": "Erkunden"
   },
+  "mealType": {
+    "breakfast": "Frühstück",
+    "lunch": "Mittag",
+    "snack": "Snack"
+  },
   "mealPlannerItem": {
     "editPlan": "Plan bearbeiten",
     "moveToNoDate": "Zu ohne Datum",

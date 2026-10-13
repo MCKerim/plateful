@@ -7,15 +7,24 @@ import { useTranslation } from "react-i18next";
 import { useSetEaten } from "@/hooks/meal-planning/useSetDaysEaten";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
+import MealTypeChip from "@/components/mealPlanner/mealTypeChip/MealTypeChip";
+import { MealType } from "@/types/meal-planning.types";
 
 type Props = {
   id: string;
   recipeId: string;
   recipeName: string;
+  mealType: MealType;
   eaten: boolean;
 };
 
-export default function TodaysMealCard({ id, recipeId, recipeName, eaten }: Readonly<Props>) {
+export default function TodaysMealCard({
+  id,
+  recipeId,
+  recipeName,
+  mealType,
+  eaten,
+}: Readonly<Props>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { data: imageUrl } = useRecipeFirstImage(recipeId);
@@ -34,7 +43,11 @@ export default function TodaysMealCard({ id, recipeId, recipeName, eaten }: Read
         </button>
 
         <div className="flex flex-col gap-2 p-2 border-b-2 border-l-2 border-r-2 rounded-b-lg">
-          <button onClick={() => navigate(`/recipe/${recipeId}`)} className="text-left">
+          <button
+            onClick={() => navigate(`/recipe/${recipeId}`)}
+            className="flex flex-col gap-1 text-left"
+          >
+            <MealTypeChip mealType={mealType} />
             <h3 className="font-bold leading-tight text-md line-clamp-2 break-words">
               {recipeName}
             </h3>

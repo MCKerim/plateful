@@ -17,6 +17,7 @@ import { useDraggable } from "@dnd-kit/core";
 import { isBefore, startOfToday } from "date-fns";
 import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import { MealPlannerItem as MealPlannerItemType } from "@/types/meal-planning.types";
+import MealTypeChip from "../mealTypeChip/MealTypeChip";
 
 type Props = {
   item: MealPlannerItemType;
@@ -205,6 +206,7 @@ export default function MealPlannerItem({
           }}
           className="text-left flex-1 px-2.5 min-w-0 h-full flex flex-col justify-center gap-0.5"
         >
+          <MealTypeChip mealType={item.mealType} />
           <p className="text-md font-semibold break-words leading-tight line-clamp-2 w-full">
             {title}
           </p>

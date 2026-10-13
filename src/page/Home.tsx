@@ -111,6 +111,7 @@ export default function Home() {
                     id={item.id}
                     recipeId={item.recipeId}
                     recipeName={item.recipeName}
+                    mealType={item.mealType}
                     eaten={item.eaten}
                   />
                 ) : (
