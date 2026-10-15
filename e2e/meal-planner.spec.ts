@@ -144,6 +144,41 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByRole("button", { name: /cooked it/i })).toHaveCount(0);
   });
 
+  test("should list a day's notes after all its dishes, even one written before breakfast", async ({
+    page,
+    setupAuth,
+  }) => {
+    const today = formatDate(new Date());
+    const at = (minute: number) => new Date(2026, 0, 1, 12, minute).toISOString();
+    const [brownie, pasta, pancakes] = ["Brownie", "Pasta", "Pancakes"].map((name) =>
+      createRecipe({ name })
+    );
+    const dish = (recipe: typeof brownie, meal_type: string | null, minute: number) =>
+      createMealPlan({
+        recipe_id: recipe.id,
+        planned_date: today,
+        meal_type,
+        created_at: at(minute),
+        recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
+      });
+    // The note is the day's oldest row and still holds a type from an older build.
+    await setupAuth({
+      recipes: [brownie, pasta, pancakes],
+      mealPlans: [
+        createNotePlan({ text: "Eating out", meal_type: "breakfast", created_at: at(0) }),
+        dish(brownie, "snack", 1),
+        dish(pasta, null, 2),
+        dish(pancakes, "breakfast", 3),
+      ],
+    });
+
+    await page.goto("/planner");
+    await expect(page.getByRole("listitem")).toHaveText(
+      [/Pancakes/, /Pasta/, /Brownie/, /Eating out/],
+      { timeout: 10000 }
+    );
+  });
+
   test("should add a note to an empty day through the chooser", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
 

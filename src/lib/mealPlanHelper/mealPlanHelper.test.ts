@@ -364,33 +364,33 @@ describe("orderForDisplay", () => {
     mealType,
     eaten: false,
   });
-  const note = (id: string, mealType: MealType): MealPlannerItem => ({
+  const note = (id: string): MealPlannerItem => ({
     kind: "note",
     id,
     noteId: id,
     text: id,
     planned_date: null,
-    mealType,
+    mealType: "dinner",
   });
 
-  it("orders by meal type, then recipes before notes, then the plan's order", () => {
+  it("lists the dishes by meal type, then every note, a note created before a breakfast included", () => {
     const planOrder = [
+      note("early-note"),
       recipe("snack", "snack"),
-      note("dinner-note", "dinner"),
       recipe("dinner-1", "dinner"),
-      note("breakfast-note", "breakfast"),
       recipe("breakfast", "breakfast"),
+      note("late-note"),
       recipe("lunch", "lunch"),
       recipe("dinner-2", "dinner"),
     ];
     expect(orderForDisplay(planOrder).map((item) => item.id)).toEqual([
       "breakfast",
-      "breakfast-note",
       "lunch",
       "dinner-1",
       "dinner-2",
-      "dinner-note",
       "snack",
+      "early-note",
+      "late-note",
     ]);
   });
 });

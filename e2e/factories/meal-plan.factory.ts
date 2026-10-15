@@ -39,6 +39,8 @@ export function createNotePlan(overrides?: {
   household_id?: string;
   planned_date?: string | null;
   text?: string;
+  meal_type?: string | null;
+  created_at?: string;
 }): MockMealPlan {
   const noteId = overrides?.note_id ?? crypto.randomUUID();
 
@@ -52,8 +54,8 @@ export function createNotePlan(overrides?: {
         ? (overrides.planned_date ?? null)
         : formatDate(new Date()),
     eaten: null,
-    meal_type: null,
-    created_at: new Date().toISOString(),
+    meal_type: overrides?.meal_type ?? null,
+    created_at: overrides?.created_at ?? new Date().toISOString(),
     recipes: null,
     planner_notes: { id: noteId, text: overrides?.text ?? "Eating out" },
   };
