@@ -13,6 +13,8 @@
  * small, and the HTML shaping is unit-tested without a network.
  */
 
+import { APP_STORE_ID } from "./appStores";
+
 /** What the preview needs from a `shared_recipes.snapshot`. */
 export type SharePreviewSnapshot = {
   name: string;
@@ -119,6 +121,8 @@ export function previewTags({ snapshot, pageUrl, projectUrl }: PreviewInput): st
     `<meta name="twitter:card" content="${image ? "summary_large_image" : "summary"}" />`,
     `<meta name="twitter:title" content="${title}" />`,
     `<meta name="twitter:description" content="${description}" />`,
+    // Safari's Smart App Banner: "Get" without the app, "Open" with it, handing the app this link.
+    `<meta name="apple-itunes-app" content="app-id=${APP_STORE_ID}, app-argument=${escapeHtml(pageUrl)}" />`,
   ];
   if (image) {
     const escapedImage = escapeHtml(image);

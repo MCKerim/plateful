@@ -1013,7 +1013,7 @@
     "importing": "Speichern...",
     "importSuccess": "Zu Plateful hinzugefügt",
     "importError": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
-    "loginToSave": "Anmelden, um dieses Rezept zu speichern",
+    "saveRecipe": "Dieses Rezept speichern",
     "downloadApp": "Plateful App herunterladen",
     "notFound": "Dieses Rezept ist verschwunden",
     "notFoundDescription": "Dieser Link ist leider nicht mehr gültig. Lass dir das Rezept einfach nochmal schicken.",

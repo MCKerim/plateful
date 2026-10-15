@@ -48,10 +48,69 @@ test.describe("Shared recipe", () => {
 
     const lastStep = await page.getByText(steps[steps.length - 1]).boundingBox();
     const footer = await page
-      .getByRole("button", { name: "Get the Plateful app" })
+      .getByText("Save this recipe", { exact: true })
       .locator("..")
       .boundingBox();
 
     expect(lastStep!.y + lastStep!.height).toBeLessThanOrEqual(footer!.y);
   });
 });
+
+const APP_STORE = "https://apps.apple.com/app/id6788850965";
+const PLAY_STORE = "https://play.google.com/store/apps/details?id=com.kblanks.plateful";
+
+const devices = [
+  {
+    device: "iPhone",
+    userAgent:
+      "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
+    maxTouchPoints: 5,
+    store: APP_STORE,
+  },
+  {
+    device: "Android phone",
+    userAgent:
+      "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36",
+    maxTouchPoints: 5,
+    store: PLAY_STORE,
+  },
+  {
+    device: "Mac",
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36",
+    maxTouchPoints: 0,
+    store: null,
+  },
+];
+
+for (const { device, userAgent, maxTouchPoints, store } of devices) {
+  test.describe(`Shared recipe on ${device}, signed out`, () => {
+    test.use({ userAgent });
+
+    test("offers one button to save the recipe", async ({ page }) => {
+      // The mobile projects emulate touch, so pin the count each device really reports.
+      await page.addInitScript((points) => {
+        Object.defineProperty(Navigator.prototype, "maxTouchPoints", { get: () => points });
+      }, maxTouchPoints);
+      await page.route("**/rest/v1/rpc/resolve_recipe_share", (route) =>
+        route.fulfill({ json: [{ snapshot }] })
+      );
+      await page.goto("/share/e2e-token");
+      await expect(page.getByRole("heading", { name: "Pesto Pasta" })).toBeVisible();
+
+      const save = page.getByText("Save this recipe", { exact: true });
+      await expect(save).toHaveCount(1);
+      await expect(page.getByText(/Log in|Get the Plateful app/)).toHaveCount(0);
+
+      if (store) {
+        await expect(page.getByRole("link", { name: "Save this recipe" })).toHaveAttribute(
+          "href",
+          store
+        );
+      } else {
+        await page.getByRole("button", { name: "Save this recipe" }).click();
+        await expect(page).toHaveURL(/\/signup$/);
+      }
+    });
+  });
+}

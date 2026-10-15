@@ -19,6 +19,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
+import { mobileStoreUrl } from "@/lib/appStores";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -81,7 +82,7 @@ export default function SharedRecipe() {
   }
 
   function handleDownloadApp() {
-    window.open(PLATEFUL_URL, "_blank");
+    window.open(mobileStoreUrl() ?? PLATEFUL_URL, "_blank");
   }
 
   if (isLoading) {
@@ -152,27 +153,34 @@ export default function SharedRecipe() {
       </Button>
     ) : null;
 
-  const downloadButton = !isNative ? (
-    <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
-      <Download size={18} />
-      {t("share.downloadApp")}
-    </Button>
-  ) : null;
+  // On a phone the app is where the recipe gets saved: the store, or the app itself
+  // when installed, since the link then opens it before this page ever loads.
+  const storeUrl = isNative ? null : mobileStoreUrl();
+  const storeButton =
+    !saveButton && storeUrl ? (
+      <Button asChild className="w-full">
+        <a href={storeUrl} target="_blank" rel="noreferrer">
+          <BookmarkPlus size={18} />
+          {t("share.saveRecipe")}
+        </a>
+      </Button>
+    ) : null;
 
-  const loginButton = !isLoggedIn ? (
-    <Button className="w-full" onClick={() => navigate("/signup")}>
-      {t("share.loginToSave")}
-    </Button>
-  ) : null;
+  const loginButton =
+    !saveButton && !storeButton && !isLoggedIn ? (
+      <Button className="w-full" onClick={() => navigate("/signup")}>
+        <BookmarkPlus size={18} />
+        {t("share.saveRecipe")}
+      </Button>
+    ) : null;
 
-  // Sticky, not fixed + spacer: the bar holds one or two buttons, so no fixed spacer height fits.
-  const footer = (
+  const action = saveButton ?? storeButton ?? loginButton;
+  // Sticky, not fixed + spacer: no fixed spacer height fits every button's wrap.
+  const footer = action ? (
     <div className="sticky bottom-0 w-full bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex flex-col gap-2 border-border border-t-[1px]">
-      {saveButton}
-      {loginButton}
-      {downloadButton}
+      {action}
     </div>
-  );
+  ) : undefined;
 
   return (
     <Layout showHeader={false} showFooter={false} footer={footer}>

@@ -2,20 +2,7 @@ import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import OnboardingLayout from "@/components/layout/onboardingLayout/OnboardingLayout";
-
-const APP_STORE_URL = "https://apps.apple.com/app/id6788850965";
-const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.kblanks.plateful";
-
-function storesForDevice() {
-  const ua = navigator.userAgent;
-  // iPadOS Safari sends a Mac user agent; only the touch points give it away.
-  const isIOS =
-    /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
-  return {
-    appStore: isIOS || !/Android/.test(ua),
-    playStore: !isIOS,
-  };
-}
+import { APP_STORE_URL, PLAY_STORE_URL, storesForDevice } from "@/lib/appStores";
 
 export default function SubscribeWeb() {
   const { t } = useTranslation();

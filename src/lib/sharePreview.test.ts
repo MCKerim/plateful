@@ -111,6 +111,13 @@ describe("previewTags", () => {
     expect(without).not.toContain("og:image");
     expect(without).toContain(`<meta name="twitter:card" content="summary" />`);
   });
+
+  it("adds Safari's Smart App Banner, handing the app the share link", () => {
+    const tags = previewTags({ snapshot: { name: "Pasta" }, pageUrl, projectUrl });
+    expect(tags).toContain(
+      `<meta name="apple-itunes-app" content="app-id=6788850965, app-argument=${pageUrl}" />`
+    );
+  });
 });
 
 describe("injectPreview", () => {

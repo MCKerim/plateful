@@ -1013,7 +1013,7 @@
     "importing": "Saving...",
     "importSuccess": "Added to Plateful",
     "importError": "Could not save the recipe. Please try again.",
-    "loginToSave": "Log in to save this recipe",
+    "saveRecipe": "Save this recipe",
     "downloadApp": "Get the Plateful app",
     "notFound": "This recipe has gone missing",
     "notFoundDescription": "This link doesn't seem to work anymore. Just ask to have the recipe sent again.",
