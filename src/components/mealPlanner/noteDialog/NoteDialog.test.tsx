@@ -134,7 +134,6 @@ describe("NoteDialog", () => {
         noteId: "note-1",
         text: "Birthday",
         planned_date: null,
-        mealType: "dinner",
       },
     });
     const user = userEvent.setup();

@@ -19,8 +19,9 @@ export function parsePlannedDate(value: string | null): Date | null {
 }
 
 /**
- * NULL comes from clients that set no type (this app, older iOS versions) and
- * reads as dinner, as does a value this version doesn't know.
+ * A recipe placement's type. NULL comes from clients that set no type (older
+ * builds of this app and of iOS) and reads as dinner, as does a value this
+ * version doesn't know.
  */
 export function parseMealType(value: string | null): MealType {
   return MEAL_TYPES.find((type) => type === value) ?? "dinner";
@@ -35,7 +36,6 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
   const items: MealPlannerItem[] = [];
   for (const row of raw) {
     const planned_date = parsePlannedDate(row.planned_date);
-    const mealType = parseMealType(row.meal_type);
     if (row.planner_notes) {
       items.push({
         kind: "note",
@@ -43,7 +43,6 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         noteId: row.planner_notes.id,
         text: row.planner_notes.text,
         planned_date,
-        mealType,
       });
     } else if (row.recipes) {
       items.push({
@@ -53,7 +52,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         recipeName: row.recipes.name,
         recipeTags: row.recipes.tags,
         planned_date,
-        mealType,
+        mealType: parseMealType(row.meal_type),
         eaten: row.eaten ?? false,
       });
     }

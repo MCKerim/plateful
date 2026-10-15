@@ -7,7 +7,7 @@ export function usePlannerTracking() {
   const posthog = usePostHog();
 
   return {
-    /** A meal type the user picked, against what the course tags alone suggest (`tags` is empty for a note). */
+    /** A meal type the user picked for a recipe, against what its course tags alone suggest. */
     trackMealTypeSet: (mealType: MealType, tags: readonly string[]) =>
       posthog?.capture(AnalyticsEvent.plannerMealTypeSet, {
         meal_type: mealType,

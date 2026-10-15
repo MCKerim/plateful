@@ -23,7 +23,8 @@ export type PlannedRecipe = {
 /**
  * A note on the plan. Copies made through "Edit plan" share `noteId`, so
  * editing the text changes every copy; moving and removing act on the single
- * placement. Notes have no cooked state.
+ * placement. Notes have no cooked state and no meal type: a note is not a
+ * meal, and a type an older build stored on its row is never read.
  */
 export type PlannedNote = {
   kind: "note";
@@ -31,7 +32,6 @@ export type PlannedNote = {
   noteId: string;
   text: string;
   planned_date: Date | null;
-  mealType: MealType;
 };
 
 export type MealPlannerItem = PlannedRecipe | PlannedNote;

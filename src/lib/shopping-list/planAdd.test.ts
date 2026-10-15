@@ -184,7 +184,6 @@ describe("planMeals", () => {
       noteId: "note",
       text: "Eating out",
       planned_date: october(8),
-      mealType: "dinner",
     };
     const offered = meals([
       meal("cooked", 8, true),

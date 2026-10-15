@@ -2,7 +2,7 @@ import { useTranslation } from "react-i18next";
 import { MealType } from "@/types/meal-planning.types";
 import { MEAL_TYPE_ICONS } from "../mealTypeIcons";
 
-/** An entry's meal type below its title, as on iOS. Dinner, the plan's usual meal, shows nothing. */
+/** A planned recipe's meal type below its title, as on iOS. Dinner, the plan's usual meal, shows nothing. */
 export default function MealTypeChip({ mealType }: Readonly<{ mealType: MealType }>) {
   const { t } = useTranslation();
   if (mealType === "dinner") return null;

@@ -28,8 +28,8 @@ type Props = {
   onRemove: () => void;
   /** Opens the weekly plan dialog for the recipe or the note. */
   onEditPlan: () => void;
-  /** Changes this placement's meal type. */
-  onSetMealType: (mealType: MealType) => void;
+  /** Recipes only: changes this placement's meal type. */
+  onSetMealType?: (mealType: MealType) => void;
   /** Notes only: opens the text editor (also the row's tap). */
   onEditNote?: () => void;
   onMoveToNoDate?: () => void;
@@ -213,7 +213,7 @@ export default function MealPlannerItem({
           <p className="text-md font-semibold leading-tight truncate w-full">
             {title}
           </p>
-          <MealTypeChip mealType={item.mealType} />
+          {item.kind === "recipe" && <MealTypeChip mealType={item.mealType} />}
         </button>
       </div>
 
@@ -243,12 +243,14 @@ export default function MealPlannerItem({
           <DrawerFooter className="gap-2 mb-8 mt-4">
             {/* Stays open on a pick: the entry moves to its new place in the
                 day behind the drawer. */}
-            <div className="mb-2 flex flex-col gap-2">
-              <p className="text-sm font-semibold text-muted-foreground" aria-hidden>
-                {t("mealType.label")}
-              </p>
-              <MealTypePicker value={item.mealType} onChange={onSetMealType} />
-            </div>
+            {item.kind === "recipe" && onSetMealType && (
+              <div className="mb-2 flex flex-col gap-2">
+                <p className="text-sm font-semibold text-muted-foreground" aria-hidden>
+                  {t("mealType.label")}
+                </p>
+                <MealTypePicker value={item.mealType} onChange={onSetMealType} />
+              </div>
+            )}
 
             <DrawerClose asChild>
               <Button className="w-full" onClick={onEditPlan}>

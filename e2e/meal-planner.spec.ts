@@ -173,10 +173,13 @@ test.describe("Meal Planner Page", () => {
     });
 
     await page.goto("/planner");
-    await expect(page.getByRole("listitem")).toHaveText(
-      [/Pancakes/, /Pasta/, /Brownie/, /Eating out/],
-      { timeout: 10000 }
-    );
+    const entries = page.getByRole("listitem");
+    await expect(entries).toHaveText([/Pancakes/, /Pasta/, /Brownie/, /Eating out/], {
+      timeout: 10000,
+    });
+    // The dishes keep their chips; the note shows none, whatever its row holds.
+    await expect(entries.nth(0)).toContainText("Breakfast");
+    await expect(entries.nth(3)).toHaveText("Eating out");
   });
 
   test("should add a note to an empty day through the chooser", async ({ page, setupAuth }) => {
@@ -299,7 +302,11 @@ test.describe("Meal Planner Page", () => {
       .getByRole("button")
       .last()
       .click();
-    await page.getByRole("button", { name: "Edit Plan" }).click();
+    // The note's menu offers no meal type, only its plan, text and removal.
+    const menu = page.getByRole("dialog");
+    await expect(menu.getByRole("button", { name: "Edit note" })).toBeVisible();
+    await expect(page.getByRole("radiogroup", { name: "Meal type" })).toHaveCount(0);
+    await menu.getByRole("button", { name: "Edit Plan" }).click();
 
     const dialog = page.getByRole("dialog").filter({ hasText: "No Date" });
     await dialog.getByRole("button", { name: "No Date" }).click();
@@ -312,22 +319,5 @@ test.describe("Meal Planner Page", () => {
     expect(body.p_insertions).toEqual([
       { id: expect.any(String), planned_date: null, meal_type: null },
     ]);
-  });
-
-  test("should change a note's meal type from its menu", async ({ page, setupAuth }) => {
-    await setupAuth({ recipes: [], mealPlans: [createNotePlan({ text: "Eating out" })] });
-
-    await page.goto("/planner");
-    const note = page.getByRole("listitem").filter({ hasText: "Eating out" });
-    await note.getByRole("button").last().click();
-
-    const patch = page.waitForRequest(
-      (request) => request.method() === "PATCH" && request.url().includes("meal_planning")
-    );
-    await page.getByRole("radio", { name: "Lunch" }).click();
-    expect((await patch).postDataJSON()).toEqual({ meal_type: "lunch" });
-
-    await page.keyboard.press("Escape");
-    await expect(note).toContainText("Lunch");
   });
 });

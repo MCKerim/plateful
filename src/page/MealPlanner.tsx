@@ -181,12 +181,12 @@ export default function MealPlanner() {
     );
   }
 
-  function handleSetMealType(item: MealPlannerItemType, mealType: MealType) {
+  function handleSetMealType(item: PlannedRecipe, mealType: MealType) {
     setMealTypeMutation.mutate(
       { id: item.id, mealType },
       { onError: () => toast.error(t("mealPlanner.updateError")) }
     );
-    trackMealTypeSet(mealType, item.kind === "recipe" ? item.recipeTags : []);
+    trackMealTypeSet(mealType, item.recipeTags);
   }
 
   function handleRecipeEaten(item: PlannedRecipe) {
@@ -316,7 +316,9 @@ export default function MealPlanner() {
         onToggleEaten={item.kind === "recipe" ? () => handleToggleEaten(item) : undefined}
         onRemove={() => handleDelete(item.id)}
         onEditPlan={() => handleEditPlan(item)}
-        onSetMealType={(mealType) => handleSetMealType(item, mealType)}
+        onSetMealType={
+          item.kind === "recipe" ? (mealType) => handleSetMealType(item, mealType) : undefined
+        }
         onEditNote={item.kind === "note" ? () => handleEditNote(item) : undefined}
         onMoveToNoDate={inDay ? () => handleUpdateDate(item.id, null) : undefined}
         isDragging={activeItem?.id === item.id}

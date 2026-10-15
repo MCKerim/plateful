@@ -2,7 +2,6 @@ import { StickyNote } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Card } from "../ui/card";
 import { PlannedNote } from "@/types/meal-planning.types";
-import MealTypeChip from "@/components/mealPlanner/mealTypeChip/MealTypeChip";
 
 type Props = {
   note: PlannedNote;
@@ -27,10 +26,9 @@ export default function TodaysNoteCard({ note, onEdit }: Readonly<Props>) {
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
           <StickyNote size={24} />
         </div>
-        <div className="flex min-w-0 flex-col gap-1">
-          <h3 className="font-bold leading-tight text-md line-clamp-2 break-words">{note.text}</h3>
-          <MealTypeChip mealType={note.mealType} />
-        </div>
+        <h3 className="min-w-0 font-bold leading-tight text-md line-clamp-2 break-words">
+          {note.text}
+        </h3>
       </button>
     </Card>
   );

@@ -370,7 +370,6 @@ describe("orderForDisplay", () => {
     noteId: id,
     text: id,
     planned_date: null,
-    mealType: "dinner",
   });
 
   it("lists the dishes by meal type, then every note, a note created before a breakfast included", () => {
@@ -435,10 +434,6 @@ describe("preselectedMealType", () => {
 
   it("treats a value this version doesn't know as no choice", () => {
     expect(preselectedMealType("brunch", ["dessert"])).toBe("snack");
-  });
-
-  it("starts a note, which has no tags, as dinner", () => {
-    expect(preselectedMealType(null, [])).toBe("dinner");
   });
 
   it("accepts every stored type as a last choice", () => {

@@ -4,7 +4,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
 import { MealPlannerItem, MealType } from "@/types/meal-planning.types";
 
-/** Changes one placement's meal type, optimistically like the cooked check. */
+/** Changes one recipe placement's meal type, optimistically like the cooked check. A note has none. */
 export function useSetMealType() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
@@ -24,7 +24,9 @@ export function useSetMealType() {
         { queryKey: queryKeys.mealPlanning.all },
         (old) => {
           if (!old || !Array.isArray(old)) return old;
-          return old.map((item) => (item.id === id ? { ...item, mealType } : item));
+          return old.map((item) =>
+            item.id === id && item.kind === "recipe" ? { ...item, mealType } : item
+          );
         }
       );
 

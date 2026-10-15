@@ -70,17 +70,17 @@ const COURSE_MEAL_TYPES: readonly (readonly [tag: string, mealType: MealType])[]
 ];
 
 /**
- * What a recipe's course tags suggest, dinner without one (and for a note,
- * which has no tags). Also the baseline `planner_meal_type_set` compares a
- * pick against, to learn how often the tagger is wrong.
+ * What a recipe's course tags suggest, dinner without one. Also the baseline
+ * `planner_meal_type_set` compares a pick against, to learn how often the
+ * tagger is wrong.
  */
 export function courseMealType(tags: readonly string[]): MealType {
   return COURSE_MEAL_TYPES.find(([tag]) => tags.includes(tag))?.[1] ?? "dinner";
 }
 
 /**
- * The type a new placement gets unless the user picks another: the last
- * choice, i.e. the stored type of the subject's newest placement that has
+ * The type a recipe's new placement gets unless the user picks another: the
+ * last choice, i.e. the stored type of the recipe's newest placement that has
  * one (a correction lands on that placement, so it sticks), else the course
  * tags. A value this version doesn't know counts as no choice.
  */

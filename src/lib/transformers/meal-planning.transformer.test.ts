@@ -49,7 +49,6 @@ describe("transformMealPlannerItems", () => {
         noteId: "note-1",
         text: "Eating out",
         planned_date: new Date(2026, 8, 14),
-        mealType: "dinner",
       },
     ]);
   });
@@ -68,12 +67,13 @@ describe("transformMealPlannerItems", () => {
     ]);
   });
 
-  it("carries the meal type of recipes and notes alike", () => {
-    const items = transformMealPlannerItems([
+  it("reads a recipe's meal type and ignores the one an older build stored on a note", () => {
+    const [recipe, note] = transformMealPlannerItems([
       { ...recipeRow, meal_type: "breakfast" },
       { ...noteRow, meal_type: "snack" },
     ]);
-    expect(items.map((item) => item.mealType)).toEqual(["breakfast", "snack"]);
+    expect(recipe).toMatchObject({ kind: "recipe", mealType: "breakfast" });
+    expect(note).not.toHaveProperty("mealType");
   });
 
   it("keeps a pool row dateless", () => {
