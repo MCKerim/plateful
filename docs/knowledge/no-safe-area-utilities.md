@@ -6,6 +6,6 @@
 
 **Fix (2026-10-15):** write the inset as an arbitrary value, the form `ImageImport.tsx` already used: `pb-[calc(1rem+env(safe-area-inset-bottom))]` on the bar, `h-[calc(4.625rem+env(safe-area-inset-bottom))]` for a one-row bar's spacer. The share page's bar holds one or two buttons, so no single spacer height fits: it is `sticky bottom-0` in the flow instead, with no spacer. `e2e/shared-recipe.spec.ts` checks that the last step ends above the bar.
 
-**Still open:** `Cookbook.tsx` uses `top-safe-5` on its search bar, so `sticky` there has no `top` and never sticks. Fixing it changes behaviour (the bar would start sticking), so it was left for a deliberate decision.
+**Cookbook search bar (2026-10-15):** `top-safe-5` left the sticky bar without a `top`, so it never stuck. It is now `sticky top-0 py-2 bg-background` (the planner header's pattern; the background keeps cards from showing through), covered by a cookbook e2e test.
 
 **Note:** `index.html` has no `viewport-fit=cover`, so `env(safe-area-inset-bottom)` is 0 in iOS Safari. Capacitor 8's `SystemBars` writes Android insets into `--safe-area-inset-*` CSS variables, not into `env()`; what `env()` returns in the Android WebView without `viewport-fit=cover` was not checked on a device.

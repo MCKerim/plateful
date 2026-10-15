@@ -193,7 +193,7 @@ export default function Cookbook() {
 
   return (
     <Layout showHeader={false}>
-      <div className="sticky z-40 flex items-center w-full gap-1 my-1 top-safe-5">
+      <div className="sticky top-0 z-40 flex items-center w-full gap-1 py-2 bg-background">
         <Input
           className="rounded-full"
           type="text"

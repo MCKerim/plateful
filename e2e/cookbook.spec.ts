@@ -91,4 +91,18 @@ test.describe("Cookbook Collections", () => {
     await expect(page.getByText("Banana Bread")).toBeVisible();
     await expect(page.getByText("Chocolate Mousse")).not.toBeVisible();
   });
+
+  test("keeps the search bar on screen while the list scrolls", async ({ page, setupAuth }) => {
+    const recipes = Array.from({ length: 20 }, (_, i) =>
+      createRecipe({ name: `Recipe ${i + 1}`, collectionIds: [] })
+    );
+    await setupAuth({ recipes, collections: [] });
+    await page.goto("/cookbook");
+    await page.getByRole("button", { name: /all recipes/i }).click();
+    await expect(page.getByText("Recipe 20")).toBeAttached();
+
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+
+    await expect(page.getByPlaceholder(/recipe/i)).toBeInViewport();
+  });
 });
