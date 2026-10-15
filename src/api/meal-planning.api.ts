@@ -21,11 +21,11 @@ export type CreateNoteParams = {
   plannedDate: string | null;
 };
 
-/** One new placement for `apply_planner_changes`: a client-minted id, a local day (`null` for a pool copy) and its meal type. */
+/** One new placement for `apply_planner_changes`: a client-minted id, a local day (`null` for a pool copy) and a recipe's meal type (`null` for a note, which has none). */
 export type PlacementInsertion = {
   id: string;
   planned_date: string | null;
-  meal_type: MealType;
+  meal_type: MealType | null;
 };
 
 export type ApplyPlannerChangesParams = {
@@ -205,26 +205,22 @@ export const mealPlanningApi = {
   },
 
   /**
-   * The stored meal type of the subject's newest placement that has one, the
+   * The stored meal type of the recipe's newest placement that has one, the
    * last choice the weekly plan dialog preselects; `null` when none has.
    * Newest by `created_at`, not `updated_at`: a move or a cooked check bumps
    * that. `updated_at` only breaks the tie between copies one save inserted
    * together, so a type changed on one of them wins. RLS scopes the rows to
    * the household.
    */
-  async getLastMealType(supabase: SupabaseClient, subject: PlanSubject): Promise<string | null> {
-    const query = supabase
+  async getLastMealType(supabase: SupabaseClient, recipeId: string): Promise<string | null> {
+    const { data, error } = await supabase
       .from("meal_planning")
       .select("meal_type")
+      .eq("recipe_id", recipeId)
       .not("meal_type", "is", null)
       .order("created_at", { ascending: false })
       .order("updated_at", { ascending: false })
       .limit(1);
-    const scoped =
-      subject.kind === "recipe"
-        ? query.eq("recipe_id", subject.id)
-        : query.eq("note_id", subject.noteId);
-    const { data, error } = await scoped;
 
     if (error) throw error;
     return data?.[0]?.meal_type ?? null;

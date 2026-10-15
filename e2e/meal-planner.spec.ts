@@ -288,6 +288,32 @@ test.describe("Meal Planner Page", () => {
     await expect(entries).toHaveText([/Pasta.*Breakfast/, /Omelette/]);
   });
 
+  test("should plan a note again without a meal type", async ({ page, setupAuth }) => {
+    const note = createNotePlan({ text: "Eating out" });
+    await setupAuth({ recipes: [], mealPlans: [note] });
+
+    await page.goto("/planner");
+    await page
+      .getByRole("listitem")
+      .filter({ hasText: "Eating out" })
+      .getByRole("button")
+      .last()
+      .click();
+    await page.getByRole("button", { name: "Edit Plan" }).click();
+
+    const dialog = page.getByRole("dialog").filter({ hasText: "No Date" });
+    await dialog.getByRole("button", { name: "No Date" }).click();
+    await expect(dialog.getByRole("radiogroup", { name: "Meal type" })).toHaveCount(0);
+
+    const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    const body = (await save).postDataJSON();
+    expect(body.p_note_id).toBe(note.note_id);
+    expect(body.p_insertions).toEqual([
+      { id: expect.any(String), planned_date: null, meal_type: null },
+    ]);
+  });
+
   test("should change a note's meal type from its menu", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [createNotePlan({ text: "Eating out" })] });
 

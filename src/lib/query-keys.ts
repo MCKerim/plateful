@@ -8,7 +8,7 @@ export const queryKeys = {
     recipePlacements: ["meal-planning", "recipe-placements"] as const,
     placements: (subjectKey: string, weekStart: string) =>
       ["meal-planning", "placements", subjectKey, weekStart] as const,
-    lastMealType: (subjectKey: string) => ["meal-planning", "last-meal-type", subjectKey] as const,
+    lastMealType: (recipeId: string) => ["meal-planning", "last-meal-type", recipeId] as const,
     noteSuggestions: (householdId: string) =>
       ["meal-planning", "note-suggestions", householdId] as const,
   },

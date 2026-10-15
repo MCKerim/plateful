@@ -265,14 +265,12 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       await route.fulfill({ status: 204, body: "" });
       return;
     }
-    // The weekly plan dialog's last choice: the subject's newest typed row
+    // The weekly plan dialog's last choice: the recipe's newest typed row
     const url = new URL(route.request().url());
     if (url.searchParams.get("select") === "meal_type") {
       const recipeId = url.searchParams.get("recipe_id")?.replace("eq.", "");
-      const noteId = url.searchParams.get("note_id")?.replace("eq.", "");
       const newest = scenario.mealPlans
-        .filter((plan) => plan.meal_type !== null)
-        .filter((plan) => (recipeId ? plan.recipe_id === recipeId : plan.note_id === noteId))
+        .filter((plan) => plan.meal_type !== null && plan.recipe_id === recipeId)
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
         .slice(0, 1)
         .map((plan) => ({ meal_type: plan.meal_type }));

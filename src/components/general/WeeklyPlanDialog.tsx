@@ -112,9 +112,14 @@ export default function WeeklyPlanDialog({
     isDialogOpen
   );
 
-  const { data: lastMealType = null } = useLastMealType(subject);
-  const subjectTags = subject?.kind === "recipe" ? subject.tags : [];
-  const mealType = pickedMealType ?? preselectedMealType(lastMealType, subjectTags);
+  const { data: lastMealType = null } = useLastMealType(
+    subject?.kind === "recipe" ? subject.id : null
+  );
+  // Only a recipe has a meal type; a note's placements are written without one.
+  const mealType =
+    subject?.kind === "recipe"
+      ? (pickedMealType ?? preselectedMealType(lastMealType, subject.tags))
+      : null;
   const { trackMealTypeSet } = usePlannerTracking();
 
   const incrementMission = useIncrementMission();
@@ -320,7 +325,9 @@ export default function WeeklyPlanDialog({
         deleteIds: planIdsToRemove,
       });
 
-      if (pickedMealType && insertions.length > 0) trackMealTypeSet(pickedMealType, subjectTags);
+      if (subject.kind === "recipe" && pickedMealType && insertions.length > 0) {
+        trackMealTypeSet(pickedMealType, subject.tags);
+      }
       toast.success(
         subject.kind === "recipe" ? t("recipe.planningSuccessful") : t("mealPlanner.planUpdated")
       );
@@ -437,9 +444,11 @@ export default function WeeklyPlanDialog({
           })}
         </div>
 
-        <div className="mt-2">
-          <MealTypePicker value={mealType} onChange={setPickedMealType} />
-        </div>
+        {mealType && (
+          <div className="mt-2">
+            <MealTypePicker value={mealType} onChange={setPickedMealType} />
+          </div>
+        )}
 
         {/* Without Date Button */}
         <Button
