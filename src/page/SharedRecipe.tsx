@@ -102,7 +102,7 @@ export default function SharedRecipe() {
 
   if (isError || !share) {
     const notFoundFooter = !isNative ? (
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-border border-t-[1px]">
         <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
           <Download size={18} />
           {t("share.downloadApp")}
@@ -165,15 +165,13 @@ export default function SharedRecipe() {
     </Button>
   ) : null;
 
+  // Sticky, not fixed + spacer: the bar holds one or two buttons, so no fixed spacer height fits.
   const footer = (
-    <>
-      <div className="h-safe-b-[80px]" />
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex flex-col gap-2 border-border border-t-[1px]">
-        {saveButton}
-        {loginButton}
-        {downloadButton}
-      </div>
-    </>
+    <div className="sticky bottom-0 w-full bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex flex-col gap-2 border-border border-t-[1px]">
+      {saveButton}
+      {loginButton}
+      {downloadButton}
+    </div>
   );
 
   return (
@@ -230,7 +228,10 @@ export default function SharedRecipe() {
 
           {snapshot.base_servings && (
             <p className="text-sm text-muted-foreground mb-2">
-              {snapshot.base_servings} {snapshot.servings_unit ?? t("ingredients.servings")}
+              {snapshot.base_servings}{" "}
+              {t(`ingredients.units.${snapshot.servings_unit ?? "servings"}`, {
+                defaultValue: snapshot.servings_unit ?? "servings",
+              })}
             </p>
           )}
 

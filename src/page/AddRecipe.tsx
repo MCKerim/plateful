@@ -512,9 +512,9 @@ export default function AddRecipe() {
 
   const saveFooter = (
     <>
-      <div className="h-safe-b-[100px]"></div>
+      <div className="h-[calc(4.625rem+env(safe-area-inset-bottom))]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-safe-4 flex gap-2 border-border border-t-[1px]">
+      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex gap-2 border-border border-t-[1px]">
         <Button
           className="w-full"
           variant="secondary"
