@@ -1000,7 +1000,9 @@
     "retry": "Try again",
     "web": {
       "title": "Subscribe in the Plateful App",
-      "description": "Subscriptions are available on iOS and Android. Download the app to get started."
+      "description": "Subscriptions are available on iOS and Android. Download the app and sign in with the same account to get started.",
+      "appStore": "Download on the App Store",
+      "playStore": "Get it on Google Play"
     }
   },
   "share": {

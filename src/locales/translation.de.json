@@ -1000,7 +1000,9 @@
     "retry": "Erneut versuchen",
     "web": {
       "title": "In der Plateful App abonnieren",
-      "description": "Abonnements sind auf iOS und Android verfügbar. Lade die App herunter, um loszulegen."
+      "description": "Abonnements sind auf iOS und Android verfügbar. Lade die App herunter und melde dich mit demselben Konto an, um loszulegen.",
+      "appStore": "Laden im App Store",
+      "playStore": "Jetzt bei Google Play"
     }
   },
   "share": {
