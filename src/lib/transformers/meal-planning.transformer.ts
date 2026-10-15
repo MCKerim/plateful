@@ -68,7 +68,12 @@ export function transformPlannedItemsSummary(raw: PlannedItemSummaryRaw[]): Plan
     if (row.planner_notes) {
       summary.push({ planned_date: row.planned_date, kind: "note", label: row.planner_notes.text });
     } else if (row.recipes) {
-      summary.push({ planned_date: row.planned_date, kind: "recipe", label: row.recipes.name });
+      summary.push({
+        planned_date: row.planned_date,
+        kind: "recipe",
+        label: row.recipes.name,
+        mealType: parseMealType(row.meal_type),
+      });
     }
   }
   return summary;

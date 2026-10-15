@@ -180,6 +180,14 @@ test.describe("Meal Planner Page", () => {
     // The dishes keep their chips; the note shows none, whatever its row holds.
     await expect(entries.nth(0)).toContainText("Breakfast");
     await expect(entries.nth(3)).toHaveText("Eating out");
+
+    // The weekly plan dialog's chips for the day follow the same order.
+    await entries.nth(3).getByRole("button").last().click();
+    await page.getByRole("dialog").getByRole("button", { name: "Edit Plan" }).click();
+    const dialog = page.getByRole("dialog").filter({ hasText: "No Date" });
+    await expect(dialog.getByRole("button", { name: /today/i })).toHaveText(
+      /Pancakes.*Pasta.*Brownie.*Eating out/
+    );
   });
 
   test("should add a note to an empty day through the chooser", async ({ page, setupAuth }) => {

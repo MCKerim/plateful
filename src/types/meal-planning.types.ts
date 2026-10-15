@@ -48,16 +48,15 @@ export type MealPlannerItemRaw = {
 
 export type PlannedItemSummaryRaw = {
   planned_date: string | null;
+  meal_type: string | null;
   recipes: { name: string } | null;
   planner_notes: { text: string } | null;
 };
 
-/** What a day holds, for the weekly plan dialog's chips: a recipe's name or a note's text. */
-export type PlannedItemSummary = {
-  planned_date: string;
-  kind: "recipe" | "note";
-  label: string;
-};
+/** What a day holds, for the weekly plan dialog's chips: a recipe's name (its type orders the day) or a note's text. */
+export type PlannedItemSummary =
+  | { planned_date: string; kind: "recipe"; label: string; mealType: MealType }
+  | { planned_date: string; kind: "note"; label: string };
 
 /** What the weekly plan dialog plans: a recipe, or a note (every copy shares the text). */
 export type PlanSubject =

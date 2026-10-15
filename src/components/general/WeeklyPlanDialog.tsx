@@ -19,7 +19,11 @@ import { useApplyPlannerChanges } from "@/hooks/meal-planning/useApplyPlannerCha
 import { useLastMealType } from "@/hooks/meal-planning/useLastMealType";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { usePlannerTracking } from "@/hooks/analytics/usePlannerTracking";
-import { planSubjectKey, preselectedMealType } from "@/lib/mealPlanHelper/mealPlanHelper";
+import {
+  orderForDisplay,
+  planSubjectKey,
+  preselectedMealType,
+} from "@/lib/mealPlanHelper/mealPlanHelper";
 import { MealType, PlannedItemSummary, PlanSubject } from "@/types/meal-planning.types";
 import { randomId } from "@/utils/randomId";
 import MealTypePicker from "@/components/mealPlanner/mealTypePicker/MealTypePicker";
@@ -43,8 +47,8 @@ const locales = {
 };
 
 function getPlannedItemsForDate(plannedItems: PlannedItemSummary[], date: Date) {
-  return plannedItems.filter(
-    (item) => item.planned_date && isSameDay(new Date(item.planned_date), date)
+  return orderForDisplay(
+    plannedItems.filter((item) => item.planned_date && isSameDay(new Date(item.planned_date), date))
   );
 }
 

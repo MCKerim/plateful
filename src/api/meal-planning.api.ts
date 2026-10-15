@@ -73,10 +73,11 @@ export const mealPlanningApi = {
   ): Promise<PlannedItemSummaryRaw[]> {
     const { data, error } = await supabase
       .from("meal_planning")
-      .select(`planned_date, recipes (name), planner_notes (text)`)
+      .select(`planned_date, meal_type, recipes (name), planner_notes (text)`)
       .gte("planned_date", toPlannedDateString(weekStart))
       .lte("planned_date", toPlannedDateString(weekEnd))
       .order("planned_date", { ascending: true })
+      .order("created_at", { ascending: true })
       .returns<PlannedItemSummaryRaw[]>();
 
     if (error) throw error;

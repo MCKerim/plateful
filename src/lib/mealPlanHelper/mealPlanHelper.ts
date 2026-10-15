@@ -43,13 +43,17 @@ export function mergeNoteSuggestions(own: string[], defaults: string[], limit = 
 /** The four meal types in a day's order, which is also the picker's order. */
 export const MEAL_TYPES: readonly MealType[] = ["breakfast", "lunch", "dinner", "snack"];
 
+/** What a day's order reads: a dish's meal type, or that the entry is a note. */
+type DayEntry = { kind: "recipe"; mealType: MealType } | { kind: "note" };
+
 /**
- * A day's (or the pool's) order on screen: the dishes by meal type, breakfast
- * first and snack last, then every note; each in the plan's own (creation)
- * order. The native app's `PlannerDayEntry.ordered(meals:notes:)`.
+ * A day's (or the pool's) order on screen, in the planner, on Home and in the
+ * weekly plan dialog's chips: the dishes by meal type, breakfast first and
+ * snack last, then every note; each in the plan's own (creation) order. The
+ * native app's `PlannerDayEntry.ordered(meals:notes:)`.
  */
-export function orderForDisplay<T extends MealPlannerItem>(items: T[]): T[] {
-  const rank = (item: MealPlannerItem) =>
+export function orderForDisplay<T extends DayEntry>(items: T[]): T[] {
+  const rank = (item: DayEntry) =>
     item.kind === "recipe" ? MEAL_TYPES.indexOf(item.mealType) : MEAL_TYPES.length;
   return [...items].sort((a, b) => rank(a) - rank(b));
 }

@@ -109,14 +109,24 @@ describe("parsePlannedDate", () => {
 });
 
 describe("transformPlannedItemsSummary", () => {
-  it("labels recipes by name and notes by text, skipping the pool", () => {
+  it("labels recipes by name with their meal type and notes by text alone, skipping the pool", () => {
     const raw: PlannedItemSummaryRaw[] = [
-      { planned_date: "2026-09-13", recipes: { name: "Pasta" }, planner_notes: null },
-      { planned_date: "2026-09-13", recipes: null, planner_notes: { text: "Leftovers" } },
-      { planned_date: null, recipes: { name: "Pooled" }, planner_notes: null },
+      {
+        planned_date: "2026-09-13",
+        meal_type: "lunch",
+        recipes: { name: "Pasta" },
+        planner_notes: null,
+      },
+      {
+        planned_date: "2026-09-13",
+        meal_type: "breakfast",
+        recipes: null,
+        planner_notes: { text: "Leftovers" },
+      },
+      { planned_date: null, meal_type: null, recipes: { name: "Pooled" }, planner_notes: null },
     ];
     expect(transformPlannedItemsSummary(raw)).toEqual([
-      { planned_date: "2026-09-13", kind: "recipe", label: "Pasta" },
+      { planned_date: "2026-09-13", kind: "recipe", label: "Pasta", mealType: "lunch" },
       { planned_date: "2026-09-13", kind: "note", label: "Leftovers" },
     ]);
   });
