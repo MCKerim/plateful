@@ -16,7 +16,7 @@ import {
 import { writeClipboardText } from "@/utils/nativeClipboard";
 import { toast } from "sonner";
 
-const SHARE_BASE_URL = "https://app.plateful.cloud/share";
+export const SHARE_BASE_URL = "https://app.plateful.cloud/share";
 
 export function useCreateRecipeShare() {
   const { supabase } = useSupabase();

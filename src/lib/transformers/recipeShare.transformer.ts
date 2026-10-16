@@ -138,56 +138,6 @@ export function toSnapshotAnnotation(
 }
 
 /**
- * The stored form for an imported step, positions resolved against the minted
- * ingredient row ids (`ingredientIds[i]` is the row for `ingredients[i]`).
- * `null` — the step is written without an annotation and renders plain on iOS
- * — when a position has no row or an entity is incomplete or unknown, as in a
- * snapshot from a newer client.
- */
-export function toStoredAnnotation(
-  annotation: SnapshotStepAnnotation | null | undefined,
-  ingredientIds: readonly string[]
-): StoredStepAnnotation | null {
-  if (!annotation || annotation.v !== 1 || typeof annotation.template !== "string") return null;
-  if (!Array.isArray(annotation.entities)) return null;
-
-  const entities: StoredAnnotationEntity[] = [];
-  for (const entity of annotation.entities) {
-    if (typeof entity?.text !== "string") return null;
-    if (entity.t === "ing") {
-      const ingredientId =
-        typeof entity.ingredient_index === "number"
-          ? ingredientIds[entity.ingredient_index]
-          : undefined;
-      if (!ingredientId) return null;
-      entities.push({
-        t: "ing",
-        ingredient_id: ingredientId,
-        text: entity.text,
-        emoji: typeof entity.emoji === "string" ? entity.emoji : "",
-        amount: entity.amount === true,
-      });
-    } else if (entity.t === "timer") {
-      if (typeof entity.seconds !== "number" || typeof entity.label !== "string") return null;
-      const timer: StoredAnnotationEntity = {
-        t: "timer",
-        seconds: entity.seconds,
-        text: entity.text,
-        label: entity.label,
-      };
-      // Written only as a real upper bound, the way the extractor stores it.
-      if (typeof entity.seconds_max === "number" && entity.seconds_max > entity.seconds) {
-        timer.seconds_max = entity.seconds_max;
-      }
-      entities.push(timer);
-    } else {
-      return null;
-    }
-  }
-  return { v: 1, template: annotation.template, entities };
-}
-
-/**
  * The seven nutrition columns of a recipe row as a snapshot value, or `null`
  * when nothing has been calculated (the key is then left out of the snapshot
  * and the recipient estimates afresh).

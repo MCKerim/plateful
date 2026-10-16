@@ -65,14 +65,15 @@ export default function SharedRecipe() {
   const isLoggedIn = user !== null;
 
   async function handleSave() {
-    if (!share || !user || !householdId) return;
+    if (!share || !user || !householdId || !token) return;
 
     importMutation.mutate(
-      { snapshot: share.snapshot, householdId },
+      { token, householdId },
       {
-        onSuccess: (newRecipeId) => {
+        onSuccess: () => {
           toast.success(t("share.importSuccess"));
-          navigate(`/recipe/${newRecipeId}`, { replace: true });
+          // Where the import shows until the recipe lands, as after a pasted link.
+          navigate("/cookbook", { replace: true });
         },
         onError: () => {
           toast.error(t("share.importError"));
