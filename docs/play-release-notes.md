@@ -4,7 +4,9 @@ Per language 500 characters (Play Console limit). Same voice as the iOS
 What's New in the iOS repo's `docs/app-store-listing.md`; the Android notes
 for 1.4 fold iOS 1.2 and 1.3 into one release.
 
-## 1.5 (versionCode 44), 2026-10-12
+## 1.5 (versionCode 45), 2026-10-19
+
+versionCode 44 stayed in internal testing: it declared `USE_EXACT_ALARM`, which Play refuses for a recipe app.
 
 **DE**
 

@@ -196,9 +196,8 @@ Same on iOS; no client guard.
   both, session end cancels all. Notification ids are integers: a stable
   31-bit hash of the timer id. Tap opens the cooking screen (route the
   existing `localNotificationActionPerformed` handler by `extra.type`).
-  Manifest: `USE_EXACT_ALARM` (Android 14+, no prompt, allowed for timer
-  apps) and `SCHEDULE_EXACT_ALARM` (Android 12 and 13, surfaced through the
-  plugin's `checkExactNotificationSetting`). Fire quietly without
+  Manifest: `SCHEDULE_EXACT_ALARM` only (`USE_EXACT_ALARM` was shipped in
+  versionCode 44 and refused by Play, see `docs/knowledge/exact-alarms.md`). Fire quietly without
   notification permission. Web gets the in-app ring only.
 - **In-app ring** while the screen is open: banner and sound, the iOS
   `CookingTimerAlerts` behaviour; "Dismiss" clears it.

@@ -35,8 +35,8 @@ type AlarmText = { recipeId: string; recipeName: string; title: string };
 
 /**
  * Per-device alarms for the timers, the iOS `CookingTimerNotifications`:
- * every running timer gets one notification at its end (exact, through
- * Doze), a fired one loses its pending alarm but keeps its delivered banner
+ * every running timer gets one notification at its end (exact through Doze
+ * where Android allows it, see docs/knowledge/exact-alarms.md), a fired one loses its pending alarm but keeps its delivered banner
  * until the cook dismisses it. Call on every timer change; scheduling with
  * the same id replaces, so reconciling never accumulates. Fires quietly
  * without permission, and does nothing on the web.
