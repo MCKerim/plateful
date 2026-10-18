@@ -58,18 +58,37 @@ test.describe("Onboarding Flow", () => {
   });
 });
 
-// A phone browser with its bars showing leaves ~640 px; the videos alone are 464 px tall.
+// A phone browser with its bars showing leaves about 640 px. Nothing may need a
+// scroll there (toBeInViewport doesn't scroll): the phone shrinks instead, and
+// its screen keeps the recordings' ratio so none of a recording is cut off.
 test.describe("Value screens on a short screen", () => {
   test.use({ viewport: { width: 360, height: 640 } });
 
+  test.beforeEach(async ({ setupAuth }) => {
+    await setupAuth({ user: { has_completed_survey: false }, household: null });
+  });
+
   for (const path of ["/values/1", "/values/2", "/values/3", "/values/4"]) {
-    test(`${path} keeps its button on screen`, async ({ page, setupAuth }) => {
-      await setupAuth({ user: { has_completed_survey: false }, household: null });
+    test(`${path} shows title, text and button without scrolling`, async ({ page }) => {
       await page.goto(path);
 
-      await expect(page.getByRole("button", { name: /^(Next|Let's go)$/ })).toBeInViewport({
-        ratio: 1,
-      });
+      const button = page.getByRole("button", { name: /^(Next|Let's go)$/ });
+      await expect(button).toBeInViewport({ ratio: 1 });
+      for (const text of await page.locator("h1, p").all()) {
+        await expect(text).toBeInViewport({ ratio: 1 });
+      }
+    });
+  }
+
+  for (const path of ["/values/2", "/values/3", "/values/4"]) {
+    test(`${path} shows the whole recording`, async ({ page }) => {
+      await page.goto(path);
+
+      const video = page.locator("video");
+      await expect(video).toBeInViewport({ ratio: 1 });
+      const box = await video.boundingBox();
+      // The recordings are 1080x2424; a box of any other ratio crops them.
+      expect(box!.width / box!.height).toBeCloseTo(1080 / 2424, 2);
     });
   }
 });

@@ -1,0 +1,52 @@
+/* The space a value screen gives its phone: whatever height is left between
+   the title and the text. The phone sizes itself from it (cqh/cqw below). */
+.phone-stage {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  padding-block: 1rem;
+  container-type: size;
+}
+
+/* A neutral phone around a screen recording. The recordings are 1080x2424
+   (the 720x1616 ones have the same ratio), and the screen keeps exactly that
+   ratio inside a bezel of 4% of the phone's width, so the whole recording
+   shows, its title bar included. Phone ratio = 1 / (0.92 * 2424 / 1080 + 0.08). */
+.phone-mockup {
+  position: relative;
+  flex: none;
+  aspect-ratio: 0.4662;
+  height: 24rem; /* without container query units (WebView before 105) */
+  height: min(100cqh, calc((100cqw - var(--phone-gutter, 0px)) / 0.4662));
+  /* 13% of the width, the same length vertically (13% x 0.4662 of the height) */
+  border-radius: 13% / 6.06%;
+  background: #1c1c1e;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.12),
+    0 0 60px rgb(0 0 0 / 0.12);
+}
+
+.phone-mockup video {
+  position: absolute;
+  /* the 4% bezel, as a share of the height for top and height */
+  top: 1.865%;
+  left: 4%;
+  width: 92%;
+  height: 96.27%;
+  border-radius: 9.8% / 4.37%;
+  object-fit: cover;
+}
+
+.phone-mockup-camera {
+  position: absolute;
+  top: 2.9%;
+  left: 50%;
+  width: 3.5%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #0b0b0c;
+  transform: translateX(-50%);
+}

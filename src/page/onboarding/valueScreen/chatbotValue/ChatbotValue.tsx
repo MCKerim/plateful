@@ -26,16 +26,18 @@ export default function ChatbotValue() {
         <h1 className="text-4xl font-bold first-font">{t("valueScreens.chatbot.title")}</h1>
       </motion.div>
 
-      <motion.div
-        initial={{ opacity: 0, scale: 0.93 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
-      >
-        <PhoneMockup mediaUrl="/chatbot-screen-recording.mp4" />
-      </motion.div>
+      <div className="phone-stage">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.93 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+        >
+          <PhoneMockup mediaUrl="/chatbot-screen-recording.mp4" />
+        </motion.div>
+      </div>
 
       <motion.p
-        className="max-w-sm mt-2 text-center text-gray-600"
+        className="max-w-sm mb-4 text-center text-gray-600"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}

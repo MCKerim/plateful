@@ -1,4 +1,6 @@
 .phone-with-icons {
+  /* room beside the phone for the floating icons */
+  --phone-gutter: 8rem;
   position: relative;
   display: flex;
   align-items: center;

@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import "./PhoneMockup.css";
 
 type Props = {
   mediaUrl: string;
-  mediaType?: "image" | "video";
   loopDelay?: number;
 };
 
-export default function PhoneMockup({ mediaUrl, mediaType = "image", loopDelay = 2000 }: Readonly<Props>) {
-  const isVideo = mediaType === "video" || mediaUrl.match(/\.(mp4|webm|ogg|mov)$/i);
+/** Must sit inside a `.phone-stage`, whose size it fills. */
+export default function PhoneMockup({ mediaUrl, loopDelay = 2000 }: Readonly<Props>) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [videoReady, setVideoReady] = useState(false);
 
@@ -26,25 +26,18 @@ export default function PhoneMockup({ mediaUrl, mediaType = "image", loopDelay =
   }, [loopDelay]);
 
   return (
-    <div className="bg-white rounded-[18px] p-2 shadow-[0px_0px_77px_rgba(0,0,0,0.1)]">
-      {isVideo ? (
-        <video
-          ref={videoRef}
-          src={mediaUrl}
-          autoPlay
-          muted
-          playsInline
-          preload="auto"
-          onCanPlay={() => setVideoReady(true)}
-          className={`object-cover rounded-[12px] h-[28rem] w-full transition-opacity duration-300 ${videoReady ? "opacity-100" : "opacity-0"}`}
-        />
-      ) : (
-        <img
-          src={mediaUrl}
-          alt="Mobile app interface screenshot"
-          className="object-cover rounded-[12px] h-[28rem] w-full"
-        />
-      )}
+    <div className="phone-mockup">
+      <video
+        ref={videoRef}
+        src={mediaUrl}
+        autoPlay
+        muted
+        playsInline
+        preload="auto"
+        onCanPlay={() => setVideoReady(true)}
+        className={`transition-opacity duration-300 ${videoReady ? "opacity-100" : "opacity-0"}`}
+      />
+      <div className="phone-mockup-camera" />
     </div>
   );
 }
