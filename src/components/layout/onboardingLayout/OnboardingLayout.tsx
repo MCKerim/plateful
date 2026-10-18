@@ -14,11 +14,14 @@ export default function OnboardingLayout({ onNext, children, nextButtonLabel }: 
   const { t } = useTranslation();
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-screen px-4 py-6 overflow-hidden">
+    <div
+      className={`relative flex flex-col items-center justify-between h-dvh px-4 pt-6 overflow-x-hidden overflow-y-auto ${onNext ? "" : "pb-6"}`}
+    >
       {children}
 
       {onNext && (
-        <div className="w-full max-w-sm">
+        // Sticky: on a short screen the content scrolls under the button instead of pushing it off-screen.
+        <div className="sticky bottom-0 w-full max-w-sm pb-6 bg-background">
           <OnboardingButton label={nextButtonLabel ?? t("common.next")} onClick={onNext} />
         </div>
       )}

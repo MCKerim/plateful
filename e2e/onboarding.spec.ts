@@ -57,3 +57,19 @@ test.describe("Onboarding Flow", () => {
     expect(buttons + links).toBeGreaterThan(0);
   });
 });
+
+// A phone browser with its bars showing leaves ~640 px; the videos alone are 464 px tall.
+test.describe("Value screens on a short screen", () => {
+  test.use({ viewport: { width: 360, height: 640 } });
+
+  for (const path of ["/values/1", "/values/2", "/values/3", "/values/4"]) {
+    test(`${path} keeps its button on screen`, async ({ page, setupAuth }) => {
+      await setupAuth({ user: { has_completed_survey: false }, household: null });
+      await page.goto(path);
+
+      await expect(page.getByRole("button", { name: /^(Next|Let's go)$/ })).toBeInViewport({
+        ratio: 1,
+      });
+    });
+  }
+});
