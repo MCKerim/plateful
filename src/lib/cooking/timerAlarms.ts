@@ -1,3 +1,4 @@
+import { Capacitor } from "@capacitor/core";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import {
   checkNotificationPermission,
@@ -31,12 +32,50 @@ export async function ensureTimerAlarmPermission(): Promise<void> {
   }
 }
 
+const EXACT_HINT_DISMISSED_KEY = "cooking.exactAlarmHintDismissed";
+
+/**
+ * Whether to suggest "Alarms & reminders": on Android with notifications on
+ * but exact alarms off (Android 14+ by default), a timer's alarm can come late
+ * while the phone sleeps. Never again on this device once dismissed.
+ */
+export async function shouldSuggestExactAlarms(): Promise<boolean> {
+  if (Capacitor.getPlatform() !== "android" || !isNotificationSupported()) return false;
+  try {
+    if (localStorage.getItem(EXACT_HINT_DISMISSED_KEY)) return false;
+    if ((await checkNotificationPermission()) !== "granted") return false;
+    return (await LocalNotifications.checkExactNotificationSetting()).exact_alarm !== "granted";
+  } catch (error) {
+    reportError("Exact alarm check failed", error);
+    return false;
+  }
+}
+
+/** Opens the app's "Alarms & reminders" page; true when the cook came back with it on. */
+export async function openExactAlarmSettings(): Promise<boolean> {
+  try {
+    return (await LocalNotifications.changeExactNotificationSetting()).exact_alarm === "granted";
+  } catch (error) {
+    reportError("Exact alarm settings failed", error);
+    return false;
+  }
+}
+
+export function dismissExactAlarmHint(): void {
+  try {
+    localStorage.setItem(EXACT_HINT_DISMISSED_KEY, "1");
+  } catch {
+    // Storage may be unavailable; the hint then comes back with the next timer.
+  }
+}
+
 type AlarmText = { recipeId: string; recipeName: string; title: string };
 
 /**
  * Per-device alarms for the timers, the iOS `CookingTimerNotifications`:
  * every running timer gets one notification at its end (exact through Doze
- * where Android allows it, see docs/knowledge/exact-alarms.md), a fired one loses its pending alarm but keeps its delivered banner
+ * where Android allows it, see docs/knowledge/exact-alarms.md; scheduling
+ * again after the cook allows it makes a pending alarm exact), a fired one loses its pending alarm but keeps its delivered banner
  * until the cook dismisses it. Call on every timer change; scheduling with
  * the same id replaces, so reconciling never accumulates. Fires quietly
  * without permission, and does nothing on the web.

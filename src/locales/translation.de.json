@@ -1090,6 +1090,8 @@
     "timerUp": "Timer abgelaufen",
     "timerDone": "Fertig",
     "stepN": "Schritt {{n}}",
-    "timerOptions": "Timer-Optionen"
+    "timerOptions": "Timer-Optionen",
+    "exactAlarmsHint": "Damit Timer auch bei gesperrtem Handy pünktlich klingeln, erlaube Plateful „Wecker und Erinnerungen“.",
+    "exactAlarmsAllow": "Erlauben"
   }
 }

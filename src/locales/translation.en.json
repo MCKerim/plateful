@@ -1090,6 +1090,8 @@
     "timerUp": "Timer's up",
     "timerDone": "Done",
     "stepN": "Step {{n}}",
-    "timerOptions": "Timer options"
+    "timerOptions": "Timer options",
+    "exactAlarmsHint": "So timers ring on time with your phone locked, allow Plateful “Alarms & reminders”.",
+    "exactAlarmsAllow": "Allow"
   }
 }

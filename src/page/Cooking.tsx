@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { App } from "@capacitor/app";
-import { Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
+import { AlarmClock, Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -31,7 +31,14 @@ import { ambientGradient } from "@/lib/cooking/ambientColor";
 import { isOnLastStep } from "@/lib/cooking/session";
 import { prepareStep, type PreparedStep } from "@/lib/cooking/stepTokens";
 import { countdownText, hasFired, remainingSeconds, soonestRunningTimer } from "@/lib/cooking/timer";
-import { cancelTimerAlarms, ensureTimerAlarmPermission, reconcileTimerAlarms } from "@/lib/cooking/timerAlarms";
+import {
+  cancelTimerAlarms,
+  dismissExactAlarmHint,
+  ensureTimerAlarmPermission,
+  openExactAlarmSettings,
+  reconcileTimerAlarms,
+  shouldSuggestExactAlarms,
+} from "@/lib/cooking/timerAlarms";
 import { cn } from "@/lib/utils";
 
 type FeedStep = PreparedStep & { id: string; stepText: string; sectionName: string | null };
@@ -90,17 +97,24 @@ export default function Cooking() {
     [cooking]
   );
   useTimerRing(timers, now, recipeName, stopTimer);
-  useEffect(() => {
+  const scheduleAlarms = useCallback(() => {
     if (!recipeId || !recipe) return;
     void reconcileTimerAlarms(timers, { recipeId, recipeName: recipe.name, title: t("cooking.timerUp") });
   }, [timers, recipeId, recipe, t]);
+  useEffect(scheduleAlarms, [scheduleAlarms]);
+  const [suggestExactAlarms, setSuggestExactAlarms] = useState(false);
   const startTimer = useCallback(
     (seconds: number, label: string, stepId: string | null) => {
-      void ensureTimerAlarmPermission();
+      void ensureTimerAlarmPermission().then(shouldSuggestExactAlarms).then(setSuggestExactAlarms);
       cooking.startTimer(seconds, label, stepId);
     },
     [cooking]
   );
+  async function allowExactAlarms() {
+    if (!(await openExactAlarmSettings())) return;
+    setSuggestExactAlarms(false);
+    scheduleAlarms();
+  }
 
   const ambient = useAmbientColor(coverUrl);
   const [showIngredients, setShowIngredients] = useState(false);
@@ -248,6 +262,28 @@ export default function Cooking() {
               );
             }}
           />
+        )}
+        {/* Over the feed, not beside it: the feed keeps its height and its centred step. */}
+        {suggestExactAlarms && (
+          <div className="absolute inset-x-4 bottom-2 z-10 flex items-center gap-2 rounded-2xl bg-card p-3 shadow-md">
+            <AlarmClock className="size-5 shrink-0 text-muted-foreground" />
+            <p className="min-w-0 flex-1 text-sm">{t("cooking.exactAlarmsHint")}</p>
+            <Button variant="accent" size="sm" className="shrink-0 rounded-full" onClick={allowExactAlarms}>
+              {t("cooking.exactAlarmsAllow")}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-8 shrink-0"
+              onClick={() => {
+                dismissExactAlarmHint();
+                setSuggestExactAlarms(false);
+              }}
+              aria-label={t("common.close")}
+            >
+              <X />
+            </Button>
+          </div>
         )}
       </main>
 
