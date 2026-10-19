@@ -395,10 +395,11 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
-  // Lists that are empty in every scenario so far: running imports, and the
-  // household's missions and rewards.
+  // Lists that are empty in every scenario so far: running imports, survey
+  // answers, and the household's missions and rewards.
   for (const table of [
     "recipe_imports",
+    "survey_answers",
     "mission_definitions",
     "household_missions",
     "household_rewards",

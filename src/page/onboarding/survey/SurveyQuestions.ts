@@ -70,6 +70,7 @@ export const SURVEY_QUESTIONS: SurveyQuestionType[] = [
       "option8",
     ],
     type: "multiple",
+    twoColumns: true,
   },
   // Q9: Wie organisierst du Rezepte?
   {

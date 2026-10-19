@@ -45,7 +45,7 @@ export default function SurveyStart() {
   const progressValue = resumeQuestion ? ((resumeQuestion - 1) / SURVEY_QUESTIONS.length) * 100 : 0;
 
   return (
-    <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">
+    <div className="flex flex-col items-center justify-between w-screen h-dvh max-w-xs py-10 mx-auto">
       <div className="flex flex-col w-full gap-8">
         <Progress value={progressValue} />
       </div>

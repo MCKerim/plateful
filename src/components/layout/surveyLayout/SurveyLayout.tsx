@@ -32,7 +32,7 @@ export default function SurveyLayout({
   const { t } = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-between w-screen h-screen max-w-xs py-10 mx-auto">
+    <div className="flex flex-col items-center justify-between w-screen h-dvh max-w-xs py-10 mx-auto">
       <motion.div
         className="flex flex-col w-full gap-8"
         initial={{ opacity: 0, y: -20 }}

@@ -206,7 +206,7 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
         duration={1.2}
       />
 
-      <div className="flex flex-col items-center h-screen px-4 py-10">
+      <div className="flex flex-col items-center h-dvh px-4 py-10">
         <div className="flex flex-col w-full mb-8 text-center">
           {variant === "connect" ? (
             <>

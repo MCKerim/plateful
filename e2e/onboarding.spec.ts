@@ -61,7 +61,7 @@ test.describe("Onboarding Flow", () => {
 // A phone browser with its bars showing leaves about 640 px. Nothing may need a
 // scroll there (toBeInViewport doesn't scroll): the phone shrinks instead, and
 // its screen keeps the recordings' ratio so none of a recording is cut off.
-test.describe("Value screens on a short screen", () => {
+test.describe("Onboarding on a short screen", () => {
   test.use({ viewport: { width: 360, height: 640 } });
 
   test.beforeEach(async ({ setupAuth }) => {
@@ -76,6 +76,20 @@ test.describe("Value screens on a short screen", () => {
       await expect(button).toBeInViewport({ ratio: 1 });
       for (const text of await page.locator("h1, p").all()) {
         await expect(text).toBeInViewport({ ratio: 1 });
+      }
+    });
+  }
+
+  for (let question = 1; question <= 9; question++) {
+    test(`/survey/${question} shows every answer and Continue without scrolling`, async ({
+      page,
+    }) => {
+      await page.goto(`/survey/${question}`);
+
+      // 0.99: a disabled Continue is scaled to 0.98 and lands on sub-pixels.
+      await expect(page.getByRole("button", { name: "Continue" })).toBeInViewport({ ratio: 0.99 });
+      for (const button of await page.getByRole("button").all()) {
+        await expect(button).toBeInViewport({ ratio: 0.99 });
       }
     });
   }

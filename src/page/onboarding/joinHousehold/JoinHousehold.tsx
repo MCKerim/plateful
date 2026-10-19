@@ -7,7 +7,7 @@ export default function JoinHousehold() {
   const { t } = useTranslation();
 
   return (
-    <div className="relative flex flex-col items-center justify-between h-screen px-4 py-6 overflow-hidden">
+    <div className="relative flex flex-col items-center justify-between h-dvh px-4 py-6 overflow-hidden">
       <div className="text-center">
         <h1 className="first-font text-4xl font-bold">{t("joinHousehold.title")}</h1>
       </div>
