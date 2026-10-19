@@ -1091,7 +1091,8 @@
     "timerDone": "Done",
     "stepN": "Step {{n}}",
     "timerOptions": "Timer options",
-    "exactAlarmsHint": "So timers ring on time with your phone locked, allow Plateful “Alarms & reminders”.",
-    "exactAlarmsAllow": "Allow"
+    "exactAlarmsTitle": "Turn on Alarms & reminders",
+    "exactAlarmsBody": "Turn on Alarms & reminders in Settings so your timers ring on time.",
+    "exactAlarmsAllow": "Open Settings"
   }
 }

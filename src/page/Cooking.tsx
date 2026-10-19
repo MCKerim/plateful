@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { App } from "@capacitor/app";
-import { AlarmClock, Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
+import { Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -110,10 +110,11 @@ export default function Cooking() {
     },
     [cooking]
   );
-  async function allowExactAlarms() {
-    if (!(await openExactAlarmSettings())) return;
+  // Asked once per device: opening the settings or closing the dialog settles it.
+  async function answerExactAlarms(allow: boolean) {
     setSuggestExactAlarms(false);
-    scheduleAlarms();
+    dismissExactAlarmHint();
+    if (allow && (await openExactAlarmSettings())) scheduleAlarms();
   }
 
   const ambient = useAmbientColor(coverUrl);
@@ -263,28 +264,6 @@ export default function Cooking() {
             }}
           />
         )}
-        {/* Over the feed, not beside it: the feed keeps its height and its centred step. */}
-        {suggestExactAlarms && (
-          <div className="absolute inset-x-4 bottom-2 z-10 flex items-center gap-2 rounded-2xl bg-card p-3 shadow-md">
-            <AlarmClock className="size-5 shrink-0 text-muted-foreground" />
-            <p className="min-w-0 flex-1 text-sm">{t("cooking.exactAlarmsHint")}</p>
-            <Button variant="accent" size="sm" className="shrink-0 rounded-full" onClick={allowExactAlarms}>
-              {t("cooking.exactAlarmsAllow")}
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-8 shrink-0"
-              onClick={() => {
-                dismissExactAlarmHint();
-                setSuggestExactAlarms(false);
-              }}
-              aria-label={t("common.close")}
-            >
-              <X />
-            </Button>
-          </div>
-        )}
       </main>
 
       <footer className="flex shrink-0 items-center gap-2 px-4 pb-[calc(env(safe-area-inset-bottom)+12px)] pt-2">
@@ -364,6 +343,18 @@ export default function Cooking() {
             <Button variant="secondary" onClick={() => setConfirmingEnd(false)}>
               {t("cooking.keepCooking")}
             </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={suggestExactAlarms} onOpenChange={(open) => !open && void answerExactAlarms(false)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{t("cooking.exactAlarmsTitle")}</DialogTitle>
+            <DialogDescription>{t("cooking.exactAlarmsBody")}</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => void answerExactAlarms(true)}>{t("cooking.exactAlarmsAllow")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

@@ -35,7 +35,7 @@ export async function ensureTimerAlarmPermission(): Promise<void> {
 const EXACT_HINT_DISMISSED_KEY = "cooking.exactAlarmHintDismissed";
 
 /**
- * Whether to suggest "Alarms & reminders": on Android with notifications on
+ * Whether to ask for "Alarms & reminders": on Android with notifications on
  * but exact alarms off (Android 14+ by default), a timer's alarm can come late
  * while the phone sleeps. Never again on this device once dismissed.
  */
@@ -65,7 +65,7 @@ export function dismissExactAlarmHint(): void {
   try {
     localStorage.setItem(EXACT_HINT_DISMISSED_KEY, "1");
   } catch {
-    // Storage may be unavailable; the hint then comes back with the next timer.
+    // Storage may be unavailable; the dialog then comes back with the next timer.
   }
 }
 

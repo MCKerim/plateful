@@ -1091,7 +1091,8 @@
     "timerDone": "Fertig",
     "stepN": "Schritt {{n}}",
     "timerOptions": "Timer-Optionen",
-    "exactAlarmsHint": "Damit Timer auch bei gesperrtem Handy pünktlich klingeln, erlaube Plateful „Wecker und Erinnerungen“.",
-    "exactAlarmsAllow": "Erlauben"
+    "exactAlarmsTitle": "„Wecker und Erinnerungen“ einschalten",
+    "exactAlarmsBody": "Schalte „Wecker und Erinnerungen“ in den Einstellungen ein, damit deine Timer pünktlich klingeln.",
+    "exactAlarmsAllow": "Zu den Einstellungen"
   }
 }
