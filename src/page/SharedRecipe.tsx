@@ -19,7 +19,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
-import { mobileStoreUrl } from "@/lib/appStores";
+import { mobileStoreUrl, shareAppLink } from "@/lib/appStores";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -154,13 +154,13 @@ export default function SharedRecipe() {
       </Button>
     ) : null;
 
-  // On a phone the app is where the recipe gets saved: the store, or the app itself
-  // when installed, since the link then opens it before this page ever loads.
-  const storeUrl = isNative ? null : mobileStoreUrl();
+  // On a phone the recipe is saved in the app: this opens it when installed,
+  // else the store.
+  const appLink = isNative || !token ? null : shareAppLink(token);
   const storeButton =
-    !saveButton && storeUrl ? (
+    !saveButton && appLink ? (
       <Button asChild className="w-full">
-        <a href={storeUrl} target="_blank" rel="noreferrer">
+        <a href={appLink}>
           <BookmarkPlus size={18} />
           {t("share.saveRecipe")}
         </a>

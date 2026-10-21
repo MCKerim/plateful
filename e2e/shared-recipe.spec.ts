@@ -56,8 +56,9 @@ test.describe("Shared recipe", () => {
   });
 });
 
-const APP_STORE = "https://apps.apple.com/app/id6788850965";
-const PLAY_STORE = "https://play.google.com/store/apps/details?id=com.kblanks.plateful";
+const IOS_LINK = "https://plateful.cloud/share/e2e-token";
+const ANDROID_LINK =
+  "intent://app.plateful.cloud/share/e2e-token#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.kblanks.plateful;end";
 
 const devices = [
   {
@@ -65,14 +66,14 @@ const devices = [
     userAgent:
       "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1",
     maxTouchPoints: 5,
-    store: APP_STORE,
+    store: IOS_LINK,
   },
   {
     device: "Android phone",
     userAgent:
       "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36",
     maxTouchPoints: 5,
-    store: PLAY_STORE,
+    store: ANDROID_LINK,
   },
   {
     device: "Mac",

@@ -25,3 +25,19 @@ export function mobileStoreUrl(): string | null {
   if (/Android/.test(navigator.userAgent)) return PLAY_STORE_URL;
   return null;
 }
+
+/**
+ * Where the share page's button sends a phone: the app with this recipe when it
+ * is installed, else its store. `null` on a desktop. A link to the page's own
+ * domain never opens the app, so iOS goes through plateful.cloud (a second
+ * Universal Link domain, which redirects to the App Store without the app);
+ * Android's intent URL opens the app or falls back to Google Play by itself.
+ */
+export function shareAppLink(token: string): string | null {
+  const path = `share/${encodeURIComponent(token)}`;
+  if (isIOS()) return `https://plateful.cloud/${path}`;
+  if (/Android/.test(navigator.userAgent)) {
+    return `intent://app.plateful.cloud/${path}#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
+  }
+  return null;
+}
