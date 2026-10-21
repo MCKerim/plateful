@@ -49,7 +49,7 @@ test.describe("Recipe Edit Page", () => {
 
     // Click edit button
     await page.getByRole("button", { name: "More actions" }).click();
-    await page.getByRole("button", { name: "Edit Recipe" }).click();
+    await page.getByRole("menuitem", { name: "Edit" }).click();
     await page.waitForURL(new RegExp(`/recipe/edit/${recipeId}`));
 
     // Click cancel button

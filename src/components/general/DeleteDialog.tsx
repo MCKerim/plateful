@@ -19,6 +19,9 @@ type Props = {
   cancelText?: string;
   confirmText?: string;
   loading?: boolean;
+  /** Controlled from outside (a menu item), with no trigger of its own. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 };
 
 export default function DeleteDialog({
@@ -29,10 +32,14 @@ export default function DeleteDialog({
   cancelText,
   confirmText,
   loading,
+  open,
+  onOpenChange,
 }: Readonly<Props>) {
   const { t } = useTranslation();
 
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isControlled = open !== undefined;
+  const isDialogOpen = isControlled ? open : internalOpen;
 
   const dialogTitle = title ?? t("common.deleteTitle");
   const dialogDescription = description ?? t("common.deleteConfirmation");
@@ -40,18 +47,21 @@ export default function DeleteDialog({
   const dialogConfirmText = confirmText ?? t("common.delete");
 
   function handleDialogOpenChange(isOpen: boolean) {
-    setIsDialogOpen(isOpen);
+    if (isControlled) onOpenChange?.(isOpen);
+    else setInternalOpen(isOpen);
   }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-      <DialogTrigger asChild>
-        {customTrigger || (
-          <Button className="hover:bg-destructive" variant="ghost">
-            <Trash2 size={20} />
-          </Button>
-        )}
-      </DialogTrigger>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          {customTrigger || (
+            <Button className="hover:bg-destructive" variant="ghost">
+              <Trash2 size={20} />
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
 
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>

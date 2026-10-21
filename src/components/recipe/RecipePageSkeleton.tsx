@@ -1,50 +1,44 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/layout/Layout";
 
-function RatingItemSkeleton() {
-  return (
-    <div className="mb-6">
-      <div className="flex justify-between items-center">
-        <Skeleton className="h-5 w-24" />
-        <Skeleton className="h-4 w-20" />
-      </div>
-      <Skeleton className="h-4 w-20 mt-1" />
-      <Skeleton className="h-4 w-full mt-2" />
-      <Skeleton className="h-4 w-3/4 mt-1" />
-    </div>
-  );
-}
-
+/** The recipe page's shape while it loads: top bar, 4:3 cover, title, meta rows, text, ingredients. */
 export default function RecipePageSkeleton() {
   return (
-    <Layout showHeader={false} showFooter={false}>
-      <AspectRatio ratio={16 / 9}>
-        <Skeleton className="w-full h-full rounded-md" />
-      </AspectRatio>
+    <Layout showHeader={false} showFooter={false} noTopPadding>
+      <div className="h-12" />
 
-      <Skeleton className="h-8 w-3/4 mt-2" />
+      <div className="flex flex-col gap-4">
+        <AspectRatio ratio={4 / 3}>
+          <Skeleton className="w-full h-full rounded-[28px]" />
+        </AspectRatio>
 
-      <div className="flex justify-between mt-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-4 w-12" />
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-8 w-3/4" />
+
+          <div className="flex justify-between">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-5 w-12" />
+          </div>
+
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-2/3" />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-7 w-24" />
+          <Skeleton className="h-10 w-40 rounded-full" />
+        </div>
+
+        <div className="space-y-3">
+          <Skeleton className="h-5 w-full" />
+          <Skeleton className="h-5 w-5/6" />
+          <Skeleton className="h-5 w-2/3" />
+        </div>
       </div>
-
-      <Separator className="my-4" />
-
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-      </div>
-
-      <Separator className="mb-2 mt-4" />
-
-      <Skeleton className="h-6 w-24 mb-4" />
-
-      <RatingItemSkeleton />
-      <RatingItemSkeleton />
     </Layout>
   );
 }

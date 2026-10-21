@@ -1,20 +1,24 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useEffect, useRef, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
   Pencil,
-  Link,
   CalendarDays,
+  CalendarPlus,
+  ChevronLeft,
+  Folder,
   Printer,
   Share2,
   Sparkles,
+  Star,
   Loader2,
-  MoreVertical,
+  MoreHorizontal,
   ShoppingCart,
   Trash2,
+  User,
 } from "lucide-react";
 import imageCompression from "browser-image-compression";
 import { IMAGE_COMPRESSION_OPTIONS } from "@/lib/constants";
@@ -28,20 +32,17 @@ import RatingModal, {
   RecipeRatingWithUser,
   RatingModalRef,
 } from "@/components/general/RatingModal";
-import StarIcon from "@mui/icons-material/Star";
 import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
+import { selectHouseholdMembers } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper/mealPlanHelper";
-import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import { formatRating } from "@/lib/formateRatingHelper/formatRatingHelper";
-import { Separator } from "@/components/ui/separator";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
 import { toast } from "sonner";
 import RatingListItem from "@/components/general/RatingListItem";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
 import { useRecipeInstructions } from "@/hooks/instructions/useRecipeInstructions";
-import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import { useRecipeImages } from "@/hooks/recipe/useRecipeImages";
 import { useRecipeMealPlanInfo } from "@/hooks/meal-planning/useRecipeMealPlanInfo";
 import { useRecipeRatings } from "@/hooks/ratings/useRecipeRatings";
@@ -49,25 +50,42 @@ import { useDeleteRating } from "@/hooks/ratings/useDeleteRating";
 import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
 import { useWakeLock } from "@/hooks/general/useWakeLock";
 import { IngredientList } from "@/components/ingredients/IngredientList";
+import InstructionSteps from "@/components/instructions/InstructionSteps";
 import NutritionSection from "@/components/recipe/NutritionSection";
+import SourceLinkButton from "@/components/recipe/SourceLinkButton";
 import { RecipePrintView } from "@/components/recipe/RecipePrintView";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { selectTargetServings } from "@/redux/slices/servingsSlice";
 import { useCreateRecipeShare } from "@/hooks/recipe/useCreateRecipeShare";
 import { useDeleteRecipe } from "@/hooks/recipe/useDeleteRecipe";
 import DeleteDialog from "@/components/general/DeleteDialog";
-import { Drawer, DrawerContent, DrawerFooter } from "@/components/ui/drawer";
+import RecipeCollectionsDialog from "@/components/collections/RecipeCollectionsDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Capacitor } from "@capacitor/core";
 import { recipeImageApi } from "@/api/recipeImage.api";
 import { useRecipeCookingState } from "@/hooks/cooking/useRecipeCookingState";
+import { cn } from "@/lib/utils";
+
+// The top and bottom bars' controls sit on translucent capsules, like iOS 26's glass.
+const glass = "rounded-full border border-border/60 bg-card/80 shadow-sm backdrop-blur-md";
+// Plain buttons on a capsule: no orange hover, which sticks after a tap on touch.
+const barButton = "rounded-full font-semibold hover:bg-transparent hover:text-foreground active:bg-secondary";
 
 export default function Recipe() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
   const currentUser = useAppSelector(selectUser);
+  const members = useAppSelector(selectHouseholdMembers);
   const chatMessages = useAppSelector(selectMessages);
   const chatRecipeId = useAppSelector(selectRecipeId);
   const recipeId = params.recipeId ?? null;
@@ -85,12 +103,6 @@ export default function Recipe() {
   // Queries
   const { data: recipe, isLoading } = useRecipe(recipeId);
   const { data: instructionSteps = [] } = useRecipeInstructions(recipeId);
-  // Structured step rows are the source of truth; recipes from older app
-  // versions may only carry the legacy markdown column.
-  const instructionsMarkdown =
-    instructionSteps.length > 0
-      ? instructionsToMarkdown(instructionSteps)
-      : (recipe?.instructions ?? null);
   const { data: imageUrls = [] } = useRecipeImages(recipeId);
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
@@ -112,8 +124,10 @@ export default function Recipe() {
   const { takePhoto, ImageSourceDrawerComponent } = useNativeCamera();
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
-  const [actionsDrawerOpen, setActionsDrawerOpen] = useState(false);
   const [addToListOpen, setAddToListOpen] = useState(false);
+  const [planOpen, setPlanOpen] = useState(false);
+  const [collectionsOpen, setCollectionsOpen] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   // Mutations
   const deleteRatingMutation = useDeleteRating();
@@ -155,8 +169,13 @@ export default function Recipe() {
     return (currentUser && rating.owner_id === currentUser.id) || false;
   };
 
+  function handleBack() {
+    // Opened from a link there is no in-app page to go back to.
+    if (window.history.state?.idx > 0) navigate(-1);
+    else navigate("/cookbook");
+  }
+
   function handlePrint() {
-    setActionsDrawerOpen(false);
     setTimeout(() => {
       const prev = document.title;
       document.title = `Plateful - ${recipe?.name}`;
@@ -206,42 +225,50 @@ export default function Recipe() {
     }
   }
 
+  // Ask and Plan opposite Cook, like the native bar (Ask stands where iOS has Adapt).
   const saveFooter = (
     <>
-      <div className="h-[calc(4.625rem+env(safe-area-inset-bottom))]"></div>
+      <div className="h-[calc(4.5rem+env(safe-area-inset-bottom))]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex gap-2 border-border border-t-[1px]">
-        <Button variant="secondary" className="flex-1" onClick={handleAskChatbot}>
-          <Sparkles />
-          {t("recipe.ask")}
-        </Button>
+      {/* No bar of its own: the page scrolls on under the capsules. */}
+      <div className="pointer-events-none fixed bottom-0 z-20 flex w-full max-w-lg items-center gap-2 px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <div className={cn(glass, "pointer-events-auto flex items-center")}>
+          <Button
+            variant="ghost"
+            className={cn(barButton, "h-12 px-4 text-base [&_svg]:size-5")}
+            onClick={handleAskChatbot}
+          >
+            <Sparkles />
+            {t("recipe.ask")}
+          </Button>
 
-        {recipe && (
-          <WeeklyPlanDialog
-            subject={{ kind: "recipe", id: recipe.id, name: recipe.name, tags: recipe.tags }}
-            navigateOnSuccess={true}
-            trigger={
-              <Button variant="accent" className="flex-1">
-                {t("recipe.plan")}
-              </Button>
-            }
-          />
-        )}
+          <Button
+            variant="ghost"
+            className={cn(barButton, "h-12 px-4 text-base [&_svg]:size-5")}
+            onClick={() => setPlanOpen(true)}
+          >
+            <CalendarPlus />
+            {t("recipe.plan")}
+          </Button>
+        </div>
+
+        <div className="flex-1" />
 
         {/* One word per state, as on iOS: Cook, Cook along (a member's
             session), Continue (one this user is in). All three open cooking
             mode; the session hook resolves fresh-vs-resume on the server. */}
-        <Button
-          className="flex-1"
-          onClick={() => navigate(`/cooking/${recipeId}`)}
-          disabled={instructionSteps.length === 0}
-        >
-          {cookingState.kind === "mine"
-            ? t("cooking.continue")
-            : cookingState.kind === "joinable"
-              ? t("cooking.cookAlong")
-              : t("cooking.cook")}
-        </Button>
+        {instructionSteps.length > 0 && (
+          <Button
+            className="pointer-events-auto h-12 rounded-full px-6 text-base font-semibold shadow-sm"
+            onClick={() => navigate(`/cooking/${recipeId}`)}
+          >
+            {cookingState.kind === "mine"
+              ? t("cooking.continue")
+              : cookingState.kind === "joinable"
+                ? t("cooking.cookAlong")
+                : t("cooking.cook")}
+          </Button>
+        )}
       </div>
     </>
   );
@@ -264,49 +291,42 @@ export default function Recipe() {
       </Layout>
     );
 
+  const myRating = ratings.find((rating) => canModifyRating(rating)) ?? null;
+  const planStatus =
+    lastMealPlan && (lastMealPlan.activePlan || lastMealPlan.lastPlannedDate)
+      ? getMealPlanStatus(lastMealPlan, t)
+      : null;
+  // Who added the recipe; no line in a one-person household or once they left.
+  const adderName =
+    members && members.length > 1 && recipe.owner_id
+      ? recipe.owner_id === currentUser?.id
+        ? t("recipe.you")
+        : (members.find((member) => member.id === recipe.owner_id)?.username ?? null)
+      : null;
+  const addedOn = new Date(recipe.created_at).toLocaleDateString(i18n.resolvedLanguage, {
+    dateStyle: "long",
+  });
+
   return (
-    <Layout showHeader={false} showFooter={false} footer={saveFooter}>
-      <div className="relative">
-        {imageUrls.length === 0 ? (
-          <AspectRatio ratio={16 / 9}>
-            <div className="relative w-full h-full" onClick={handlePlaceholderClick}>
-              <img
-                src={"/no-img.jpg"}
-                alt="Recipe"
-                className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-              />
-              {isUploadingImage && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-md">
-                  <Loader2 className="w-8 h-8 text-white animate-spin" />
-                </div>
-              )}
-            </div>
-          </AspectRatio>
-        ) : (
-          <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
-            <AspectRatio ratio={16 / 9}>
-              {imageUrls.map((item, index) => (
-                <PhotoView key={index} src={item}>
-                  {index < 1 ? (
-                    <img
-                      src={item}
-                      alt="Recipe"
-                      className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-                    />
-                  ) : undefined}
-                </PhotoView>
-              ))}
-            </AspectRatio>
-          </PhotoProvider>
-        )}
+    <Layout showHeader={false} showFooter={false} footer={saveFooter} noTopPadding>
+      <div className="flex items-center justify-between pt-2">
+        <Button
+          variant="ghost"
+          size="icon"
+          className={cn(glass, barButton)}
+          onClick={handleBack}
+          aria-label={t("recipe.back")}
+        >
+          <ChevronLeft className="!size-6" />
+        </Button>
 
         {/* Sharing sits outside the menu, left of the dots, the way the
             native iOS app has it — one tap instead of two. */}
-        <div className="absolute top-1 right-1 z-10 flex items-center">
+        <div className={cn(glass, "flex items-center")}>
           <Button
             variant="ghost"
-            className="text-white"
             size="icon"
+            className={barButton}
             onClick={() => createShareMutation.mutate(recipe.id)}
             disabled={createShareMutation.isPending}
             aria-label={t("share.shareRecipe")}
@@ -318,161 +338,239 @@ export default function Recipe() {
             )}
           </Button>
 
-          <Button
-            variant="ghost"
-            className="text-white"
-            size="icon"
-            onClick={() => setActionsDrawerOpen(true)}
-            aria-label="More actions"
-          >
-            <MoreVertical className="!size-5" />
-          </Button>
-        </div>
+          {/* Not modal: a modal menu and the dialog its item opens fight over body's pointer lock. */}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className={barButton}
+                aria-label={t("recipe.moreActions")}
+              >
+                <MoreHorizontal className="!size-6" />
+              </Button>
+            </DropdownMenuTrigger>
 
-        <Drawer open={actionsDrawerOpen} onOpenChange={setActionsDrawerOpen}>
-          <DrawerContent>
-            <DrawerFooter className="gap-4 mb-8 mt-4">
+            <DropdownMenuContent align="end" className="min-w-52">
+              <DropdownMenuItem className="py-2.5 text-base" onSelect={() => setPlanOpen(true)}>
+                <CalendarPlus />
+                {t("recipe.plan")}
+              </DropdownMenuItem>
+
               {scaledIngredients.length > 0 && (
-                <Button
-                  variant="secondary"
-                  size="lg"
-                  onClick={() => {
-                    setActionsDrawerOpen(false);
-                    setAddToListOpen(true);
-                  }}
-                >
-                  <div className="flex justify-start gap-4 w-full h-full items-center">
-                    <ShoppingCart />
-                    <p className="font-semibold">{t("shoppingList.addToList")}</p>
-                  </div>
-                </Button>
+                <DropdownMenuItem className="py-2.5 text-base" onSelect={() => setAddToListOpen(true)}>
+                  <ShoppingCart />
+                  {t("shoppingList.addToList")}
+                </DropdownMenuItem>
               )}
 
-              <Button
-                variant="secondary"
-                size="lg"
-                onClick={() => {
-                  setActionsDrawerOpen(false);
-                  navigate(`/recipe/edit/${recipe?.id}`, { replace: true });
-                }}
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem
+                className="py-2.5 text-base"
+                onSelect={() => navigate(`/recipe/edit/${recipe.id}`, { replace: true })}
               >
-                <div className="flex justify-start gap-4 w-full h-full items-center">
-                  <Pencil />
-                  <p className="font-semibold">{t("recipe.editRecipe")}</p>
-                </div>
-              </Button>
+                <Pencil />
+                {t("common.edit")}
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="py-2.5 text-base" onSelect={() => setCollectionsOpen(true)}>
+                <Folder />
+                {t("collections.collections")}
+              </DropdownMenuItem>
 
               {!Capacitor.isNativePlatform() && (
-                <Button variant="secondary" size="lg" onClick={handlePrint}>
-                  <div className="flex justify-start gap-4 w-full h-full items-center">
-                    <Printer />
-                    <p className="font-semibold">{t("recipe.printPdf")}</p>
-                  </div>
-                </Button>
+                <DropdownMenuItem className="py-2.5 text-base" onSelect={handlePrint}>
+                  <Printer />
+                  {t("recipe.printPdf")}
+                </DropdownMenuItem>
               )}
-              <DeleteDialog
-                onDelete={handleDeleteRecipe}
-                loading={deleteRecipeMutation.isPending}
-                customTrigger={
-                  <Button variant="secondary" size="lg" className="w-full">
-                    <div className="flex justify-start gap-4 w-full h-full items-center">
-                      <Trash2 />
-                      <p className="font-semibold">{t("common.delete")}</p>
-                    </div>
-                  </Button>
-                }
+
+              <DropdownMenuItem
+                className="py-2.5 text-base text-destructive focus:text-destructive"
+                onSelect={() => setDeleteOpen(true)}
+              >
+                <Trash2 />
+                {t("common.delete")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <AspectRatio ratio={4 / 3}>
+          {imageUrls.length === 0 ? (
+            <div className="relative w-full h-full" onClick={handlePlaceholderClick}>
+              <img
+                src={"/no-img.jpg"}
+                alt="Recipe"
+                className="object-cover w-full h-full rounded-[28px] dark:brightness-75 cursor-pointer"
               />
-            </DrawerFooter>
-          </DrawerContent>
-        </Drawer>
-      </div>
+              {isUploadingImage && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-[28px]">
+                  <Loader2 className="w-8 h-8 text-white animate-spin" />
+                </div>
+              )}
+            </div>
+          ) : (
+            <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
+              {imageUrls.map((item, index) => (
+                <PhotoView key={index} src={item}>
+                  {index < 1 ? (
+                    <img
+                      src={item}
+                      alt="Recipe"
+                      className="object-cover w-full h-full rounded-[28px] dark:brightness-75 cursor-pointer"
+                    />
+                  ) : undefined}
+                </PhotoView>
+              ))}
+            </PhotoProvider>
+          )}
+        </AspectRatio>
 
-      <div className="flex justify-between">
-        <h1 className="first-font text-2xl font-bold break-words w-full">{recipe.name}</h1>
-      </div>
+        <div className="flex flex-col gap-3">
+          <h1 className="first-font text-2xl font-bold break-words w-full">{recipe.name}</h1>
 
-      <div className="flex justify-between mt-2">
-        <div className="flex items-center gap-1">
-          <CalendarDays size={16} />
-          <p className="text-sm">{getMealPlanStatus(lastMealPlan ?? null, t)}</p>
+          {(recipe.link || averageRating !== null) && (
+            <div className="flex items-center justify-between gap-2">
+              {recipe.link ? <SourceLinkButton link={recipe.link} /> : <span />}
+
+              {averageRating !== null && (
+                <span className="flex items-center gap-1 font-semibold text-muted-foreground">
+                  <Star className="size-4 fill-current" />
+                  {formatRating(averageRating)}
+                </span>
+              )}
+            </div>
+          )}
+
+          {(planStatus || adderName) && (
+            <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+              {planStatus ? (
+                <button
+                  type="button"
+                  className="flex items-center gap-1.5"
+                  onClick={() => setPlanOpen(true)}
+                >
+                  <CalendarDays className="size-4" />
+                  {planStatus}
+                </button>
+              ) : (
+                <span />
+              )}
+
+              {adderName && (
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="flex items-center gap-1.5"
+                      aria-label={
+                        recipe.owner_id === currentUser?.id
+                          ? t("recipe.addedByYou")
+                          : t("recipe.addedBy", { name: adderName })
+                      }
+                    >
+                      <User className="size-4" />
+                      {adderName}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="end" className="w-auto px-4 py-3 text-sm">
+                    {t("recipe.addedOn", { date: addedOn })}
+                  </PopoverContent>
+                </Popover>
+              )}
+            </div>
+          )}
+
+          {recipe.description && (
+            <p className="text-base text-muted-foreground whitespace-pre-wrap">{recipe.description}</p>
+          )}
         </div>
 
-        <div className="flex items-center gap-0.5">
-          <p className="text-sm">{formatRating(averageRating)}</p>
-          <StarIcon style={{ fontSize: "16px" }} />
-        </div>
+        {/* Nutrition Section (per serving; hidden when nothing calculated and
+            no estimate is running — nutrition_pending pulses until the worker's
+            values arrive via Realtime → refetch) */}
+        <NutritionSection
+          nutrition={{
+            calories_kcal: recipe.calories_kcal,
+            carbs_g: recipe.carbs_g,
+            protein_g: recipe.protein_g,
+            fat_g: recipe.fat_g,
+            sugar_g: recipe.sugar_g,
+            fiber_g: recipe.fiber_g,
+            sodium_mg: recipe.sodium_mg,
+          }}
+          isPending={recipe.nutrition_pending}
+        />
+
+        {scaledIngredients.length > 0 && (
+          <IngredientList
+            recipeId={recipe.id}
+            recipeName={recipe.name}
+            baseServings={recipe.base_servings}
+            servingsUnit={recipe.servings_unit ?? "servings"}
+            showScalingControls={recipe.base_servings !== null}
+            addToListOpen={addToListOpen}
+            onAddToListOpenChange={setAddToListOpen}
+          />
+        )}
+
+        {instructionSteps.length > 0 && <InstructionSteps steps={instructionSteps} />}
+
+        <section className="flex flex-col gap-4 pt-1">
+          <Button
+            variant="secondary"
+            className="h-12 rounded-full font-semibold"
+            onClick={() => ratingModalRef.current?.open(myRating ?? undefined)}
+          >
+            <Star />
+            {myRating ? t("rating.editYourRating") : t("rating.rateThisRecipe")}
+          </Button>
+
+          {ratings.length > 0 && (
+            <div>
+              <h2 className="text-xl font-bold mb-3">{t("recipe.ratings")}</h2>
+
+              {ratings.map((rating) => (
+                <RatingListItem
+                  key={rating.id}
+                  canModify={canModifyRating(rating)}
+                  rating={rating}
+                  handleEditRating={handleEditRating}
+                  handleDeleteRating={handleDeleteRating}
+                />
+              ))}
+            </div>
+          )}
+        </section>
       </div>
 
-      {recipe.link && (
-        <NavLink to={recipe.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
-          <Link />
-          {t("recipe.toTheRecipe")}
-        </NavLink>
-      )}
+      <RatingModal ref={ratingModalRef} recipeId={recipe.id} />
 
-      <Separator />
-
-      {recipe.description && (
-        <p className="text-md font-medium mt-2 whitespace-pre-wrap">{recipe.description}</p>
-      )}
-
-      {/* Nutrition Section (per serving; hidden when nothing calculated and
-          no estimate is running — nutrition_pending pulses until the worker's
-          values arrive via Realtime → refetch) */}
-      <NutritionSection
-        nutrition={{
-          calories_kcal: recipe.calories_kcal,
-          carbs_g: recipe.carbs_g,
-          protein_g: recipe.protein_g,
-          fat_g: recipe.fat_g,
-          sugar_g: recipe.sugar_g,
-          fiber_g: recipe.fiber_g,
-          sodium_mg: recipe.sodium_mg,
-        }}
-        isPending={recipe.nutrition_pending}
+      <WeeklyPlanDialog
+        subject={{ kind: "recipe", id: recipe.id, name: recipe.name, tags: recipe.tags }}
+        open={planOpen}
+        onOpenChange={setPlanOpen}
+        trigger={null}
+        navigateOnSuccess={true}
       />
 
-      {/* Ingredients Section */}
-      {scaledIngredients.length > 0 && (
-        <IngredientList
-          recipeId={recipe.id}
-          recipeName={recipe.name}
-          baseServings={recipe.base_servings}
-          servingsUnit={recipe.servings_unit ?? "servings"}
-          showScalingControls={recipe.base_servings !== null}
-          addToListOpen={addToListOpen}
-          onAddToListOpenChange={setAddToListOpen}
-        />
-      )}
+      <RecipeCollectionsDialog
+        recipeId={recipe.id}
+        householdId={recipe.household_id}
+        open={collectionsOpen}
+        onOpenChange={setCollectionsOpen}
+      />
 
-      {/* Instructions Section */}
-      {instructionsMarkdown && (
-        <div>
-          <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
-
-          <MarkdownRenderer content={instructionsMarkdown} className="font-medium" />
-        </div>
-      )}
-
-      <div>
-        <Separator className="mb-2 mt-4" />
-
-        <RatingModal ref={ratingModalRef} recipeId={recipe.id} />
-
-        <h2 className="first-font text-xl font-bold mb-1">{t("recipe.ratings")}</h2>
-
-        {ratings.length === 0 && <p>{t("recipe.noRatings")}</p>}
-
-        {ratings.map((rating) => (
-          <RatingListItem
-            key={rating.id}
-            canModify={canModifyRating(rating)}
-            rating={rating}
-            handleEditRating={handleEditRating}
-            handleDeleteRating={handleDeleteRating}
-          />
-        ))}
-      </div>
+      <DeleteDialog
+        open={deleteOpen}
+        onOpenChange={setDeleteOpen}
+        onDelete={handleDeleteRecipe}
+        loading={deleteRecipeMutation.isPending}
+      />
 
       <RecipePrintView
         recipe={recipe}

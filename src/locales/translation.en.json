@@ -490,18 +490,24 @@
   "recipe": {
     "goneTitle": "This Recipe Is Gone",
     "goneBody": "It may have been deleted by someone in your household.",
-    "editRecipe": "Edit recipe",
     "toTheRecipe": "To the recipe",
     "planRecipe": "Plan recipe",
     "ratings": "Ratings",
-    "noRatings": "No Ratings",
     "planningSuccessful": "Recipe planned successfully!",
     "planningFailed": "Error planning recipe. Please try again later.",
     "askChatbot": "Ask AI-Chef",
     "instructions": "Instructions",
     "printPdf": "Print recipe",
     "ask": "Ask",
-    "plan": "Plan"
+    "plan": "Plan",
+    "openOriginal": "Open original",
+    "openOriginalRecipe": "Open original recipe",
+    "you": "You",
+    "addedByYou": "Added by you",
+    "addedBy": "Added by {{name}}",
+    "addedOn": "Added on {{date}}",
+    "back": "Back",
+    "moreActions": "More actions"
   },
   "mealType": {
     "label": "Meal type",
@@ -806,13 +812,14 @@
     "shopping": "List"
   },
   "rating": {
-    "rate": "Rate",
     "title": "How did you like it?",
     "editTitle": "Edit your rating",
     "commentLabel": "Comments",
     "commentPlaceholder": "Your comment (optional)",
     "submit": "Save",
-    "formerMember": "Former member"
+    "formerMember": "Former member",
+    "rateThisRecipe": "Rate This Recipe",
+    "editYourRating": "Edit Your Rating"
   },
   "categorys": {
     "category": "Category",
@@ -858,7 +865,9 @@
       "servings": "servings",
       "portions": "portions",
       "pieces": "pieces"
-    }
+    },
+    "fewerServings": "Fewer servings",
+    "moreServings": "More servings"
   },
   "dayWithCount_one": "{{count}} day",
   "dayWithCount_other": "{{count}} days",

@@ -58,7 +58,11 @@ export default function ShoppingRecipeAddSheet({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <Button variant="secondary" className="mt-4 mb-2 w-full" onClick={() => onOpenChange(true)}>
+      <Button
+        variant="secondary"
+        className="h-12 w-full rounded-full font-semibold"
+        onClick={() => onOpenChange(true)}
+      >
         <ShoppingCart />
         {t("shoppingList.addToList")}
       </Button>

@@ -70,7 +70,7 @@ export default function TodaysMealCard({
         </div>
       </Card>
 
-      <RatingModal ref={ratingModalRef} recipeId={recipeId} showTriggerButton={false} />
+      <RatingModal ref={ratingModalRef} recipeId={recipeId} />
     </>
   );
 }

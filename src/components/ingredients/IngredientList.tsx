@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useScaledIngredients } from "@/hooks/ingredients/useScaledIngredients";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { ServingScaler } from "./ServingScaler";
@@ -69,7 +72,19 @@ export function IngredientList({
     targetServings
   );
 
+  // Ticked off while cooking; ephemeral, like iOS.
+  const [checkedIds, setCheckedIds] = useState<Set<string>>(new Set());
+
+  function toggleChecked(id: string) {
+    setCheckedIds((current) => {
+      const next = new Set(current);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
+
   const isScaled = targetServings !== effectiveBaseServings;
+  const canScale = showScalingControls && !!baseServings;
   const groupedIngredients = groupIngredients(scaledIngredients);
 
   if (isLoading) {
@@ -87,27 +102,53 @@ export function IngredientList({
   }
 
   return (
-    <div className="">
-      {showScalingControls && baseServings && (
-        <ServingScaler
-          value={targetServings}
-          onChange={handleServingsChange}
-          unit={servingsUnit}
-          showSetDefault={isScaled}
-          onSetDefault={handleSetDefault}
-          isSettingDefault={updateBaseServings.isPending}
-        />
-      )}
+    <section className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-2">
+        <h2 className="text-xl font-bold">{t("ingredients.title")}</h2>
 
-      <h2 className="text-lg font-semibold mt-4">{t("ingredients.title")}</h2>
+        {canScale && (
+          <ServingScaler value={targetServings} onChange={handleServingsChange} unit={servingsUnit} />
+        )}
+      </div>
+
+      {canScale && isScaled && (
+        <div className="flex items-center justify-between">
+          <button
+            type="button"
+            className="text-sm font-semibold text-muted-foreground"
+            onClick={() => dispatch(clearTargetServings(recipeId))}
+          >
+            {t("ingredients.reset")}
+          </button>
+
+          <Button
+            variant="secondary"
+            size="sm"
+            className="rounded-full"
+            onClick={handleSetDefault}
+            disabled={updateBaseServings.isPending}
+          >
+            {updateBaseServings.isPending ? <Loader2 className="animate-spin" /> : t("ingredients.setAsDefault")}
+          </Button>
+        </div>
+      )}
 
       {groupedIngredients.map((group, groupIndex) => (
         <div key={group.name ?? `group-${groupIndex}`}>
-          {group.name && <h4 className="font-bold text-sm mt-4">{group.name}</h4>}
+          {group.name && (
+            <h3 className="pt-1 text-sm font-semibold text-muted-foreground">{group.name}</h3>
+          )}
 
-          <ul className="list-disc ml-4">
+          <ul>
             {group.ingredients.map((ingredient) => (
-              <IngredientRow key={ingredient.id} ingredient={ingredient} isScaled={isScaled} />
+              <IngredientRow
+                key={ingredient.id}
+                ingredient={ingredient}
+                baseServings={effectiveBaseServings}
+                targetServings={targetServings}
+                checked={checkedIds.has(ingredient.id)}
+                onToggle={() => toggleChecked(ingredient.id)}
+              />
             ))}
           </ul>
         </div>
@@ -121,6 +162,6 @@ export function IngredientList({
         open={addToListOpen}
         onOpenChange={onAddToListOpenChange}
       />
-    </div>
+    </section>
   );
 }

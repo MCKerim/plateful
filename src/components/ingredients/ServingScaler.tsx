@@ -1,76 +1,49 @@
-import { Button } from "@/components/ui/button";
 import { Minus, Plus } from "lucide-react";
 import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 type Props = {
   value: number;
   onChange: (servings: number) => void;
   unit?: string;
-  showSetDefault?: boolean;
-  onSetDefault?: () => void;
-  isSettingDefault?: boolean;
   /** The count alone, for a row that has its own context (the week's add-to-list sheet). */
   compact?: boolean;
 };
 
-export function ServingScaler({
-  value,
-  onChange,
-  unit = "servings",
-  showSetDefault = false,
-  onSetDefault,
-  isSettingDefault = false,
-  compact = false,
-}: Props) {
+/** The serving count as a stepper in a capsule — minus, "4 servings", plus — like the native `ServingsPill`. */
+export function ServingScaler({ value, onChange, unit = "servings", compact = false }: Props) {
   const { t } = useTranslation();
-
-  const handleDecrement = () => {
-    if (value > 1) {
-      onChange(value - 1);
-    }
-  };
-
-  const handleIncrement = () => {
-    onChange(value + 1);
-  };
+  const label = `${value} ${t(`ingredients.units.${unit}`, { defaultValue: unit })}`;
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="secondary"
-        size="icon"
-        onClick={handleDecrement}
+    <div
+      className={cn(
+        "inline-flex w-fit shrink-0 items-center rounded-full text-sm font-semibold",
+        compact ? "gap-2 bg-muted px-2 py-1.5" : "gap-3.5 bg-secondary px-3.5 py-2"
+      )}
+    >
+      <button
+        type="button"
+        onClick={() => onChange(Math.max(1, value - 1))}
         disabled={value <= 1}
-        className="rounded-full h-8 w-8"
+        aria-label={t("ingredients.fewerServings")}
+        className="flex size-6 items-center justify-center disabled:opacity-40"
       >
-        <Minus />
-      </Button>
+        <Minus className="size-4" />
+      </button>
 
-      <span className={`${compact ? "min-w-6" : "min-w-[100px]"} text-center font-medium`}>
-        {value}
-        {!compact && ` ${t(`ingredients.units.${unit}`, { defaultValue: unit })}`}
+      <span className="whitespace-nowrap tabular-nums" aria-label={label}>
+        {compact ? value : label}
       </span>
 
-      <Button
-        variant="secondary"
-        size="icon"
-        onClick={handleIncrement}
-        className="rounded-full h-8 w-8"
+      <button
+        type="button"
+        onClick={() => onChange(value + 1)}
+        aria-label={t("ingredients.moreServings")}
+        className="flex size-6 items-center justify-center"
       >
-        <Plus />
-      </Button>
-
-      {showSetDefault && onSetDefault && (
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onSetDefault}
-          disabled={isSettingDefault}
-          className="text-xs text-muted-foreground h-auto py-1"
-        >
-          {t("ingredients.setAsDefault")}
-        </Button>
-      )}
+        <Plus className="size-4" />
+      </button>
     </div>
   );
 }

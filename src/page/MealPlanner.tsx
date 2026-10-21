@@ -343,7 +343,7 @@ export default function MealPlanner() {
       }}
     >
       <Layout showHeader={false} noTopPadding>
-        <RatingModal ref={ratingModalRef} recipeId={recipeToRate} showTriggerButton={false} />
+        <RatingModal ref={ratingModalRef} recipeId={recipeToRate} />
 
         {/* Weekly Plan Dialog for editing a recipe's or a note's days */}
         <WeeklyPlanDialog

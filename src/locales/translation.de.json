@@ -490,18 +490,24 @@
   "recipe": {
     "goneTitle": "Dieses Rezept ist verschwunden",
     "goneBody": "Vielleicht hat es jemand aus deinem Haushalt gelöscht.",
-    "editRecipe": "Rezept bearbeiten",
     "toTheRecipe": "Zum Rezept",
     "planRecipe": "Rezept planen",
     "ratings": "Bewertungen",
-    "noRatings": "Keine Bewertungen",
     "planningSuccessful": "Rezept erfolgreich geplant!",
     "planningFailed": "Fehler beim Planen des Rezepts. Bitte versuche es später erneut.",
     "askChatbot": "KI-Koch fragen",
     "instructions": "Zubereitung",
     "printPdf": "Rezept drucken",
     "ask": "Fragen",
-    "plan": "Planen"
+    "plan": "Planen",
+    "openOriginal": "Original öffnen",
+    "openOriginalRecipe": "Originalrezept öffnen",
+    "you": "Du",
+    "addedByYou": "Von dir hinzugefügt",
+    "addedBy": "Von {{name}} hinzugefügt",
+    "addedOn": "Hinzugefügt am {{date}}",
+    "back": "Zurück",
+    "moreActions": "Weitere Aktionen"
   },
   "addRecipeDrawer": {
     "open": "Rezept oder Sammlung hinzufügen",
@@ -806,13 +812,14 @@
     "recipeUpdated": "Rezept aktualisiert!"
   },
   "rating": {
-    "rate": "Bewerten",
     "title": "Wie hat es dir geschmeckt?",
     "editTitle": "Bewertung bearbeiten",
     "commentLabel": "Anmerkungen",
     "commentPlaceholder": "Dein Kommentar (optional)",
     "submit": "Speichern",
-    "formerMember": "Ehemaliges Mitglied"
+    "formerMember": "Ehemaliges Mitglied",
+    "rateThisRecipe": "Rezept bewerten",
+    "editYourRating": "Deine Bewertung bearbeiten"
   },
   "categorys": {
     "category": "Kategorie",
@@ -858,7 +865,9 @@
       "servings": "Portionen",
       "portions": "Portionen",
       "pieces": "Stück"
-    }
+    },
+    "fewerServings": "Weniger Portionen",
+    "moreServings": "Mehr Portionen"
   },
   "dayWithCount_one": "{{count}} Tag",
   "dayWithCount_other": "{{count}} Tage",

@@ -28,11 +28,11 @@ test.describe("Recipe Detail Page", () => {
     await expect(page.getByText(/classic Italian pasta/i).first()).toBeVisible();
 
     // Should have link to original recipe
-    const recipeLink = page.getByRole("link", { name: /to the recipe/i });
+    const recipeLink = page.getByRole("link", { name: "Open original recipe" });
     await expect(recipeLink).toBeVisible();
   });
 
-  test("should display no ratings message for new recipe", async ({ page, setupAuth }) => {
+  test("should offer a rating for a new recipe", async ({ page, setupAuth }) => {
     const recipeId = "00000000-0000-0000-0000-000000000002";
     const recipe = createRecipe({
       id: recipeId,
@@ -50,8 +50,9 @@ test.describe("Recipe Detail Page", () => {
       timeout: 10000,
     });
 
-    // Should show no ratings message
-    await expect(page.getByText(/no ratings/i)).toBeVisible();
+    // No ratings yet: the button offers the first one, and no list heading shows
+    await expect(page.getByRole("button", { name: "Rate This Recipe" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Ratings" })).toHaveCount(0);
   });
 
   test("should have edit button that navigates to edit page", async ({ page, setupAuth }) => {
@@ -73,7 +74,7 @@ test.describe("Recipe Detail Page", () => {
 
     await page.getByRole("button", { name: "More actions" }).click();
     // Find and click edit button
-    const editButton = page.getByRole("button", { name: "Edit Recipe" });
+    const editButton = page.getByRole("menuitem", { name: "Edit" });
     await expect(editButton).toBeVisible();
     await editButton.click();
 
@@ -100,7 +101,7 @@ test.describe("Recipe Detail Page", () => {
     });
 
     // Should have plan meal button
-    const planButton = page.getByRole("button", { name: /plan/i });
+    const planButton = page.getByRole("button", { name: "Plan", exact: true });
     await expect(planButton).toBeVisible();
   });
 
