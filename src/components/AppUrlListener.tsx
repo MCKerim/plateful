@@ -37,8 +37,9 @@ const AppUrlListener: React.FC = () => {
         });
       }
 
-      const slug = url.pathname;
-      navigate(slug);
+      // Keep the query: `/oauth/consent` needs its `authorization_id`. The hash
+      // stays behind so tokens never enter router history.
+      navigate(url.pathname + url.search);
     });
   }, [navigate, supabase]);
 
