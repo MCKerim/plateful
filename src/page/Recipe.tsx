@@ -309,11 +309,12 @@ export default function Recipe() {
 
   return (
     <Layout showHeader={false} showFooter={false} footer={saveFooter} noTopPadding>
-      <div className="flex items-center justify-between pt-2">
+      {/* Sticky like iOS's navigation bar; only the capsules take taps, the page scrolls on between them. */}
+      <div className="pointer-events-none sticky top-0 z-20 flex items-center justify-between pt-2">
         <Button
           variant="ghost"
           size="icon"
-          className={cn(glass, barButton)}
+          className={cn(glass, barButton, "pointer-events-auto")}
           onClick={handleBack}
           aria-label={t("recipe.back")}
         >
@@ -322,7 +323,7 @@ export default function Recipe() {
 
         {/* Sharing sits outside the menu, left of the dots, the way the
             native iOS app has it — one tap instead of two. */}
-        <div className={cn(glass, "flex items-center")}>
+        <div className={cn(glass, "pointer-events-auto flex items-center")}>
           <Button
             variant="ghost"
             size="icon"
