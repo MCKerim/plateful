@@ -1020,6 +1020,20 @@
     "linkCopied": "Link copied to clipboard",
     "copyError": "Could not copy link"
   },
+  "connections": {
+    "headline": "Connect Plateful to your AI",
+    "subheadline": "Ask what to cook and the answer comes from your own saved recipes. Your assistant can add new ones and tidy your collections too.",
+    "examplesTitle": "Try asking",
+    "promptTonight": "What should we cook tonight? Something from my Plateful we rated well.",
+    "promptCollections": "Put all of my salads into a Salads collection.",
+    "copyPromptHint": "Copies this prompt",
+    "connectClaude": "Connect to Claude",
+    "connectChatGPT": "Connect to ChatGPT",
+    "advanced": "Advanced",
+    "advancedText": "Plateful is an MCP server. Any app that supports MCP, like ChatGPT, Claude Code or code editors, can connect using this address.",
+    "copyServerHint": "Copies the server address",
+    "settingsTitle": "Claude & ChatGPT"
+  },
   "notificationSettings": {
     "title": "Notifications",
     "mobileOnly": "Push notifications are only available in the mobile app. Download Plateful on iOS or Android to enable reminders.",

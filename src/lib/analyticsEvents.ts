@@ -45,6 +45,8 @@
  *   only, never a note: from the weekly plan dialog on a save that inserts,
  *   only when the user picked a type, and from a planner entry's menu on a
  *   change.
+ * - `mcp_connect_opened`: `client` is "claude" | "chatgpt", the connect button
+ *   tapped on the Claude & ChatGPT page; sent as its link opens.
  */
 export const AnalyticsEvent = {
   magicLinkRequested: "magic_link_requested",
@@ -79,6 +81,7 @@ export const AnalyticsEvent = {
   cookingAbandoned: "cooking_abandoned",
   cookingTimerStarted: "cooking_timer_started",
   plannerMealTypeSet: "planner_meal_type_set",
+  mcpConnectOpened: "mcp_connect_opened",
 } as const;
 
 export type AnalyticsEventName = (typeof AnalyticsEvent)[keyof typeof AnalyticsEvent];

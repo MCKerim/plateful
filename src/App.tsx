@@ -54,6 +54,7 @@ import ImageImport from "./page/ImageImport";
 import SharedRecipe from "./page/SharedRecipe";
 import OAuthConsentRoute, { PostSignInLanding } from "./components/general/OAuthConsentRoute";
 import NotificationSettings from "./page/NotificationSettings";
+import Connections from "./page/Connections";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
@@ -533,6 +534,7 @@ function App() {
           path="/notificationSettings"
           element={routeToCorrectPage(<NotificationSettings />)}
         />
+        <Route path="/connections" element={routeToCorrectPage(<Connections />)} />
         <Route
           path="/invite/:token"
           element={isLoggedIn() ? <InvitePage refreshUser={refreshUser} /> : <SignUp />}

@@ -7,7 +7,7 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectUser, setUserWeekStart } from "@/redux/slices/userSlice";
-import { Bell, CreditCard, Donut, House, LogOut, Pencil, Trash2 } from "lucide-react";
+import { Bell, CreditCard, Donut, House, LogOut, Pencil, Sparkles, Trash2 } from "lucide-react";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
 import { isNativePlatform } from "@/lib/revenuecat";
@@ -253,6 +253,18 @@ export default function Settings() {
               <House />
 
               {t("settings.manageYourHousehold")}
+            </Button>
+          </NavLink>
+        </div>
+
+        <div className="flex flex-col gap-2 p-2 border rounded-lg">
+          <h2 className="font-medium border-b">{t("connections.settingsTitle")}</h2>
+
+          <NavLink to="/connections">
+            <Button variant="secondary" className="w-full">
+              <Sparkles />
+
+              {t("connections.headline")}
             </Button>
           </NavLink>
         </div>
