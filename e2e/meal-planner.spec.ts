@@ -1,11 +1,6 @@
 import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
-import { createMealPlan, createNotePlan } from "./factories/meal-plan.factory";
-
-// Helper to get date string in YYYY-MM-DD format
-function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
+import { createMealPlan, createNotePlan, formatDate } from "./factories/meal-plan.factory";
 
 test.describe("Meal Planner Page", () => {
   test("should display week navigation", async ({ page, setupAuth }) => {

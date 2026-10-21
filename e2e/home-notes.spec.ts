@@ -1,9 +1,5 @@
 import { test, expect } from "./fixtures";
-import { createNotePlan } from "./factories/meal-plan.factory";
-
-function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0];
-}
+import { createNotePlan, formatDate } from "./factories/meal-plan.factory";
 
 test.describe("Home with a planned note", () => {
   test("shows today's note under the plan headline", async ({ page, setupAuth }) => {

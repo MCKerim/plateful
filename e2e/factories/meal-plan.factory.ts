@@ -1,7 +1,13 @@
+import { format } from "date-fns";
 import { MockMealPlan, MockRecipe } from "../fixtures/types";
 
-function formatDate(date: Date): string {
-  return date.toISOString().split("T")[0];
+/**
+ * A `planned_date` for the browser's local day, as the app writes it. Never
+ * `toISOString()`: between local midnight and the UTC offset that is still
+ * yesterday, and every "today" test failed in that window.
+ */
+export function formatDate(date: Date): string {
+  return format(date, "yyyy-MM-dd");
 }
 
 function addDays(date: Date, days: number): Date {
