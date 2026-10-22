@@ -6,7 +6,8 @@ export const recipeShareApi = {
    * Create a shared recipe snapshot in the DB and return the generated token.
    * Caller builds the textual snapshot. The Edge Function verifies household
    * access, reads the recipe's authoritative cover path, and copies it with the
-   * service role, so clients never receive Storage list/copy permission.
+   * service role, so clients never receive Storage list/copy permission. It
+   * also stamps the recipe's `original_id` into the snapshot.
    */
   async create(
     supabase: SupabaseClient,

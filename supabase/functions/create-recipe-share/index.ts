@@ -114,7 +114,7 @@ Deno.serve(async (req: Request) => {
   // indistinguishable to the caller.
   const { data: recipe, error: recipeError } = await userClient
     .from("recipes")
-    .select("id, image_path")
+    .select("id, image_path, recipe_originals(id, source_key)")
     .eq("id", recipeId)
     .maybeSingle();
   if (recipeError) {
@@ -151,8 +151,14 @@ Deno.serve(async (req: Request) => {
     imageUrls = [serviceClient.storage.from(BUCKET).getPublicUrl(copiedImagePath).data.publicUrl];
   }
 
+  // The recipe row, not the client, names the original, and only a keyed
+  // (public-source) one: the extractor links the recipient's copy only to
+  // those, and a keyless id would let a link holder read a private photo or
+  // text extraction. Without one the key stays absent.
+  const original = recipe.recipe_originals as { id: string; source_key: string | null } | null;
   const snapshot = {
     ...body.snapshot,
+    original_id: original?.source_key ? original.id : undefined,
     image_urls: imageUrls,
     image_folder: imageFolder,
   };
