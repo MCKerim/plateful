@@ -56,6 +56,22 @@ test.describe("Shared recipe", () => {
   });
 });
 
+test("an old share with markdown instructions still shows its steps", async ({ page }) => {
+  const legacy = {
+    ...snapshot,
+    instruction_steps: null,
+    instructions: "### Sauce\n1. Blend the basil.\n2. Stir in the oil.",
+  };
+  await page.route("**/rest/v1/rpc/resolve_recipe_share", (route) =>
+    route.fulfill({ json: [{ snapshot: legacy }] })
+  );
+  await page.goto("/share/e2e-token");
+
+  await expect(page.getByText("Sauce", { exact: true })).toBeVisible();
+  await expect(page.getByText("Blend the basil.", { exact: true })).toBeVisible();
+  await expect(page.getByText("Stir in the oil.", { exact: true })).toBeVisible();
+});
+
 const IOS_LINK = "https://plateful.cloud/share/e2e-token";
 const ANDROID_LINK =
   "intent://app.plateful.cloud/share/e2e-token#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.kblanks.plateful;end";

@@ -72,11 +72,7 @@ import { Capacitor } from "@capacitor/core";
 import { recipeImageApi } from "@/api/recipeImage.api";
 import { useRecipeCookingState } from "@/hooks/cooking/useRecipeCookingState";
 import { cn } from "@/lib/utils";
-
-// The top and bottom bars' controls sit on translucent capsules, like iOS 26's glass.
-const glass = "rounded-full border border-border/60 bg-card/80 shadow-sm backdrop-blur-md";
-// Plain buttons on a capsule: no orange hover, which sticks after a tap on touch.
-const barButton = "rounded-full font-semibold hover:bg-transparent hover:text-foreground active:bg-secondary";
+import { barButton, glass } from "@/components/recipe/glass";
 
 export default function Recipe() {
   const { t, i18n } = useTranslation();

@@ -1027,7 +1027,7 @@
     "shareRecipe": "Share recipe",
     "shareMessage": "Check out this recipe in Plateful: {{recipeName}}",
     "sharedRecipeBadge": "Shared recipe",
-    "saveToMyRecipes": "Save to my recipes",
+    "saveToMyRecipes": "Add to Recipes",
     "importing": "Saving...",
     "importSuccess": "Added to Plateful",
     "importError": "Could not save the recipe. Please try again.",

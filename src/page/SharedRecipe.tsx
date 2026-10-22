@@ -1,15 +1,19 @@
-import { useParams, useNavigate, NavLink } from "react-router";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
 import { motion } from "motion/react";
 import { PhotoProvider, PhotoView } from "react-photo-view";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { Button, buttonVariants } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
-import MarkdownRenderer from "@/components/general/MarkdownRenderer";
 import NutritionSection from "@/components/recipe/NutritionSection";
+import RecipePageSkeleton from "@/components/recipe/RecipePageSkeleton";
+import SourceLinkButton from "@/components/recipe/SourceLinkButton";
+import InstructionSteps from "@/components/instructions/InstructionSteps";
+import { IngredientRow } from "@/components/ingredients/IngredientRow";
+import { ServingScaler } from "@/components/ingredients/ServingScaler";
+import { barButton, glass } from "@/components/recipe/glass";
 import { snapshotNutrition } from "@/lib/transformers/recipeShare.transformer";
 import { useRecipeShare } from "@/hooks/recipe/useRecipeShare";
 import { useImportRecipeShare } from "@/hooks/recipe/useImportRecipeShare";
@@ -17,15 +21,22 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectUser } from "@/redux/slices/userSlice";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
-import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
+import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
+import { scaleIngredients } from "@/lib/ingredient-parser/scale-ingredients";
+import { canScale } from "@/lib/shopping-list/planAdd";
 import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
 import { mobileStoreUrl, openInAppLink } from "@/lib/appStores";
+import { cn } from "@/lib/utils";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
+import type { RecipeInstruction } from "@/types/instruction.types";
 import { toast } from "sonner";
-import { Download, BookmarkPlus, Link } from "lucide-react";
+import { Download, Plus, X } from "lucide-react";
 
 const PLATEFUL_URL = "https://plateful.cloud";
+
+// The floating bottom action, like the recipe page's Cook capsule.
+const actionClass = "pointer-events-auto h-12 w-full rounded-full text-base font-semibold shadow-sm";
 
 /** Map a snapshot ingredient to the RecipeIngredient shape needed by groupIngredients */
 function toDisplayIngredient(ing: SnapshotIngredient, index: number): RecipeIngredient {
@@ -50,6 +61,11 @@ function toDisplayIngredient(ing: SnapshotIngredient, index: number): RecipeIngr
   };
 }
 
+/**
+ * The recipe page's read-only twin, like the native `SharedRecipeView`: a
+ * shared recipe reads exactly like it will once saved, with a floating Save
+ * capsule where the recipe page has its actions.
+ */
 export default function SharedRecipe() {
   const { t } = useTranslation();
   const { token } = useParams<{ token: string }>();
@@ -63,6 +79,8 @@ export default function SharedRecipe() {
 
   const isNative = Capacitor.isNativePlatform();
   const isLoggedIn = user !== null;
+  // The servings shown; scales the amounts only, as on iOS (nothing to save here).
+  const [servings, setServings] = useState<number | null>(null);
 
   async function handleSave() {
     if (!share || !user || !householdId || !token) return;
@@ -82,30 +100,21 @@ export default function SharedRecipe() {
     );
   }
 
+  function handleClose() {
+    if (window.history.state?.idx > 0) navigate(-1);
+    else navigate("/home");
+  }
+
   function handleDownloadApp() {
     window.open(mobileStoreUrl() ?? PLATEFUL_URL, "_blank");
   }
 
-  if (isLoading) {
-    return (
-      <Layout showHeader={false} showFooter={false}>
-        <AspectRatio ratio={16 / 9}>
-          <Skeleton className="w-full h-full rounded-md" />
-        </AspectRatio>
-        <Skeleton className="h-8 w-3/4 mt-2" />
-        <Separator className="my-4" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-        </div>
-      </Layout>
-    );
-  }
+  if (isLoading) return <RecipePageSkeleton />;
 
   if (isError || !share) {
     const notFoundFooter = !isNative ? (
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] border-border border-t-[1px]">
-        <Button variant="outline" className="w-full" onClick={handleDownloadApp}>
+      <div className="pointer-events-none fixed bottom-0 z-20 w-full max-w-lg px-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <Button variant="outline" className={actionClass} onClick={handleDownloadApp}>
           <Download size={18} />
           {t("share.downloadApp")}
         </Button>
@@ -134,22 +143,33 @@ export default function SharedRecipe() {
   const { snapshot } = share;
   const trustedImageUrls = snapshot.image_urls.filter((url) => isTrustedRecipeImageUrl(url));
   const displayIngredients = snapshot.ingredients.map(toDisplayIngredient);
-  const instructionsMarkdown =
+  const baseServings = snapshot.base_servings ?? 1;
+  const targetServings = servings ?? baseServings;
+  const groupedIngredients = groupIngredients(
+    scaleIngredients(displayIngredients, baseServings, targetServings)
+  );
+  // Structured steps; old shares (made before steps existed) only carry the
+  // markdown, and a link out in the world can't be fixed, so it is parsed.
+  const stepInputs =
     snapshot.instruction_steps && snapshot.instruction_steps.length > 0
-      ? instructionsToMarkdown(
-          snapshot.instruction_steps.map((step) => ({
-            stepText: step.step_text,
-            groupName: step.group_name,
-          }))
-        )
-      : snapshot.instructions;
-  const groupedIngredients = groupIngredients(displayIngredients);
+      ? snapshot.instruction_steps.map((step) => ({ stepText: step.step_text, groupName: step.group_name }))
+      : snapshot.instructions
+        ? parseInstructionsMarkdown(snapshot.instructions)
+        : [];
+  const steps: RecipeInstruction[] = stepInputs.map((step, index) => ({
+    id: `step-${index}`,
+    recipeId: "",
+    stepText: step.stepText,
+    groupName: step.groupName ?? null,
+    sortOrder: index,
+    annotation: null,
+  }));
   const nutrition = snapshotNutrition(snapshot);
 
   const saveButton =
     isLoggedIn && householdId ? (
-      <Button className="w-full" onClick={handleSave} disabled={importMutation.isPending}>
-        <BookmarkPlus size={18} />
+      <Button className={actionClass} onClick={handleSave} disabled={importMutation.isPending}>
+        <Plus className="!size-5" />
         {importMutation.isPending ? t("share.importing") : t("share.saveToMyRecipes")}
       </Button>
     ) : null;
@@ -159,9 +179,9 @@ export default function SharedRecipe() {
   const appLink = isNative || !token ? null : openInAppLink("share", token);
   const storeButton =
     !saveButton && appLink ? (
-      <Button asChild className="w-full">
+      <Button asChild className={actionClass}>
         <a href={appLink}>
-          <BookmarkPlus size={18} />
+          <Plus className="!size-5" />
           {t("share.saveRecipe")}
         </a>
       </Button>
@@ -169,111 +189,108 @@ export default function SharedRecipe() {
 
   const loginButton =
     !saveButton && !storeButton && !isLoggedIn ? (
-      <Button className="w-full" onClick={() => navigate("/signup")}>
-        <BookmarkPlus size={18} />
+      <Button className={actionClass} onClick={() => navigate("/signup")}>
+        <Plus className="!size-5" />
         {t("share.saveRecipe")}
       </Button>
     ) : null;
 
   const action = saveButton ?? storeButton ?? loginButton;
-  // Sticky, not fixed + spacer: no fixed spacer height fits every button's wrap.
+  // Sticky, not fixed + spacer: it keeps its own room under the last step.
+  // No bar of its own, the page scrolls on under the capsule.
   const footer = action ? (
-    <div className="sticky bottom-0 w-full bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex flex-col gap-2 border-border border-t-[1px]">
+    <div className="pointer-events-none sticky bottom-0 z-20 w-full px-4 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
       {action}
     </div>
   ) : undefined;
 
   return (
-    <Layout showHeader={false} showFooter={false} footer={footer}>
-      {/* Image gallery */}
-      {trustedImageUrls.length === 0 ? (
-        <AspectRatio ratio={16 / 9}>
-          <img
-            src="/no-img.jpg"
-            alt="Recipe"
-            className="object-cover w-full h-full rounded-md dark:brightness-75"
-          />
-        </AspectRatio>
-      ) : (
-        <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
-          <AspectRatio ratio={16 / 9}>
-            {trustedImageUrls.map((url, index) => (
-              <PhotoView key={index} src={url}>
-                {index < 1 ? (
-                  <img
-                    src={url}
-                    alt="Recipe"
-                    className="object-cover w-full h-full rounded-md dark:brightness-75 cursor-pointer"
-                  />
-                ) : undefined}
-              </PhotoView>
-            ))}
-          </AspectRatio>
-        </PhotoProvider>
+    <Layout showHeader={false} showFooter={false} footer={footer} noTopPadding={isLoggedIn}>
+      {/* Only someone in the app has somewhere to go back to; a visitor from a link has not. */}
+      {isLoggedIn && (
+        <div className="pointer-events-none sticky top-0 z-20 flex justify-end pt-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn(glass, barButton, "pointer-events-auto")}
+            onClick={handleClose}
+            aria-label={t("common.close")}
+          >
+            <X className="!size-5" />
+          </Button>
+        </div>
       )}
 
-      <h1 className="first-font text-2xl font-bold break-words w-full">{snapshot.name}</h1>
+      <div className="flex flex-col gap-4">
+        {/* No photo, no hero: there is no cover to add here. */}
+        {trustedImageUrls.length > 0 && (
+          <PhotoProvider maskOpacity={0.5} bannerVisible={false}>
+            <AspectRatio ratio={4 / 3}>
+              {trustedImageUrls.map((url, index) => (
+                <PhotoView key={index} src={url}>
+                  {index < 1 ? (
+                    <img
+                      src={url}
+                      alt="Recipe"
+                      className="object-cover w-full h-full rounded-[28px] dark:brightness-75 cursor-pointer"
+                    />
+                  ) : undefined}
+                </PhotoView>
+              ))}
+            </AspectRatio>
+          </PhotoProvider>
+        )}
 
-      {snapshot.link && (
-        <NavLink to={snapshot.link} target="blank" className={buttonVariants() + " w-full mt-2"}>
-          <Link />
-          {t("recipe.toTheRecipe")}
-        </NavLink>
-      )}
+        <div className="flex flex-col gap-3">
+          <h1 className="first-font text-2xl font-bold break-words w-full">{snapshot.name}</h1>
 
-      <Separator />
+          {snapshot.link && <SourceLinkButton link={snapshot.link} />}
 
-      {snapshot.description && (
-        <p className="text-md font-medium mb-4 mt-2 whitespace-pre-wrap">{snapshot.description}</p>
-      )}
-
-      {/* Nutrition — the sharer's values, when the snapshot carries them */}
-      {nutrition && <NutritionSection nutrition={nutrition} />}
-
-      {/* Ingredients */}
-      {displayIngredients.length > 0 && (
-        <div>
-          <h2 className="text-lg font-semibold mt-4">{t("ingredients.title")}</h2>
-
-          {snapshot.base_servings && (
-            <p className="text-sm text-muted-foreground mb-2">
-              {snapshot.base_servings}{" "}
-              {t(`ingredients.units.${snapshot.servings_unit ?? "servings"}`, {
-                defaultValue: snapshot.servings_unit ?? "servings",
-              })}
-            </p>
+          {snapshot.description && (
+            <p className="text-base text-muted-foreground whitespace-pre-wrap">{snapshot.description}</p>
           )}
+        </div>
 
-          {groupedIngredients.map((group, groupIndex) => (
-            <div key={group.name ?? `group-${groupIndex}`}>
-              {group.name && <h4 className="font-bold text-sm mt-4">{group.name}</h4>}
-              <ul className="list-disc ml-4">
-                {group.ingredients.map((ingredient) => (
-                  <li
-                    key={ingredient.id}
-                    className={`py-0.5 ${ingredient.isOptional ? "text-muted-foreground" : ""}`}
-                  >
-                    <span className="text-sm font-medium">
-                      {ingredient.rawText}
-                      {ingredient.isOptional && (
-                        <span className="text-xs ml-1 text-muted-foreground">(optional)</span>
-                      )}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+        {/* Nutrition — the sharer's values, when the snapshot carries them */}
+        {nutrition && <NutritionSection nutrition={nutrition} />}
+
+        {/* The recipe page's section in preview mode: scalable, not checkable. */}
+        {displayIngredients.length > 0 && (
+          <section className="flex flex-col gap-4">
+            <div className="flex items-center justify-between gap-2">
+              <h2 className="text-xl font-bold">{t("ingredients.title")}</h2>
+
+              {canScale(snapshot.base_servings, displayIngredients) && (
+                <ServingScaler
+                  value={targetServings}
+                  onChange={setServings}
+                  unit={snapshot.servings_unit ?? "servings"}
+                />
+              )}
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Instructions — structured steps when present, legacy markdown otherwise */}
-      {instructionsMarkdown && (
-        <div>
-          <h2 className="text-lg font-semibold mt-4 mb-1">{t("recipe.instructions")}</h2>
-          <MarkdownRenderer content={instructionsMarkdown} className="font-medium" />
-        </div>
-      )}
+            {groupedIngredients.map((group, groupIndex) => (
+              <div key={group.name ?? `group-${groupIndex}`}>
+                {group.name && (
+                  <h3 className="pt-1 text-sm font-semibold text-muted-foreground">{group.name}</h3>
+                )}
+                <ul>
+                  {group.ingredients.map((ingredient) => (
+                    <IngredientRow
+                      key={ingredient.id}
+                      ingredient={ingredient}
+                      baseServings={baseServings}
+                      targetServings={targetServings}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </section>
+        )}
+
+        {steps.length > 0 && <InstructionSteps steps={steps} />}
+      </div>
     </Layout>
   );
 }
