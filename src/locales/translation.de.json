@@ -246,9 +246,9 @@
     "shareNotSupported": "Teilen ist in diesem Browser nicht unterstützt. Der Link wurde in die Zwischenablage kopiert."
   },
   "invitePage": {
-    "invitedTo": "Du wurdest zu folgendem Haushalt eingeladen:",
-    "joinButton": "Dem Haushalt beitreten",
-    "declineButton": "Nicht beitreten",
+    "invitedTo": "Du wurdest eingeladen beizutreten",
+    "joinButton": "Haushalt beitreten",
+    "declineButton": "Jetzt nicht",
     "invalidLink": "Ungültiger Link",
     "expiredLink": "Dieser Link ist abgelaufen",
     "invalidOrExpiredLink": "Ungültiger oder abgelaufener Link",
@@ -267,6 +267,9 @@
     "handoffSubtitle": "Tritt dem Haushalt in der Plateful-App bei. Noch keine App? Lade sie und öffne danach diesen Link noch einmal.",
     "continueInApp": "Weiter in der App",
     "continueInBrowser": "Weiter im Browser",
+    "unavailableTitle": "Einladung nicht verfügbar",
+    "unavailableDescription": "Dieser Einladungslink ist ungültig oder abgelaufen. Bitte fordere einen neuen an.",
+    "rateLimitedTitle": "Zu viele Versuche",
     "signInTitle": "Anmelden zum Beitreten",
     "signInSubtitle": "Melde dich bei Plateful an, um dem Haushalt beizutreten, in den du eingeladen wurdest."
   },

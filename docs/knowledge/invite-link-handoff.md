@@ -4,7 +4,7 @@ Since `cbdf004` (2026-10-22). Cause: the 2026-10-18 invitee opened the link with
 
 **Who sees what on `/invite/:token`** (`src/components/general/InviteRoute.tsx`):
 
-- Signed in: `InvitePage` (household name, Join).
+- Signed in: `InvitePage`, also laid out like `InviteLandingView` since 2026-10-22: full screen without header and tab bar, close button top right, the artwork, "Du wurdest eingeladen beizutreten", the household name in the brand font, "Haushalt beitreten" and "Jetzt nicht" (iOS wording). An invalid, expired or rate-limited link shows its own empty state instead of a toast.
 - Signed out in a phone browser: laid out like the iOS `InviteLandingView` (household artwork `src/assets/household-portrait.webp` from the iOS asset `HouseholdPortrait`, "Du wurdest eingeladen", an orange "Weiter in der App" pill and a text button "Weiter im Browser"). The second shows `SignUp variant="invite"` ("Anmelden zum Beitreten") in place.
 - Signed out on a desktop or inside the Android app (`Capacitor.isNativePlatform()`): `SignUp variant="invite"` directly.
 

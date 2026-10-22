@@ -194,9 +194,9 @@
     "shareNotSupported": "Sharing is not supported in this browser. The link has been copied to clipboard."
   },
   "invitePage": {
-    "invitedTo": "You have been invited to the following household:",
+    "invitedTo": "You've been invited to join",
     "joinButton": "Join Household",
-    "declineButton": "Don't Join",
+    "declineButton": "Not Now",
     "invalidLink": "Invalid link",
     "expiredLink": "This link has expired",
     "invalidOrExpiredLink": "Invalid or expired link",
@@ -215,6 +215,9 @@
     "handoffSubtitle": "Join the household in the Plateful app. Don't have it yet? Install it, then open this link again.",
     "continueInApp": "Continue in the app",
     "continueInBrowser": "Continue in browser",
+    "unavailableTitle": "Invitation Unavailable",
+    "unavailableDescription": "This invite link is invalid or has expired. Ask for a new one.",
+    "rateLimitedTitle": "Too Many Attempts",
     "signInTitle": "Sign in to join",
     "signInSubtitle": "Sign in to Plateful to join the household you were invited to."
   },

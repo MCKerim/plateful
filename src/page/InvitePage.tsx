@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router";
-import { House } from "lucide-react";
+import { Clock, Link2Off, Loader2, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import householdPortrait from "@/assets/household-portrait.webp";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,7 +50,6 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
     const loadInvite = async () => {
       if (!token) {
         setPreview({ status: "unavailable" });
-        toast.error(t("invitePage.invalidLink"));
         return;
       }
 
@@ -62,23 +61,10 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
 
         setPreview(result);
 
-        if (result.status === "unavailable") {
-          toast.error(t("invitePage.invalidOrExpiredLink"));
-          return;
-        }
-
-        if (result.status === "rate_limited") {
-          toast.error(
-            t("invitePage.rateLimited", {
-              count: inviteRetryMinutes(result.retryAfterSeconds),
-            })
-          );
-          return;
-        }
-
         if (
+          result.status === "ready" &&
           getInviteJoinRequirement(user?.household_id ?? null, result.householdId) ===
-          "must_leave_current_household"
+            "must_leave_current_household"
         ) {
           setIsHouseholdWarningOpen(true);
         }
@@ -89,7 +75,6 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
 
         reportError("Error loading invite", error);
         setPreview({ status: "unavailable" });
-        toast.error(t("invitePage.invalidOrExpiredLink"));
       }
     };
 
@@ -152,7 +137,6 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
           break;
         case "unavailable":
           setPreview({ status: "unavailable" });
-          toast.error(t("invitePage.invalidOrExpiredLink"));
           break;
       }
     } catch (error) {
@@ -166,44 +150,77 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
   const invitedHouseholdName = preview?.status === "ready" ? preview.householdName : undefined;
   const currentHouseholdName = currentHousehold?.name ?? t("invitePage.currentHouseholdFallback");
 
+  // Laid out like the iOS invite screen (InviteLandingView), a full screen with
+  // a close button instead of the app's header and tab bar.
   return (
-    <Layout>
-      <div className="flex flex-col items-center justify-center flex-1 h-full max-w-md mx-auto space-y-6 text-center">
-        <div className="mb-16 gap-2">
-          <div className="flex items-center justify-center">
-            <House className="w-12 h-12" />
-          </div>
-
-          <p className="font-medium text-primary">
-            {preview === null
-              ? t("common.loading")
-              : preview.status === "ready"
-                ? t("invitePage.invitedTo")
-                : preview.status === "rate_limited"
-                  ? t("invitePage.rateLimited", {
-                      count: inviteRetryMinutes(preview.retryAfterSeconds),
-                    })
-                  : t("invitePage.invalidOrExpiredLink")}
-          </p>
-
-          {invitedHouseholdName && (
-            <h1 className="first-font text-4xl mt-12 break-all">{invitedHouseholdName}</h1>
-          )}
-        </div>
-
-        <div className="flex flex-col w-full gap-3">
-          {preview?.status === "ready" && (
-            <Button onClick={joinHousehold} disabled={isJoining} className="w-full">
-              {isJoining ? t("invitePage.joinLoading") : t("invitePage.joinButton")}
-            </Button>
-          )}
-
-          <NavLink to="/" className="w-full">
-            <Button variant="outline" className="w-full" disabled={isJoining}>
-              {t("invitePage.declineButton")}
-            </Button>
+    <>
+      <div className="relative flex flex-col items-center w-full max-w-lg h-dvh mx-auto px-6 pt-16 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+        <Button
+          asChild
+          variant="outline"
+          size="icon"
+          className={`absolute right-4 top-4 rounded-full ${isJoining ? "pointer-events-none opacity-50" : ""}`}
+        >
+          <NavLink to="/" aria-label={t("common.close")}>
+            <X />
           </NavLink>
-        </div>
+        </Button>
+
+        {preview === null ? (
+          <div className="flex flex-1 items-center justify-center">
+            <Loader2 className="size-8 animate-spin text-muted-foreground" />
+          </div>
+        ) : preview.status === "ready" ? (
+          <>
+            <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
+              <img src={householdPortrait} alt="" className="w-[min(173px,45vw)]" />
+              <p className="font-semibold text-muted-foreground">{t("invitePage.invitedTo")}</p>
+              <h1 className="first-font text-4xl break-words max-w-full">
+                {preview.householdName}
+              </h1>
+            </div>
+
+            <div className="flex flex-col w-full max-w-sm gap-1">
+              <Button
+                variant="accent"
+                className="w-full h-12 rounded-full font-semibold text-base"
+                onClick={joinHousehold}
+                disabled={isJoining}
+              >
+                {isJoining ? t("invitePage.joinLoading") : t("invitePage.joinButton")}
+              </Button>
+              <Button
+                asChild
+                variant="link"
+                className={`text-accent font-semibold hover:no-underline ${isJoining ? "pointer-events-none opacity-50" : ""}`}
+              >
+                <NavLink to="/">{t("invitePage.declineButton")}</NavLink>
+              </Button>
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 text-center">
+            {preview.status === "rate_limited" ? (
+              <>
+                <Clock className="size-12 mb-2 text-muted-foreground" />
+                <h1 className="text-xl font-semibold">{t("invitePage.rateLimitedTitle")}</h1>
+                <p className="max-w-xs text-muted-foreground">
+                  {t("invitePage.rateLimited", {
+                    count: inviteRetryMinutes(preview.retryAfterSeconds),
+                  })}
+                </p>
+              </>
+            ) : (
+              <>
+                <Link2Off className="size-12 mb-2 text-muted-foreground" />
+                <h1 className="text-xl font-semibold">{t("invitePage.unavailableTitle")}</h1>
+                <p className="max-w-xs text-muted-foreground">
+                  {t("invitePage.unavailableDescription")}
+                </p>
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <Dialog open={isHouseholdWarningOpen} onOpenChange={setIsHouseholdWarningOpen}>
@@ -226,6 +243,6 @@ export default function InvitePage({ refreshUser }: Readonly<Props>) {
           </DialogDescription>
         </DialogContent>
       </Dialog>
-    </Layout>
+    </>
   );
 }
