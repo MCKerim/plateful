@@ -8,7 +8,6 @@ const mocks = vi.hoisted(() => ({
   getAuthorizationDetails: vi.fn(),
   approveAuthorization: vi.fn(),
   denyAuthorization: vi.fn(),
-  household: { name: "Team Kitchen" } as { name: string } | null,
   toastError: vi.fn(),
   redirectTo: vi.fn(),
   signOut: vi.fn(),
@@ -37,15 +36,7 @@ const supabaseValue = {
 };
 vi.mock("@/utils/supabase", () => ({ useSupabase: () => supabaseValue }));
 
-vi.mock("@/redux/hooks", () => ({ useAppSelector: () => mocks.household }));
-vi.mock("@/redux/slices/householdSlice", () => ({ selectHousehold: vi.fn() }));
 vi.mock("sonner", () => ({ toast: { error: mocks.toastError } }));
-
-// The real Layout drags in the header/bottom-nav shell (redux + router state);
-// this page's behaviour is entirely inside it.
-vi.mock("@/components/layout/Layout", () => ({
-  default: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}));
 
 // i18n isn't initialised in tests, so render the key plus its interpolations —
 // enough to assert *which* string was chosen without asserting on wording.
@@ -60,7 +51,6 @@ vi.mock("react-i18next", () => ({ useTranslation: () => translation }));
 beforeEach(() => {
   mocks.redirectTo.mockClear();
   mocks.signOut.mockClear();
-  mocks.household = { name: "Team Kitchen" };
 });
 
 function renderPage(search: string) {
@@ -88,22 +78,11 @@ describe("OAuthConsent", () => {
     // The client name has to reach the user — approving an unnamed app is the
     // failure mode this page exists to prevent.
     expect(await screen.findByText("oauthConsent.title:Claude")).toBeInTheDocument();
-    expect(screen.getByText("oauthConsent.subtitleWithHousehold:Team Kitchen")).toBeInTheDocument();
 
     // Deletion is permanent and no scope string conveys it, so it must be listed.
     expect(screen.getByText("oauthConsent.permissionRead")).toBeInTheDocument();
     expect(screen.getByText("oauthConsent.permissionWrite")).toBeInTheDocument();
     expect(screen.getByText("oauthConsent.permissionDelete")).toBeInTheDocument();
-    expect(screen.getByText("oauthConsent.permissionHousehold")).toBeInTheDocument();
-  });
-
-  it("falls back to the household-less subtitle when no household is loaded", async () => {
-    mocks.household = null;
-    mocks.getAuthorizationDetails.mockResolvedValue({ data: details, error: null });
-
-    renderPage("?authorization_id=auth-123");
-
-    expect(await screen.findByText("oauthConsent.subtitle")).toBeInTheDocument();
   });
 
   it("sends the user back to the client after approving", async () => {

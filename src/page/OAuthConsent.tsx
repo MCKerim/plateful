@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Pencil, Trash2, Users, Plug } from "lucide-react";
+import { BookOpen, Link2Off, Loader2, Pencil, Plug, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import Layout from "@/components/layout/Layout";
+import mascotSalad from "@/assets/mascot-filled-salad.webp";
+import claudeMark from "@/assets/icons/claude-spark-clay.svg";
+import blossomBlack from "@/assets/icons/openai-blossom-black.svg";
+import blossomWhite from "@/assets/icons/openai-blossom-white.svg";
 import { Button } from "@/components/ui/button";
 import { useSupabase } from "@/utils/supabase";
 import { redirectTo } from "@/utils/nativeBrowser";
-import { useAppSelector } from "@/redux/hooks";
-import { selectHousehold } from "@/redux/slices/householdSlice";
 import { reportError } from "@/utils/reportError";
 
 /**
@@ -54,11 +55,29 @@ type ConsentState =
       clientUri: string | null;
     };
 
+/**
+ * The requesting app's mark, in its own colours like on the Connections page.
+ * Clients register no logo (Claude and ChatGPT send none), so the name decides;
+ * anything else gets a plug.
+ */
+function ClientMark({ name }: Readonly<{ name: string }>) {
+  const lowered = name.toLowerCase();
+  if (lowered.includes("claude")) return <img src={claudeMark} alt="" className="size-8" />;
+  if (lowered.includes("chatgpt") || lowered.includes("openai")) {
+    return (
+      <>
+        <img src={blossomBlack} alt="" className="size-10 dark:hidden" />
+        <img src={blossomWhite} alt="" className="hidden size-10 dark:block" />
+      </>
+    );
+  }
+  return <Plug className="size-8" />;
+}
+
 export default function OAuthConsent() {
   const { supabase } = useSupabase();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
-  const household = useAppSelector(selectHousehold);
 
   const authorizationId = searchParams.get("authorization_id");
   const [state, setState] = useState<ConsentState>({ status: "loading" });
@@ -145,84 +164,90 @@ export default function OAuthConsent() {
     { icon: BookOpen, text: t("oauthConsent.permissionRead") },
     { icon: Pencil, text: t("oauthConsent.permissionWrite") },
     { icon: Trash2, text: t("oauthConsent.permissionDelete") },
-    { icon: Users, text: t("oauthConsent.permissionHousehold") },
   ];
 
+  // A full screen without the app's header and tab bar, like the invite page:
+  // the person arrives from the other app and leaves through one of the buttons.
   return (
-    <Layout showFooter={false}>
-      <div className="flex flex-col items-center justify-center flex-1 w-full max-w-md mx-auto space-y-8 text-center">
-        <div className="flex flex-col items-center gap-4">
-          <Plug className="w-12 h-12" />
+    <div className="flex flex-col items-center w-full max-w-lg min-h-dvh mx-auto px-6 pt-16 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      {state.status === "loading" && (
+        <div className="flex flex-1 items-center justify-center">
+          <Loader2 className="size-8 animate-spin text-muted-foreground" />
+        </div>
+      )}
 
-          {state.status === "loading" && (
-            <p className="font-medium text-primary">{t("common.loading")}</p>
-          )}
-
-          {state.status === "error" && (
-            <>
-              <p className="font-medium text-primary">{t(`oauthConsent.${state.key}`)}</p>
-              {state.key === "sessionExpired" && (
-                // Signing out drops this route to the sign-in screen, and the URL
-                // (with authorization_id) is untouched — so signing back in
-                // returns straight to this consent request rather than losing it.
-                <Button className="w-full" onClick={() => supabase.auth.signOut()}>
-                  {t("oauthConsent.signInAgain")}
-                </Button>
-              )}
-            </>
-          )}
-
-          {state.status === "ready" && (
-            <>
-              <h1 className="first-font text-3xl break-words">
-                {t("oauthConsent.title", { client: state.clientName })}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {household?.name
-                  ? t("oauthConsent.subtitleWithHousehold", { household: household.name })
-                  : t("oauthConsent.subtitle")}
-              </p>
-            </>
+      {state.status === "error" && (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
+          <Link2Off className="size-12 text-muted-foreground" />
+          <p className="max-w-xs text-muted-foreground">{t(`oauthConsent.${state.key}`)}</p>
+          {state.key === "sessionExpired" && (
+            // Signing out drops this route to the sign-in screen, and the URL
+            // (with authorization_id) is untouched — so signing back in
+            // returns straight to this consent request rather than losing it.
+            <Button
+              variant="accent"
+              className="w-full max-w-sm h-12 rounded-full font-semibold text-base"
+              onClick={() => supabase.auth.signOut()}
+            >
+              {t("oauthConsent.signInAgain")}
+            </Button>
           )}
         </div>
+      )}
 
-        {state.status === "ready" && (
-          <>
-            <ul className="flex flex-col w-full gap-3 text-left">
-              {permissions.map(({ icon: Icon, text }) => (
-                <li key={text} className="flex items-start gap-3">
-                  <Icon className="w-5 h-5 mt-0.5 shrink-0 text-primary" />
-                  <span className="text-sm">{text}</span>
-                </li>
-              ))}
-            </ul>
-
-            <p className="text-xs text-muted-foreground text-left">
-              {t("oauthConsent.revokeHint")}
-            </p>
-
-            <div className="flex flex-col w-full gap-3">
-              <Button onClick={() => decide(true)} disabled={isDeciding} className="w-full">
-                {isDeciding ? t("oauthConsent.deciding") : t("oauthConsent.approve")}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => decide(false)}
-                disabled={isDeciding}
-                className="w-full"
-              >
-                {t("oauthConsent.deny")}
-              </Button>
+      {state.status === "ready" && (
+        <>
+          <div className="flex items-center gap-3">
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-card">
+              <img src={mascotSalad} alt="" className="size-11 object-contain" />
             </div>
+            <div aria-hidden className="w-8 border-t-2 border-dashed border-muted-foreground/50" />
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-card">
+              <ClientMark name={state.clientName} />
+            </div>
+          </div>
+
+          <h1 className="first-font mt-6 max-w-full break-words text-center text-4xl">
+            {t("oauthConsent.title", { client: state.clientName })}
+          </h1>
+
+          <ul className="mt-8 flex w-full flex-col gap-4 rounded-2xl bg-card p-4">
+            {permissions.map(({ icon: Icon, text }) => (
+              <li key={text} className="flex items-center gap-3">
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-background">
+                  <Icon className="size-4" />
+                </span>
+                <span className="text-sm">{text}</span>
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-auto flex w-full max-w-sm flex-col gap-1 pt-8">
+            <Button
+              variant="accent"
+              className="w-full h-12 rounded-full font-semibold text-base"
+              onClick={() => decide(true)}
+              disabled={isDeciding}
+            >
+              {isDeciding ? t("oauthConsent.deciding") : t("oauthConsent.approve")}
+            </Button>
+            <Button
+              variant="link"
+              className="text-accent font-semibold hover:no-underline"
+              onClick={() => decide(false)}
+              disabled={isDeciding}
+            >
+              {t("oauthConsent.deny")}
+            </Button>
 
             {state.clientUri && (
-              <p className="text-xs text-muted-foreground break-all">
+              <p className="mt-2 break-all text-center text-xs text-muted-foreground">
                 {t("oauthConsent.clientUri", { uri: state.clientUri })}
               </p>
             )}
-          </>
-        )}
-      </div>
-    </Layout>
+          </div>
+        </>
+      )}
+    </div>
   );
 }
