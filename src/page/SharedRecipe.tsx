@@ -19,7 +19,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { instructionsToMarkdown } from "@/lib/transformers/instruction.transformer";
 import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
-import { mobileStoreUrl, shareAppLink } from "@/lib/appStores";
+import { mobileStoreUrl, openInAppLink } from "@/lib/appStores";
 import type { SnapshotIngredient } from "@/types/recipeShare.types";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 import { toast } from "sonner";
@@ -156,7 +156,7 @@ export default function SharedRecipe() {
 
   // On a phone the recipe is saved in the app: this opens it when installed,
   // else the store.
-  const appLink = isNative || !token ? null : shareAppLink(token);
+  const appLink = isNative || !token ? null : openInAppLink("share", token);
   const storeButton =
     !saveButton && appLink ? (
       <Button asChild className="w-full">

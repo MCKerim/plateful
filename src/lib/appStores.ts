@@ -27,33 +27,18 @@ export function mobileStoreUrl(): string | null {
 }
 
 /**
- * Where the share page's button sends a phone: the app with this recipe when it
- * is installed, else its store. `null` on a desktop. A link to the page's own
- * domain never opens the app, so iOS goes through plateful.cloud (a second
- * Universal Link domain, which redirects to the App Store without the app);
- * Android's intent URL opens the app or falls back to Google Play by itself.
+ * Where the share or invite page's button sends a phone: the app at this link
+ * when it is installed, else its store. `null` on a desktop. A link to the
+ * page's own domain never opens the app, so iOS goes through plateful.cloud (a
+ * second Universal Link domain, which redirects to the App Store without the
+ * app); Android's intent URL opens the app or falls back to Google Play by
+ * itself.
  */
-export function shareAppLink(token: string): string | null {
-  const path = `share/${encodeURIComponent(token)}`;
+export function openInAppLink(kind: "share" | "invite", token: string): string | null {
+  const path = `${kind}/${encodeURIComponent(token)}`;
   if (isIOS()) return `https://plateful.cloud/${path}`;
-  if (/Android/.test(navigator.userAgent)) return androidAppLink(path);
-  return null;
-}
-
-/**
- * Where the invite page's button sends a phone: on Android the app with this
- * invite when installed, else Google Play. iOS goes to the App Store, because
- * there the tapped invite link already opens an installed app (Universal Link)
- * and plateful.cloud does not forward invites the way it forwards shares.
- */
-export function inviteAppLink(token: string): string | null {
-  if (isIOS()) return APP_STORE_URL;
   if (/Android/.test(navigator.userAgent)) {
-    return androidAppLink(`invite/${encodeURIComponent(token)}`);
+    return `intent://app.plateful.cloud/${path}#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
   }
   return null;
-}
-
-function androidAppLink(path: string): string {
-  return `intent://app.plateful.cloud/${path}#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
 }

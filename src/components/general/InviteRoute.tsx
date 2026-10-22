@@ -10,7 +10,7 @@ import mascotSalad from "@/assets/mascot-filled-salad.webp";
 import SignUp from "@/page/onboarding/signUp/SignUp";
 import InvitePage from "@/page/InvitePage";
 import type { CurrentAuthUser } from "@/api/user.api";
-import { inviteAppLink } from "@/lib/appStores";
+import { openInAppLink } from "@/lib/appStores";
 import { clearPendingInvite, rememberPendingInvite } from "@/lib/pendingInvite";
 
 type Props = {
@@ -31,7 +31,7 @@ type Props = {
 export default function InviteRoute({ isLoggedIn, refreshUser }: Readonly<Props>) {
   const { token } = useParams();
   const [continueInBrowser, setContinueInBrowser] = useState(false);
-  const appLink = Capacitor.isNativePlatform() || !token ? null : inviteAppLink(token);
+  const appLink = Capacitor.isNativePlatform() || !token ? null : openInAppLink("invite", token);
   const showsSignIn = !appLink || continueInBrowser;
 
   useEffect(() => {

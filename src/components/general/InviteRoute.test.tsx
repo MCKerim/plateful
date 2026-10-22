@@ -3,7 +3,6 @@ import { MemoryRouter, Route, Routes } from "react-router";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import InviteRoute from "./InviteRoute";
 import { PostSignInLanding } from "./OAuthConsentRoute";
-import { APP_STORE_URL } from "@/lib/appStores";
 import { peekPendingInvite, rememberPendingInvite } from "@/lib/pendingInvite";
 import { peekPendingConsent, rememberPendingConsent } from "@/lib/pendingOAuthConsent";
 
@@ -63,13 +62,13 @@ describe("InviteRoute signed out", () => {
     expect(screen.queryByText(/sign-in screen/)).toBeNull();
   });
 
-  it("sends an iPhone to the App Store", () => {
+  it("sends an iPhone through plateful.cloud, which opens the app or the App Store", () => {
     useAgent(IPHONE);
     renderAt("/invite/abc123", false);
 
     expect(
       screen.getByRole("link", { name: "invitePage.continueInApp" }).getAttribute("href")
-    ).toBe(APP_STORE_URL);
+    ).toBe("https://plateful.cloud/invite/abc123");
   });
 
   it("keeps web sign-in one tap away, framed as an invite", () => {
