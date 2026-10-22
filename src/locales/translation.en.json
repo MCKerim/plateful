@@ -243,42 +243,37 @@
     "subtitle": "Never stare blankly at your fridge again!",
     "continueWithGoogle": "Continue with Google",
     "continueWithApple": "Continue with Apple",
-    "continueWithEMail": "Continue with E-Mail",
+    "continueWithEMail": "Continue with Email",
     "alreadyHaveAccount": "Already have an account? Sign in"
   },
   "emailSignup": {
-    "title": "Create Account",
-    "subtitle": "Sign up with your email",
+    "subtitle": "We'll send a magic link - no password needed",
     "emailLabel": "Email",
-    "emailPlaceholder": "your@email.com",
-    "signupButton": "Send Magic Link",
-    "loading": "Sending magic link...",
+    "emailPlaceholder": "Email",
+    "signupButton": "Email me a magic link",
+    "loading": "Sending magic link…",
     "errors": {
-      "invalidEmail": "Please enter a valid email address",
+      "invalidEmail": "Enter a valid email address",
       "fillAllFields": "Please fill in all fields",
-      "signupFailed": "Failed to send magic link. Please try again."
+      "signupFailed": "We couldn't send your magic link - check your connection and try again"
     }
   },
   "emailVerification": {
-    "title": "Check Your Email",
-    "subtitle": "We've sent a verification link to {{email}}",
-    "checkEmail": "Check your email inbox and click the verification link to activate your account",
-    "description": "This helps us confirm your email address and secure your account.",
-    "continueButton": "Back to Home",
-    "resendButton": "Resend email",
-    "changeEmailButton": "Use a different email",
-    "resendSent": "Verification email resent. Please check your inbox.",
+    "title": "Check your email",
+    "subtitle": "We sent a magic link to {{email}}. Tap the link to sign in. No email? Check your spam folder.",
+    "resendButton": "Send another link",
+    "resendSent": "Magic link sent again. Check your inbox.",
     "errors": {
-      "noEmailFound": "No email found to resend verification.",
-      "resendFailed": "Error resending verification email."
+      "noEmailFound": "No email address to send the link to. Go back and enter it again.",
+      "resendFailed": "We couldn't send another magic link - check your connection and try again"
     }
   },
   "login": {
-    "termsPrefix": "By signing up, you agree to our",
+    "termsPrefix": "By continuing, you agree to our",
     "termsOfService": "Terms of Service",
     "termsAnd": "and",
     "privacyPolicy": "Privacy Policy",
-    "termsSuffix": ""
+    "termsSuffix": "."
   },
   "reviewSignIn": {
     "hint": "Enter the review account password",

@@ -61,41 +61,36 @@
     "alreadyHaveAccount": "Bereits registriert? Anmelden"
   },
   "emailSignup": {
-    "title": "Konto erstellen oder anmelden",
-    "subtitle": "Melden Sie sich mit Ihrer E-Mail an",
+    "subtitle": "Wir schicken dir einen Magic Link - ohne Passwort",
     "emailLabel": "E-Mail",
-    "emailPlaceholder": "ihre@email.de",
-    "signupButton": "Magic Link senden",
-    "loading": "Magic Link wird gesendet...",
+    "emailPlaceholder": "E-Mail",
+    "signupButton": "Schick mir einen Magic Link",
+    "loading": "Magic Link wird gesendet …",
     "errors": {
-      "invalidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
-      "fillAllFields": "Bitte füllen Sie alle Felder aus",
-      "signupFailed": "Fehler beim Senden des Magic Links. Bitte versuchen Sie es später erneut."
+      "invalidEmail": "Gib eine gültige E-Mail-Adresse ein",
+      "fillAllFields": "Bitte fülle alle Felder aus",
+      "signupFailed": "Wir konnten deinen Magic Link nicht senden - überprüfe deine Verbindung und versuche es erneut"
     }
   },
   "emailVerification": {
-    "title": "Überprüfen Sie Ihre E-Mail",
-    "subtitle": "Wir haben einen Bestätigungslink an {{email}} gesendet",
-    "checkEmail": "Überprüfen Sie Ihr E-Mail-Postfach und klicken Sie auf den Bestätigungslink, um Ihr Konto zu aktivieren",
-    "description": "Dies hilft uns, Ihre E-Mail-Adresse zu bestätigen und Ihr Konto zu sichern.",
-    "continueButton": "Zurück nach Hause",
-    "resendButton": "Erneut senden",
-    "changeEmailButton": "Eine andere E-Mail verwenden",
-    "resendSent": "Bestätigungsemail gesendet. Bitte überprüfen Sie Ihr Postfach.",
+    "title": "Prüfe deine E-Mails",
+    "subtitle": "Wir haben einen Magic Link an {{email}} gesendet. Tippe auf den Link, um dich anzumelden. Keine E-Mail? Sieh im Spam-Ordner nach.",
+    "resendButton": "Neuen Link senden",
+    "resendSent": "Magic Link erneut gesendet. Prüfe dein Postfach.",
     "errors": {
-      "noEmailFound": "Keine E-Mail-Adresse gefunden, um die Bestätigung erneut zu senden.",
-      "resendFailed": "Fehler beim erneuten Senden der Bestätigungsemail."
+      "noEmailFound": "Keine E-Mail-Adresse, an die der Link gehen könnte. Geh zurück und gib sie erneut ein.",
+      "resendFailed": "Wir konnten keinen neuen Magic Link senden - überprüfe deine Verbindung und versuche es erneut"
     }
   },
   "login": {
-    "termsPrefix": "Indem du dich anmeldest, stimmst du unseren",
+    "termsPrefix": "Indem du fortfährst, stimmst du unseren",
     "termsOfService": "Nutzungsbedingungen",
-    "termsAnd": "und",
-    "privacyPolicy": "Datenschutzrichtlinien",
-    "termsSuffix": " zu"
+    "termsAnd": "und unserer",
+    "privacyPolicy": "Datenschutzerklärung",
+    "termsSuffix": " zu."
   },
   "reviewSignIn": {
-    "hint": "Passwort des Review-Kontos eingeben",
+    "hint": "Gib das Passwort des Review-Kontos ein",
     "passwordLabel": "Passwort",
     "passwordPlaceholder": "Passwort des Review-Kontos",
     "signInButton": "Anmelden",

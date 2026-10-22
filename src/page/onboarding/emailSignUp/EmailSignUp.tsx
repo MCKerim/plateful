@@ -111,22 +111,20 @@ export default function EmailSignUp() {
   };
 
   return (
+    // Laid out like the iOS email screen (EmailSignUpView): no page title, the
+    // field's heading and a one-line hint, then the form.
     <div className="flex flex-col items-center h-dvh px-4 py-10">
-      <div className="flex flex-col justify-center flex-1 w-full mb-8 text-center">
-        <h1 className="font-bold text-4xl first-font">{t("emailSignup.title")}</h1>
+      <form onSubmit={handleSignUp} className="flex flex-col w-full max-w-sm flex-1 gap-3">
+        <div className="flex flex-col gap-1.5 mb-8">
+          <Label htmlFor="email" className="text-2xl font-bold">
+            {t("emailSignup.emailLabel")}
+          </Label>
+          <p className="text-sm text-muted-foreground">
+            {isReviewAccount ? t("reviewSignIn.hint") : t("emailSignup.subtitle")}
+          </p>
+        </div>
 
-        <p className="text-sm text-muted-foreground">
-          {isReviewAccount ? t("reviewSignIn.hint") : t("emailSignup.subtitle")}
-        </p>
-      </div>
-
-      <form
-        onSubmit={handleSignUp}
-        className="flex flex-col w-full max-w-sm gap-3 h-full justify-center"
-      >
         <div className="flex flex-col gap-2">
-          <Label htmlFor="email">{t("emailSignup.emailLabel")}</Label>
-
           <Input
             id="email"
             type="email"
@@ -156,7 +154,7 @@ export default function EmailSignUp() {
 
         {error && <p className="text-destructive text-sm">{error}</p>}
 
-        <div className="flex flex-col w-full max-w-sm gap-3">
+        <div className="flex flex-col w-full max-w-sm gap-3 mt-5">
           <OnboardingButton
             label={(() => {
               if (isReviewAccount) {
