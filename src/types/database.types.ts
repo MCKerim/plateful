@@ -499,6 +499,45 @@ export type Database = {
           },
         ]
       }
+      ingredient_names: {
+        Row: {
+          created_at: string
+          lang: string
+          name: string
+          name_norm: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          lang: string
+          name: string
+          name_norm?: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          lang?: string
+          name?: string
+          name_norm?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_names_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: false
+            referencedRelation: "ingredient_dictionary"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "ingredient_names_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
       ingredients: {
         Row: {
           category: string
@@ -1008,6 +1047,94 @@ export type Database = {
           },
         ]
       }
+      recipe_originals: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          derived_at: string | null
+          embedding: string | null
+          id: string
+          image_path: string | null
+          import_id: string | null
+          ingredient_slugs: string[] | null
+          nutrition: Json | null
+          origin: string
+          recipe_index: number
+          snapshot: Json
+          source_key: string | null
+          source_language: string | null
+          source_type: string
+          tags: string[] | null
+          total_time_minutes: number | null
+          translations: Json
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          derived_at?: string | null
+          embedding?: string | null
+          id?: string
+          image_path?: string | null
+          import_id?: string | null
+          ingredient_slugs?: string[] | null
+          nutrition?: Json | null
+          origin?: string
+          recipe_index?: number
+          snapshot: Json
+          source_key?: string | null
+          source_language?: string | null
+          source_type: string
+          tags?: string[] | null
+          total_time_minutes?: number | null
+          translations?: Json
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          derived_at?: string | null
+          embedding?: string | null
+          id?: string
+          image_path?: string | null
+          import_id?: string | null
+          ingredient_slugs?: string[] | null
+          nutrition?: Json | null
+          origin?: string
+          recipe_index?: number
+          snapshot?: Json
+          source_key?: string | null
+          source_language?: string | null
+          source_type?: string
+          tags?: string[] | null
+          total_time_minutes?: number | null
+          translations?: Json
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipe_originals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "household_entitlements"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "recipe_originals_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipe_originals_import_id_fkey"
+            columns: ["import_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_imports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       recipe_ratings: {
         Row: {
           created_at: string
@@ -1154,6 +1281,7 @@ export type Database = {
           name: string
           nutrition_auto: boolean
           nutrition_pending: boolean
+          original_id: string | null
           owner_id: string | null
           protein_g: number | null
           search_tsv: unknown
@@ -1188,6 +1316,7 @@ export type Database = {
           name: string
           nutrition_auto?: boolean
           nutrition_pending?: boolean
+          original_id?: string | null
           owner_id?: string | null
           protein_g?: number | null
           search_tsv?: unknown
@@ -1222,6 +1351,7 @@ export type Database = {
           name?: string
           nutrition_auto?: boolean
           nutrition_pending?: boolean
+          original_id?: string | null
           owner_id?: string | null
           protein_g?: number | null
           search_tsv?: unknown
@@ -1253,6 +1383,13 @@ export type Database = {
             columns: ["import_id"]
             isOneToOne: false
             referencedRelation: "recipe_imports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recipes_original_id_fkey"
+            columns: ["original_id"]
+            isOneToOne: false
+            referencedRelation: "recipe_originals"
             referencedColumns: ["id"]
           },
           {
@@ -1374,6 +1511,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "household"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shopping_list_items_ingredient_slug_fkey"
+            columns: ["ingredient_slug"]
+            isOneToOne: false
+            referencedRelation: "ingredient_dictionary"
+            referencedColumns: ["slug"]
           },
           {
             foreignKeyName: "shopping_list_items_ingredient_slug_fkey"
@@ -1652,6 +1796,36 @@ export type Database = {
           },
         ]
       }
+      ingredient_dictionary: {
+        Row: {
+          category: string | null
+          is_staple: boolean | null
+          name_de: string | null
+          name_en: string | null
+          names_de: string[] | null
+          names_en: string[] | null
+          slug: string | null
+        }
+        Insert: {
+          category?: string | null
+          is_staple?: boolean | null
+          name_de?: string | null
+          name_en?: string | null
+          names_de?: never
+          names_en?: never
+          slug?: string | null
+        }
+        Update: {
+          category?: string | null
+          is_staple?: boolean | null
+          name_de?: string | null
+          name_en?: string | null
+          names_de?: never
+          names_en?: never
+          slug?: string | null
+        }
+        Relationships: []
+      }
       recipes_with_rating: {
         Row: {
           avg_rating: number | null
@@ -1667,6 +1841,7 @@ export type Database = {
           nutrition_pending: boolean | null
           servings_unit: string | null
           status: string | null
+          tags: string[] | null
         }
         Insert: {
           avg_rating?: never
@@ -1682,6 +1857,7 @@ export type Database = {
           nutrition_pending?: boolean | null
           servings_unit?: string | null
           status?: string | null
+          tags?: string[] | null
         }
         Update: {
           avg_rating?: never
@@ -1697,6 +1873,7 @@ export type Database = {
           nutrition_pending?: boolean | null
           servings_unit?: string | null
           status?: string | null
+          tags?: string[] | null
         }
         Relationships: [
           {
@@ -1748,42 +1925,11 @@ export type Database = {
           isSetofReturn: true
         }
       }
-      add_recipe_to_shopping_list: {
-        Args: {
-          p_household_id: string
-          p_ingredient_ids: string[]
-          p_scale?: number
-        }
-        Returns: {
-          added_at: string
-          bought_at: string | null
-          bought_count: number
-          category: string
-          created_at: string
-          created_by: string | null
-          household_id: string
-          id: string
-          ingredient_slug: string | null
-          name: string
-          name_key: string | null
-          on_list: boolean
-          quantity_display: string | null
-          quantity_value: number | null
-          sources: Json
-          unit: string | null
-          updated_at: string
-        }[]
-        SetofOptions: {
-          from: "*"
-          to: "shopping_list_items"
-          isOneToOne: false
-          isSetofReturn: true
-        }
-      }
       add_shopping_list_item: {
         Args: {
           p_household_id: string
           p_id: string
+          p_language?: string
           p_name: string
           p_quantity_display?: string
           p_quantity_value?: number
@@ -1831,6 +1977,17 @@ export type Database = {
           p_recipe_id: string
           p_tags: string[]
           p_total_time_minutes: number
+        }
+        Returns: undefined
+      }
+      apply_week_plan: {
+        Args: {
+          p_delete_ids: string[]
+          p_household_id: string
+          p_moves: Json
+          p_note_inserts: Json
+          p_note_text_edits: Json
+          p_recipe_inserts: Json
         }
         Returns: undefined
       }
@@ -1908,6 +2065,10 @@ export type Database = {
         }
       }
       leave_household: { Args: never; Returns: string }
+      merge_ingredient: {
+        Args: { p_from: string; p_into: string }
+        Returns: undefined
+      }
       planner_note_suggestions: {
         Args: { p_household_id: string; p_limit?: number }
         Returns: {
@@ -2076,6 +2237,7 @@ export type Database = {
         Args: {
           p_category: string
           p_id: string
+          p_language?: string
           p_name: string
           p_quantity_display?: string
           p_quantity_value?: number
