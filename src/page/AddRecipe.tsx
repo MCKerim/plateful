@@ -50,6 +50,10 @@ import {
 } from "@/hooks/collections/useCollections";
 import { recipeImageApi } from "@/api/recipeImage.api";
 import { reportError } from "@/utils/reportError";
+import { useRecipeOriginal } from "@/hooks/recipe/useRecipeOriginal";
+import { useResetRecipeToOriginal } from "@/hooks/recipe/useResetRecipeToOriginal";
+import { matchesOriginal } from "@/lib/recipeOriginal";
+import { Undo2 } from "lucide-react";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -116,6 +120,7 @@ export default function AddRecipe() {
       : [];
   });
   const [createdRecipeId, setCreatedRecipeId] = useState<string | null>(null);
+  const [confirmingReset, setConfirmingReset] = useState(false);
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>("");
@@ -131,7 +136,8 @@ export default function AddRecipe() {
   // React Query hooks
   const { recipe, imageInfo } = useRecipeForEdit(recipeId);
   const membershipsQuery = useRecipeCollectionIds(recipeId);
-  const { data: existingIngredients = [] } = useRecipeIngredients(recipeId);
+  const { data: existingIngredients = [], isSuccess: ingredientsLoaded } =
+    useRecipeIngredients(recipeId);
   const { data: existingInstructions = [], isSuccess: instructionsLoaded } =
     useRecipeInstructions(recipeId);
   const createRecipeMutation = useCreateRecipe();
@@ -140,6 +146,19 @@ export default function AddRecipe() {
   const replaceIngredientsMutation = useReplaceAllIngredients();
   const replaceInstructionsMutation = useReplaceAllInstructions();
   const replaceCollectionsMutation = useReplaceRecipeCollections();
+  const resetMutation = useResetRecipeToOriginal();
+  const { data: original } = useRecipeOriginal(recipe?.original_id ?? null);
+
+  // Decided on the SAVED rows, so unsaved edits in this form never count.
+  const differsFromOriginal =
+    !!recipe &&
+    !!original &&
+    ingredientsLoaded &&
+    !matchesOriginal(original, {
+      name: recipe.name,
+      ingredientLines: existingIngredients.map((row) => row.rawText),
+      baseServings: recipe.base_servings,
+    });
 
   const searchUrl = searchParams.get("url");
   const searchTitle = searchParams.get("title");
@@ -491,6 +510,26 @@ export default function AddRecipe() {
     });
   }
 
+  // Drops unsaved edits in the form along with the saved changes.
+  function resetToOriginal() {
+    if (!recipeId || !original) return;
+
+    resetMutation.mutate(
+      { recipeId, originalId: original.id },
+      {
+        onSuccess: () => {
+          toast.success(t("addRecipe.recipeReset"));
+          navigate(`/recipe/${recipeId}`, { replace: true });
+        },
+        onError: (error) => {
+          console.error("Error while resetting recipe to original: ", error);
+          setConfirmingReset(false);
+          toast.error(t("addRecipe.errors.resetFailed"));
+        },
+      }
+    );
+  }
+
   // Current ingredient lines (raw text, no section headers) for the nutrition estimate.
   const ingredientLines = ingredients
     .filter((item) => item.type === "ingredient")
@@ -533,7 +572,8 @@ export default function AddRecipe() {
             createRecipeMutation.isPending ||
             updateRecipeMutation.isPending ||
             replaceCollectionsMutation.isPending ||
-            imageUploading
+            imageUploading ||
+            resetMutation.isPending
           }
         >
           {createRecipeMutation.isPending ||
@@ -657,6 +697,33 @@ export default function AddRecipe() {
           auto={nutritionAuto}
           onAutoChange={setNutritionAuto}
         />
+
+        {/* Kept while pending: the refetch before navigating already matches. */}
+        {(differsFromOriginal || resetMutation.isPending) && (
+          <>
+            <Button
+              variant="outline"
+              className="w-full text-destructive"
+              onClick={() => setConfirmingReset(true)}
+            >
+              <Undo2 />
+              {t("addRecipe.resetToOriginal")}
+            </Button>
+
+            <DeleteDialog
+              open={confirmingReset}
+              onOpenChange={(open) => {
+                if (!resetMutation.isPending) setConfirmingReset(open);
+              }}
+              onDelete={resetToOriginal}
+              title={t("addRecipe.resetToOriginalTitle")}
+              description={t("addRecipe.resetToOriginalMessage")}
+              confirmText={t("common.reset")}
+              loading={resetMutation.isPending}
+              loadingText={t("addRecipe.resetting")}
+            />
+          </>
+        )}
       </div>
     </Layout>
   );

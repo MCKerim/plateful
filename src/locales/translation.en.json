@@ -563,11 +563,17 @@
     "importRecipeData": "Import recipe data (TikTok)",
     "recipeSaved": "Added to Plateful",
     "recipeDeleted": "Recipe deleted!",
+    "resetToOriginal": "Reset to original",
+    "resetToOriginalTitle": "Reset to original?",
+    "resetToOriginalMessage": "Your changes since the import will be lost. Ingredients, steps, servings, text and photo go back to the original.",
+    "resetting": "Resetting...",
+    "recipeReset": "Recipe reset to the original",
     "errors": {
       "uploadFailed": "Upload failed",
       "nameRequired": "Please enter a name for the recipe.",
       "saveFailed": "The recipe could not be saved. Please try again.",
-      "deleteFailed": "Error while deleting recipe"
+      "deleteFailed": "Error while deleting recipe",
+      "resetFailed": "The recipe couldn't be reset to its original. Please try again."
     }
   },
   "urlImport": {

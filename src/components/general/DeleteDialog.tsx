@@ -19,6 +19,7 @@ type Props = {
   cancelText?: string;
   confirmText?: string;
   loading?: boolean;
+  loadingText?: string;
   /** Controlled from outside (a menu item), with no trigger of its own. */
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -32,6 +33,7 @@ export default function DeleteDialog({
   cancelText,
   confirmText,
   loading,
+  loadingText,
   open,
   onOpenChange,
 }: Readonly<Props>) {
@@ -81,13 +83,8 @@ export default function DeleteDialog({
               {dialogCancelText}
             </Button>
 
-            <Button
-              className="w-full"
-              variant="destructive"
-              disabled={loading}
-              onClick={onDelete}
-            >
-              {loading ? t("common.deleting") : dialogConfirmText}
+            <Button className="w-full" variant="destructive" disabled={loading} onClick={onDelete}>
+              {loading ? (loadingText ?? t("common.deleting")) : dialogConfirmText}
             </Button>
           </div>
         </DialogDescription>

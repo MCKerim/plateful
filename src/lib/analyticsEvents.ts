@@ -66,6 +66,8 @@ export const AnalyticsEvent = {
    * toggle off was never auto-managed and would inflate the metric.
    */
   nutritionAutoToggled: "nutrition_auto_toggled",
+  /** The editor's "Reset to original" succeeded; the iOS event, no properties. */
+  recipeResetToOriginal: "recipe_reset_to_original",
   subscriptionPurchased: "subscription_purchased",
   subscriptionRestored: "subscription_restored",
   householdCreated: "household_created",

@@ -22,6 +22,9 @@ export const queryKeys = {
     images: (id: string) => ["recipes", id, "images"] as const,
     bundles: (ids: string[]) => ["recipes", "bundles", ...ids] as const,
   },
+  recipeOriginals: {
+    detail: (id: string) => ["recipe-originals", id] as const,
+  },
   collections: {
     all: ["collections"] as const,
     list: (householdId: string) => ["collections", "list", householdId] as const,

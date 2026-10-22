@@ -550,11 +550,17 @@
     "importRecipeData": "Rezeptdaten importieren (TikTok)",
     "recipeSaved": "Zu Plateful hinzugefügt",
     "recipeDeleted": "Rezept gelöscht!",
+    "resetToOriginal": "Auf Original zurücksetzen",
+    "resetToOriginalTitle": "Auf Original zurücksetzen?",
+    "resetToOriginalMessage": "Deine Änderungen seit dem Import gehen verloren. Zutaten, Schritte, Portionen, Text und Foto werden auf das Original zurückgesetzt.",
+    "resetting": "Zurücksetzen...",
+    "recipeReset": "Rezept auf das Original zurückgesetzt",
     "errors": {
       "uploadFailed": "Hochladen fehlgeschlagen",
       "nameRequired": "Bitte gib einen Namen für das Rezept ein.",
       "saveFailed": "Das Rezept konnte nicht gespeichert werden. Bitte versuche es erneut.",
-      "deleteFailed": "Fehler beim Löschen des Rezepts"
+      "deleteFailed": "Fehler beim Löschen des Rezepts",
+      "resetFailed": "Das Rezept konnte nicht auf das Original zurückgesetzt werden. Bitte versuche es erneut."
     }
   },
   "urlImport": {
