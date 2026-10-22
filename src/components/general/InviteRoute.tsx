@@ -31,17 +31,19 @@ type Props = {
 export default function InviteRoute({ isLoggedIn, refreshUser }: Readonly<Props>) {
   const { token } = useParams();
   const [continueInBrowser, setContinueInBrowser] = useState(false);
+  const appLink = Capacitor.isNativePlatform() || !token ? null : inviteAppLink(token);
+  const showsSignIn = !appLink || continueInBrowser;
 
   useEffect(() => {
     if (!token) return;
     if (isLoggedIn) clearPendingInvite();
-    else rememberPendingInvite(token);
-  }, [isLoggedIn, token]);
+    // Not while only the app is offered: someone who joins there would be sent
+    // back to the invite by their next web sign-in in this browser.
+    else if (showsSignIn) rememberPendingInvite(token);
+  }, [isLoggedIn, token, showsSignIn]);
 
   if (isLoggedIn) return <InvitePage refreshUser={refreshUser} />;
-
-  const appLink = Capacitor.isNativePlatform() || !token ? null : inviteAppLink(token);
-  if (!appLink || continueInBrowser) return <SignUp variant="invite" />;
+  if (showsSignIn) return <SignUp variant="invite" />;
 
   return (
     <InviteAppHandoff appLink={appLink} onContinueInBrowser={() => setContinueInBrowser(true)} />

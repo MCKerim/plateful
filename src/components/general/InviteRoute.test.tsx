@@ -102,6 +102,19 @@ describe("InviteRoute signed out", () => {
 
     expect(peekPendingInvite()).toBe("/invite/abc123");
   });
+
+  it("remembers the invite only once web sign-in is shown", () => {
+    useAgent(ANDROID);
+    renderAt("/invite/abc123", false);
+
+    // Someone who leaves for the app and joins there must not be sent back to
+    // the invite by a later web sign-in in this browser.
+    expect(peekPendingInvite()).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: "invitePage.continueInBrowser" }));
+
+    expect(peekPendingInvite()).toBe("/invite/abc123");
+  });
 });
 
 describe("InviteRoute signed in", () => {

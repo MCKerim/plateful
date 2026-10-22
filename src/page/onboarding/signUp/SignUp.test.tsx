@@ -85,6 +85,31 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
+describe("SignUp: variants", () => {
+  function renderVariant(variant: "onboarding" | "connect" | "invite") {
+    render(
+      <MemoryRouter>
+        <SignUp variant={variant} />
+      </MemoryRouter>
+    );
+  }
+
+  it("greets an invitee with the join heading and counts them in the signup funnel", () => {
+    renderVariant("invite");
+
+    expect(screen.getByRole("heading", { name: "invitePage.signInTitle" })).toBeInTheDocument();
+    expect(screen.getByText("invitePage.signInSubtitle")).toBeInTheDocument();
+    expect(tracking.trackScreenViewed).toHaveBeenCalledWith("signup");
+  });
+
+  it("keeps someone connecting an assistant out of the signup funnel", () => {
+    renderVariant("connect");
+
+    expect(screen.getByRole("heading", { name: "oauthConsent.signInTitle" })).toBeInTheDocument();
+    expect(tracking.trackScreenViewed).not.toHaveBeenCalled();
+  });
+});
+
 describe("SignUp: which providers are offered", () => {
   it("offers Google, Apple and e-mail on the web and initializes both providers", () => {
     renderScreen();
