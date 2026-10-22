@@ -4,33 +4,33 @@ Per language 500 characters (Play Console limit). Same voice as the iOS
 What's New in the iOS repo's `docs/app-store-listing.md`; the Android notes
 for 1.4 fold iOS 1.2 and 1.3 into one release.
 
-## 1.5 (versionCode 45), 2026-10-19
+## 1.5 (versionCode 46), 2026-10-23
 
-versionCode 44 stayed in internal testing: it declared `USE_EXACT_ALARM`, which Play refuses for a recipe app.
+versionCode 44 stayed in internal testing: it declared `USE_EXACT_ALARM`, which Play refuses for a recipe app. versionCode 45 stayed there too: it predates the new recipe page and the reset to the original (2026-10-22).
 
 **DE**
 
 Der Kochmodus ist da.
 
-• Ein Tipp auf „Kochen“ zeigt deinen aktuellen Schritt groß und lesbar, Wischen ist die Navigation.
-• Zutaten stehen direkt im Schritt, die skalierte Menge auf Tipp. Zeitangaben werden zu Timern.
-• Timer laufen für den ganzen Haushalt und klingeln auf jedem beteiligten Gerät, auch bei dunklem Bildschirm.
-• Kocht jemand aus deinem Haushalt, kochst du von der Startseite aus mit, mit eigenem Schritt.
+• „Kochen“ zeigt deinen Schritt groß und lesbar, Wischen blättert.
+• Zutaten stehen im Schritt, die skalierte Menge auf Tipp. Zeitangaben werden zu Timern.
+• Timer klingeln auf jedem Gerät, das mitkocht, auch bei dunklem Bildschirm.
+• Kocht dein Haushalt, kochst du von der Startseite aus mit, mit eigenem Schritt.
 • Portionen und Häkchen teilt ihr euch live.
 
-Dazu kleinere Verbesserungen.
+Neu auch: die Rezeptseite, und importierte Rezepte lassen sich im Editor auf das Original zurücksetzen.
 
 **EN**
 
 Cooking mode is here.
 
-• Tap “Cook” and your current step fills the screen, big and readable; swiping is the navigation.
+• Tap “Cook” and your step fills the screen, big and readable; swipe to move on.
 • Ingredients sit right in the step, with the scaled amount on tap. Durations become timers.
-• Timers run for the whole household and ring on every device that's cooking, screen off included.
-• When someone in your household cooks, Home shows it and you cook along at your own step.
+• Timers ring on every device that's cooking, screen off included.
+• When your household cooks, Home shows it and you cook along at your own step.
 • Servings and checked-off ingredients are shared live.
 
-Plus smaller improvements and fixes.
+Also new: the recipe page, and an imported recipe can be reset to its original in the editor.
 
 ## 1.4 (versionCode 43), 2026-10-11
 
