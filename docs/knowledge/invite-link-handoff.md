@@ -5,7 +5,7 @@ Since `cbdf004` (2026-10-22). Cause: the 2026-10-18 invitee opened the link with
 **Who sees what on `/invite/:token`** (`src/components/general/InviteRoute.tsx`):
 
 - Signed in: `InvitePage` (household name, Join).
-- Signed out in a phone browser: "Du wurdest eingeladen" with "Weiter in der App" and "Weiter im Browser". The second shows `SignUp variant="invite"` ("Anmelden zum Beitreten") in place.
+- Signed out in a phone browser: laid out like the iOS `InviteLandingView` (household artwork `src/assets/household-portrait.webp` from the iOS asset `HouseholdPortrait`, "Du wurdest eingeladen", an orange "Weiter in der App" pill and a text button "Weiter im Browser"). The second shows `SignUp variant="invite"` ("Anmelden zum Beitreten") in place.
 - Signed out on a desktop or inside the Android app (`Capacitor.isNativePlatform()`): `SignUp variant="invite"` directly.
 
 **The app button** (`openInAppLink("invite", token)` in `src/lib/appStores.ts`, shared with the share page). Android gets an `intent://app.plateful.cloud/invite/<token>` URL that opens the app at the invite or falls back to Google Play by itself. iPhone links to `https://plateful.cloud/invite/<token>`, because a link to the page's own domain never opens the app. Since 2026-10-22 the website lists `/invite/*` in its AASA and redirects it to the App Store (`plateful-website` `4f87e1b`), and the iOS app's `HouseholdInvite.token(from:)` accepts the `plateful.cloud` host (iOS `invite-plateful-cloud` branch). iOS builds from before that change open the app on this link but drop the invite, as the App Store's "Open" would. After a store install, the invitee has to open the link again, which the page says. There is no deferred deep link.

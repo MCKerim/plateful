@@ -2,11 +2,8 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
-import { Smartphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import OnboardingButton from "@/components/onboarding/onboardingButton/OnboardingButton";
-import MascotBowl from "@/components/general/MascotBowl";
-import mascotSalad from "@/assets/mascot-filled-salad.webp";
+import householdPortrait from "@/assets/household-portrait.webp";
 import SignUp from "@/page/onboarding/signUp/SignUp";
 import InvitePage from "@/page/InvitePage";
 import type { CurrentAuthUser } from "@/api/user.api";
@@ -56,29 +53,34 @@ function InviteAppHandoff({
 }: Readonly<{ appLink: string; onContinueInBrowser: () => void }>) {
   const { t } = useTranslation();
 
+  // Laid out like the iOS invite screen (InviteLandingView): the household
+  // artwork and the invitation centred, the app as the one primary action and
+  // the browser as a quiet text button beneath it.
   return (
-    <div className="flex flex-col items-center h-dvh px-4 py-10">
-      <div className="flex flex-col w-full mb-8 text-center">
-        <h1 className="font-bold text-5xl first-font">{t("invitePage.handoffTitle")}</h1>
-        <p className="mt-2 text-sm text-muted-foreground">{t("invitePage.handoffSubtitle")}</p>
+    <div className="flex flex-col items-center h-dvh px-6 pt-10 pb-[calc(1.5rem+env(safe-area-inset-bottom))]">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-4 text-center">
+        <img src={householdPortrait} alt="" className="w-[min(173px,45vw)]" />
+        <h1 className="first-font text-4xl">{t("invitePage.handoffTitle")}</h1>
+        <p className="max-w-xs font-semibold text-muted-foreground">
+          {t("invitePage.handoffSubtitle")}
+        </p>
       </div>
 
-      <div className="flex min-h-0 flex-1 w-full items-end justify-center pb-5">
-        <MascotBowl src={mascotSalad} grounded className="w-[min(228px,58vw)] max-h-full" />
-      </div>
-
-      <div className="flex flex-col w-full max-w-sm gap-2">
-        <Button asChild className="w-full h-12 rounded-full font-semibold text-base">
-          <a href={appLink}>
-            <Smartphone />
-            {t("invitePage.continueInApp")}
-          </a>
+      <div className="flex flex-col w-full max-w-sm gap-1">
+        <Button
+          asChild
+          variant="accent"
+          className="w-full h-12 rounded-full font-semibold text-base"
+        >
+          <a href={appLink}>{t("invitePage.continueInApp")}</a>
         </Button>
-        <OnboardingButton
-          label={t("invitePage.continueInBrowser")}
-          variant="secondary"
+        <Button
+          variant="link"
+          className="text-accent font-semibold hover:no-underline"
           onClick={onContinueInBrowser}
-        />
+        >
+          {t("invitePage.continueInBrowser")}
+        </Button>
       </div>
     </div>
   );
