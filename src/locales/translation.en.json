@@ -210,7 +210,13 @@
     "householdConflictDescription": "You are currently in “{{currentHousehold}}”. To join “{{invitedHousehold}}”, leave your current household first, then open this invitation again.",
     "householdConflictButton": "Got it",
     "currentHouseholdFallback": "your current household",
-    "invitedHouseholdFallback": "the invited household"
+    "invitedHouseholdFallback": "the invited household",
+    "handoffTitle": "You're invited",
+    "handoffSubtitle": "Join the household in the Plateful app. Don't have it yet? Install it, then open this link again.",
+    "continueInApp": "Continue in the app",
+    "continueInBrowser": "Continue in browser",
+    "signInTitle": "Sign in to join",
+    "signInSubtitle": "Sign in to Plateful to join the household you were invited to."
   },
   "oauthConsent": {
     "title": "Connect {{client}} to Plateful?",

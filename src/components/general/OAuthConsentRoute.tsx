@@ -7,6 +7,7 @@ import {
   peekPendingConsent,
   rememberPendingConsent,
 } from "@/lib/pendingOAuthConsent";
+import { peekPendingInvite } from "@/lib/pendingInvite";
 
 /**
  * The `/oauth/consent` route.
@@ -29,18 +30,20 @@ export default function OAuthConsentRoute({ isLoggedIn }: Readonly<{ isLoggedIn:
 /**
  * Where a signed-in user lands on `/`.
  *
- * Normally the home screen, but a magic link sent from a consent request returns
- * here — so a pending request takes precedence and the user is handed back to
- * the screen they were trying to reach.
+ * Normally the home screen, but a magic link sent from a consent request or an
+ * invite returns here — so a pending request takes precedence and the user is
+ * handed back to the screen they were trying to reach.
  */
 export function PostSignInLanding() {
   // Read once per mount so a re-render can't lose it, and clear only after the
   // redirect is committed (StrictMode mounts effects twice in development).
-  const pending = useMemo(() => peekPendingConsent(), []);
+  const consent = useMemo(() => peekPendingConsent(), []);
+  // The invite route clears its own entry once it renders signed in.
+  const invite = useMemo(() => peekPendingInvite(), []);
 
   useEffect(() => {
-    if (pending) clearPendingConsent();
-  }, [pending]);
+    if (consent) clearPendingConsent();
+  }, [consent]);
 
-  return <Navigate to={pending ?? "/home"} replace />;
+  return <Navigate to={consent ?? invite ?? "/home"} replace />;
 }

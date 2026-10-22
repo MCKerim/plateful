@@ -262,7 +262,13 @@
     "householdConflictDescription": "Du bist aktuell im Haushalt „{{currentHousehold}}“. Um „{{invitedHousehold}}“ beizutreten, verlasse zuerst deinen aktuellen Haushalt und öffne diese Einladung danach erneut.",
     "householdConflictButton": "Verstanden",
     "currentHouseholdFallback": "dein aktueller Haushalt",
-    "invitedHouseholdFallback": "der eingeladene Haushalt"
+    "invitedHouseholdFallback": "der eingeladene Haushalt",
+    "handoffTitle": "Du wurdest eingeladen",
+    "handoffSubtitle": "Tritt dem Haushalt in der Plateful-App bei. Noch keine App? Lade sie und öffne danach diesen Link noch einmal.",
+    "continueInApp": "Weiter in der App",
+    "continueInBrowser": "Weiter im Browser",
+    "signInTitle": "Anmelden zum Beitreten",
+    "signInSubtitle": "Melde dich bei Plateful an, um dem Haushalt beizutreten, in den du eingeladen wurdest."
   },
   "oauthConsent": {
     "title": "{{client}} mit Plateful verbinden?",

@@ -9,7 +9,6 @@ import EmailVerification from "./page/onboarding/emailVerification/EmailVerifica
 import React, { useEffect, useState } from "react";
 import Settings from "./page/Settings";
 import HouseholdSettings from "./page/HouseholdSettings";
-import InvitePage from "./page/InvitePage";
 import { useAppSelector } from "./redux/hooks";
 import { selectUser } from "./redux/slices/userSlice";
 import { selectHouseholdId } from "./redux/slices/householdSlice";
@@ -53,6 +52,7 @@ import URLImport from "./page/URLImport";
 import ImageImport from "./page/ImageImport";
 import SharedRecipe from "./page/SharedRecipe";
 import OAuthConsentRoute, { PostSignInLanding } from "./components/general/OAuthConsentRoute";
+import InviteRoute from "./components/general/InviteRoute";
 import NotificationSettings from "./page/NotificationSettings";
 import Connections from "./page/Connections";
 import UpdateDialog from "./components/general/UpdateDialog";
@@ -537,7 +537,7 @@ function App() {
         <Route path="/connections" element={routeToCorrectPage(<Connections />)} />
         <Route
           path="/invite/:token"
-          element={isLoggedIn() ? <InvitePage refreshUser={refreshUser} /> : <SignUp />}
+          element={<InviteRoute isLoggedIn={isLoggedIn()} refreshUser={refreshUser} />}
         />
 
         <Route path="/planner" element={routeToCorrectPage(<MealPlanner />)} />

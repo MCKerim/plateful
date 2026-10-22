@@ -60,7 +60,10 @@ function isAppleCancellation(error: unknown): boolean {
  * `getAuthorizationDetails`, which needs a session we don't have yet. The
  * consent screen immediately after does name it.
  */
-type Props = { variant?: "onboarding" | "connect" };
+type Props = { variant?: "onboarding" | "connect" | "invite" };
+
+/** The translation section holding each non-onboarding variant's sign-in heading. */
+const HEADING_KEYS = { connect: "oauthConsent", invite: "invitePage" } as const;
 
 export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   const { supabase } = useSupabase();
@@ -92,9 +95,9 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
   }, []);
 
   useEffect(() => {
-    // Only the onboarding funnel. Someone connecting an AI assistant is an
-    // existing user, and counting them as a signup would distort it.
-    if (variant === "onboarding") trackScreenViewed("signup");
+    // Only the onboarding funnel, which invitees enter too. Someone connecting
+    // an AI assistant is an existing user, and counting them would distort it.
+    if (variant !== "connect") trackScreenViewed("signup");
   }, [variant]);
 
   useEffect(() => {
@@ -208,17 +211,19 @@ export default function SignUp({ variant = "onboarding" }: Readonly<Props>) {
 
       <div className="flex flex-col items-center h-dvh px-4 py-10">
         <div className="flex flex-col w-full mb-8 text-center">
-          {variant === "connect" ? (
-            <>
-              <h1 className="font-bold text-5xl first-font">{t("oauthConsent.signInTitle")}</h1>
-              <p className="mt-2 text-sm text-muted-foreground">
-                {t("oauthConsent.signInSubtitle")}
-              </p>
-            </>
-          ) : (
+          {variant === "onboarding" ? (
             <>
               <h1 className="font-bold text-7xl first-font">{t("signup.title")}</h1>
               <p className="text-sm text-muted-foreground">{t("signup.subtitle")}</p>
+            </>
+          ) : (
+            <>
+              <h1 className="font-bold text-5xl first-font">
+                {t(`${HEADING_KEYS[variant]}.signInTitle`)}
+              </h1>
+              <p className="mt-2 text-sm text-muted-foreground">
+                {t(`${HEADING_KEYS[variant]}.signInSubtitle`)}
+              </p>
             </>
           )}
         </div>

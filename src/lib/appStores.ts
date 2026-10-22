@@ -36,8 +36,24 @@ export function mobileStoreUrl(): string | null {
 export function shareAppLink(token: string): string | null {
   const path = `share/${encodeURIComponent(token)}`;
   if (isIOS()) return `https://plateful.cloud/${path}`;
+  if (/Android/.test(navigator.userAgent)) return androidAppLink(path);
+  return null;
+}
+
+/**
+ * Where the invite page's button sends a phone: on Android the app with this
+ * invite when installed, else Google Play. iOS goes to the App Store, because
+ * there the tapped invite link already opens an installed app (Universal Link)
+ * and plateful.cloud does not forward invites the way it forwards shares.
+ */
+export function inviteAppLink(token: string): string | null {
+  if (isIOS()) return APP_STORE_URL;
   if (/Android/.test(navigator.userAgent)) {
-    return `intent://app.plateful.cloud/${path}#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
+    return androidAppLink(`invite/${encodeURIComponent(token)}`);
   }
   return null;
+}
+
+function androidAppLink(path: string): string {
+  return `intent://app.plateful.cloud/${path}#Intent;scheme=https;package=com.kblanks.plateful;S.browser_fallback_url=${encodeURIComponent(PLAY_STORE_URL)};end`;
 }
