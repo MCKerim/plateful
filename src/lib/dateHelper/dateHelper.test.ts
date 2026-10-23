@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { getWeekdays, toPlannedDateString, toWeekday, weekStartsOn } from "./dateHelper";
+import i18next from "i18next";
+import en from "@/locales/translation.en.json";
+import de from "@/locales/translation.de.json";
+import { getWeekdays, toPlannedDateString, toWeekday, weekStartsOn, weekTitle } from "./dateHelper";
 
 // Mock i18n module
 vi.mock("@/i18n", () => ({
@@ -213,5 +216,39 @@ describe("toPlannedDateString", () => {
 
   it("zero-pads month and day", () => {
     expect(toPlannedDateString(new Date(2026, 0, 3))).toBe("2026-01-03");
+  });
+});
+
+describe("weekTitle", () => {
+  const translator = async (lng: "en" | "de") => {
+    const instance = i18next.createInstance();
+    await instance.init({
+      lng,
+      resources: { en: { translation: en }, de: { translation: de } },
+      interpolation: { escapeValue: false },
+    });
+    return instance.t;
+  };
+  // Friday 23 October 2026; a Monday-first week runs 19–25 October.
+  const now = new Date(2026, 9, 23, 12);
+
+  it("names this, next and last week", async () => {
+    const t = await translator("de");
+    expect(weekTitle(new Date(2026, 9, 19), 1, t, now)).toBe("Diese Woche");
+    expect(weekTitle(new Date(2026, 9, 26), 1, t, now)).toBe("Nächste Woche");
+    expect(weekTitle(new Date(2026, 9, 18), 1, t, now)).toBe("Letzte Woche");
+  });
+
+  it("spans any other week in the language's day and month order", async () => {
+    expect(weekTitle(new Date(2026, 10, 4), 1, await translator("de"), now)).toBe("2.11. – 8.11.");
+    expect(weekTitle(new Date(2026, 10, 4), 1, await translator("en"), now)).toBe("11/2 – 11/8");
+  });
+
+  it("follows the account's first weekday", async () => {
+    const t = await translator("en");
+    // Sunday the 18th opens this week when weeks start on Sunday.
+    expect(weekTitle(new Date(2026, 9, 18), 0, t, now)).toBe("This Week");
+    expect(weekTitle(new Date(2026, 9, 11), 0, t, now)).toBe("Last Week");
+    expect(weekTitle(new Date(2026, 9, 4), 0, t, now)).toBe("10/4 – 10/10");
   });
 });

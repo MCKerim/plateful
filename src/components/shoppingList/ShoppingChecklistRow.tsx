@@ -1,7 +1,8 @@
-import { Check, CircleCheck, Loader2 } from "lucide-react";
+import { CircleCheck, Loader2 } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import RecipeCover from "@/components/shoppingList/RecipeCover";
+import CheckMark from "@/components/general/CheckMark";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -45,7 +46,7 @@ export default function ShoppingChecklistRow({
       )}
       onClick={onToggle}
     >
-      <ShoppingCheckMark isSelected={isSelected} />
+      <CheckMark isSelected={isSelected} />
       <span
         className={cn("w-7 shrink-0 text-center text-xl", !isSelected && "opacity-60 grayscale")}
         aria-hidden
@@ -90,21 +91,6 @@ export default function ShoppingChecklistRow({
         </span>
       )}
     </button>
-  );
-}
-
-/** The mark in front of a checklist line (an ingredient, a planned meal). */
-export function ShoppingCheckMark({ isSelected }: Readonly<{ isSelected: boolean }>) {
-  return (
-    <span
-      className={cn(
-        "flex size-6 shrink-0 items-center justify-center rounded-full border-2",
-        isSelected ? "border-accent bg-accent text-accent-foreground" : "border-muted-foreground/50"
-      )}
-      aria-hidden
-    >
-      {isSelected && <Check className="size-4" strokeWidth={3} />}
-    </span>
   );
 }
 

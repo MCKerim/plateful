@@ -17,8 +17,8 @@ import RecipeCover from "@/components/shoppingList/RecipeCover";
 import ShoppingChecklistRow, {
   ShoppingAddButton,
   ShoppingAddedConfirmation,
-  ShoppingCheckMark,
 } from "@/components/shoppingList/ShoppingChecklistRow";
+import CheckMark from "@/components/general/CheckMark";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { useRecipes } from "@/hooks/cookbook/useRecipes";
@@ -253,7 +253,7 @@ function Steps({ meals, onClose }: Readonly<{ meals: PlanMeal[]; onClose: () => 
                         className="flex min-w-0 flex-1 items-center gap-3 text-left"
                         onClick={() => setToggledMeals((current) => flipped(current, meal.id))}
                       >
-                        <ShoppingCheckMark isSelected={selected} />
+                        <CheckMark isSelected={selected} />
                         <span
                           className={cn(
                             "size-[52px] shrink-0 overflow-hidden rounded-xl",

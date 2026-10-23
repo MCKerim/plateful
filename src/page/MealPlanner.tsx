@@ -8,11 +8,11 @@ import {
   setCurrentWeek,
   resetToCurrentWeek,
 } from "@/redux/slices/mealPlannerSlice";
-import { format, isSameDay, isToday, addWeeks, subWeeks, isSameWeek } from "date-fns";
+import { format, isSameDay, isToday, addWeeks, subWeeks } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
 import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
-import { getWeekdays, weekStartsOn } from "@/lib/dateHelper/dateHelper";
+import { getWeekdays, weekTitle } from "@/lib/dateHelper/dateHelper";
 import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { Button } from "@/components/ui/button";
 import {
@@ -89,11 +89,8 @@ export default function MealPlanner() {
   const dispatch = useAppDispatch();
 
   const currentWeek = useAppSelector(selectCurrentWeek);
-  // The account's first weekday: every week here, and the "this week" test
-  // (date-fns counts from Sunday unless told), runs on it.
+  // The account's first weekday: every week here, and the week's title, runs on it.
   const firstWeekday = useWeekStart();
-  const shownWeekIs = (date: Date) =>
-    isSameWeek(currentWeek, date, { weekStartsOn: weekStartsOn(firstWeekday) });
   const [activeItem, setActiveItem] = useState<MealPlannerItemType | null>(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [slideDirection, setSlideDirection] = useState<"left" | "right" | null>(null);
@@ -371,7 +368,12 @@ export default function MealPlanner() {
         {/* Week Navigation */}
         <div className="sticky flex items-center justify-between px-2 pb-1 pt-4 border-b bg-background top-0 z-10">
           <div className="flex items-center">
-            <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={t("mealPlanner.previousWeekButton")}
+              onClick={goToPreviousWeek}
+            >
               <ChevronLeft size={20} />
             </Button>
             {/* The cart's invisible twin keeps the title centred. */}
@@ -380,33 +382,12 @@ export default function MealPlanner() {
             </Button>
           </div>
 
-          <div className="flex flex-col items-center">
-            <h2 className="text-lg font-semibold">
-              {shownWeekIs(new Date())
-                ? t("mealPlanner.thisWeek")
-                : shownWeekIs(addWeeks(new Date(), 1))
-                  ? t("mealPlanner.nextWeek")
-                  : shownWeekIs(subWeeks(new Date(), 1))
-                    ? t("mealPlanner.lastWeek")
-                    : `${format(getWeekdays(currentWeek, firstWeekday)[0], "dd.MM")} - ${format(
-                        getWeekdays(currentWeek, firstWeekday)[6],
-                        "dd.MM"
-                      )}`}
-            </h2>
-
-            {!shownWeekIs(new Date()) && (
-              <Button
-                variant="link"
-                size="sm"
-                onClick={goToCurrentWeek}
-                className="h-auto p-0 text-xs text-muted-foreground italic"
-              >
-                {t("mealPlanner.goToCurrentWeek")}
-              </Button>
-            )}
-
-            {shownWeekIs(new Date()) && <div className="h-[16px]"></div>}
-          </div>
+          {/* A tap on the title is the way back to this week, as on iOS. */}
+          <h2 className="text-lg font-semibold">
+            <button type="button" onClick={goToCurrentWeek}>
+              {weekTitle(currentWeek, firstWeekday, t)}
+            </button>
+          </h2>
 
           <div className="flex items-center">
             <Button
@@ -418,7 +399,12 @@ export default function MealPlanner() {
             >
               <ShoppingCart size={20} />
             </Button>
-            <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+            <Button
+              variant="ghost"
+              size="sm"
+              aria-label={t("mealPlanner.nextWeekButton")}
+              onClick={goToNextWeek}
+            >
               <ChevronRight size={20} />
             </Button>
           </div>

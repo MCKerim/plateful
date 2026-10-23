@@ -1,6 +1,7 @@
 import i18n from "@/i18n";
-import { formatDate } from "date-fns";
+import { addWeeks, formatDate, isSameWeek } from "date-fns";
 import type { Day } from "date-fns";
+import type { TFunction } from "i18next";
 import { de } from "date-fns/locale";
 
 const weekday = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -62,6 +63,27 @@ export function getWeekdays(date: Date, weekStart: number): Date[] {
 /** `weekStart` as date-fns wants it (`isSameWeek` and friends default to Sunday otherwise). */
 export function weekStartsOn(weekStart: number): Day {
   return (((weekStart % 7) + 7) % 7) as Day;
+}
+
+/**
+ * The week switcher's title for the week holding `week`, as the planner and
+ * the Plan sheet show it: the nearest three by name, any other by its span
+ * ("19.10. – 25.10." in German, "10/19 – 10/25" in English).
+ */
+export function weekTitle(
+  week: Date,
+  firstWeekday: number,
+  t: TFunction,
+  now: Date = new Date()
+): string {
+  const weeksAway = [-1, 0, 1].find((offset) =>
+    isSameWeek(week, addWeeks(now, offset), { weekStartsOn: weekStartsOn(firstWeekday) })
+  );
+  if (weeksAway === 0) return t("mealPlanner.thisWeek");
+  if (weeksAway === 1) return t("mealPlanner.nextWeek");
+  if (weeksAway === -1) return t("mealPlanner.lastWeek");
+  const days = getWeekdays(week, firstWeekday);
+  return t("mealPlanner.weekRange", { start: days[0], end: days[6] });
 }
 
 /**
