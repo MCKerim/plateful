@@ -10,27 +10,21 @@ versionCode 44 stayed in internal testing: it declared `USE_EXACT_ALARM`, which 
 
 **DE**
 
-Der Kochmodus ist da.
+Der Kochmodus ist da!
+• Zutaten stehen direkt im Schritt. Zeitangaben werden zu Timern
+• Timer klingeln auf jedem Gerät, das mitkocht
+• Portionen und Häkchen teilt ihr euch live
 
-• „Kochen“ zeigt deinen Schritt groß und lesbar, Wischen blättert.
-• Zutaten stehen im Schritt, die skalierte Menge auf Tipp. Zeitangaben werden zu Timern.
-• Timer klingeln auf jedem Gerät, das mitkocht, auch bei dunklem Bildschirm.
-• Kocht dein Haushalt, kochst du von der Startseite aus mit, mit eigenem Schritt.
-• Portionen und Häkchen teilt ihr euch live.
-
-Neu auch: die Rezeptseite, und importierte Rezepte lassen sich im Editor auf das Original zurücksetzen.
+Auch neu: die Rezeptseite wurde überarbeitet, und importierte Rezepte lassen sich im Editor auf das Original zurücksetzen
 
 **EN**
 
-Cooking mode is here.
+Cooking mode is here!
+• Ingredients sit right in the step. Durations become timers
+• Timers ring on every device that's cooking
+• Servings and checked-off ingredients are shared live
 
-• Tap “Cook” and your step fills the screen, big and readable; swipe to move on.
-• Ingredients sit right in the step, with the scaled amount on tap. Durations become timers.
-• Timers ring on every device that's cooking, screen off included.
-• When your household cooks, Home shows it and you cook along at your own step.
-• Servings and checked-off ingredients are shared live.
-
-Also new: the recipe page, and an imported recipe can be reset to its original in the editor.
+Also new: the recipe page got a new design, and an imported recipe can be reset to its original in the editor
 
 ## 1.4 (versionCode 43), 2026-10-11
 
