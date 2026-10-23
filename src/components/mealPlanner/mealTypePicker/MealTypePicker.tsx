@@ -25,10 +25,12 @@ export default function MealTypePicker({
       {MEAL_TYPES.map((type) => {
         const Icon = MEAL_TYPE_ICONS[type];
         return (
+          // Switches at once, as on iOS: a colour transition crossfaded two
+          // half-orange tiles on every tap.
           <RadioGroupPrimitive.Item
             key={type}
             value={type}
-            className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 py-2 text-[11px] font-semibold text-muted-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground"
+            className="flex min-w-0 flex-col items-center gap-1 rounded-lg px-0.5 py-2 text-[11px] font-semibold text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring data-[state=checked]:bg-accent/15 data-[state=checked]:text-accent"
           >
             <Icon size={20} aria-hidden />
             <span className="w-full truncate text-center">{t(`mealType.${type}`)}</span>

@@ -436,7 +436,7 @@ function Editor({
         )}
         <Button
           variant="accent"
-          className="h-12 w-full rounded-full text-base font-semibold"
+          className="h-12 w-full rounded-full text-base font-semibold disabled:bg-muted disabled:text-muted-foreground disabled:opacity-100"
           disabled={action.kind === "none" || !isLoaded || applyChanges.isPending}
           onClick={() => void handleSave()}
         >
