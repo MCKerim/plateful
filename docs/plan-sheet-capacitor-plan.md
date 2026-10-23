@@ -1,6 +1,9 @@
 # The Plan sheet on Capacitor (web + Android)
 
-Plan, 2026-10-23. Status: decisions taken (Kerim, 2026-10-23: "ja zu allem"), in build. Parity port of the iOS Plan
+Plan, 2026-10-23. Status: built and merged to `main` on 2026-10-23 after
+Kerim's emulator test ("sieht gut aus"); on Android it ships with the first
+build after 46. Device checks still open: Android back closing the sheet,
+vertical scroll against vaul's drag-to-close, 130 percent font. Parity port of the iOS Plan
 sheet (`PlanRecipeSheet` / `PlanEntrySheet`, built 2026-09-02 and extended
 with notes and meal types since). It replaces `WeeklyPlanDialog`, the
 centred dialog the recipe page and the planner's "Edit plan" open today.
