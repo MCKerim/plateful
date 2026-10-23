@@ -15,7 +15,6 @@ import {
 import { useTranslation } from "react-i18next";
 import { useDraggable } from "@dnd-kit/core";
 import { isBefore, startOfToday } from "date-fns";
-import { useRecipeFirstImage } from "@/hooks/recipe/useRecipeFirstImage";
 import { MealPlannerItem as MealPlannerItemType, MealType } from "@/types/meal-planning.types";
 import MealTypeChip from "../mealTypeChip/MealTypeChip";
 import MealTypePicker from "../mealTypePicker/MealTypePicker";
@@ -53,7 +52,6 @@ export default function MealPlannerItem({
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { data: imageUrl } = useRecipeFirstImage(item.kind === "recipe" ? item.recipeId : null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const dragHandleRef = useRef<HTMLDivElement>(null);
@@ -191,7 +189,7 @@ export default function MealPlannerItem({
         >
           {item.kind === "recipe" ? (
             <img
-              src={imageUrl || "/no-img.jpg"}
+              src={item.coverUrl || "/no-img.jpg"}
               alt="Recipe"
               className="h-full w-[74px] object-cover border-r-4 border-background dark:brightness-75 pointer-events-none select-none"
               draggable={false}

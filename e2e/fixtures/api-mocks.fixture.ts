@@ -340,7 +340,9 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
         eaten: body.p_recipe_id ? false : null,
         meal_type: insertion.meal_type ?? null,
         created_at: new Date().toISOString(),
-        recipes: recipe ? { id: recipe.id, name: recipe.name, tags: recipe.tags } : null,
+        recipes: recipe
+          ? { id: recipe.id, name: recipe.name, tags: recipe.tags, image_path: null }
+          : null,
         planner_notes: note?.planner_notes ?? null,
       });
     }

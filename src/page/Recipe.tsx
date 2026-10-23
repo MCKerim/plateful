@@ -230,6 +230,8 @@ export default function Recipe() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: queryKeys.recipes.images(recipeId) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.recipes.detail(recipeId) }),
+        // The plan's rows carry the cover too, still pointing at the old file that gets cleaned up.
+        queryClient.invalidateQueries({ queryKey: queryKeys.mealPlanning.all }),
       ]);
     } catch {
       toast.error(t("addRecipe.errors.uploadFailed"));

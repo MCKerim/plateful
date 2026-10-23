@@ -54,7 +54,7 @@ export const mealPlanningApi = {
         planned_date,
         eaten,
         meal_type,
-        recipes (id, name, tags),
+        recipes (id, name, tags, image_path),
         planner_notes (id, text)
       `
       )

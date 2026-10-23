@@ -360,6 +360,7 @@ describe("orderForDisplay", () => {
     recipeId: id,
     recipeName: id,
     recipeTags: [],
+    coverUrl: null,
     planned_date: null,
     mealType,
     eaten: false,

@@ -140,6 +140,7 @@ function meal(recipeId: string, day: number | null, eaten = false): MealPlannerI
     recipeId,
     recipeName: recipeId,
     recipeTags: [],
+    coverUrl: null,
     planned_date: day === null ? null : october(day),
     mealType: "dinner",
     eaten,

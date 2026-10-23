@@ -15,6 +15,8 @@ export type PlannedRecipe = {
   recipeName: string;
   /** The recipe's tags; the course tags among them preselect a meal type. */
   recipeTags: string[];
+  /** The cover's public URL, carried by the week query so a row makes no request of its own. */
+  coverUrl: string | null;
   planned_date: Date | null;
   mealType: MealType;
   eaten: boolean;
@@ -42,7 +44,7 @@ export type MealPlannerItemRaw = {
   planned_date: string | null;
   eaten: boolean | null;
   meal_type: string | null;
-  recipes: { id: string; name: string; tags: string[] } | null;
+  recipes: { id: string; name: string; tags: string[]; image_path: string | null } | null;
   planner_notes: { id: string; text: string } | null;
 };
 

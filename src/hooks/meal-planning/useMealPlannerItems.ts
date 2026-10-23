@@ -4,6 +4,7 @@ import { getWeekdays } from "@/lib/dateHelper/dateHelper";
 import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { queryKeys } from "@/lib/query-keys";
 import { mealPlanningApi } from "@/api/meal-planning.api";
+import { recipeImageUrl } from "@/api/recipe.api";
 import { transformMealPlannerItems } from "@/lib/transformers/meal-planning.transformer";
 
 export function useMealPlannerItems(currentWeek: Date) {
@@ -21,7 +22,7 @@ export function useMealPlannerItems(currentWeek: Date) {
     queryKey: queryKeys.mealPlanning.list(weekStart.toISOString()),
     queryFn: async () => {
       const data = await mealPlanningApi.getItemsForWeek(supabase, weekStart, weekEnd);
-      return transformMealPlannerItems(data);
+      return transformMealPlannerItems(data, (imagePath) => recipeImageUrl(supabase, imagePath));
     },
     refetchInterval: 1000 * 30, // Poll every 30s for household sync
     placeholderData: keepPreviousData,

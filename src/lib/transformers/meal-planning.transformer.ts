@@ -32,7 +32,10 @@ export function parseMealType(value: string | null): MealType {
  * a note is a placement whose content is gone (nothing to show); it used to
  * render as a "-" line.
  */
-export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlannerItem[] {
+export function transformMealPlannerItems(
+  raw: MealPlannerItemRaw[],
+  coverUrlOf: (imagePath: string | null) => string | null
+): MealPlannerItem[] {
   const items: MealPlannerItem[] = [];
   for (const row of raw) {
     const planned_date = parsePlannedDate(row.planned_date);
@@ -51,6 +54,7 @@ export function transformMealPlannerItems(raw: MealPlannerItemRaw[]): MealPlanne
         recipeId: row.recipes.id,
         recipeName: row.recipes.name,
         recipeTags: row.recipes.tags,
+        coverUrl: coverUrlOf(row.recipes.image_path),
         planned_date,
         mealType: parseMealType(row.meal_type),
         eaten: row.eaten ?? false,

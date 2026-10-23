@@ -12,7 +12,12 @@ const recipeRow: MealPlannerItemRaw = {
   planned_date: "2026-09-13",
   eaten: false,
   meal_type: null,
-  recipes: { id: "recipe-1", name: "Pasta", tags: ["main"] },
+  recipes: {
+    id: "recipe-1",
+    name: "Pasta",
+    tags: ["main"],
+    image_path: "recipe_recipe-1/cover.jpg",
+  },
   planner_notes: null,
 };
 
@@ -25,15 +30,18 @@ const noteRow: MealPlannerItemRaw = {
   planner_notes: { id: "note-1", text: "Eating out" },
 };
 
+const coverUrlOf = (imagePath: string | null) => imagePath && `https://covers.test/${imagePath}`;
+
 describe("transformMealPlannerItems", () => {
   it("keeps a recipe row a recipe", () => {
-    expect(transformMealPlannerItems([recipeRow])).toEqual([
+    expect(transformMealPlannerItems([recipeRow], coverUrlOf)).toEqual([
       {
         kind: "recipe",
         id: "placement-1",
         recipeId: "recipe-1",
         recipeName: "Pasta",
         recipeTags: ["main"],
+        coverUrl: "https://covers.test/recipe_recipe-1/cover.jpg",
         planned_date: new Date(2026, 8, 13),
         mealType: "dinner",
         eaten: false,
@@ -42,7 +50,7 @@ describe("transformMealPlannerItems", () => {
   });
 
   it("turns a note row with a null eaten flag into a note", () => {
-    expect(transformMealPlannerItems([noteRow])).toEqual([
+    expect(transformMealPlannerItems([noteRow], coverUrlOf)).toEqual([
       {
         kind: "note",
         id: "placement-2",
@@ -62,22 +70,33 @@ describe("transformMealPlannerItems", () => {
       recipes: null,
       planner_notes: null,
     };
-    expect(transformMealPlannerItems([orphan, noteRow]).map((item) => item.id)).toEqual([
-      "placement-2",
-    ]);
+    expect(transformMealPlannerItems([orphan, noteRow], coverUrlOf).map((item) => item.id)).toEqual(
+      ["placement-2"]
+    );
   });
 
   it("reads a recipe's meal type and ignores the one an older build stored on a note", () => {
-    const [recipe, note] = transformMealPlannerItems([
-      { ...recipeRow, meal_type: "breakfast" },
-      { ...noteRow, meal_type: "snack" },
-    ]);
+    const [recipe, note] = transformMealPlannerItems(
+      [
+        { ...recipeRow, meal_type: "breakfast" },
+        { ...noteRow, meal_type: "snack" },
+      ],
+      coverUrlOf
+    );
     expect(recipe).toMatchObject({ kind: "recipe", mealType: "breakfast" });
     expect(note).not.toHaveProperty("mealType");
   });
 
+  it("gives a recipe without a cover no URL", () => {
+    const [recipe] = transformMealPlannerItems(
+      [{ ...recipeRow, recipes: { ...recipeRow.recipes!, image_path: null } }],
+      coverUrlOf
+    );
+    expect(recipe).toMatchObject({ kind: "recipe", coverUrl: null });
+  });
+
   it("keeps a pool row dateless", () => {
-    const pooled = transformMealPlannerItems([{ ...noteRow, planned_date: null }]);
+    const pooled = transformMealPlannerItems([{ ...noteRow, planned_date: null }], coverUrlOf);
     expect(pooled[0].planned_date).toBeNull();
   });
 });

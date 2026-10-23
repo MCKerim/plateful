@@ -58,7 +58,8 @@ export type MockMealPlan = {
   eaten: boolean | null;
   meal_type: string | null;
   created_at: string;
-  recipes: { id: string; name: string; tags: string[] } | null;
+  // The cover's storage path; specs that build the join by hand may leave it out.
+  recipes: { id: string; name: string; tags: string[]; image_path?: string | null } | null;
   planner_notes: { id: string; text: string } | null;
 };
 

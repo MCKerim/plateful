@@ -33,7 +33,7 @@ export function createMealPlan(overrides?: Partial<MockMealPlan>): MockMealPlan 
     eaten: overrides?.eaten ?? false,
     meal_type: overrides?.meal_type ?? null,
     created_at: overrides?.created_at ?? new Date().toISOString(),
-    recipes: overrides?.recipes ?? { id: defaultRecipeId, name: "Test Recipe", tags: [] },
+    recipes: overrides?.recipes ?? { id: defaultRecipeId, name: "Test Recipe", tags: [], image_path: null },
     planner_notes: null,
   };
 }
