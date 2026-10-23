@@ -1,23 +1,17 @@
-import { useEffect } from "react";
 import { Separator } from "@/components/ui/separator";
 import { useNavigate } from "react-router";
-import { App } from "@capacitor/app";
+import { useBackButton } from "@/hooks/general/useBackButton";
 
 export default function Privacy() {
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const listener = App.addListener("backButton", () => {
-      if (window.history.length > 1) {
-        navigate(-1);
-      } else {
-        navigate("/");
-      }
-    });
-    return () => {
-      listener.then((l) => l.remove());
-    };
-  }, [navigate]);
+  useBackButton(() => {
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate("/");
+    }
+  });
 
   return (
     <div className="w-full max-w-4xl mx-auto p-6 min-h-screen bg-background">

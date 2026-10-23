@@ -143,3 +143,71 @@ test.describe("Recipe Detail Page", () => {
     expect(page.url()).toContain("/cookbook");
   });
 });
+
+// Celine's Galaxy in German (2026-10-23): "Weiterkochen" pushed the cook
+// button off a 360 px screen, and the week plan dialog was taller than the
+// screen, its close button and Save out of reach.
+test.describe("Recipe Detail Page on a small German phone", () => {
+  test.use({ viewport: { width: 360, height: 640 } });
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => localStorage.setItem("i18nextLng", "de"));
+  });
+
+  const recipeId = "00000000-0000-0000-0000-0000000000d1";
+  const steps = ["Zwiebeln anbraten.", "Mit Brühe ablöschen."].map((stepText, index) => ({
+    id: `step-${index + 1}`,
+    recipe_id: recipeId,
+    step_text: stepText,
+    group_name: null,
+    sort_order: index,
+    annotation: null,
+  }));
+
+  test("keeps Weiterkochen on screen by dropping the words of Ask and Plan", async ({
+    page,
+    setupAuth,
+  }) => {
+    await setupAuth({
+      recipes: [createRecipe({ id: recipeId, name: "Zwiebelsuppe" })],
+      instructions: steps,
+    });
+
+    await page.goto(`/recipe/${recipeId}`);
+    await page.getByRole("button", { name: "Kochen", exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`/cooking/${recipeId}`));
+    // The session exists once the first step shows.
+    await expect(page.locator('[aria-current="step"]')).toContainText("Zwiebeln anbraten");
+    await page.goBack();
+
+    const cook = page.getByRole("button", { name: "Weiterkochen" });
+    await expect(cook).toBeVisible();
+    const box = (await cook.boundingBox())!;
+    expect(box.x + box.width).toBeLessThanOrEqual(360);
+    // The whole word, no ellipsis.
+    const text = cook.locator("span");
+    expect(await text.evaluate((span) => span.scrollWidth <= span.clientWidth)).toBe(true);
+    // Ask and Plan keep their names for screen readers.
+    await expect(page.getByRole("button", { name: "Fragen" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Planen" })).toBeVisible();
+  });
+
+  test("fits the week plan dialog on the screen", async ({ page, setupAuth }) => {
+    await setupAuth({
+      recipes: [createRecipe({ id: recipeId, name: "Zwiebelsuppe" })],
+      instructions: steps,
+    });
+
+    await page.goto(`/recipe/${recipeId}`);
+    await page.getByRole("button", { name: "Planen" }).click();
+
+    const dialog = page.getByRole("dialog");
+    await expect(dialog.getByRole("button", { name: "Speichern" })).toBeVisible();
+    const box = (await dialog.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(640);
+
+    await dialog.getByRole("button", { name: "Close" }).click();
+    await expect(dialog).toBeHidden();
+    await expect(page).toHaveURL(new RegExp(`/recipe/${recipeId}`));
+  });
+});

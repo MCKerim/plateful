@@ -1,0 +1,9 @@
+# Android's back button has one listener
+
+**Failure (2026-10-23):** On Celine's Galaxy the week plan dialog was taller than the screen (since fixed, see below), so the only way out was the back button, and back left the recipe page instead of closing the dialog. Capacitor's App plugin knows nothing about web dialogs: with no `backButton` listener it calls the WebView's `goBack()` (and does nothing on the first page), and with listeners it calls every one of them.
+
+**Mechanism:** `useBackButtonListener()` in `src/hooks/general/useBackButton.ts`, mounted once in `App`, is the only `App.addListener("backButton")`. Back closes the topmost open Radix or vaul layer first (a dialog, sheet, drawer, popover, menu or select: any `[role=dialog|alertdialog|menu|listbox][data-state=open]`) by dispatching Escape on `document`, the key every Radix layer closes on, topmost first. With no layer open, a page's `useBackButton(handler)` runs instead (Cooking minimizes, Terms and Privacy go to `/` without history), else `history.back()` when the WebView can go back. A page must never add its own `backButton` listener: Capacitor would call both, and the page would go back while its dialog closes.
+
+**Verification:** `src/hooks/general/useBackButton.test.tsx` fails with the layer check removed. Not yet tested on a device; needs a new Android release.
+
+**Related, same report:** `DialogContent` (`src/components/ui/dialog.tsx`) is capped at the screen height minus the safe areas and scrolls inside, so a tall dialog keeps its close button and Save on screen (e2e: "fits the week plan dialog on the screen"). The recipe page's Ask and Plan drop their words when Cook's word would be cut off, as iOS's toolbar does ("Weiterkochen" ran 40 px off a 360 px screen); the word is measured, not guessed by width, so a large Android font size is covered too.

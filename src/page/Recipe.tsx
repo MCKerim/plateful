@@ -1,7 +1,7 @@
 import Layout from "@/components/layout/Layout";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Button } from "@/components/ui/button";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
 import {
@@ -103,6 +103,23 @@ export default function Recipe() {
   const { data: lastMealPlan } = useRecipeMealPlanInfo(recipeId);
   const { ratings, averageRating } = useRecipeRatings(recipeId);
   const cookingState = useRecipeCookingState(recipeId);
+  // One word per state, as on iOS: Cook, Cook along (a member's session),
+  // Continue (one this user is in).
+  const cookLabel =
+    cookingState.kind === "mine"
+      ? t("cooking.continue")
+      : cookingState.kind === "joinable"
+        ? t("cooking.cookAlong")
+        : t("cooking.cook");
+  // Ask and Plan drop their words when Cook's would be cut off, as iOS's
+  // toolbar does: "Weiterkochen" doesn't fit next to them on a 360 px phone.
+  const cookTextRef = useRef<HTMLSpanElement>(null);
+  const [iconsOnlyFor, setIconsOnlyFor] = useState<string | null>(null);
+  const iconsOnly = iconsOnlyFor === cookLabel;
+  useLayoutEffect(() => {
+    const text = cookTextRef.current;
+    if (text && !iconsOnly && text.scrollWidth > text.clientWidth) setIconsOnlyFor(cookLabel);
+  }, [cookLabel, iconsOnly, isLoading, instructionSteps.length]);
   const savedServings = useAppSelector((state) =>
     recipeId != null ? selectTargetServings(recipeId)(state) : undefined
   );
@@ -235,7 +252,7 @@ export default function Recipe() {
             onClick={handleAskChatbot}
           >
             <Sparkles />
-            {t("recipe.ask")}
+            <span className={cn(iconsOnly && "sr-only")}>{t("recipe.ask")}</span>
           </Button>
 
           <Button
@@ -244,25 +261,24 @@ export default function Recipe() {
             onClick={() => setPlanOpen(true)}
           >
             <CalendarPlus />
-            {t("recipe.plan")}
+            <span className={cn(iconsOnly && "sr-only")}>{t("recipe.plan")}</span>
           </Button>
         </div>
 
         <div className="flex-1" />
 
-        {/* One word per state, as on iOS: Cook, Cook along (a member's
-            session), Continue (one this user is in). All three open cooking
-            mode; the session hook resolves fresh-vs-resume on the server. */}
+        {/* All three words open cooking mode; the session hook resolves
+            fresh-vs-resume on the server. Only this button shrinks, so a
+            word too long even next to bare icons ends in an ellipsis
+            instead of running off the screen. */}
         {instructionSteps.length > 0 && (
           <Button
-            className="pointer-events-auto h-12 rounded-full px-6 text-base font-semibold shadow-sm"
+            className="pointer-events-auto h-12 min-w-0 rounded-full px-6 text-base font-semibold shadow-sm"
             onClick={() => navigate(`/cooking/${recipeId}`)}
           >
-            {cookingState.kind === "mine"
-              ? t("cooking.continue")
-              : cookingState.kind === "joinable"
-                ? t("cooking.cookAlong")
-                : t("cooking.cook")}
+            <span ref={cookTextRef} className="truncate">
+              {cookLabel}
+            </span>
           </Button>
         )}
       </div>

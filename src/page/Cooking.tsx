@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useTranslation } from "react-i18next";
-import { App } from "@capacitor/app";
+import { useBackButton } from "@/hooks/general/useBackButton";
 import { Carrot, ChevronDown, Loader2, Timer, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -132,12 +132,7 @@ export default function Cooking() {
     else navigate("/home");
   }, [navigate]);
 
-  useEffect(() => {
-    const listener = App.addListener("backButton", minimize);
-    return () => {
-      listener.then((handle) => handle.remove());
-    };
-  }, [minimize]);
+  useBackButton(minimize);
 
   const onLastStep = isOnLastStep(cooking.steps, cooking.currentStepId);
 

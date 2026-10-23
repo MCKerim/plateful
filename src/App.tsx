@@ -61,6 +61,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { useAuthBootstrap } from "@/hooks/user/useAuthBootstrap";
 import AccountLoadError from "@/components/general/AccountLoadError";
 import { reportError } from "@/utils/reportError";
+import { useBackButtonListener } from "@/hooks/general/useBackButton";
 
 function App() {
   const { supabase } = useSupabase();
@@ -72,6 +73,7 @@ function App() {
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const navigate = useNavigate();
   const { state: authBootstrap, retry: retryAuthBootstrap, refreshUser } = useAuthBootstrap();
+  useBackButtonListener();
 
   useEffect(() => {
     const checkForUpdates = async () => {
