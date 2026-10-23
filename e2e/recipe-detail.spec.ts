@@ -146,7 +146,7 @@ test.describe("Recipe Detail Page", () => {
 
 // Celine's Galaxy in German (2026-10-23): "Weiterkochen" pushed the cook
 // button off a 360 px screen, and the week plan dialog was taller than the
-// screen, its close button and Save out of reach.
+// screen, its close button and Save out of reach. The Plan sheet replaced it.
 test.describe("Recipe Detail Page on a small German phone", () => {
   test.use({ viewport: { width: 360, height: 640 } });
   test.beforeEach(async ({ page }) => {
@@ -191,7 +191,10 @@ test.describe("Recipe Detail Page on a small German phone", () => {
     await expect(page.getByRole("button", { name: "Planen" })).toBeVisible();
   });
 
-  test("fits the week plan dialog on the screen", async ({ page, setupAuth }) => {
+  test("fits the Plan sheet on the screen and closes it without leaving the recipe", async ({
+    page,
+    setupAuth,
+  }) => {
     await setupAuth({
       recipes: [createRecipe({ id: recipeId, name: "Zwiebelsuppe" })],
       instructions: steps,
@@ -200,14 +203,16 @@ test.describe("Recipe Detail Page on a small German phone", () => {
     await page.goto(`/recipe/${recipeId}`);
     await page.getByRole("button", { name: "Planen" }).click();
 
-    const dialog = page.getByRole("dialog");
-    await expect(dialog.getByRole("button", { name: "Speichern" })).toBeVisible();
-    const box = (await dialog.boundingBox())!;
-    expect(box.y).toBeGreaterThanOrEqual(0);
-    expect(box.y + box.height).toBeLessThanOrEqual(640);
+    const sheet = page.getByRole("dialog", { name: "Planen" });
+    const save = sheet.getByRole("button", { name: "Plan aktualisieren" });
+    await expect(save).toBeDisabled();
+    // Retried until the sheet has slid all the way up.
+    await expect(sheet).toBeInViewport({ ratio: 1 });
+    await expect(save).toBeInViewport({ ratio: 1 });
 
-    await dialog.getByRole("button", { name: "Close" }).click();
-    await expect(dialog).toBeHidden();
+    // No close button: Escape (Android's back button sends it) closes the sheet.
+    await page.keyboard.press("Escape");
+    await expect(sheet).toBeHidden();
     await expect(page).toHaveURL(new RegExp(`/recipe/${recipeId}`));
   });
 });

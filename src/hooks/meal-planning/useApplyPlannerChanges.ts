@@ -9,7 +9,7 @@ export type ApplyPlannerChangesResult = {
 };
 
 /**
- * The weekly plan dialog's save, for a recipe or a note: every added day and
+ * The Plan sheet's save, for a recipe or a note: every added day and
  * pool copy plus every deselected day in one server transaction. The caller
  * mints the insertion ids and keeps them while its selection is unchanged, so
  * a retry after a lost response cannot plan a day twice.

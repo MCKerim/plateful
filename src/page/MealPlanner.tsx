@@ -11,7 +11,7 @@ import {
 import { format, isSameDay, isToday, addWeeks, subWeeks } from "date-fns";
 import RatingModal, { RatingModalRef } from "@/components/general/RatingModal";
 import MealPlannerAdd from "@/components/general/MealPlannerAdd";
-import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
+import PlanSheet from "@/components/general/PlanSheet";
 import { getWeekdays, weekTitle } from "@/lib/dateHelper/dateHelper";
 import { useWeekStart } from "@/hooks/user/useWeekStart";
 import { Button } from "@/components/ui/button";
@@ -97,7 +97,7 @@ export default function MealPlanner() {
 
   const ratingModalRef = useRef<RatingModalRef>(null);
   const [recipeToRate, setRecipeToRate] = useState<string>();
-  /** The recipe or note whose weekly plan dialog is open. */
+  /** The recipe or note whose Plan sheet is open. */
   const [editingSubject, setEditingSubject] = useState<PlanSubject | null>(null);
   /** The day whose "+" opened the recipe-or-note chooser. */
   const [chooserDay, setChooserDay] = useState<Date | null>(null);
@@ -342,14 +342,11 @@ export default function MealPlanner() {
       <Layout showHeader={false} noTopPadding>
         <RatingModal ref={ratingModalRef} recipeId={recipeToRate} />
 
-        {/* Weekly Plan Dialog for editing a recipe's or a note's days */}
-        <WeeklyPlanDialog
+        <PlanSheet
           subject={editingSubject}
           open={editingSubject !== null}
-          onOpenChange={(open) => !open && setEditingSubject(null)}
-          trigger={null}
-          navigateOnSuccess={false}
           initialWeek={currentWeek}
+          onClose={() => setEditingSubject(null)}
         />
 
         {/* A day's "+": a recipe from the cookbook, or a note for the day */}

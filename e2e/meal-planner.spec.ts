@@ -2,6 +2,13 @@ import { test, expect } from "./fixtures";
 import { createRecipe } from "./factories";
 import { createMealPlan, createNotePlan, formatDate } from "./factories/meal-plan.factory";
 
+/** A day's name in the Plan sheet: its section's toggle is labelled with the long date. */
+function longDate(date: Date): string {
+  return new Intl.DateTimeFormat("en", { weekday: "long", day: "numeric", month: "long" }).format(
+    date
+  );
+}
+
 test.describe("Meal Planner Page", () => {
   test("should display week navigation", async ({ page, setupAuth }) => {
     await setupAuth({ recipes: [], mealPlans: [] });
@@ -57,7 +64,7 @@ test.describe("Meal Planner Page", () => {
     await page.waitForLoadState("networkidle");
 
     // Should see unplanned section with count > 0
-    const unplannedButton = page.getByRole("button", { name: /no date - 1/i });
+    const unplannedButton = page.getByRole("button", { name: /pool - 1/i });
     await expect(unplannedButton).toBeVisible({ timeout: 10000 });
 
     // Click to expand
@@ -77,8 +84,8 @@ test.describe("Meal Planner Page", () => {
     const weekHeading = page.getByRole("heading", { name: /this week/i });
     await expect(weekHeading).toBeVisible({ timeout: 10000 });
 
-    // Should show "No Date - 0" for unplanned section
-    await expect(page.getByText(/no date - 0/i)).toBeVisible();
+    // Should show "Pool - 0" for unplanned section
+    await expect(page.getByText(/pool - 0/i)).toBeVisible();
   });
 
   test("should click on planned item to view recipe", async ({ page, setupAuth }) => {
@@ -176,13 +183,14 @@ test.describe("Meal Planner Page", () => {
     await expect(entries.nth(0)).toContainText("Breakfast");
     await expect(entries.nth(3)).toHaveText("Eating out");
 
-    // The weekly plan dialog's chips for the day follow the same order.
+    // The Plan sheet lists the day in the same order.
     await entries.nth(3).getByRole("button").last().click();
     await page.getByRole("dialog").getByRole("button", { name: "Edit Plan" }).click();
-    const dialog = page.getByRole("dialog").filter({ hasText: "No Date" });
-    await expect(dialog.getByRole("button", { name: /today/i })).toHaveText(
-      /Pancakes.*Pasta.*Brownie.*Eating out/
-    );
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    const todaySection = sheet
+      .locator("section")
+      .filter({ has: page.getByRole("button", { name: longDate(new Date()) }) });
+    await expect(todaySection).toHaveText(/Pancakes.*Pasta.*Brownie.*Eating out/);
   });
 
   test("should add a note to an empty day through the chooser", async ({ page, setupAuth }) => {
@@ -216,19 +224,21 @@ test.describe("Meal Planner Page", () => {
     await page.goto(`/recipe/${recipe.id}`);
     await page.getByRole("button", { name: "Plan", exact: true }).click();
 
-    const dialog = page.getByRole("dialog");
-    await expect(dialog.getByRole("radiogroup", { name: "Meal type" })).toBeVisible();
-    await expect(dialog.getByRole("radio", { name: "Breakfast" })).toBeChecked();
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    await expect(sheet.getByRole("radiogroup", { name: "Meal type" })).toBeVisible();
+    await expect(sheet.getByRole("radio", { name: "Breakfast" })).toBeChecked();
 
-    await dialog.getByRole("button", { name: /today/i }).click();
+    await sheet.getByRole("button", { name: longDate(new Date()) }).click();
     const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
-    await dialog.getByRole("button", { name: "Save" }).click();
+    await sheet.getByRole("button", { name: "Plan for 1 day" }).click();
     const body = (await save).postDataJSON();
     expect(body.p_insertions.map((entry: { meal_type: string }) => entry.meal_type)).toEqual([
       "breakfast",
     ]);
+    await expect(sheet).toBeHidden();
 
-    // Saving goes to the planner, where the new entry carries the chip.
+    // The new entry carries the chip in the planner.
+    await page.goto("/planner");
     await expect(page.getByRole("listitem").filter({ hasText: "Pancakes" })).toContainText(
       "Breakfast",
       { timeout: 10000 }
@@ -311,12 +321,12 @@ test.describe("Meal Planner Page", () => {
     await expect(page.getByRole("radiogroup", { name: "Meal type" })).toHaveCount(0);
     await menu.getByRole("button", { name: "Edit Plan" }).click();
 
-    const dialog = page.getByRole("dialog").filter({ hasText: "No Date" });
-    await dialog.getByRole("button", { name: "No Date" }).click();
-    await expect(dialog.getByRole("radiogroup", { name: "Meal type" })).toHaveCount(0);
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    await sheet.getByRole("button", { name: "Pool", exact: true }).click();
+    await expect(sheet.getByRole("radiogroup", { name: "Meal type" })).toHaveCount(0);
 
     const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
-    await dialog.getByRole("button", { name: "Save" }).click();
+    await sheet.getByRole("button", { name: "Add to pool" }).click();
     const body = (await save).postDataJSON();
     expect(body.p_note_id).toBe(note.note_id);
     expect(body.p_insertions).toEqual([

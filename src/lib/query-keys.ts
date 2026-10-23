@@ -3,11 +3,8 @@ export const queryKeys = {
     all: ["meal-planning"] as const,
     lists: ["meal-planning", "list"] as const,
     list: (weekStart: string) => ["meal-planning", "list", weekStart] as const,
-    summary: (weekStart: string) => ["meal-planning", "summary", weekStart] as const,
     info: (recipeId: string) => ["meal-planning", "info", recipeId] as const,
     recipePlacements: ["meal-planning", "recipe-placements"] as const,
-    placements: (subjectKey: string, weekStart: string) =>
-      ["meal-planning", "placements", subjectKey, weekStart] as const,
     lastMealType: (recipeId: string) => ["meal-planning", "last-meal-type", recipeId] as const,
     noteSuggestions: (householdId: string) =>
       ["meal-planning", "note-suggestions", householdId] as const,

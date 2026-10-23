@@ -2,8 +2,6 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import {
   MealPlannerItemRaw,
   MealType,
-  PlacementEntryRaw,
-  PlannedItemSummaryRaw,
   PlanSubject,
   RecipeMealPlanInfo,
   RecipePlacementRow,
@@ -61,24 +59,6 @@ export const mealPlanningApi = {
       .or(`planned_date.is.null,and(planned_date.gte.${from},planned_date.lte.${to})`)
       .order("created_at", { ascending: true })
       .returns<MealPlannerItemRaw[]>();
-
-    if (error) throw error;
-    return data ?? [];
-  },
-
-  async getSummaryForWeek(
-    supabase: SupabaseClient,
-    weekStart: Date,
-    weekEnd: Date
-  ): Promise<PlannedItemSummaryRaw[]> {
-    const { data, error } = await supabase
-      .from("meal_planning")
-      .select(`planned_date, meal_type, recipes (name), planner_notes (text)`)
-      .gte("planned_date", toPlannedDateString(weekStart))
-      .lte("planned_date", toPlannedDateString(weekEnd))
-      .order("planned_date", { ascending: true })
-      .order("created_at", { ascending: true })
-      .returns<PlannedItemSummaryRaw[]>();
 
     if (error) throw error;
     return data ?? [];
@@ -163,7 +143,7 @@ export const mealPlanningApi = {
   },
 
   /**
-   * The weekly plan dialog's save as one transaction: the new placements and
+   * The Plan sheet's save as one transaction: the new placements and
    * the removed ones together, for a recipe or a note. Only the ids given are
    * deleted, so a day a household member added meanwhile survives.
    */
@@ -182,32 +162,9 @@ export const mealPlanningApi = {
     if (error) throw error;
   },
 
-  /** The subject's dated placements in a week, for the weekly plan dialog. */
-  async getPlacementsInWeek(
-    supabase: SupabaseClient,
-    subject: PlanSubject,
-    weekStart: Date,
-    weekEnd: Date
-  ): Promise<PlacementEntryRaw[]> {
-    const query = supabase
-      .from("meal_planning")
-      .select("id, planned_date")
-      .gte("planned_date", toPlannedDateString(weekStart))
-      .lte("planned_date", toPlannedDateString(weekEnd))
-      .order("planned_date", { ascending: true });
-    const scoped =
-      subject.kind === "recipe"
-        ? query.eq("recipe_id", subject.id)
-        : query.eq("note_id", subject.noteId);
-    const { data, error } = await scoped.returns<PlacementEntryRaw[]>();
-
-    if (error) throw error;
-    return data ?? [];
-  },
-
   /**
    * The stored meal type of the recipe's newest placement that has one, the
-   * last choice the weekly plan dialog preselects; `null` when none has.
+   * last choice the Plan sheet preselects; `null` when none has.
    * Newest by `created_at`, not `updated_at`: a move or a cooked check bumps
    * that. `updated_at` only breaks the tie between copies one save inserted
    * together, so a type changed on one of them wins. RLS scopes the rows to

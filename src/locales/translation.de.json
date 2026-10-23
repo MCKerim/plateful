@@ -21,8 +21,6 @@
     "today": "Heute",
     "tomorrow": "Morgen",
     "yesterday": "Gestern",
-    "day": "Tag",
-    "days": "Tage",
     "inDays_one": "In {{count}} Tag",
     "inDays_other": "In {{count}} Tagen",
     "daysAgo_one": "Vor {{count}} Tag",
@@ -396,9 +394,8 @@
     "alreadyEaten": "Zuletzt gegessen",
     "nothingPlanned": "Keine Rezepte geplant...",
     "dropToRemoveDate": "Hier ablegen, um das Datum zu entfernen",
-    "noDate": "Ohne Datum",
+    "noDate": "Pool",
     "noUnplannedRecipes": "Keine ungeplanten Rezepte",
-    "goToCurrentWeek": "zur aktuellen Woche",
     "thisWeek": "Diese Woche",
     "nextWeek": "Nächste Woche",
     "lastWeek": "Letzte Woche",
@@ -408,9 +405,6 @@
     "deleteError": "Fehler beim Löschen",
     "updateError": "Fehler beim Aktualisieren",
     "planned": "Geplant",
-    "selectDayOrWithoutDate": "Bitte wählen Sie einen Tag aus oder wählen Sie 'Ohne Datum'.",
-    "alreadyPlanned": "Bereits geplant",
-    "willBeRemoved": "Wird entfernt",
     "addToPlan": "Zum Plan hinzufügen",
     "addRecipe": "Rezept",
     "addNote": "Notiz",
@@ -431,6 +425,18 @@
       "add": "Hinzufügen",
       "saveError": "Notiz konnte nicht gespeichert werden"
     }
+  },
+  "plan": {
+    "pool": "Pool",
+    "entries_one": "{{count}} Eintrag",
+    "entries_other": "{{count}} Einträge",
+    "planDays_one": "Für {{count}} Tag planen",
+    "planDays_other": "Für {{count}} Tage planen",
+    "addToPool": "In den Pool",
+    "update": "Plan aktualisieren",
+    "fewerDays": "Weniger Tage",
+    "moreDays": "Mehr Tage",
+    "loadFailed": "Der Plan konnte nicht geladen werden."
   },
   "cookbook": {
     "enterRecipeName": "Rezept suchen...",

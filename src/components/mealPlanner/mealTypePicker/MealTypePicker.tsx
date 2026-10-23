@@ -5,8 +5,8 @@ import { MealType } from "@/types/meal-planning.types";
 import { MEAL_TYPE_ICONS } from "../mealTypeIcons";
 
 /**
- * The four meal types side by side, one always selected: the weekly plan
- * dialog's control and the "Meal type" row in a planned recipe's menu.
+ * The four meal types side by side, one always selected: the Plan sheet's
+ * control and the "Meal type" row in a planned recipe's menu.
  */
 export default function MealTypePicker({
   value,

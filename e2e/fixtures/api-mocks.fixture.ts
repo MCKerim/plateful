@@ -265,7 +265,7 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       await route.fulfill({ status: 204, body: "" });
       return;
     }
-    // The weekly plan dialog's last choice: the recipe's newest typed row
+    // The Plan sheet's last choice: the recipe's newest typed row
     const url = new URL(route.request().url());
     if (url.searchParams.get("select") === "meal_type") {
       const recipeId = url.searchParams.get("recipe_id")?.replace("eq.", "");
@@ -323,7 +323,7 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   });
 
-  // The weekly plan dialog's save: the delta, applied to the scenario
+  // The Plan sheet's save: the delta, applied to the scenario
   await page.route("**/rest/v1/rpc/apply_planner_changes", async (route) => {
     const body = route.request().postDataJSON();
     const deleteIds: string[] = body.p_delete_ids ?? [];

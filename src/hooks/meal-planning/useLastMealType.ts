@@ -5,9 +5,9 @@ import { mealPlanningApi } from "@/api/meal-planning.api";
 
 /**
  * The stored type of the recipe's newest typed placement (see
- * `getLastMealType`), for the weekly plan dialog; `null` (a note) loads
- * nothing. Fetched while the dialog is still closed, so it opens on the right
- * type instead of moving to it.
+ * `getLastMealType`), for the Plan sheet; `null` (a note) loads nothing.
+ * Fetched while the sheet is still closed where the recipe is known, so it
+ * opens on the right type instead of moving to it.
  */
 export function useLastMealType(recipeId: string | null) {
   const { supabase } = useSupabase();

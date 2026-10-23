@@ -21,8 +21,6 @@
     "today": "Today",
     "tomorrow": "Tomorrow",
     "yesterday": "Yesterday",
-    "day": "Day",
-    "days": "Days",
     "inDays_one": "In {{count}} day",
     "inDays_other": "In {{count}} days",
     "daysAgo_one": "{{count}} day ago",
@@ -396,9 +394,8 @@
     "alreadyEaten": "Recently eaten",
     "nothingPlanned": "No recipes planned...",
     "dropToRemoveDate": "Drop here to remove date",
-    "noDate": "No Date",
+    "noDate": "Pool",
     "noUnplannedRecipes": "no unplanned recipes",
-    "goToCurrentWeek": "go to current week",
     "thisWeek": "This Week",
     "nextWeek": "Next Week",
     "lastWeek": "Last Week",
@@ -408,9 +405,6 @@
     "deleteError": "Error deleting item",
     "updateError": "Error updating item",
     "planned": "planned",
-    "selectDayOrWithoutDate": "Please select a day or choose 'Without date'",
-    "alreadyPlanned": "Already planned",
-    "willBeRemoved": "Will be removed",
     "addToPlan": "Add to plan",
     "addRecipe": "Recipe",
     "addNote": "Note",
@@ -431,6 +425,18 @@
       "add": "Add",
       "saveError": "Couldn't save note"
     }
+  },
+  "plan": {
+    "pool": "Pool",
+    "entries_one": "{{count}} entry",
+    "entries_other": "{{count}} entries",
+    "planDays_one": "Plan for {{count}} day",
+    "planDays_other": "Plan for {{count}} days",
+    "addToPool": "Add to pool",
+    "update": "Update plan",
+    "fewerDays": "Fewer days",
+    "moreDays": "More days",
+    "loadFailed": "Couldn’t load the plan."
   },
   "cookbook": {
     "enterRecipeName": "Search recipe...",

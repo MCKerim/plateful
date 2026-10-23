@@ -38,7 +38,7 @@ import { selectHouseholdMembers } from "@/redux/slices/householdSlice";
 import { getMealPlanStatus } from "@/lib/mealPlanHelper/mealPlanHelper";
 import { formatRating } from "@/lib/formateRatingHelper/formatRatingHelper";
 import { PhotoProvider, PhotoView } from "react-photo-view";
-import WeeklyPlanDialog from "@/components/general/WeeklyPlanDialog";
+import PlanSheet from "@/components/general/PlanSheet";
 import { toast } from "sonner";
 import RatingListItem from "@/components/general/RatingListItem";
 import { useRecipe } from "@/hooks/recipe/useRecipe";
@@ -565,12 +565,17 @@ export default function Recipe() {
 
       <RatingModal ref={ratingModalRef} recipeId={recipe.id} />
 
-      <WeeklyPlanDialog
-        subject={{ kind: "recipe", id: recipe.id, name: recipe.name, tags: recipe.tags }}
+      {/* After saving the user stays here, as on iOS; the plan line under the title confirms it. */}
+      <PlanSheet
+        subject={{
+          kind: "recipe",
+          id: recipe.id,
+          name: recipe.name,
+          tags: recipe.tags,
+          coverUrl: imageUrls[0] ?? null,
+        }}
         open={planOpen}
-        onOpenChange={setPlanOpen}
-        trigger={null}
-        navigateOnSuccess={true}
+        onClose={() => setPlanOpen(false)}
       />
 
       <RecipeCollectionsDialog

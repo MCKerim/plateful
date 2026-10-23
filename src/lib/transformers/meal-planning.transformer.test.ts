@@ -3,9 +3,8 @@ import {
   parseMealType,
   parsePlannedDate,
   transformMealPlannerItems,
-  transformPlannedItemsSummary,
 } from "./meal-planning.transformer";
-import type { MealPlannerItemRaw, PlannedItemSummaryRaw } from "@/types/meal-planning.types";
+import type { MealPlannerItemRaw } from "@/types/meal-planning.types";
 
 const recipeRow: MealPlannerItemRaw = {
   id: "placement-1",
@@ -124,29 +123,5 @@ describe("parsePlannedDate", () => {
 
   it("passes null through", () => {
     expect(parsePlannedDate(null)).toBeNull();
-  });
-});
-
-describe("transformPlannedItemsSummary", () => {
-  it("labels recipes by name with their meal type and notes by text alone, skipping the pool", () => {
-    const raw: PlannedItemSummaryRaw[] = [
-      {
-        planned_date: "2026-09-13",
-        meal_type: "lunch",
-        recipes: { name: "Pasta" },
-        planner_notes: null,
-      },
-      {
-        planned_date: "2026-09-13",
-        meal_type: "breakfast",
-        recipes: null,
-        planner_notes: { text: "Leftovers" },
-      },
-      { planned_date: null, meal_type: null, recipes: { name: "Pooled" }, planner_notes: null },
-    ];
-    expect(transformPlannedItemsSummary(raw)).toEqual([
-      { planned_date: "2026-09-13", kind: "recipe", label: "Pasta", mealType: "lunch" },
-      { planned_date: "2026-09-13", kind: "note", label: "Leftovers" },
-    ]);
   });
 });

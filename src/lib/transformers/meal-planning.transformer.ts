@@ -1,12 +1,6 @@
 import { parseISO } from "date-fns";
 import { MEAL_TYPES } from "@/lib/mealPlanHelper/mealPlanHelper";
-import {
-  MealPlannerItem,
-  MealPlannerItemRaw,
-  MealType,
-  PlannedItemSummary,
-  PlannedItemSummaryRaw,
-} from "@/types/meal-planning.types";
+import { MealPlannerItem, MealPlannerItemRaw, MealType } from "@/types/meal-planning.types";
 
 /**
  * `planned_date` is a Postgres `date` ("2026-09-13"): a calendar day with no
@@ -62,23 +56,4 @@ export function transformMealPlannerItems(
     }
   }
   return items;
-}
-
-/** The weekly plan dialog's day chips: dated rows only, one label per row. */
-export function transformPlannedItemsSummary(raw: PlannedItemSummaryRaw[]): PlannedItemSummary[] {
-  const summary: PlannedItemSummary[] = [];
-  for (const row of raw) {
-    if (!row.planned_date) continue;
-    if (row.planner_notes) {
-      summary.push({ planned_date: row.planned_date, kind: "note", label: row.planner_notes.text });
-    } else if (row.recipes) {
-      summary.push({
-        planned_date: row.planned_date,
-        kind: "recipe",
-        label: row.recipes.name,
-        mealType: parseMealType(row.meal_type),
-      });
-    }
-  }
-  return summary;
 }

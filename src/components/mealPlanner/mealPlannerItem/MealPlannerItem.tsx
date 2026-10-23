@@ -25,7 +25,7 @@ type Props = {
   onToggleEaten?: () => void;
   /** Takes this placement off the plan. */
   onRemove: () => void;
-  /** Opens the weekly plan dialog for the recipe or the note. */
+  /** Opens the Plan sheet for the recipe or the note. */
   onEditPlan: () => void;
   /** Recipes only: changes this placement's meal type. */
   onSetMealType?: (mealType: MealType) => void;

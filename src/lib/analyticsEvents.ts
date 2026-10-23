@@ -42,7 +42,7 @@
  *   or the close button), `cooking_timer_started`: no properties, as on iOS.
  * - `planner_meal_type_set`: `meal_type` (the picked type) and
  *   `differs_from_default` (against the course-tag type). Sent for a recipe
- *   only, never a note: from the weekly plan dialog on a save that inserts,
+ *   only, never a note: from the Plan sheet on a save that inserts,
  *   only when the user picked a type, and from a planner entry's menu on a
  *   change.
  * - `mcp_connect_opened`: `client` is "claude" | "chatgpt", the connect button
