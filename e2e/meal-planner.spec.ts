@@ -334,3 +334,150 @@ test.describe("Meal Planner Page", () => {
     ]);
   });
 });
+
+test.describe("Plan sheet", () => {
+  /** The test account's weeks start on Monday (`week_start: 1`). */
+  function mondayOf(date: Date, weeks = 0): Date {
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - ((date.getDay() + 6) % 7) + weeks * 7);
+    return monday;
+  }
+
+  test("plans two days across two weeks and stays on the recipe", async ({ page, setupAuth }) => {
+    const recipe = createRecipe({ name: "Shakshuka" });
+    await setupAuth({ recipes: [recipe], mealPlans: [] });
+    const today = new Date();
+    const nextMonday = mondayOf(today, 1);
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    await expect(sheet.getByRole("button", { name: "Update plan" })).toBeDisabled();
+
+    await sheet.getByRole("button", { name: longDate(today) }).click();
+    await expect(sheet.getByRole("button", { name: "Plan for 1 day" })).toBeEnabled();
+    // The chevron; the title button reads "Next Week" once there.
+    await sheet.getByRole("button", { name: "Next week", exact: true }).click();
+    await expect(sheet.getByRole("button", { name: "Next Week", exact: true })).toBeVisible();
+    await sheet.getByRole("button", { name: longDate(nextMonday) }).click();
+
+    const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
+    await sheet.getByRole("button", { name: "Plan for 2 days" }).click();
+    const body = (await save).postDataJSON();
+    expect(body.p_recipe_id).toBe(recipe.id);
+    expect(body.p_delete_ids).toEqual([]);
+    expect(body.p_insertions).toEqual([
+      { id: expect.any(String), planned_date: formatDate(today), meal_type: "dinner" },
+      { id: expect.any(String), planned_date: formatDate(nextMonday), meal_type: "dinner" },
+    ]);
+
+    // As on iOS the user stays on the recipe; the toast confirms.
+    await expect(sheet).toBeHidden();
+    await expect(page.getByText("Recipe planned successfully!")).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/recipe/${recipe.id}$`));
+  });
+
+  test("deletes the rows of planned days deselected in two weeks", async ({ page, setupAuth }) => {
+    const recipe = createRecipe({ name: "Shakshuka" });
+    const today = new Date();
+    const nextMonday = mondayOf(today, 1);
+    const [planned, plannedNextWeek] = [today, nextMonday].map((day) =>
+      createMealPlan({
+        recipe_id: recipe.id,
+        planned_date: formatDate(day),
+        recipes: { id: recipe.id, name: recipe.name, tags: recipe.tags },
+      })
+    );
+    await setupAuth({ recipes: [recipe], mealPlans: [planned, plannedNextWeek] });
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    const todaySection = sheet.getByRole("button", { name: longDate(today) });
+    await expect(todaySection).toHaveAttribute("aria-pressed", "true");
+    await todaySection.click();
+    await expect(todaySection).toHaveAttribute("aria-pressed", "false");
+
+    // Next week's row comes with that week's read; it is planned there too.
+    await sheet.getByRole("button", { name: "Next week", exact: true }).click();
+    const mondaySection = sheet.getByRole("button", { name: longDate(nextMonday) });
+    await expect(mondaySection).toHaveAttribute("aria-pressed", "true");
+    await mondaySection.click();
+    await sheet.getByRole("button", { name: "Previous week", exact: true }).click();
+
+    const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
+    await sheet.getByRole("button", { name: "Update plan" }).click();
+    const body = (await save).postDataJSON();
+    expect(body.p_delete_ids).toEqual([planned.id, plannedNextWeek.id]);
+    expect(body.p_insertions).toEqual([]);
+  });
+
+  test("puts two copies into the pool", async ({ page, setupAuth }) => {
+    const recipe = createRecipe({ name: "Shakshuka" });
+    await setupAuth({ recipes: [recipe], mealPlans: [] });
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    await sheet.getByRole("button", { name: "Pool", exact: true }).click();
+    await expect(sheet.getByText("1 day", { exact: true })).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Fewer days" })).toBeDisabled();
+    await sheet.getByRole("button", { name: "More days" }).click();
+    await expect(sheet.getByText("2 days", { exact: true })).toBeVisible();
+
+    const save = page.waitForRequest("**/rest/v1/rpc/apply_planner_changes");
+    await sheet.getByRole("button", { name: "Add to pool" }).click();
+    const body = (await save).postDataJSON();
+    expect(body.p_insertions).toEqual([
+      { id: expect.any(String), planned_date: null, meal_type: "dinner" },
+      { id: expect.any(String), planned_date: null, meal_type: "dinner" },
+    ]);
+    expect(body.p_insertions[0].id).not.toBe(body.p_insertions[1].id);
+  });
+
+  test("says when a week could not load and saves after a retry", async ({ page, setupAuth }) => {
+    const recipe = createRecipe({ name: "Shakshuka" });
+    await setupAuth({ recipes: [recipe], mealPlans: [] });
+    const nextMonday = mondayOf(new Date(), 1);
+    let nextWeekFails = true;
+    await page.route("**/rest/v1/meal_planning?*", async (route) => {
+      const week = new URL(route.request().url()).searchParams.get("or") ?? "";
+      if (nextWeekFails && week.includes(`gte.${formatDate(nextMonday)}`)) {
+        await route.fulfill({ status: 500, contentType: "application/json", body: "{}" });
+      } else {
+        await route.fallback();
+      }
+    });
+
+    await page.goto(`/recipe/${recipe.id}`);
+    await page.getByRole("button", { name: "Plan", exact: true }).click();
+    const sheet = page.getByRole("dialog", { name: "Plan" });
+    await sheet.getByRole("button", { name: longDate(new Date()) }).click();
+    await sheet.getByRole("button", { name: "Next week", exact: true }).click();
+
+    // Its days can't be chosen, and nothing saves, until the week is in.
+    await expect(sheet.getByText("Couldn’t load the plan.")).toBeVisible({ timeout: 10000 });
+    await expect(sheet.getByRole("button", { name: longDate(nextMonday) })).toBeDisabled();
+    await expect(sheet.getByRole("button", { name: "Plan for 1 day" })).toBeDisabled();
+
+    nextWeekFails = false;
+    await sheet.getByRole("button", { name: "Try again" }).click();
+    await expect(sheet.getByText("Couldn’t load the plan.")).toBeHidden();
+    await expect(sheet.getByRole("button", { name: "Plan for 1 day" })).toBeEnabled();
+  });
+
+  test("goes back to this week from the planner's title", async ({ page, setupAuth }) => {
+    await setupAuth({ recipes: [], mealPlans: [] });
+
+    await page.goto("/planner");
+    await expect(page.getByRole("heading", { name: "This Week" })).toBeVisible({ timeout: 10000 });
+    const nextWeek = page.getByRole("button", { name: "Next week", exact: true });
+    await nextWeek.click();
+    await nextWeek.click();
+    const title = page.getByRole("heading").getByRole("button");
+    await expect(title).not.toHaveText(/week/i);
+
+    await title.click();
+    await expect(page.getByRole("heading", { name: "This Week" })).toBeVisible();
+  });
+});

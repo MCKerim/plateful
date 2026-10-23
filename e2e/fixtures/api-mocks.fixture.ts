@@ -281,10 +281,22 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
       });
       return;
     }
+    // A week's read (the pool plus the week) answers only that, so a test
+    // sees what each week's query really holds; other reads get every row.
+    const week = url.searchParams
+      .get("or")
+      ?.match(/planned_date\.gte\.([\d-]+),planned_date\.lte\.([\d-]+)/);
+    const rows = week
+      ? scenario.mealPlans.filter(
+          (plan) =>
+            plan.planned_date === null ||
+            (plan.planned_date >= week[1] && plan.planned_date <= week[2])
+        )
+      : scenario.mealPlans;
     await route.fulfill({
       status: 200,
       contentType: "application/json",
-      body: JSON.stringify(scenario.mealPlans),
+      body: JSON.stringify(rows),
     });
   });
 
