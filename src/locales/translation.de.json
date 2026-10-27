@@ -574,7 +574,9 @@
     "importingDescription": "Du kannst die Seite schließen und später das Rezept in deinen Rezepten finden",
     "errors": {
       "invalidUrl": "Ungültige URL. Bitte überprüfe den Link.",
-      "importFailed": "Fehler beim Importieren des Rezepts."
+      "importFailed": "Fehler beim Importieren des Rezepts.",
+      "duplicate": "Wird schon importiert. Schau gleich in deine Rezepte.",
+      "limited": "Das sind viele Importe auf einmal. Gib ihnen eine Minute, dann versuch es noch einmal."
     },
     "success": "Zu Plateful hinzugefügt",
     "importedRecipe": "Zu Plateful hinzugefügt:",

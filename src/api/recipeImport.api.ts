@@ -2,6 +2,19 @@ import { SupabaseClient } from "@supabase/supabase-js";
 import { randomId } from "@/utils/randomId";
 
 /**
+ * The message key for a refused import submission. The `recipe_imports` guard
+ * raises 23505 for the same source sent moments ago and P0001 for its caps
+ * (imports in flight, per 10 minutes, per day); neither is helped by trying
+ * again right away, so both say what happened, like the iOS app.
+ */
+export function importErrorKey(error: unknown): string {
+  const code = (error as { code?: string } | null)?.code;
+  if (code === "23505") return "urlImport.errors.duplicate";
+  if (code === "P0001") return "urlImport.errors.limited";
+  return "urlImport.errors.importFailed";
+}
+
+/**
  * Client for the insert-based recipe-import pipeline (the same one iOS uses).
  * Starting an import just inserts a `recipe_imports` placeholder row (and, for
  * photos, stages the images first). A Postgres webhook then nudges the backend

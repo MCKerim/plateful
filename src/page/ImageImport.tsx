@@ -17,7 +17,7 @@ import { queryKeys } from "@/lib/query-keys";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import { recipeImportApi } from "@/api/recipeImport.api";
+import { importErrorKey, recipeImportApi } from "@/api/recipeImport.api";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { contentLanguage } from "@/lib/contentLanguage";
@@ -173,7 +173,7 @@ export default function ImageImport() {
     } catch (err) {
       reportError("Failed to start image import", err);
       posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "photo" });
-      toast.error(t("urlImport.errors.importFailed"));
+      toast.error(t(importErrorKey(err)));
     } finally {
       setIsSaving(false);
     }

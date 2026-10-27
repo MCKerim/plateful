@@ -14,7 +14,7 @@ import { readClipboardText } from "@/utils/nativeClipboard";
 import { useIncrementMission } from "@/hooks/missions/useIncrementMission";
 import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
-import { recipeImportApi } from "@/api/recipeImport.api";
+import { importErrorKey, recipeImportApi } from "@/api/recipeImport.api";
 import { normalizeRecipeImportUrl } from "@/lib/normalizeRecipeImportUrl";
 import { usePostHog } from "posthog-js/react";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
@@ -81,7 +81,7 @@ export default function URLImport() {
       } catch (err) {
         reportError("Failed to start URL import", err);
         posthog?.capture(AnalyticsEvent.recipeImportFailed, { source: "url" });
-        toast.error(t("urlImport.errors.importFailed"));
+        toast.error(t(importErrorKey(err)));
       } finally {
         setIsSaving(false);
       }
