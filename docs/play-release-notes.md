@@ -4,6 +4,28 @@ Per language 500 characters (Play Console limit). Same voice as the iOS
 What's New in the iOS repo's `docs/app-store-listing.md`; the Android notes
 for 1.4 fold iOS 1.2 and 1.3 into one release.
 
+## 1.6 (versionCode 47), 2026-11-05
+
+**DE**
+
+Planen wie auf dem iPhone!
+• Plane ein Rezept auf mehrere Tage und Wochen auf einmal
+• Jeder Tag zeigt mit Bildern, was schon geplant ist
+• Ohne festen Tag kommt es in den Pool, bis zu siebenmal
+• Der Button sagt, was passiert: „Für 2 Tage planen“
+
+Auch neu: Ein Import, der schon läuft, oder zu viele Importe auf einmal zeigen jetzt eine klare Meldung statt eines Fehlers
+
+**EN**
+
+Plan like on the iPhone!
+• Plan a recipe for several days and weeks at once
+• Every day shows what's already planned, with pictures
+• No fixed day? It goes into the pool, up to seven times
+• The button says what will happen: “Plan for 2 days”
+
+Also new: an import that's already running, or too many at once, now gets a clear message instead of an error
+
 ## 1.5 (versionCode 46), 2026-10-23
 
 versionCode 44 stayed in internal testing: it declared `USE_EXACT_ALARM`, which Play refuses for a recipe app. versionCode 45 stayed there too: it predates the new recipe page and the reset to the original (2026-10-22).
