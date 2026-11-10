@@ -18,6 +18,14 @@ describe("shoppingEmoji", () => {
     expect(shoppingEmoji(null, "Eis", "frozen")).toBe("🍦");
   });
 
+  // Backpapier under the toilet roll read as Klopapier (2026-11-08).
+  it("shows the roll for toilet paper and kitchen roll only", () => {
+    expect(shoppingEmoji("baking-paper", "Backpapier", "household")).toBe("📜");
+    expect(shoppingEmoji(null, "Backpapier", "other")).toBe("📜");
+    expect(shoppingEmoji("aluminum-foil", "Alufolie", "household")).toBe("🧹");
+    expect(shoppingEmoji("toilet-paper", "Toilettenpapier", "household")).toBe("🧻");
+  });
+
   it("falls back to the aisle last", () => {
     expect(shoppingEmoji(null, "Zeug", "pets")).toBe("🐾");
     expect(shoppingEmoji(null, "Zeug", "other")).toBe("🛒");

@@ -14,7 +14,7 @@ export const AISLES = [
   { id: "frozen", labelKey: "shoppingList.aisle.frozen", emoji: "🧊" },
   { id: "drinks", labelKey: "shoppingList.aisle.drinks", emoji: "🥤" },
   { id: "snacks", labelKey: "shoppingList.aisle.snacks", emoji: "🍫" },
-  { id: "household", labelKey: "shoppingList.aisle.household", emoji: "🧻" },
+  { id: "household", labelKey: "shoppingList.aisle.household", emoji: "🧹" },
   { id: "care", labelKey: "shoppingList.aisle.care", emoji: "🧴" },
   { id: "pets", labelKey: "shoppingList.aisle.pets", emoji: "🐾" },
   { id: "garden", labelKey: "shoppingList.aisle.garden", emoji: "🌱" },

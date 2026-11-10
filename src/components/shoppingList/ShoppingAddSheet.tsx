@@ -1,20 +1,21 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import ShoppingItemCard from "@/components/shoppingList/ShoppingItemCard";
 import { contentLanguage } from "@/lib/contentLanguage";
 import {
+  nameKey,
   parseTypedLine,
   type ShoppingDictionaryEntry,
   type ShoppingListItem,
   type TypedLine,
 } from "@/lib/shopping-list/item";
 import {
+  addUndo,
   addsNothing,
   previewItem,
   previewLine,
-  previewName,
   recentlyBought,
   suggestionItem,
   suggestions,
@@ -29,14 +30,28 @@ type Props = {
   /** Adds a line through the list's one add path. */
   onAdd: (line: TypedLine) => void;
   onPutBack: (id: string) => void;
+  /** Takes the last add back: deletes the new item, or takes a put-back off again. */
+  onUndo: (undo: "remove" | "takeOff", id: string) => void;
+  onDetails: (id: string) => void;
 };
 
-type Confirmation = { name: string; wasOnList: boolean };
+/** What the last add did: the card as tapped, and how to find its row. */
+type Confirmation = {
+  item: ShoppingListItem;
+  /** The row's id when the add landed on an item the household had. */
+  rowId: string | null;
+  wasOnList: boolean;
+  undo: "remove" | "takeOff" | null;
+};
 
 /**
  * One field for a line ("10 apples"). Empty, it offers what was bought last;
  * typed, the line as it will stand on the list and what it could mean, each row
  * drawn as the list's own card. Return adds the line and keeps the sheet open.
+ * After an add the card just added stands where the preview was, above what
+ * was bought last: another item under the finger read as "my Backpapier became
+ * Klopapier", and the next tap added it (2026-11-08). A tap on that card takes
+ * the add back and never adds anything.
  */
 export default function ShoppingAddSheet({
   open,
@@ -45,39 +60,67 @@ export default function ShoppingAddSheet({
   dictionary,
   onAdd,
   onPutBack,
+  onUndo,
+  onDetails,
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const [text, setText] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (!confirmation) return;
-    const timer = setTimeout(() => setConfirmation(null), 2000);
-    return () => clearTimeout(timer);
-  }, [confirmation]);
-
   const line = parseTypedLine(text);
   const preview = line ? previewLine(items, dictionary, line) : null;
   const rows = preview ? suggestions(items, dictionary, preview, contentLanguage()) : [];
   const bought = preview ? [] : recentlyBought(items);
 
-  function done(name: string, wasOnList = false) {
-    setConfirmation({ name, wasOnList });
+  // The row on the list now: a new item is found by its name once the add lands.
+  const addedRow = confirmation
+    ? (items.find(
+        (item) =>
+          item.onList &&
+          (confirmation.rowId
+            ? item.id === confirmation.rowId
+            : nameKey(item.name) === nameKey(confirmation.item.name))
+      ) ?? null)
+    : null;
+
+  function done(next: Confirmation) {
+    setConfirmation(next);
     setText("");
     inputRef.current?.focus();
   }
 
+  /** Adds a line and notes, from the list as it stands, what a tap takes back. */
+  function addLine(line: TypedLine) {
+    const adding = previewLine(items, dictionary, line);
+    onAdd(line);
+    done({
+      item: previewItem(adding),
+      rowId: adding.existing?.id ?? null,
+      wasOnList: addsNothing(adding),
+      undo: addUndo(adding),
+    });
+  }
+
+  function putBack(item: ShoppingListItem) {
+    onPutBack(item.id);
+    done({ item: { ...item, onList: true }, rowId: item.id, wasOnList: false, undo: "takeOff" });
+  }
+
   function addTyped() {
-    if (!preview) return;
-    onAdd(preview.line);
-    done(previewName(preview), addsNothing(preview));
+    if (preview) addLine(preview.line);
   }
 
   function addSuggestion(suggestion: ShoppingSuggestion, typed: TypedLine) {
-    if (suggestion.lastBought) onPutBack(suggestion.lastBought.id);
-    else onAdd({ ...typed, name: suggestion.name });
-    done(suggestion.name);
+    if (suggestion.lastBought) putBack(suggestion.lastBought);
+    else addLine({ ...typed, name: suggestion.name });
+  }
+
+  function undoAdd() {
+    if (!confirmation?.undo || !addedRow) return;
+    onUndo(confirmation.undo, addedRow.id);
+    setConfirmation(null);
+    inputRef.current?.focus();
   }
 
   return (
@@ -101,7 +144,10 @@ export default function ShoppingAddSheet({
               ref={inputRef}
               autoFocus
               value={text}
-              onChange={(event) => setText(event.target.value)}
+              onChange={(event) => {
+                setText(event.target.value);
+                if (event.target.value) setConfirmation(null);
+              }}
               placeholder={t("shoppingList.addSheet.placeholder")}
               enterKeyHint="enter"
               autoCorrect="off"
@@ -113,20 +159,9 @@ export default function ShoppingAddSheet({
               aria-label={t("shoppingList.addSheet.title")}
             />
           </form>
-          <p className="min-h-5 text-sm text-muted-foreground" aria-live="polite">
-            {confirmation &&
-              t(
-                confirmation.wasOnList
-                  ? "shoppingList.addSheet.alreadyOnList"
-                  : "shoppingList.addSheet.added",
-                {
-                  name: confirmation.name,
-                }
-              )}
-          </p>
         </DrawerHeader>
 
-        <div className="flex flex-col gap-2.5 overflow-y-auto px-4 pb-6">
+        <div className="flex flex-col gap-2.5 overflow-y-auto px-4 pt-0.5 pb-6">
           {preview ? (
             <>
               <ShoppingItemCard
@@ -143,21 +178,35 @@ export default function ShoppingAddSheet({
               ))}
             </>
           ) : (
-            bought.length > 0 && (
-              <>
-                <h3 className="font-semibold">{t("shoppingList.recentlyBought")}</h3>
-                {bought.map((item) => (
+            <>
+              {confirmation && (confirmation.rowId === null || addedRow) && (
+                <div className="mb-3.5 flex flex-col gap-1.5">
                   <ShoppingItemCard
-                    key={item.id}
-                    item={item}
-                    onClick={() => {
-                      onPutBack(item.id);
-                      done(item.name);
-                    }}
+                    item={addedRow ?? confirmation.item}
+                    highlighted
+                    onClick={undoAdd}
+                    onDetails={addedRow ? () => onDetails(addedRow.id) : undefined}
                   />
-                ))}
-              </>
-            )
+                  <p className="px-1 text-xs text-muted-foreground" aria-live="polite">
+                    {confirmation.wasOnList
+                      ? t("shoppingList.alreadyOnList")
+                      : t(
+                          confirmation.undo
+                            ? "shoppingList.addSheet.addedUndo"
+                            : "shoppingList.addSheet.added"
+                        )}
+                  </p>
+                </div>
+              )}
+              {bought.length > 0 && (
+                <>
+                  <h3 className="font-semibold">{t("shoppingList.recentlyBought")}</h3>
+                  {bought.map((item) => (
+                    <ShoppingItemCard key={item.id} item={item} onClick={() => putBack(item)} />
+                  ))}
+                </>
+              )}
+            </>
           )}
         </div>
       </DrawerContent>

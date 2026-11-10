@@ -60,11 +60,11 @@ const BY_SLUG: Record<string, string> = {
   "oat-milk": "🥛", "almond-milk": "🥛", "soy-milk": "🥛", "plant-milk": "🥛", "ayran": "🥛",
   "lime-juice": "🍋", "matcha": "🍵", "gyokuro-green-tea": "🍵", "chocolate": "🍫",
   "dark-chocolate": "🍫", "milk-chocolate": "🍫", "white-chocolate": "🍫", "chocolate-nibs": "🍫",
-  "nachos": "🌮",
+  "nachos": "🌮", "toilet-paper": "🧻", "kitchen-roll": "🧻", "baking-paper": "📜",
 };
 // prettier-ignore
 const BY_WORD: [string, string][] = [
-  ["klopapier", "🧻"], ["toilettenpapier", "🧻"], ["toilet", "🧻"], ["kuchenrolle", "🧻"],
+  ["klopapier", "🧻"], ["toilettenpapier", "🧻"], ["toilet", "🧻"], ["kuchenrolle", "🧻"], ["backpapier", "📜"],
   ["spulmittel", "🧽"], ["schwamm", "🧽"], ["dish", "🧽"], ["sponge", "🧽"], ["waschmittel", "🧺"],
   ["detergent", "🧺"], ["weichspuler", "🧺"], ["zahnpasta", "🪥"], ["zahnburste", "🪥"],
   ["toothpaste", "🪥"], ["toothbrush", "🪥"], ["shampoo", "🧴"], ["duschgel", "🧴"], ["seife", "🧼"],

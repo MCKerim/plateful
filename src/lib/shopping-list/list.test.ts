@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   addLine,
+  addUndo,
   addsNothing,
   aisleSections,
   editItem,
@@ -277,6 +278,16 @@ describe("the list", () => {
     expect(preview([], dictionary, "Taschentücher")).toMatchObject({ slug: "tissue", aisle: "care" });
     const items = [makeItem("a", "Apfel", "produce", { slug: "apple" })];
     expect(addsNothing(preview(items, dictionary, "Äpfel"))).toBe(true);
+  });
+
+  it("knows what a tap on the added card takes back", () => {
+    const items = [
+      makeItem("a", "Äpfel", "produce"),
+      makeItem("k", "Klopapier", "household", { onList: false }),
+    ];
+    expect(addUndo(preview(items, [], "Backpapier"))).toBe("remove");
+    expect(addUndo(preview(items, [], "Klopapier"))).toBe("takeOff");
+    expect(addUndo(preview(items, [], "2 Äpfel"))).toBeNull();
   });
 
   it("holds an edited aisle across buying and putting back", () => {

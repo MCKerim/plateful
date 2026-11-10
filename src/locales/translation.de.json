@@ -308,8 +308,8 @@
       "title": "Was fehlt?",
       "placeholder": "z. B. 10 Äpfel",
       "clear": "Löschen",
-      "added": "„{{name}}“ hinzugefügt",
-      "alreadyOnList": "„{{name}}“ steht schon auf der Liste"
+      "added": "Hinzugefügt",
+      "addedUndo": "Hinzugefügt. Tippen zum Entfernen."
     },
     "detail": {
       "addedFrom": "Hinzugefügt aus",

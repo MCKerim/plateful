@@ -308,8 +308,8 @@
       "title": "What's missing?",
       "placeholder": "e.g. 10 apples",
       "clear": "Clear",
-      "added": "Added “{{name}}”",
-      "alreadyOnList": "“{{name}}” is already on the list"
+      "added": "Added",
+      "addedUndo": "Added. Tap to remove."
     },
     "detail": {
       "addedFrom": "Added from",

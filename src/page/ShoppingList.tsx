@@ -238,6 +238,12 @@ export default function ShoppingList() {
         dictionary={dictionary}
         onAdd={add}
         onPutBack={(id) => setOnList.mutate({ householdId, id, onList: true })}
+        onUndo={(undo, id) =>
+          undo === "remove"
+            ? deleteItem.mutate({ householdId, id })
+            : setOnList.mutate({ householdId, id, onList: false })
+        }
+        onDetails={(id) => setSheet({ kind: "detail", itemId: id })}
       />
       <ShoppingItemDetailSheet
         item={detailItem}

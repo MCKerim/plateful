@@ -169,6 +169,16 @@ export function addsNothing(preview: ShoppingPreview): boolean {
 }
 
 /**
+ * What a tap on the added card takes back: a new item is deleted, a bought one
+ * that came back is taken off again; an amount added to an item on the list
+ * (or a line that only pointed at one) has no undo.
+ */
+export function addUndo(preview: ShoppingPreview): "remove" | "takeOff" | null {
+  if (!preview.existing) return "remove";
+  return preview.existing.onList ? null : "takeOff";
+}
+
+/**
  * The row as it will stand once the line is added: the household's item with
  * the typed amount added (a bought one starts afresh with exactly the typed
  * amount), else a new item.
