@@ -73,4 +73,6 @@ export type ParsedIngredient = {
   ingredientNameNormalized: string | null;
   preparationNote: string | null;
   isScalable: boolean;
+  /** The line says so: "(optional)" anywhere, or ", optional" at its end. The mark is not part of name or note. */
+  isOptional: boolean;
 };

@@ -64,7 +64,7 @@ export const ingredientsApi = {
       ingredient_name_normalized: parsed.ingredientNameNormalized,
       preparation_note: parsed.preparationNote,
       is_scalable: parsed.isScalable,
-      is_optional: input.isOptional ?? false,
+      is_optional: input.isOptional ?? parsed.isOptional,
       group_name: input.groupName ?? null,
       sort_order: sortOrder ?? input.sortOrder ?? 0,
     };
@@ -100,7 +100,7 @@ export const ingredientsApi = {
         ingredient_name_normalized: parsed.ingredientNameNormalized,
         preparation_note: parsed.preparationNote,
         is_scalable: parsed.isScalable,
-        is_optional: input.isOptional ?? false,
+        is_optional: input.isOptional ?? parsed.isOptional,
         group_name: input.groupName ?? null,
         sort_order: input.sortOrder ?? index,
       };

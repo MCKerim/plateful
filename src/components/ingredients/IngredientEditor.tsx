@@ -1,3 +1,4 @@
+import { parseIngredient } from "@/lib/ingredient-parser/parse-ingredient";
 import { useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -48,7 +49,10 @@ export function ingredientsToEditorItems(ingredients: RecipeIngredient[]): Edito
         items.push({ type: "section", id: generateId(), name: currentGroup });
       }
     }
-    items.push({ type: "ingredient", id: generateId(), rawText: ing.rawText });
+    // The text is what a save parses again, so a flag the line does not spell
+    // out (a shared or connector-made recipe) is written into it.
+    const unmarked = ing.isOptional && !parseIngredient(ing.rawText).isOptional;
+    items.push({ type: "ingredient", id: generateId(), rawText: unmarked ? `${ing.rawText} (optional)` : ing.rawText });
   }
   return items;
 }

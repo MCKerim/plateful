@@ -28,6 +28,23 @@ describe("parseIngredient cross-platform fixtures", () => {
   });
 });
 
+// The optional mark, as in the extractor's and the iOS parser's fixtures.
+describe("parseIngredient optional mark", () => {
+  it.each([
+    ["50 g Zartbitterschokolade (optional)", "Zartbitterschokolade", null],
+    ["Rosinen (optional)", "Rosinen", null],
+    ["1 tbsp sugar (Optional)", "sugar", null],
+    ["1 garlic clove, finely minced, optional", "garlic clove", "finely minced"],
+  ])("%j is optional", (line, name, note) => {
+    expect(parseIngredient(line)).toMatchObject({ isOptional: true, ingredientName: name, preparationNote: note });
+  });
+
+  it("leaves a line without the mark alone", () => {
+    expect(parseIngredient("optional toppings")).toMatchObject({ isOptional: false, ingredientName: "optional toppings" });
+    expect(parseIngredient("250 g flour").isOptional).toBe(false);
+  });
+});
+
 // Same cases as the extractor's parse-ingredient.test.ts — real rows were
 // stored as "e tomaten", "er gemischter salat", "es ei".
 describe("parseIngredient normalized name", () => {

@@ -471,6 +471,16 @@ function removeFillerWords(text: string): string {
  * into structured data
  */
 export function parseIngredient(rawText: string): ParsedIngredient {
+  const text = rawText.replace(/\s{2,}/g, " ");
+  // "(optional)" and a trailing ", optional" go; "(optional, zum Servieren)" keeps its rest.
+  const line = text.replace(OPTIONAL_ALONE, "").replace(OPTIONAL_LEADING, "(");
+  return { ...parseLine(line), isOptional: line !== text };
+}
+
+const OPTIONAL_ALONE = /\s*\(\s*optional\s*\)|\s*,\s*optional\s*$/gi;
+const OPTIONAL_LEADING = /\(\s*optional\s*[,;]\s*/gi;
+
+function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
   const trimmed = rawText.trim();
 
   // Check for non-scalable patterns first
