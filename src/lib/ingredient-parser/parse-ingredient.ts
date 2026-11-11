@@ -140,6 +140,21 @@ const UNIT_MAP: Record<string, string> = {
   tropfen: "drop",
   kopf: "head",
   köpfe: "head",
+  stiel: "sprig",
+  stiele: "sprig",
+  kugel: "ball",
+  kugeln: "ball",
+  flasche: "bottle",
+  flaschen: "bottle",
+  messlöffel: "scoop",
+  beutel: "bag",
+  tüte: "bag",
+  tüten: "bag",
+  riegel: "bar",
+  rolle: "roll",
+  rollen: "roll",
+  knolle: "bulb",
+  knollen: "bulb",
   // Count/measure words missing from the English section above
   pinch: "pinch",
   pinches: "pinch",
@@ -153,25 +168,88 @@ const UNIT_MAP: Record<string, string> = {
   drops: "drop",
   stick: "stick",
   sticks: "stick",
+  scoop: "scoop",
+  scoops: "scoop",
 };
 
-// Patterns that indicate non-scalable ingredients
+// Unit matchers, precompiled once at module load (not per ingredient). Sorted
+// longest-key-first so multi-word units like "fluid ounces" match before short
+// ones like "fl"; each key compiles to an anchored regex reused on every call.
+// Abbreviations are often written with a trailing period ("EL.", "Msp."), so
+// every key tolerates an optional "." before the word boundary.
+const UNIT_MATCHERS: { regex: RegExp; normalized: string }[] = Object.keys(UNIT_MAP)
+  .sort((a, b) => b.length - a.length)
+  .map((key) => ({
+    regex: new RegExp(`^${key}\\.?(?:\\s+|$)`, "i"),
+    normalized: UNIT_MAP[key]!,
+  }));
+
+// A line that opens like this is not an amount to scale, even with a number in
+// it. A phrase at the end ("to taste", "nach Geschmack", "for garnish") is not
+// in this list: "1 Prise Salz, nach Geschmack" is 1 Prise Salz with a note.
 const NON_SCALABLE_PATTERNS = [
   /^a\s+pinch\s+of/i,
   /^pinch\s+of/i,
-  /^eine?\s+prise/i,
-  /to\s+taste$/i,
-  /nach\s+geschmack$/i,
   /^some\s+/i,
   /^etwas\s+/i,
   /^a\s+dash\s+of/i,
   /^a\s+splash\s+of/i,
   /^a\s+drizzle\s+of/i,
-  /for\s+garnish$/i,
-  /zum\s+garnieren$/i,
-  /as\s+needed$/i,
-  /nach\s+bedarf$/i,
 ];
+
+// Approximation words before a number ("ca. 200 g") carry no amount of their own.
+const QUANTITY_PREFIX = /^(?:ca\.|approx\.|(?:ca|etwa|circa|about|approx)\s)\s*/i;
+
+// A standalone leading word as the quantity ("eine Prise", "zwei Eier"). English
+// "a"/"an" are left alone: "a cup of milk" reads as a phrase, not as 1.
+const WORD_NUMBERS: Record<string, number> = {
+  "einen halben": 0.5,
+  "eine halbe": 0.5,
+  "ein halber": 0.5,
+  "ein halbes": 0.5,
+  "a half": 0.5,
+  "half an": 0.5,
+  "half a": 0.5,
+  ein: 1,
+  eine: 1,
+  einen: 1,
+  zwei: 2,
+  drei: 3,
+  vier: 4,
+  fünf: 5,
+  sechs: 6,
+  halbe: 0.5,
+  halber: 0.5,
+  halbes: 0.5,
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  half: 0.5,
+};
+
+// "ein paar" / "ein bisschen" / "ein wenig" mean "a few" / "a little", not 1;
+// "half and half" and "five spice" are names.
+const WORD_NUMBER_MATCHERS = Object.keys(WORD_NUMBERS)
+  .sort((a, b) => b.length - a.length)
+  .map((key) => ({
+    regex: new RegExp(`^${key}(?=\\s|$)(?!\\s+(?:paar|bisschen|wenig|and|spice)(?:\\s|$))`, "i"),
+    value: WORD_NUMBERS[key]!,
+  }));
+
+// Adjectives that qualify a spoon or cup measure ("2 gehäufte EL"); they sit
+// between the number and the unit and move to the note.
+const MEASURE_ADJECTIVE =
+  /^(gehäuft\p{L}*|gestrichen\p{L}*|knapp\p{L}*|gut\p{L}*|heaped|heaping|level|scant|generous|rounded)\s+/iu;
+const SPOON_OR_CUP_UNITS = new Set(["tbsp", "tsp", "cup"]);
+
+// On a line without a number, a leading "etwas" is the quantity display. A
+// trailing "nach Geschmack" goes to the note: as an amount it would land on
+// the shopping list ("500 g + nach Geschmack").
+const VAGUE_AMOUNT_LEADING = /^(etwas)\s+/i;
+const VAGUE_AMOUNT_TRAILING = /(?:^|,?\s+)(nach Geschmack|nach Belieben|nach Bedarf|to taste|as needed)$/i;
 
 // Fraction map for unicode and text fractions
 const FRACTION_MAP: Record<string, number> = {
@@ -197,15 +275,16 @@ const FRACTION_MAP: Record<string, number> = {
  */
 function parseFraction(fraction: string): number | null {
   // Handle unicode fractions
-  if (FRACTION_MAP[fraction]) {
-    return FRACTION_MAP[fraction];
+  const unicode = FRACTION_MAP[fraction];
+  if (unicode !== undefined) {
+    return unicode;
   }
 
   // Handle text fractions like "1/2"
   const fractionMatch = fraction.match(/^(\d+)\/(\d+)$/);
   if (fractionMatch) {
-    const numerator = parseInt(fractionMatch[1], 10);
-    const denominator = parseInt(fractionMatch[2], 10);
+    const numerator = parseInt(fractionMatch[1]!, 10);
+    const denominator = parseInt(fractionMatch[2]!, 10);
     if (denominator !== 0) {
       return numerator / denominator;
     }
@@ -230,13 +309,13 @@ function toDecimalDisplay(value: number): string {
  * Parse a numeric token that may use a decimal point ("1.5"), a German decimal
  * comma ("1,5"), or a thousands separator ("1.000" German / "1,000" English).
  * A separator followed by exactly three zeros reads as thousands — recipes
- * never state quantities to three-zero decimal precision. Mirrors the
- * extractor's `parseNumericToken`.
+ * never state quantities to three-zero decimal precision, but "1.000 g" and
+ * "1,000 ml" genuinely mean a thousand.
  */
 function parseNumericToken(token: string): number {
   const thousands = token.match(/^(\d+)[.,]000$/);
   if (thousands) {
-    return parseInt(thousands[1], 10) * 1000;
+    return parseInt(thousands[1]!, 10) * 1000;
   }
   return parseFloat(token.replace(",", "."));
 }
@@ -244,18 +323,19 @@ function parseNumericToken(token: string): number {
 /**
  * Extract quantity value and display from a string
  */
-function extractQuantity(text: string): {
+export function extractQuantity(text: string): {
   value: number | null;
   display: string | null;
   remaining: string;
 } {
-  const remaining = text.trim();
+  const original = text.trim();
+  const remaining = original.replace(QUANTITY_PREFIX, "");
 
   // Pattern 1: Range like "2-3" or "2 - 3"
   const rangeMatch = remaining.match(/^(\d+(?:[.,]\d+)?)\s*[-–—]\s*(\d+(?:[.,]\d+)?)/);
   if (rangeMatch) {
-    const low = parseNumericToken(rangeMatch[1]);
-    const high = parseNumericToken(rangeMatch[2]);
+    const low = parseNumericToken(rangeMatch[1]!);
+    const high = parseNumericToken(rangeMatch[2]!);
     const midpoint = (low + high) / 2;
     return {
       value: midpoint,
@@ -264,11 +344,12 @@ function extractQuantity(text: string): {
     };
   }
 
-  // Pattern 2: Mixed number like "1 1/2" or "1 ½"
-  const mixedMatch = remaining.match(/^(\d+)\s+(\d+\/\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/);
+  // Pattern 2: Mixed number like "1 1/2", "1 ½" or "1½" (only a glyph may
+  // touch the whole number: "11/2" is eleven halves, not 1 + 1/2)
+  const mixedMatch = remaining.match(/^(\d+)(\s+\d+\/\d+|\s*[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/);
   if (mixedMatch) {
-    const whole = parseInt(mixedMatch[1], 10);
-    const fractionPart = parseFraction(mixedMatch[2]);
+    const whole = parseInt(mixedMatch[1]!, 10);
+    const fractionPart = parseFraction(mixedMatch[2]!.trim());
     if (fractionPart !== null) {
       const value = whole + fractionPart;
       return {
@@ -282,7 +363,7 @@ function extractQuantity(text: string): {
   // Pattern 3: Single fraction like "1/2" or "½"
   const fractionMatch = remaining.match(/^(\d+\/\d+|[½⅓⅔¼¾⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞])/);
   if (fractionMatch) {
-    const fractionValue = parseFraction(fractionMatch[1]);
+    const fractionValue = parseFraction(fractionMatch[1]!);
     if (fractionValue !== null) {
       return {
         value: fractionValue,
@@ -297,45 +378,54 @@ function extractQuantity(text: string): {
   // numeric value is normalized.
   const numberMatch = remaining.match(/^(\d+(?:[.,]\d+)?)/);
   if (numberMatch) {
-    const value = parseNumericToken(numberMatch[1]);
+    const value = parseNumericToken(numberMatch[1]!);
     return {
       value,
-      display: numberMatch[1],
+      display: numberMatch[1]!,
       remaining: remaining.slice(numberMatch[0].length).trim(),
     };
+  }
+
+  // Pattern 5: Word number like "eine" or "two"
+  for (const { regex, value } of WORD_NUMBER_MATCHERS) {
+    const wordMatch = remaining.match(regex);
+    if (wordMatch) {
+      return {
+        value,
+        display: toDecimalDisplay(value),
+        remaining: remaining.slice(wordMatch[0].length).trim(),
+      };
+    }
   }
 
   // No quantity found
   return {
     value: null,
     display: null,
-    remaining,
+    remaining: original,
   };
 }
 
 /**
  * Extract unit from the beginning of text
  */
-function extractUnit(text: string): {
+export function extractUnit(text: string): {
   unit: string | null;
   unitNormalized: string | null;
   remaining: string;
 } {
   const remaining = text.trim();
 
-  // Try to match a unit at the start of the string
-  // Sort by length descending to match longer units first (e.g., "fluid ounces" before "fl").
-  // Abbreviations may carry a trailing period ("EL.", "Msp.") — consumed but
-  // stripped from the stored unit.
-  const unitKeys = Object.keys(UNIT_MAP).sort((a, b) => b.length - a.length);
-
-  for (const unitKey of unitKeys) {
-    const regex = new RegExp(`^${unitKey}\\.?(?:\\s+|$)`, "i");
+  // Match a unit at the start of the string using the precompiled, longest-first
+  // matchers (so "fluid ounces" wins over "fl").
+  for (const { regex, normalized } of UNIT_MATCHERS) {
     const match = remaining.match(regex);
     if (match) {
       return {
+        // Strip the optional abbreviation period ("EL." → "EL") — the dot is
+        // punctuation of the source line, not part of the unit.
         unit: match[0].trim().replace(/\.$/, ""),
-        unitNormalized: UNIT_MAP[unitKey.toLowerCase()],
+        unitNormalized: normalized,
         remaining: remaining.slice(match[0].length).trim(),
       };
     }
@@ -363,16 +453,19 @@ function extractPreparationNote(
   const foundPreps: string[] = [];
 
   // Everything after the first comma is a preparation/state note ("Champignons,
-  // in Scheiben", "Pasta, ungekocht") — no word whitelist; a mis-filed tail
-  // still renders as the small note line instead of polluting the name. Two
-  // guards, mirroring the extractor: only quantified lines split (an
-  // unquantified "Salz, Pfeffer, Paprikapulver" is an enumeration, not a name
-  // plus note), and a digit-flanked comma is a decimal ("Joghurt 1,5%"), never
-  // a note boundary.
+  // in Scheiben", "Pasta, ungekocht", "Zitrone, Saft") — no word whitelist; a
+  // mis-filed tail still renders as the small note line instead of polluting
+  // the name. Two guards, both from real library data: only quantified lines
+  // are split (an unquantified "Salz, Pfeffer, Paprikapulver" is an
+  // enumeration, not a name plus note), and a digit-flanked comma is a decimal
+  // ("Joghurt 1,5%"), never a note boundary.
   if (hasQuantity) {
     for (let i = remaining.indexOf(","); i !== -1; i = remaining.indexOf(",", i + 1)) {
-      const isDecimal = /\d/.test(remaining[i - 1] ?? "") && /\d/.test(remaining[i + 1] ?? "");
-      if (i === 0 || isDecimal) continue;
+      const isDecimal =
+        /\d/.test(remaining[i - 1] ?? "") && /\d/.test(remaining[i + 1] ?? "");
+      const before = remaining.slice(0, i);
+      const insideParens = before.split("(").length > before.split(")").length;
+      if (i === 0 || isDecimal || insideParens) continue;
       const tail = remaining.slice(i + 1).trim();
       if (tail) {
         foundPreps.push(tail);
@@ -385,8 +478,8 @@ function extractPreparationNote(
   // Check for parenthetical notes like "(chopped)"
   const parenMatch = remaining.match(/\(([^)]+)\)/);
   if (parenMatch) {
-    foundPreps.push(parenMatch[1].trim());
-    remaining = remaining.replace(parenMatch[0], "").trim();
+    foundPreps.push(parenMatch[1]!.trim());
+    remaining = remaining.replace(parenMatch[0]!, "").trim();
   }
 
   return {
@@ -399,7 +492,7 @@ function extractPreparationNote(
  * Normalize ingredient name for matching
  * Removes common descriptors and standardizes format
  */
-function normalizeIngredientName(name: string): string {
+export function normalizeIngredientName(name: string): string {
   if (!name) return "";
 
   let normalized = name.toLowerCase().trim();
@@ -436,12 +529,11 @@ function normalizeIngredientName(name: string): string {
   // Whole words only, with letter-aware boundaries: JS `\b` is ASCII-only, so
   // "ß" and umlauts count as non-word characters — `\bgroß\b` matched exactly
   // when a letter followed ("große tomaten" → "e tomaten") and never the bare
-  // word. The leading boundary is a captured character rather than the
-  // extractor's lookbehind, which Safari only supports from 16.4.
+  // word.
   for (const descriptor of descriptors) {
     normalized = normalized.replace(
-      new RegExp(`(^|[^\\p{L}\\p{N}_])${descriptor}(?![\\p{L}\\p{N}_])`, "giu"),
-      "$1",
+      new RegExp(`(?<![\\p{L}\\p{N}_])${descriptor}(?![\\p{L}\\p{N}_])`, "giu"),
+      "",
     );
   }
 
@@ -483,11 +575,14 @@ const OPTIONAL_LEADING = /\(\s*optional\s*[,;]\s*/gi;
 function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
   const trimmed = rawText.trim();
 
-  // Check for non-scalable patterns first
-  const nonScalable = isNonScalable(trimmed);
+  const quantity = extractQuantity(trimmed);
+  const quantityValue = quantity.value;
+  let quantityDisplay = quantity.display;
+  let afterQuantity = quantity.remaining;
 
-  // If non-scalable, return minimal parsing
-  if (nonScalable) {
+  // A non-scalable line with a number ("a pinch of salt") keeps the whole line
+  // as the name; one without a number is parsed like any other line.
+  if (quantityValue !== null && isNonScalable(trimmed)) {
     return {
       quantityValue: null,
       quantityDisplay: null,
@@ -500,24 +595,42 @@ function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
     };
   }
 
-  // Extract quantity
-  const {
-    value: quantityValue,
-    display: quantityDisplay,
-    remaining: afterQuantity,
-  } = extractQuantity(trimmed);
+  let vagueNote: string | null = null;
+  // With a number the phrase is only taken off a line without a comma
+  // ("1 TL Chili nach Geschmack"); after a comma it already is the note.
+  if (quantityValue === null || !afterQuantity.includes(",")) {
+    const leading = quantityValue === null ? afterQuantity.match(VAGUE_AMOUNT_LEADING) : null;
+    const trailing = leading ? null : afterQuantity.match(VAGUE_AMOUNT_TRAILING);
+    if (leading) {
+      quantityDisplay = leading[1]!;
+      afterQuantity = afterQuantity.slice(leading[0].length).trim();
+    } else if (trailing) {
+      vagueNote = trailing[1]!;
+      afterQuantity = afterQuantity.slice(0, trailing.index).trim();
+    }
+  }
 
   // Extract unit
-  const { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
+  let { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
+  let measureAdjective: string | null = null;
+  const adjective = quantityValue !== null && !unit ? afterQuantity.match(MEASURE_ADJECTIVE) : null;
+  if (adjective) {
+    const measured = extractUnit(afterQuantity.slice(adjective[0].length));
+    if (measured.unitNormalized && SPOON_OR_CUP_UNITS.has(measured.unitNormalized)) {
+      ({ unit, unitNormalized, remaining: afterUnit } = measured);
+      measureAdjective = adjective[1]!;
+    }
+  }
 
   // Remove filler words
   const afterFiller = removeFillerWords(afterUnit);
 
   // Extract preparation notes
-  const { preparationNote, remaining: ingredientName } = extractPreparationNote(
+  const { preparationNote: note, remaining: ingredientName } = extractPreparationNote(
     afterFiller,
     quantityValue !== null,
   );
+  const preparationNote = [measureAdjective, note, vagueNote].filter(Boolean).join(", ") || null;
 
   return {
     quantityValue,

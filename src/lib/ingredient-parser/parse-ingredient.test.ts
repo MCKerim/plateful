@@ -24,24 +24,8 @@ describe("parseIngredient cross-platform fixtures", () => {
       ingredientName: parsed.ingredientName,
       preparationNote: parsed.preparationNote,
       isScalable: parsed.isScalable,
-    }).toEqual(fixture.expected);
-  });
-});
-
-// The optional mark, as in the extractor's and the iOS parser's fixtures.
-describe("parseIngredient optional mark", () => {
-  it.each([
-    ["50 g Zartbitterschokolade (optional)", "Zartbitterschokolade", null],
-    ["Rosinen (optional)", "Rosinen", null],
-    ["1 tbsp sugar (Optional)", "sugar", null],
-    ["1 garlic clove, finely minced, optional", "garlic clove", "finely minced"],
-  ])("%j is optional", (line, name, note) => {
-    expect(parseIngredient(line)).toMatchObject({ isOptional: true, ingredientName: name, preparationNote: note });
-  });
-
-  it("leaves a line without the mark alone", () => {
-    expect(parseIngredient("optional toppings")).toMatchObject({ isOptional: false, ingredientName: "optional toppings" });
-    expect(parseIngredient("250 g flour").isOptional).toBe(false);
+      isOptional: parsed.isOptional,
+    }).toEqual({ isOptional: false, ...fixture.expected });
   });
 });
 
