@@ -2,7 +2,7 @@
 
 _After an add the card just added stands where the preview was, above "Zuletzt gekauft"; a tap takes the add back; only toilet paper and kitchen roll show the roll. Built 2026-11-10 after the iOS app, not released yet (Android 1.6 does not have it)._
 
-What happened: on 2026-11-08 a "Backpapier" typed in the Android app seemed to turn into "Klopapier". Nothing was matched wrongly. The preview card showed 🧻 because that was the household aisle's fallback emoji, and after the tap the field cleared and "Zuletzt gekauft" took the preview's place with "🧻 Klopapier" first, which the next tap put on the list (PostHog autocapture; the full trail is in the iOS repo, `docs/ingredient-data-plan.md`, fourth handover).
+What happened: on 2026-11-08 a "Backpapier" typed in the Android app seemed to turn into "Klopapier". Nothing was matched wrongly. The preview card showed 🧻 because that was the household aisle's fallback emoji, and after the tap the field cleared and "Zuletzt gekauft" took the preview's place with "🧻 Klopapier" first, which the next tap put on the list (PostHog autocapture; the full trail is in the iOS repo, `docs/archive/ingredient-data-plan-2026-11.md`, fourth handover).
 
 Now, as in iOS (`ShoppingAddSheet.swift`, the iOS repo's `docs/knowledge/shopping-list.md`):
 - `ShoppingAddSheet` keeps a `Confirmation` (the card as tapped, the row's id when the household had the item, what a tap takes back) until the next line is typed. The card is outlined (`highlighted`), with "Hinzugefügt. Tippen zum Entfernen." under it; it replaces the two-second text under the field (`addSheet.added` is now the short form, `addSheet.addedUndo` is new, `addSheet.alreadyOnList` is gone, the card's `shoppingList.alreadyOnList` is used).
