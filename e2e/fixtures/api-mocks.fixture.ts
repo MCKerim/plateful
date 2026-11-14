@@ -107,6 +107,8 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
             sugar_g: null,
             fiber_g: null,
             sodium_mg: null,
+            ...recipe.nutrition,
+            nutrition_auto: recipe.nutrition_auto ?? true,
             image_path: null,
           }),
         });

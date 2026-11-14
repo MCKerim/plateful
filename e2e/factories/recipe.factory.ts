@@ -22,6 +22,8 @@ export function createRecipe(overrides?: Partial<MockRecipe>): MockRecipe {
     avg_rating: overrides?.avg_rating ?? null,
     collectionIds: overrides?.collectionIds ?? [],
     tags: overrides?.tags ?? [],
+    nutrition: overrides?.nutrition,
+    nutrition_auto: overrides?.nutrition_auto,
   };
 }
 

@@ -31,6 +31,15 @@ export type MockRecipe = {
   avg_rating: number | null;
   collectionIds: string[];
   tags: string[];
+  /** `recipes.nutrition_auto`; served as true (the column default) when unset. */
+  nutrition_auto?: boolean;
+  /** Stored per-serving values, served on the single-recipe fetch; unset ones are null. */
+  nutrition?: Partial<
+    Record<
+      "calories_kcal" | "carbs_g" | "protein_g" | "fat_g" | "sugar_g" | "fiber_g" | "sodium_mg",
+      number
+    >
+  >;
 };
 
 export type MockCollection = {
