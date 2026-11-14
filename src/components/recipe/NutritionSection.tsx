@@ -3,8 +3,10 @@ import { useTranslation } from "react-i18next";
 import { Flame } from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { NutritionValues } from "@/api/nutrition.api";
+import { currentCarbCounting, shownNutrition } from "@/lib/carbCounting";
 
 type Props = {
+  /** Stored form; carbs are shown the way the reader counts them. */
   nutrition: NutritionValues;
   /** `recipes.nutrition_pending`: an estimate is queued or running. The card
    *  shows (pulsing, with an "Updating nutrition…" note) even when every
@@ -46,8 +48,12 @@ const THIN_SPACE = " ";
  * one is (`isPending`), the values breathe with a soft opacity pulse under an
  * "Updating nutrition…" note — mirroring the iOS card.
  */
-export default function NutritionSection({ nutrition, isPending = false }: Readonly<Props>) {
+export default function NutritionSection({
+  nutrition: stored,
+  isPending = false,
+}: Readonly<Props>) {
   const { t, i18n } = useTranslation();
+  const nutrition = shownNutrition(stored, currentCarbCounting());
   const [isExpanded, setIsExpanded] = useState(false);
 
   // One pulse definition for BOTH value rows (collapsed and expanded), so

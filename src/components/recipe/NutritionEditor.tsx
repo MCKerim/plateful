@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { NutritionValues } from "@/api/nutrition.api";
+import { currentCarbCounting, shownNutrition, storedNutrition } from "@/lib/carbCounting";
 
 type FieldKey = keyof NutritionValues;
 
@@ -44,16 +45,20 @@ function parseDraft(text: string): number | null {
   return Number.isFinite(value) && value >= 0 ? value : null;
 }
 
+/** The fields hold carbs the way the reader counts them; this returns stored form. */
 function draftsToValues(drafts: Drafts): NutritionValues {
-  return {
-    calories_kcal: parseDraft(drafts.calories_kcal),
-    carbs_g: parseDraft(drafts.carbs_g),
-    protein_g: parseDraft(drafts.protein_g),
-    fat_g: parseDraft(drafts.fat_g),
-    sugar_g: parseDraft(drafts.sugar_g),
-    fiber_g: parseDraft(drafts.fiber_g),
-    sodium_mg: parseDraft(drafts.sodium_mg),
-  };
+  return storedNutrition(
+    {
+      calories_kcal: parseDraft(drafts.calories_kcal),
+      carbs_g: parseDraft(drafts.carbs_g),
+      protein_g: parseDraft(drafts.protein_g),
+      fat_g: parseDraft(drafts.fat_g),
+      sugar_g: parseDraft(drafts.sugar_g),
+      fiber_g: parseDraft(drafts.fiber_g),
+      sodium_mg: parseDraft(drafts.sodium_mg),
+    },
+    currentCarbCounting()
+  );
 }
 
 function valueToDraft(value: number | null, decimals: 0 | 1): string {
@@ -61,7 +66,8 @@ function valueToDraft(value: number | null, decimals: 0 | 1): string {
   return decimals === 0 ? Math.round(value).toString() : String(Number(value.toFixed(1)));
 }
 
-function valuesToDrafts(values: NutritionValues): Drafts {
+function valuesToDrafts(stored: NutritionValues): Drafts {
+  const values = shownNutrition(stored, currentCarbCounting());
   const drafts = { ...EMPTY_DRAFTS };
   for (const field of FIELDS) {
     drafts[field.key] = valueToDraft(values[field.key], field.decimals);
