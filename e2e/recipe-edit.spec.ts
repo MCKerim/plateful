@@ -204,4 +204,21 @@ test.describe("Recipe Edit Page", () => {
       p_collection_ids: [],
     });
   });
+
+  test("saving sends the ingredient lines to replace_recipe_ingredients", async ({ page, setupAuth }) => {
+    const recipeId = "00000000-0000-0000-0000-000000000007";
+    await setupAuth({ recipes: [createRecipe({ id: recipeId, name: "Diff Save" })] });
+    await page.goto(`/recipe/edit/${recipeId}`);
+    await expect(page.locator("#title")).toHaveValue("Diff Save", { timeout: 10000 });
+
+    await page.getByRole("button", { name: "Ingredient", exact: true }).click();
+    await page.getByPlaceholder("e.g. 2 cups flour").last().fill("200 g Mehl");
+    const rpcRequest = page.waitForRequest("**/rest/v1/rpc/replace_recipe_ingredients");
+    await page.getByRole("button", { name: /save/i }).click();
+    const body = (await rpcRequest).postDataJSON();
+    expect(body.p_recipe_id).toBe(recipeId);
+    expect(body.p_lines).toMatchObject([
+      { raw_text: "200 g Mehl", quantity_value: 200, unit: "g", ingredient_name: "Mehl", group_name: null, sort_order: 0 },
+    ]);
+  });
 });

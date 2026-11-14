@@ -182,7 +182,7 @@ The planner's first weekday is the account's own, in `users.week_start` (0 = Sun
 
 ### Ingredients System
 
-Recipes store ingredients as structured data in the `recipe_ingredients` table, using a hybrid approach: raw text is always preserved (user sees what they typed), and parsed fields (`quantity_value`, `unit`, `ingredient_name`) enable scaling and future shopping list aggregation.
+Recipes store ingredients as structured data in the `recipe_ingredients` table, using a hybrid approach: raw text is always preserved (user sees what they typed), and parsed fields (`quantity_value`, `unit`, `ingredient_name`) enable scaling and future shopping list aggregation. Every save goes through the RPC `replace_recipe_ingredients` (`ingredientsApi.replaceAll`, one transaction): a line whose text is already saved keeps its row and its `ingredient_slug`, a changed or new line is inserted parsed, the rest is deleted. Never delete and reinsert rows yourself (iOS repo `docs/knowledge/ingredient-save-keeps-unchanged-rows.md`).
 
 **Recipe table columns:** `instructions` (separated from legacy `description`), `base_servings`, `servings_unit`.
 

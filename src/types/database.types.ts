@@ -2163,6 +2163,10 @@ export type Database = {
         Args: { p_collection_ids?: string[]; p_recipe_id: string }
         Returns: undefined
       }
+      replace_recipe_ingredients: {
+        Args: { p_lines: Json; p_recipe_id: string }
+        Returns: undefined
+      }
       request_account_deletion: {
         Args: { p_request_id: string; p_successor_user_id?: string }
         Returns: Json
