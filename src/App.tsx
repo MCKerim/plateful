@@ -55,6 +55,7 @@ import OAuthConsentRoute, { PostSignInLanding } from "./components/general/OAuth
 import InviteRoute from "./components/general/InviteRoute";
 import NotificationSettings from "./page/NotificationSettings";
 import Connections from "./page/Connections";
+import NutritionSettings from "./page/NutritionSettings";
 import UpdateDialog from "./components/general/UpdateDialog";
 import { useQueryClient } from "@tanstack/react-query";
 import { queryKeys } from "@/lib/query-keys";
@@ -537,6 +538,7 @@ function App() {
           element={routeToCorrectPage(<NotificationSettings />)}
         />
         <Route path="/connections" element={routeToCorrectPage(<Connections />)} />
+        <Route path="/nutritionSettings" element={routeToCorrectPage(<NutritionSettings />)} />
         <Route
           path="/invite/:token"
           element={<InviteRoute isLoggedIn={isLoggedIn()} refreshUser={refreshUser} />}

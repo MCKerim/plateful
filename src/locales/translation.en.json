@@ -627,7 +627,14 @@
     "updateAutomatically": "Update automatically",
     "autoOnHint": "Values are per serving, estimated from the ingredients. They update on their own when the ingredients change.",
     "autoOffHint": "Values are per serving. They stay exactly as you enter them.",
-    "updating": "Updating nutrition…"
+    "updating": "Updating nutrition…",
+    "withoutFiber": "Without fiber",
+    "withFiber": "Including fiber",
+    "carbCountingNote": "Food labels in the EU and most countries list carbs without fiber, labels in the US and Canada include it. Plateful counts them the way your labels do.",
+    "source": "Source",
+    "sourceNote": "Nutrition is calculated per serving from a recipe’s ingredients. Source: Max Rubner-Institut (2025): Bundeslebensmittelschlüssel (BLS), Version 4.0, German Nutrient Database. Karlsruhe. DOI 10.25826/Data20251217-134202-0. Licensed under CC BY 4.0. Plateful selected the data, converted it to servings and supplemented it.",
+    "bls": "Bundeslebensmittelschlüssel",
+    "license": "License CC BY 4.0"
   },
   "home": {
     "title": "Home",

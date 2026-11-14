@@ -7,7 +7,17 @@ import { NavLink } from "react-router";
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { selectUser, setUserWeekStart } from "@/redux/slices/userSlice";
-import { Bell, CreditCard, Donut, House, LogOut, Pencil, Sparkles, Trash2 } from "lucide-react";
+import {
+  Bell,
+  ChartPie,
+  CreditCard,
+  Donut,
+  House,
+  LogOut,
+  Pencil,
+  Sparkles,
+  Trash2,
+} from "lucide-react";
 import { useCustomerCenter } from "@/hooks/subscription/useCustomerCenter";
 import { useHouseholdSubscription } from "@/hooks/subscription/useHouseholdSubscription";
 import { isNativePlatform } from "@/lib/revenuecat";
@@ -223,6 +233,14 @@ export default function Settings() {
               ))}
             </SelectContent>
           </Select>
+
+          <NavLink to="/nutritionSettings">
+            <Button variant="secondary" className="w-full">
+              <ChartPie />
+
+              {t("nutrition.title")}
+            </Button>
+          </NavLink>
         </div>
 
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
