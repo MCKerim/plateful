@@ -625,7 +625,7 @@
       "fat": "F"
     },
     "updateAutomatically": "Update automatically",
-    "autoOnHint": "Values are per serving, estimated from the ingredients. They update on their own when the ingredients change.",
+    "autoOnHint": "Values are per serving, calculated from the ingredients. They update on their own when the ingredients change.",
     "autoOffHint": "Values are per serving. They stay exactly as you enter them.",
     "updating": "Updating nutrition…",
     "withoutFiber": "Without fiber",

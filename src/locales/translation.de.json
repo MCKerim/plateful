@@ -612,7 +612,7 @@
       "fat": "F"
     },
     "updateAutomatically": "Automatisch aktualisieren",
-    "autoOnHint": "Alle Werte gelten pro Portion und werden aus den Zutaten geschätzt. Sie aktualisieren sich von selbst, wenn sich die Zutaten ändern.",
+    "autoOnHint": "Alle Werte gelten pro Portion und werden aus den Zutaten berechnet. Sie aktualisieren sich von selbst, wenn sich die Zutaten ändern.",
     "autoOffHint": "Alle Werte gelten pro Portion. Sie bleiben genau so, wie du sie einträgst.",
     "updating": "Nährwerte werden aktualisiert…",
     "withoutFiber": "Ohne Ballaststoffe",
