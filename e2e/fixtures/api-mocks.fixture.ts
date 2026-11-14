@@ -225,6 +225,10 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     await route.fulfill({ status: 204, body: "" });
   });
 
+  await page.route("**/rest/v1/rpc/replace_recipe_ingredients", async (route) => {
+    await route.fulfill({ status: 204, body: "" });
+  });
+
   await page.route("**/rest/v1/recipe_ingredients?*", async (route) => {
     await route.fulfill({
       status: route.request().method() === "DELETE" ? 204 : 200,

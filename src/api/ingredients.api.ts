@@ -80,42 +80,6 @@ export const ingredientsApi = {
   },
 
   /**
-   * Create multiple ingredients at once
-   */
-  async createBulk(
-    supabase: TypedSupabaseClient,
-    recipeId: string,
-    inputs: RecipeIngredientInput[]
-  ): Promise<RecipeIngredientRow[]> {
-    const insertData: RecipeIngredientInsert[] = inputs.map((input, index) => {
-      const parsed = parseIngredient(input.rawText);
-      return {
-        recipe_id: recipeId,
-        raw_text: input.rawText,
-        quantity_value: parsed.quantityValue,
-        quantity_display: parsed.quantityDisplay,
-        unit: parsed.unit,
-        unit_normalized: parsed.unitNormalized,
-        ingredient_name: parsed.ingredientName,
-        ingredient_name_normalized: parsed.ingredientNameNormalized,
-        preparation_note: parsed.preparationNote,
-        is_scalable: parsed.isScalable,
-        is_optional: input.isOptional ?? parsed.isOptional,
-        group_name: input.groupName ?? null,
-        sort_order: input.sortOrder ?? index,
-      };
-    });
-
-    const { data, error } = await supabase
-      .from("recipe_ingredients")
-      .insert(insertData)
-      .select();
-
-    if (error) throw error;
-    return data ?? [];
-  },
-
-  /**
    * Update an ingredient
    */
   async update(
@@ -180,21 +144,6 @@ export const ingredientsApi = {
   },
 
   /**
-   * Delete all ingredients for a recipe
-   */
-  async deleteAllForRecipe(
-    supabase: TypedSupabaseClient,
-    recipeId: string
-  ): Promise<void> {
-    const { error } = await supabase
-      .from("recipe_ingredients")
-      .delete()
-      .eq("recipe_id", recipeId);
-
-    if (error) throw error;
-  },
-
-  /**
    * Reorder ingredients
    */
   async reorder(
@@ -213,24 +162,40 @@ export const ingredientsApi = {
   },
 
   /**
-   * Replace all ingredients for a recipe
-   * Useful when user edits all ingredients at once
+   * Saves the recipe's ingredient list through `replace_recipe_ingredients`,
+   * one transaction: a line whose text is already saved keeps its row and its
+   * `ingredient_slug`, a changed or new line is inserted parsed, the rest is
+   * deleted. An empty `inputs` clears the recipe.
    */
   async replaceAll(
     supabase: TypedSupabaseClient,
     recipeId: string,
     inputs: RecipeIngredientInput[]
-  ): Promise<RecipeIngredientRow[]> {
-    // Delete existing ingredients
-    await ingredientsApi.deleteAllForRecipe(supabase, recipeId);
+  ): Promise<void> {
+    const lines = inputs.map((input, index) => {
+      const parsed = parseIngredient(input.rawText);
+      return {
+        raw_text: input.rawText,
+        quantity_value: parsed.quantityValue,
+        quantity_display: parsed.quantityDisplay,
+        unit: parsed.unit,
+        unit_normalized: parsed.unitNormalized,
+        ingredient_name: parsed.ingredientName,
+        ingredient_name_normalized: parsed.ingredientNameNormalized,
+        preparation_note: parsed.preparationNote,
+        is_scalable: parsed.isScalable,
+        is_optional: input.isOptional ?? parsed.isOptional,
+        group_name: input.groupName ?? null,
+        sort_order: input.sortOrder ?? index,
+      };
+    });
 
-    // If no new ingredients, return empty
-    if (inputs.length === 0) {
-      return [];
-    }
+    const { error } = await supabase.rpc("replace_recipe_ingredients", {
+      p_recipe_id: recipeId,
+      p_lines: lines,
+    });
 
-    // Create new ingredients
-    return ingredientsApi.createBulk(supabase, recipeId, inputs);
+    if (error) throw error;
   },
 
   /**

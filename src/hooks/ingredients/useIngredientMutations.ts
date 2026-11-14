@@ -28,28 +28,6 @@ export function useCreateIngredient() {
   });
 }
 
-export function useCreateIngredientsBulk() {
-  const { supabase } = useSupabase();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      recipeId,
-      inputs,
-    }: {
-      recipeId: string;
-      inputs: RecipeIngredientInput[];
-    }) => {
-      return ingredientsApi.createBulk(supabase, recipeId, inputs);
-    },
-    onSettled: async (_data, _error, variables) => {
-      await queryClient.invalidateQueries({
-        queryKey: queryKeys.recipes.ingredients(variables.recipeId),
-      });
-    },
-  });
-}
-
 export function useUpdateIngredient() {
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
