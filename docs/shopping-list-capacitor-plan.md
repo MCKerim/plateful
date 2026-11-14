@@ -33,7 +33,7 @@ Product truth: `~/PersonalOS/business/products/plateful.md`, section
 ## Server: nothing to add
 
 Everything is in production and platform-neutral (migrations
-`20260914130000` to `20261008100000` in the iOS repo). Types regenerated
+`20260914110135` to `20261008082536` in the iOS repo). Types regenerated
 here on 2026-10-11 (`npm run generate-supabase-types`).
 
 Table `shopping_list_items` (one row per product per household; `on_list`
