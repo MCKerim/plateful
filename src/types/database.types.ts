@@ -499,6 +499,51 @@ export type Database = {
           },
         ]
       }
+      import_cap_hits: {
+        Row: {
+          cap: string
+          cap_limit: number
+          created_at: string
+          household_id: string
+          id: string
+          reported_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cap: string
+          cap_limit: number
+          created_at?: string
+          household_id: string
+          id?: string
+          reported_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cap?: string
+          cap_limit?: number
+          created_at?: string
+          household_id?: string
+          id?: string
+          reported_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "import_cap_hits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "household_entitlements"
+            referencedColumns: ["user_id"]
+          },
+          {
+            foreignKeyName: "import_cap_hits_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ingredient_names: {
         Row: {
           created_at: string
@@ -531,6 +576,108 @@ export type Database = {
           },
           {
             foreignKeyName: "ingredient_names_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: false
+            referencedRelation: "ingredients"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      ingredient_nutrition: {
+        Row: {
+          bls_code: string | null
+          carbs_g: number
+          confidence: string
+          density_g_per_ml: number | null
+          fat_g: number
+          fiber_g: number
+          food_name: string | null
+          kcal: number
+          no_amount_g_per_serving: number | null
+          protein_g: number
+          slug: string
+          sodium_mg: number
+          source: string
+          sugar_g: number
+          updated_at: string
+        }
+        Insert: {
+          bls_code?: string | null
+          carbs_g: number
+          confidence: string
+          density_g_per_ml?: number | null
+          fat_g: number
+          fiber_g: number
+          food_name?: string | null
+          kcal: number
+          no_amount_g_per_serving?: number | null
+          protein_g: number
+          slug: string
+          sodium_mg: number
+          source: string
+          sugar_g: number
+          updated_at?: string
+        }
+        Update: {
+          bls_code?: string | null
+          carbs_g?: number
+          confidence?: string
+          density_g_per_ml?: number | null
+          fat_g?: number
+          fiber_g?: number
+          food_name?: string | null
+          kcal?: number
+          no_amount_g_per_serving?: number | null
+          protein_g?: number
+          slug?: string
+          sodium_mg?: number
+          source?: string
+          sugar_g?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_nutrition_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: true
+            referencedRelation: "ingredient_dictionary"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "ingredient_nutrition_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: true
+            referencedRelation: "ingredients"
+            referencedColumns: ["slug"]
+          },
+        ]
+      }
+      ingredient_units: {
+        Row: {
+          grams: number
+          slug: string
+          unit: string
+        }
+        Insert: {
+          grams: number
+          slug: string
+          unit: string
+        }
+        Update: {
+          grams?: number
+          slug?: string
+          unit?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ingredient_units_slug_fkey"
+            columns: ["slug"]
+            isOneToOne: false
+            referencedRelation: "ingredient_dictionary"
+            referencedColumns: ["slug"]
+          },
+          {
+            foreignKeyName: "ingredient_units_slug_fkey"
             columns: ["slug"]
             isOneToOne: false
             referencedRelation: "ingredients"
@@ -1049,6 +1196,7 @@ export type Database = {
       }
       recipe_originals: {
         Row: {
+          annotations: Json
           created_at: string
           created_by: string | null
           derived_at: string | null
@@ -1070,6 +1218,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          annotations?: Json
           created_at?: string
           created_by?: string | null
           derived_at?: string | null
@@ -1091,6 +1240,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          annotations?: Json
           created_at?: string
           created_by?: string | null
           derived_at?: string | null
@@ -1444,7 +1594,9 @@ export type Database = {
           id: string
           ingredient_slug: string | null
           name: string
+          name_custom: boolean
           name_key: string | null
+          note: string | null
           on_list: boolean
           quantity_display: string | null
           quantity_value: number | null
@@ -1463,7 +1615,9 @@ export type Database = {
           id?: string
           ingredient_slug?: string | null
           name: string
+          name_custom?: boolean
           name_key?: string | null
+          note?: string | null
           on_list?: boolean
           quantity_display?: string | null
           quantity_value?: number | null
@@ -1482,7 +1636,9 @@ export type Database = {
           id?: string
           ingredient_slug?: string | null
           name?: string
+          name_custom?: boolean
           name_key?: string | null
+          note?: string | null
           on_list?: boolean
           quantity_display?: string | null
           quantity_value?: number | null
@@ -1910,7 +2066,9 @@ export type Database = {
           id: string
           ingredient_slug: string | null
           name: string
+          name_custom: boolean
           name_key: string | null
+          note: string | null
           on_list: boolean
           quantity_display: string | null
           quantity_value: number | null
@@ -1946,7 +2104,9 @@ export type Database = {
           id: string
           ingredient_slug: string | null
           name: string
+          name_custom: boolean
           name_key: string | null
+          note: string | null
           on_list: boolean
           quantity_display: string | null
           quantity_value: number | null
@@ -1990,6 +2150,10 @@ export type Database = {
           p_recipe_inserts: Json
         }
         Returns: undefined
+      }
+      cache_original_annotations: {
+        Args: { p_annotations: Json; p_language: string; p_original_id: string }
+        Returns: boolean
       }
       claim_account_deletion_job: {
         Args: { p_lease_seconds?: number; p_request_id?: string }
@@ -2069,6 +2233,35 @@ export type Database = {
         Args: { p_from: string; p_into: string }
         Returns: undefined
       }
+      nutrition_lines_for_worker: {
+        Args: { p_lines: Json; p_servings: number }
+        Returns: {
+          calories_kcal: number
+          carbs_g: number
+          fat_g: number
+          fiber_g: number
+          protein_g: number
+          raw_text: string
+          slug: string
+          sodium_mg: number
+          status: string
+          sugar_g: number
+        }[]
+      }
+      nutrition_recompute_done: {
+        Args: { p_recipe_ids: string[]; p_versions: number[] }
+        Returns: undefined
+      }
+      nutrition_recompute_due: {
+        Args: { p_limit: number }
+        Returns: {
+          open_lines: string[]
+          recipe_id: string
+          servings: number
+          share: Json
+          version: number
+        }[]
+      }
       planner_note_suggestions: {
         Args: { p_household_id: string; p_limit?: number }
         Returns: {
@@ -2091,6 +2284,20 @@ export type Database = {
       recipe_needs_enrichment: {
         Args: { p_recipe_id: string }
         Returns: boolean
+      }
+      recipe_nutrition_lines_for_worker: {
+        Args: { p_recipe_id: string }
+        Returns: {
+          calories_kcal: number
+          carbs_g: number
+          fat_g: number
+          fiber_g: number
+          protein_g: number
+          raw_text: string
+          sodium_mg: number
+          status: string
+          sugar_g: number
+        }[]
       }
       recipe_storage_maintenance_secret_matches: {
         Args: { p_candidate: string }
@@ -2144,7 +2351,9 @@ export type Database = {
           id: string
           ingredient_slug: string | null
           name: string
+          name_custom: boolean
           name_key: string | null
+          note: string | null
           on_list: boolean
           quantity_display: string | null
           quantity_value: number | null
@@ -2258,7 +2467,9 @@ export type Database = {
           id: string
           ingredient_slug: string | null
           name: string
+          name_custom: boolean
           name_key: string | null
+          note: string | null
           on_list: boolean
           quantity_display: string | null
           quantity_value: number | null

@@ -35,6 +35,8 @@ function row(overrides: Partial<ShoppingListItemRow>): ShoppingListItemRow {
     created_by: null,
     household_id: "h1",
     name_key: "milch",
+    name_custom: false,
+    note: null,
     sources: [],
     updated_at: "2026-09-14T10:00:00Z",
     ...overrides,
