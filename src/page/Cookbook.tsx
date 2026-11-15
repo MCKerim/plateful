@@ -17,6 +17,7 @@ import {
 } from "@/redux/slices/filterAndSortingSlice";
 import CollectionTile from "@/components/general/CollectionTile";
 import { useScrollRestoration } from "@/hooks/general/useScrollRestoration";
+import { useKeyboardOpen } from "@/hooks/general/useKeyboardOpen";
 import AddNewRecipeDrawer from "@/components/general/AddRecipeDrawer";
 import OnboardingSheet from "@/components/onboarding/OnboardingSheet";
 import CookbookIllustration from "@/components/onboarding/illustrations/CookbookIllustration";
@@ -46,6 +47,7 @@ export default function Cookbook() {
   const navigate = useNavigate();
 
   useScrollRestoration("cookbook-scroll");
+  const keyboardOpen = useKeyboardOpen();
 
   const { data: recipes = [], isLoading } = useRecipes();
   const { data: imports = [] } = useRecipeImports();
@@ -192,7 +194,8 @@ export default function Cookbook() {
   }
 
   return (
-    <Layout showHeader={false}>
+    // With the keyboard open the tab bar would stand on it, over the results.
+    <Layout showHeader={false} showFooter={!keyboardOpen}>
       <div className="sticky top-0 z-40 flex items-center w-full gap-1 py-2 bg-background">
         <Input
           className="rounded-full"
