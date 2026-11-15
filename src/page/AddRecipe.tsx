@@ -54,6 +54,7 @@ import { useRecipeOriginal } from "@/hooks/recipe/useRecipeOriginal";
 import { useResetRecipeToOriginal } from "@/hooks/recipe/useResetRecipeToOriginal";
 import { matchesOriginal } from "@/lib/recipeOriginal";
 import { Undo2 } from "lucide-react";
+import { useKeyboardOpen } from "@/hooks/general/useKeyboardOpen";
 
 // Regex to remove common TLDs when generating recipe title from URL
 const COMMON_TLD_REGEX = /\.com$|\.de$|\.net$|\.org$/i;
@@ -88,6 +89,13 @@ export default function AddRecipe() {
   const [searchParams] = useSearchParams();
 
   const householdId = useAppSelector(selectHouseholdId);
+
+  // The WebView scrolls the focused field just inside the screen, which ends
+  // under the save bar; scroll again, stopping at html's scroll-padding.
+  const keyboardOpen = useKeyboardOpen();
+  useEffect(() => {
+    if (keyboardOpen) document.activeElement?.scrollIntoView({ block: "nearest" });
+  }, [keyboardOpen]);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -553,7 +561,10 @@ export default function AddRecipe() {
     <>
       <div className="h-[calc(4.625rem+env(safe-area-inset-bottom))]"></div>
 
-      <div className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex gap-2 border-border border-t-[1px]">
+      <div
+        data-save-bar
+        className="fixed bottom-0 w-full max-w-lg bg-background z-20 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))] flex gap-2 border-border border-t-[1px]"
+      >
         <Button
           className="w-full"
           variant="secondary"

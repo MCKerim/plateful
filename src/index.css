@@ -22,6 +22,11 @@
   font-variation-settings: "wdth" 100;
 }
 
+/* Scrolling a field into view (keyboard, caret) stops half a rem above a page's fixed save bar (4.625rem tall). */
+html:has([data-save-bar]) {
+  scroll-padding-bottom: calc(5.125rem + env(safe-area-inset-bottom));
+}
+
 body {
   font-family: "Roboto", sans-serif;
   font-optical-sizing: auto;
