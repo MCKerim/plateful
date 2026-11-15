@@ -249,4 +249,29 @@ test.describe("Shopping List", () => {
     );
     await expect(page.getByText("Milk")).toBeHidden();
   });
+
+  // Pixel emulator, 2026-11-15: "Bearbeiten" ended at 366 px on a 360 px screen.
+  test.describe("on a 360 px phone in German", () => {
+    test.use({ viewport: { width: 360, height: 740 } });
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem("i18nextLng", "de"));
+    });
+
+    test("the details' buttons fit the screen", async ({ page, setupAuth }) => {
+      await setupAuth({ recipes: [], mealPlans: [] });
+      await serveRow(page, shoppingRow({ name: "Gurken" }));
+
+      await page.goto("/shopping");
+      await page.getByRole("button", { name: "Details" }).click();
+      const details = page.getByRole("dialog");
+      for (const name of ["Entfernen", "Bearbeiten"]) {
+        const button = details.getByRole("button", { name });
+        await expect(button).toBeVisible();
+        const box = (await button.boundingBox())!;
+        expect(box.x + box.width).toBeLessThanOrEqual(360);
+        // The label fits inside the button, not over its edge.
+        expect(await button.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+      }
+    });
+  });
 });

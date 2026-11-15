@@ -221,4 +221,35 @@ test.describe("Recipe Edit Page", () => {
       { raw_text: "200 g Mehl", quantity_value: 200, unit: "g", ingredient_name: "Mehl", group_name: null, sort_order: 0 },
     ]);
   });
+
+  // Pixel emulator, 2026-11-15: the keyboard left the focused line under the
+  // save bar, where the next tap hit "Cancel" and lost the edit.
+  test.describe("with the keyboard open", () => {
+    test.use({ viewport: { width: 360, height: 732 } });
+
+    test("keeps the focused field above the save bar", async ({ page, setupAuth }) => {
+      const recipeId = "00000000-0000-0000-0000-000000000008";
+      await setupAuth({
+        recipes: [createRecipe({ id: recipeId, name: "Keyboard", link: "https://example.com" })],
+      });
+      await page.goto(`/recipe/edit/${recipeId}`);
+      const field = page.locator("#link");
+      await expect(field).toHaveValue("https://example.com", { timeout: 10000 });
+
+      // A line tapped low on the screen, then the WebView shrinks to what the
+      // soft keyboard leaves; the save bar moves up with it.
+      await field.evaluate((el) => window.scrollBy(0, el.getBoundingClientRect().top - 400));
+      await field.focus();
+      await page.setViewportSize({ width: 360, height: 453 });
+
+      const saveBar = page.getByRole("button", { name: "Cancel", exact: true }).locator("..");
+      // Room between the field's bottom and the bar's top edge.
+      await expect
+        .poll(async () => {
+          const [line, bar] = await Promise.all([field.boundingBox(), saveBar.boundingBox()]);
+          return bar!.y - (line!.y + line!.height);
+        })
+        .toBeGreaterThanOrEqual(0);
+    });
+  });
 });

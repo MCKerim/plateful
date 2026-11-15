@@ -105,4 +105,30 @@ test.describe("Cookbook Collections", () => {
 
     await expect(page.getByPlaceholder(/recipe/i)).toBeInViewport();
   });
+
+  // Pixel emulator, 2026-11-15: with the keyboard open the tab bar and the
+  // add button stood on it and took a third of what was left for results.
+  test.describe("with the keyboard open", () => {
+    test.use({ viewport: { width: 360, height: 732 } });
+
+    test("hides the tab bar and the add button", async ({ page, setupAuth }) => {
+      await setupAuth({ recipes: [createRecipe({ name: "Sprite Iced Tea" })], collections: [] });
+      await page.goto("/cookbook");
+      const tabBar = page.getByRole("link", { name: "Planner" });
+      const add = page.getByRole("button", { name: /add recipe or collection/i });
+      await expect(tabBar).toBeVisible();
+      await expect(add).toBeVisible();
+
+      await page.getByPlaceholder(/recipe/i).fill("sprite");
+      // The Android WebView shrinks to what the soft keyboard leaves.
+      await page.setViewportSize({ width: 360, height: 453 });
+      await expect(tabBar).toBeHidden();
+      await expect(add).toBeHidden();
+      await expect(page.getByText("Sprite Iced Tea")).toBeVisible();
+
+      await page.setViewportSize({ width: 360, height: 732 });
+      await expect(tabBar).toBeVisible();
+      await expect(add).toBeVisible();
+    });
+  });
 });
