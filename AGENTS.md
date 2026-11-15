@@ -113,6 +113,8 @@ The app uses a multi-step onboarding flow. `routeToCorrectPagePure()` in `src/li
 
 Use the `useSupabase()` hook to get the typed Supabase client. Types are generated from the schema in `src/types/database.types.ts`.
 
+Schema migrations live only in the iOS repo's `supabase/migrations/` (`~/programming/ios-native/plateful`), one file per migration production recorded; this repo keeps the edge functions and has had no migrations folder since 2026-11-15.
+
 ### RLS Policy Mental Model
 
 - **Household-scoped**: recipes, recipe_ingredients, cookbooks, meal_planning

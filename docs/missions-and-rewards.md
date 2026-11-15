@@ -40,7 +40,7 @@ All tables have RLS. Household tables gate access via `users.household_id = auth
 
 | File | Role |
 |---|---|
-| `supabase/migrations/20260322000000_create_missions_and_rewards.sql` | All tables, RLS policies, RPC, seed data |
+| iOS repo `supabase/migrations/20260322013833_create_missions_and_rewards.sql`, `20260322163803_add_delete_policies_to_missions_and_rewards.sql`, `20260322171237_enable_rls_on_mission_definitions.sql` | All tables, RLS policies, RPC, seed data |
 | `src/types/missions.types.ts` | `HouseholdMission`, `HouseholdReward` domain types |
 | `src/api/missions.api.ts` | Supabase queries: get missions, increment, claim reward, get rewards |
 | `src/hooks/missions/useHouseholdMissions.ts` | React Query hook — fetches all missions for the household |
