@@ -245,6 +245,11 @@ const MEASURE_ADJECTIVE =
   /^(gehäuft\p{L}*|gestrichen\p{L}*|knapp\p{L}*|gut\p{L}*|heaped|heaping|level|scant|generous|rounded)\s+/iu;
 const SPOON_OR_CUP_UNITS = new Set(["tbsp", "tsp", "cup"]);
 
+// A size word between the number and any unit ("3 dicke Scheiben") stays with the unit, and
+// so does a measure adjective before a unit that is not a spoon or cup ("1 gute Prise").
+const SIZE_ADJECTIVE =
+  /^((?:dick|dünn|groß|gross|klein|mittelgroß)(?:e[mnrs]?)?|thick|thin|large|big|small|medium)\s+/iu;
+
 // On a line without a number, a leading "etwas" is the quantity display. A
 // trailing "nach Geschmack" goes to the note: as an amount it would land on
 // the shopping list ("500 g + nach Geschmack").
@@ -613,12 +618,21 @@ function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
   // Extract unit
   let { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
   let measureAdjective: string | null = null;
-  const adjective = quantityValue !== null && !unit ? afterQuantity.match(MEASURE_ADJECTIVE) : null;
+  const adjective =
+    quantityValue !== null && !unit
+      ? (afterQuantity.match(MEASURE_ADJECTIVE) ?? afterQuantity.match(SIZE_ADJECTIVE))
+      : null;
   if (adjective) {
     const measured = extractUnit(afterQuantity.slice(adjective[0].length));
-    if (measured.unitNormalized && SPOON_OR_CUP_UNITS.has(measured.unitNormalized)) {
+    if (MEASURE_ADJECTIVE.test(adjective[0]) && SPOON_OR_CUP_UNITS.has(measured.unitNormalized ?? "")) {
       ({ unit, unitNormalized, remaining: afterUnit } = measured);
       measureAdjective = adjective[1]!;
+    } else if (measured.unit) {
+      // Written as the import stores it, with no canonical unit: `ingredient_units` keys a
+      // measure like "dicke scheiben" (40 g of feta) by these words, so an edit weighs the same.
+      unit = `${adjective[1]} ${measured.unit}`;
+      unitNormalized = null;
+      afterUnit = measured.remaining;
     }
   }
 
