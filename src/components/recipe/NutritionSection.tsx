@@ -90,7 +90,8 @@ export default function NutritionSection({
         </div>
 
         {isExpanded && (
-          <span className="text-xs text-muted-foreground truncate max-w-full">
+          // 11 px like iOS's caption2, so "Kohlenhydrate" fits its tile on a 360 px screen.
+          <span className="text-[11px] text-muted-foreground truncate max-w-full">
             {t(metric.labelKey)}
           </span>
         )}
