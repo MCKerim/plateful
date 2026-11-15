@@ -433,9 +433,10 @@ export async function setupApiMocks(page: Page, scenario: TestScenario): Promise
     });
   }
 
-  // The shopping list is empty in every scenario so far: the household's
-  // rows, the ingredient dictionary, and the RPCs that return touched rows.
-  for (const table of ["shopping_list_items", "ingredients"]) {
+  // The shopping list is empty in every scenario: the household's rows, the
+  // ingredient dictionary, and the RPCs that return touched rows. A spec that
+  // needs rows registers its own route after setupAuth.
+  for (const table of ["shopping_list_items", "ingredient_dictionary"]) {
     await page.route(`**/rest/v1/${table}?*`, async (route) => {
       const method = route.request().method();
       await route.fulfill({

@@ -2,10 +2,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { usePostHog } from "posthog-js/react";
 import { useSupabase } from "@/utils/supabase";
 import { queryKeys } from "@/lib/query-keys";
+import { contentLanguage } from "@/lib/contentLanguage";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { shoppingListApi } from "@/api/shopping-list.api";
 import { parseShoppingListItem, type ShoppingListItem } from "@/lib/shopping-list/item";
 import { mergeRows, removeRecipe } from "@/lib/shopping-list/list";
+import { useShoppingDictionary } from "@/hooks/shopping-list/useShoppingDictionary";
 import { useShoppingMutation } from "@/hooks/shopping-list/useShoppingMutation";
 
 type Variables = { householdId: string; recipeId: string; keptIds: string[] };
@@ -19,11 +21,13 @@ export function useRemoveRecipeFromShoppingList(onError?: (error: Error) => void
   const { supabase } = useSupabase();
   const queryClient = useQueryClient();
   const posthog = usePostHog();
+  const { data: dictionary = [] } = useShoppingDictionary();
 
   const mutation = useShoppingMutation({
     mutationFn: ({ householdId, recipeId }: Variables) =>
       shoppingListApi.removeRecipe(supabase, householdId, recipeId),
-    optimistic: (items, { recipeId }) => removeRecipe(items, recipeId).items,
+    optimistic: (items, { recipeId }) =>
+      removeRecipe(items, recipeId, dictionary, contentLanguage()).items,
     onError,
     onSuccess: (rows, { householdId, keptIds }) => {
       const queryKey = queryKeys.shoppingList.items(householdId);
@@ -41,7 +45,7 @@ export function useRemoveRecipeFromShoppingList(onError?: (error: Error) => void
   });
 
   return (householdId: string, recipeId: string, items: ShoppingListItem[]) => {
-    const removal = removeRecipe(items, recipeId);
+    const removal = removeRecipe(items, recipeId, dictionary, contentLanguage());
     if (removal.touchedCount === 0) return;
     mutation.mutate({ householdId, recipeId, keptIds: removal.keptIds });
     posthog?.capture(AnalyticsEvent.shoppingListRecipeRemoved, { count: removal.touchedCount });

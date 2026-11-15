@@ -3,12 +3,16 @@ import { fuzzyScore, normalize } from "@/lib/shopping-list/fuzzy";
 import {
   addTypedAmount,
   dictionaryName,
+  entryScore,
   hasAmount,
   isFromRecipe,
   itemFromLine,
+  itemTitle,
   keeping,
   nameKey,
+  normalizedNames,
   parseAmountText,
+  spellingMatching,
   type Amount,
   type ShoppingDictionaryEntry,
   type ShoppingItemSource,
@@ -97,30 +101,39 @@ export function tripRecipes(sections: AisleSection[]): TripRecipe[] {
   });
 }
 
-/** The server compares names with ä/ö/ü as a/o/u, so "Äpfel" is Apfel + nothing. */
-const fold = (name: string) =>
-  name.toLowerCase().replace(/[äöü]/g, (c) => ({ ä: "a", ö: "o", ü: "u" })[c] ?? c);
-
-/** The server's dictionary match: exact name in either language, else a plural ending. */
+/**
+ * The server's `shopping_dictionary_match`: normalize, then the product owning
+ * that spelling in the app's language, else in the other one (a spelling
+ * belongs to one product per language). No suffix guessing.
+ */
 function dictionaryMatch(
   dictionary: ShoppingDictionaryEntry[],
-  rawKey: string
+  name: string,
+  language: string
 ): ShoppingDictionaryEntry | null {
-  const key = fold(rawKey);
-  let exact: ShoppingDictionaryEntry | null = null;
-  let plural: ShoppingDictionaryEntry | null = null;
-  for (const entry of dictionary) {
-    const en = fold(entry.nameEn);
-    const de = fold(entry.nameDe);
-    if (key === en || key === de) {
-      if (!exact || entry.slug < exact.slug) exact = entry;
-    } else if (
-      [`${en}s`, `${en}es`, `${de}n`, `${de}en`, `${de}e`, `${de}s`, `${de}er`].includes(key)
-    ) {
-      if (!plural || entry.slug < plural.slug) plural = entry;
-    }
-  }
-  return exact ?? plural;
+  const key = normalize(name);
+  const owner = (lang: string) =>
+    dictionary.find((entry) => normalizedNames(entry, lang).includes(key));
+  return owner(language) ?? owner(language === "de" ? "en" : "de") ?? null;
+}
+
+/** The row under the title the server's trigger will give it (`itemTitle`). */
+function retitled(
+  item: ShoppingListItem,
+  items: ShoppingListItem[],
+  dictionary: ShoppingDictionaryEntry[],
+  language: string
+): ShoppingListItem {
+  const product = item.ingredientSlug
+    ? dictionary.find((entry) => entry.slug === item.ingredientSlug)
+    : undefined;
+  const others = new Set(
+    items.filter((other) => other.id !== item.id).map((other) => nameKey(other.name))
+  );
+  return {
+    ...item,
+    name: itemTitle(item, product ? dictionaryName(product, language) : null, others),
+  };
 }
 
 /** What the add sheet shows for the line as typed, and what the add path writes. */
@@ -131,41 +144,64 @@ export type ShoppingPreview = {
   slug: string | null;
   /** The household's item this line resolves to, if any. */
   existing: ShoppingListItem | null;
+  /**
+   * The row as it will stand once the line is added: the household's item with
+   * the line in its ledger, the typed amount added and the trigger's title (a
+   * bought one starts afresh with exactly the typed amount), the item itself
+   * when the line adds nothing, else a new item.
+   */
+  item: ShoppingListItem;
 };
+
+/** On the list already and nothing typed to add: adding only points at the item. */
+function pointsAtItem(existing: ShoppingListItem | null, line: TypedLine): boolean {
+  return (existing?.onList ?? false) && !hasAmount(line);
+}
 
 /**
  * The line's item in the server's order (`add_shopping_list_item`): the item
  * carrying the dictionary slug the name matches, else the one of that name,
  * else a new one. The same order on both sides is what lets the optimistic add
- * update the row the server will answer with.
+ * update the row the server will answer with. The add path lands the line
+ * through the same preview, so the sheet shows what lands.
  */
 export function previewLine(
   items: ShoppingListItem[],
   dictionary: ShoppingDictionaryEntry[],
-  line: TypedLine
+  line: TypedLine,
+  language: string,
+  options: { id?: string; now?: number; userId?: string | null } = {}
 ): ShoppingPreview {
-  const key = nameKey(line.name);
-  const match = dictionaryMatch(dictionary, key);
+  const now = options.now ?? Date.now();
+  const source = manualSource(line, now, options.userId ?? null);
+  const match = dictionaryMatch(dictionary, line.name, language);
   const own =
     (match && items.find((item) => item.ingredientSlug === match.slug)) ??
-    items.find((item) => nameKey(item.name) === key) ??
+    items.find((item) => nameKey(item.name) === nameKey(line.name)) ??
     null;
-  return {
-    line,
-    aisle: own?.aisle ?? match?.aisle ?? "other",
-    slug: own?.ingredientSlug ?? match?.slug ?? null,
-    existing: own,
-  };
-}
-
-/** The name on the list: the household's item keeps its own ("apfel" puts "Äpfel" back). */
-export function previewName(preview: ShoppingPreview): string {
-  return preview.existing?.name ?? preview.line.name;
+  const aisle = own?.aisle ?? match?.aisle ?? "other";
+  const slug = own?.ingredientSlug ?? match?.slug ?? null;
+  let item: ShoppingListItem;
+  if (!own) {
+    item = itemFromLine(line, { id: options.id ?? "preview", slug, aisle, now, sources: [source] });
+  } else if (pointsAtItem(own, line)) {
+    item = own;
+  } else {
+    const freshTrip = !own.onList;
+    const landed = {
+      ...addTypedAmount(own, line, freshTrip),
+      onList: true,
+      addedAt: freshTrip ? now : own.addedAt,
+      sources: [...(freshTrip ? [] : own.sources), source],
+    };
+    item = retitled(landed, items, dictionary, language);
+  }
+  return { line, aisle, slug, existing: own, item };
 }
 
 /** On the list already and nothing typed to add: adding only points at the item. */
 export function addsNothing(preview: ShoppingPreview): boolean {
-  return (preview.existing?.onList ?? false) && !hasAmount(preview.line);
+  return pointsAtItem(preview.existing, preview.line);
 }
 
 /**
@@ -176,25 +212,6 @@ export function addsNothing(preview: ShoppingPreview): boolean {
 export function addUndo(preview: ShoppingPreview): "remove" | "takeOff" | null {
   if (!preview.existing) return "remove";
   return preview.existing.onList ? null : "takeOff";
-}
-
-/**
- * The row as it will stand once the line is added: the household's item with
- * the typed amount added (a bought one starts afresh with exactly the typed
- * amount), else a new item.
- */
-export function previewItem(preview: ShoppingPreview): ShoppingListItem {
-  const { existing, line } = preview;
-  if (!existing) {
-    return itemFromLine(line, {
-      id: "preview",
-      slug: preview.slug,
-      aisle: preview.aisle,
-      now: Date.now(),
-    });
-  }
-  if (addsNothing(preview)) return existing;
-  return { ...addTypedAmount(existing, line, !existing.onList), onList: true };
 }
 
 /** One row under the add field while typing. */
@@ -260,10 +277,13 @@ export function suggestions(
   const knownNames = new Set(items.map((item) => nameKey(item.name)));
   for (const entry of dictionary) {
     if (knownSlugs.has(entry.slug) || entry.slug === preview.slug) continue;
-    const name = dictionaryName(entry, language);
-    if (knownNames.has(nameKey(name))) continue;
-    const score = fuzzyScore(query, normalize(name));
+    const display = dictionaryName(entry, language);
+    if (knownNames.has(nameKey(display))) continue;
+    // Any spelling in either language can match ("apple" in the German app).
+    const score = entryScore(entry, query);
     if (score === null) continue;
+    const name = spellingMatching(entry, query, language) ?? display;
+    if (knownNames.has(nameKey(name))) continue;
     ranked.push({
       suggestion: {
         id: `food-${entry.slug}`,
@@ -314,16 +334,23 @@ export function suggestionItem(suggestion: ShoppingSuggestion, line: TypedLine):
   );
 }
 
-function manualSource(amount: Amount, now: number, userId: string | null): ShoppingItemSource {
+/** The ledger entry the server writes for a typed line or a put-back, made here too. */
+function manualSource(
+  line: Amount & { name: string },
+  now: number,
+  userId: string | null
+): ShoppingItemSource {
   return {
     kind: "manual",
+    name: line.name,
     addedAt: now,
     addedBy: userId,
-    quantityValue: amount.quantityValue,
-    quantityDisplay: amount.quantityDisplay,
-    unit: amount.unit,
+    quantityValue: line.quantityValue,
+    quantityDisplay: line.quantityDisplay,
+    unit: line.unit,
     recipeId: null,
     recipeName: null,
+    rawText: null,
   };
 }
 
@@ -370,35 +397,17 @@ export function addLine(
   items: ShoppingListItem[],
   dictionary: ShoppingDictionaryEntry[],
   line: TypedLine,
-  options: { newId: string; now: number; userId: string | null }
+  options: { newId: string; now: number; userId: string | null; language: string }
 ): LineAddition | null {
-  const preview = previewLine(items, dictionary, line);
-  const { existing } = preview;
-  if (existing) {
-    if (addsNothing(preview)) return null;
-    const freshTrip = !existing.onList;
-    const updated = replace(items, existing.id, (item) => {
-      const sources = [
-        ...(freshTrip ? [] : item.sources),
-        manualSource(line, options.now, options.userId),
-      ];
-      return {
-        ...addTypedAmount(item, line, freshTrip),
-        onList: true,
-        addedAt: freshTrip ? options.now : item.addedAt,
-        sources,
-      };
-    });
-    return { items: updated, rowId: existing.id, isNewRow: false };
-  }
-  const item = itemFromLine(line, {
+  const preview = previewLine(items, dictionary, line, options.language, {
     id: options.newId,
-    slug: preview.slug,
-    aisle: preview.aisle,
     now: options.now,
-    sources: [manualSource(line, options.now, options.userId)],
+    userId: options.userId,
   });
-  return { items: [...items, item], rowId: item.id, isNewRow: true };
+  const { existing, item } = preview;
+  if (!existing) return { items: [...items, item], rowId: item.id, isNewRow: true };
+  if (addsNothing(preview)) return null;
+  return { items: replace(items, existing.id, () => item), rowId: existing.id, isNewRow: false };
 }
 
 export type EditProblem = "nameRequired" | "duplicateName";
@@ -417,16 +426,28 @@ export function editProblem(
 }
 
 /**
- * Name, amount and aisle in one save. `amountText` null means the amount was
- * not touched: it stays as stored, not re-parsed from its rounded display.
+ * Name, amount and aisle in one save, as `update_shopping_list_item` stores
+ * them. `amountText` null means the amount was not touched: it stays as
+ * stored, not re-parsed from its rounded display.
  */
 export function editItem(
   item: ShoppingListItem,
-  edit: { name: string; amountText: string | null; aisle: ShoppingAisle }
+  edit: { name: string; amountText: string | null; aisle: ShoppingAisle },
+  dictionary: ShoppingDictionaryEntry[],
+  language: string
 ): ShoppingListItem {
+  const name = edit.name.trim();
+  // A new name is matched afresh: one that is no product's spelling unlinks the row.
+  const slug =
+    nameKey(name) === nameKey(item.name)
+      ? item.ingredientSlug
+      : (dictionaryMatch(dictionary, name, language)?.slug ?? null);
   return {
     ...item,
-    name: edit.name.trim(),
+    name,
+    // The server takes any change of spelling as the household's own title.
+    nameCustom: item.nameCustom || name !== item.name,
+    ingredientSlug: slug,
     aisle: edit.aisle,
     ...(edit.amountText === null ? {} : parseAmountText(edit.amountText)),
   };
@@ -435,12 +456,23 @@ export function editItem(
 /** Taking a recipe off: the new list, how many rows it touched, the touched rows the server returns. */
 export type RecipeRemoval = { items: ShoppingListItem[]; touchedCount: number; keptIds: string[] };
 
+/** The shopper's own words, trimmed; a blank note clears it. */
+export function setNote(items: ShoppingListItem[], id: string, text: string): ShoppingListItem[] {
+  return replace(items, id, (item) => ({ ...item, note: text.trim() || null }));
+}
+
 /**
- * Takes a recipe off: its entries leave every ledger and each amount is rebuilt
- * from what is left. An item nothing else wants is deleted when it was never
- * bought, else taken off the list without counting as bought.
+ * Takes a recipe off: its entries leave every ledger, each amount is rebuilt
+ * from what is left and the title from the wordings left. An item nothing else
+ * wants is deleted when it was never bought, else taken off the list without
+ * counting as bought.
  */
-export function removeRecipe(items: ShoppingListItem[], recipeId: string): RecipeRemoval {
+export function removeRecipe(
+  items: ShoppingListItem[],
+  recipeId: string,
+  dictionary: ShoppingDictionaryEntry[],
+  language: string
+): RecipeRemoval {
   const touched = new Set(
     items
       .filter(
@@ -454,10 +486,19 @@ export function removeRecipe(items: ShoppingListItem[], recipeId: string): Recip
     if (rest.sources.length > 0) return [rest];
     return item.boughtCount === 0 ? [] : [{ ...rest, onList: false }];
   });
+  // One row at a time, like the server's per-row trigger: a later row sees
+  // the titles the earlier ones took.
+  const retitledNext = next.reduce(
+    (rows, item, index) =>
+      touched.has(item.id)
+        ? rows.map((row, at) => (at === index ? retitled(item, rows, dictionary, language) : row))
+        : rows,
+    next
+  );
   return {
-    items: next,
+    items: retitledNext,
     touchedCount: touched.size,
-    keptIds: next.filter((item) => touched.has(item.id)).map((item) => item.id),
+    keptIds: retitledNext.filter((item) => touched.has(item.id)).map((item) => item.id),
   };
 }
 

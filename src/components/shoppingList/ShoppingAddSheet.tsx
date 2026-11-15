@@ -14,7 +14,6 @@ import {
 import {
   addUndo,
   addsNothing,
-  previewItem,
   previewLine,
   recentlyBought,
   suggestionItem,
@@ -42,6 +41,8 @@ type Confirmation = {
   rowId: string | null;
   wasOnList: boolean;
   undo: "remove" | "takeOff" | null;
+  /** The rows before the add: "remove" may only ever delete a row the add made. */
+  priorIds: Set<string>;
 };
 
 /**
@@ -68,9 +69,21 @@ export default function ShoppingAddSheet({
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Each opening starts empty, however the sheet was closed (the details close
+  // it from the page, which vaul does not report through onOpenChange).
+  const [wasOpen, setWasOpen] = useState(open);
+  if (open !== wasOpen) {
+    setWasOpen(open);
+    if (!open) {
+      setText("");
+      setConfirmation(null);
+    }
+  }
+
+  const language = contentLanguage();
   const line = parseTypedLine(text);
-  const preview = line ? previewLine(items, dictionary, line) : null;
-  const rows = preview ? suggestions(items, dictionary, preview, contentLanguage()) : [];
+  const preview = line ? previewLine(items, dictionary, line, language) : null;
+  const rows = preview ? suggestions(items, dictionary, preview, language) : [];
   const bought = preview ? [] : recentlyBought(items);
 
   // The row on the list now: a new item is found by its name once the add lands.
@@ -92,19 +105,26 @@ export default function ShoppingAddSheet({
 
   /** Adds a line and notes, from the list as it stands, what a tap takes back. */
   function addLine(line: TypedLine) {
-    const adding = previewLine(items, dictionary, line);
+    const adding = previewLine(items, dictionary, line, language);
     onAdd(line);
     done({
-      item: previewItem(adding),
+      item: adding.item,
       rowId: adding.existing?.id ?? null,
       wasOnList: addsNothing(adding),
       undo: addUndo(adding),
+      priorIds: new Set(items.map((item) => item.id)),
     });
   }
 
   function putBack(item: ShoppingListItem) {
     onPutBack(item.id);
-    done({ item: { ...item, onList: true }, rowId: item.id, wasOnList: false, undo: "takeOff" });
+    done({
+      item: { ...item, onList: true },
+      rowId: item.id,
+      wasOnList: false,
+      undo: "takeOff",
+      priorIds: new Set(),
+    });
   }
 
   function addTyped() {
@@ -116,21 +136,24 @@ export default function ShoppingAddSheet({
     else addLine({ ...typed, name: suggestion.name });
   }
 
+  // The server can resolve a new line to a row this device didn't match (the
+  // dictionary not loaded yet); deleting that row would take its history.
+  const undo =
+    confirmation &&
+    addedRow &&
+    !(confirmation.undo === "remove" && confirmation.priorIds.has(addedRow.id))
+      ? confirmation.undo
+      : null;
+
   function undoAdd() {
-    if (!confirmation?.undo || !addedRow) return;
-    onUndo(confirmation.undo, addedRow.id);
+    if (!undo || !addedRow) return;
+    onUndo(undo, addedRow.id);
     setConfirmation(null);
     inputRef.current?.focus();
   }
 
   return (
-    <Drawer
-      open={open}
-      onOpenChange={(next) => {
-        onOpenChange(next);
-        if (!next) setText("");
-      }}
-    >
+    <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent className="h-[90dvh]">
         <DrawerHeader className="gap-3 text-left">
           <DrawerTitle>{t("shoppingList.addSheet.title")}</DrawerTitle>
@@ -165,7 +188,7 @@ export default function ShoppingAddSheet({
           {preview ? (
             <>
               <ShoppingItemCard
-                item={previewItem(preview)}
+                item={preview.item}
                 onListNow={preview.existing?.onList ? preview.existing : null}
                 onClick={addTyped}
               />
@@ -190,11 +213,7 @@ export default function ShoppingAddSheet({
                   <p className="px-1 text-xs text-muted-foreground" aria-live="polite">
                     {confirmation.wasOnList
                       ? t("shoppingList.alreadyOnList")
-                      : t(
-                          confirmation.undo
-                            ? "shoppingList.addSheet.addedUndo"
-                            : "shoppingList.addSheet.added"
-                        )}
+                      : t(undo ? "shoppingList.addSheet.addedUndo" : "shoppingList.addSheet.added")}
                   </p>
                 </div>
               )}

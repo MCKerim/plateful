@@ -329,6 +329,8 @@
       "amountPlaceholder": "e.g. 2 kg",
       "boughtHint": "Comes back onto the list with this amount.",
       "aisle": "Aisle",
+      "note": "Note",
+      "notePlaceholder": "e.g. organic, the big pack",
       "saveError": "Couldn’t save",
       "duplicateName": "You already have an item with this name.",
       "nameRequired": "Name is required."

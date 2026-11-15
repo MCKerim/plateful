@@ -23,6 +23,8 @@ export function makeItem(
   return {
     id,
     name,
+    nameCustom: false,
+    note: null,
     quantityValue: options.amount?.[0] ?? null,
     quantityDisplay:
       options.display ?? (options.amount ? formatQuantity(options.amount[0], "en") : null),
@@ -42,10 +44,13 @@ export function source(
   kind: ShoppingItemSource["kind"],
   value: number | null,
   unit: string | null = null,
-  recipe: { id: string; name: string; at?: number } | null = null
+  recipe: { id: string; name: string; at?: number } | null = null,
+  wording: { name?: string; rawText?: string } = {}
 ): ShoppingItemSource {
   return {
     kind,
+    name: wording.name ?? null,
+    rawText: wording.rawText ?? null,
     addedAt: recipe?.at ?? null,
     addedBy: null,
     quantityValue: value,

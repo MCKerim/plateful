@@ -18,6 +18,7 @@ import { aisleInfo } from "@/lib/shopping-list/aisle";
 import { shoppingEmoji } from "@/lib/shopping-list/emoji";
 import {
   itemAmountText,
+  originalLine,
   type ShoppingItemSource,
   type ShoppingListItem,
 } from "@/lib/shopping-list/item";
@@ -39,8 +40,8 @@ const GLYPHS: Record<Exclude<ShoppingItemSource["kind"], "recipe">, string> = {
 
 /**
  * Where an item's amount comes from: its picture, name, amount and aisle, then
- * the trip's ledger newest first (a recipe's cover opens the recipe), with
- * Edit and Remove at the bottom.
+ * the trip's ledger newest first (a recipe's cover opens the recipe; each line
+ * as written under its recipe), with Edit and Remove at the bottom.
  */
 export default function ShoppingItemDetailSheet({
   item,
@@ -69,7 +70,7 @@ export default function ShoppingItemDetailSheet({
       : t("shoppingList.detail.amountCleared");
   }
 
-  function sourceRow(source: ShoppingItemSource, index: number) {
+  function sourceRow(source: ShoppingItemSource, index: number, line: string | null) {
     const recipeId = source.kind === "recipe" ? source.recipeId : null;
     const opens = recipeId !== null && coverUrls.has(recipeId);
     const sourceAmount = itemAmountText(source, locale);
@@ -85,6 +86,7 @@ export default function ShoppingItemDetailSheet({
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="line-clamp-2 text-sm font-medium">{title(source)}</span>
+          {line && <span className="line-clamp-3 text-xs text-muted-foreground">{line}</span>}
           {who && <span className="text-xs text-muted-foreground">{who}</span>}
         </span>
         {sourceAmount && <span className="text-sm font-semibold tabular-nums">{sourceAmount}</span>}
@@ -131,7 +133,9 @@ export default function ShoppingItemDetailSheet({
                 {t("shoppingList.detail.nothingRecorded")}
               </p>
             ) : (
-              [...shown.sources].reverse().map(sourceRow)
+              [...shown.sources]
+                .reverse()
+                .map((source, index) => sourceRow(source, index, originalLine(shown, source)))
             )}
           </div>
         )}

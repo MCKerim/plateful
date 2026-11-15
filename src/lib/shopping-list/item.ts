@@ -2,9 +2,10 @@ import type { Database, Json } from "@/types/database.types";
 import { parseIngredient } from "@/lib/ingredient-parser/parse-ingredient";
 import { parseAisle, type ShoppingAisle } from "@/lib/shopping-list/aisle";
 import { amountText, storedAmountText } from "@/lib/shopping-list/amount";
+import { fuzzyScore, normalize } from "@/lib/shopping-list/fuzzy";
 
 export type ShoppingListItemRow = Database["public"]["Tables"]["shopping_list_items"]["Row"];
-type DictionaryRow = Database["public"]["Tables"]["ingredients"]["Row"];
+type DictionaryRow = Database["public"]["Views"]["ingredient_dictionary"]["Row"];
 
 /** An amount as stored: value, the written display ("1/2", "2-3"), unit; any may be null. */
 export type Amount = {
@@ -20,6 +21,12 @@ export type Amount = {
  */
 export type ShoppingItemSource = Amount & {
   kind: "recipe" | "manual" | "set";
+  /**
+   * The wording this addition used (a recipe line's ingredient name, what was
+   * typed, a put-back's row name): the row's title follows it. Null on entries
+   * written before 2026-11-10 and on amounts set by hand.
+   */
+  name: string | null;
   /** Epoch ms; null on entries written before the server stamped them. */
   addedAt: number | null;
   /** `users.id`; null when unknown. */
@@ -27,6 +34,8 @@ export type ShoppingItemSource = Amount & {
   recipeId: string | null;
   /** The recipe's name at the time, so it survives the recipe being deleted. */
   recipeName: string | null;
+  /** A recipe's line as written ("200 ml Schlagsahne"). */
+  rawText: string | null;
 };
 
 /**
@@ -36,7 +45,12 @@ export type ShoppingItemSource = Amount & {
  */
 export type ShoppingListItem = Amount & {
   id: string;
+  /** The title: the trip's one wording, the product's name when wordings differ, or the household's rename. */
   name: string;
+  /** The household renamed the row, so the title no longer follows the wordings. */
+  nameCustom: boolean;
+  /** The shopper's own words ("Bio", "die große Packung"), kept across trips like the aisle. */
+  note: string | null;
   ingredientSlug: string | null;
   aisle: ShoppingAisle;
   onList: boolean;
@@ -49,13 +63,16 @@ export type ShoppingListItem = Amount & {
   createdAt: number;
 };
 
-/** One dictionary row (`ingredients`), for suggesting foods the household never typed. */
+/** One dictionary product (`ingredient_dictionary`), for recognition and suggestions. */
 export type ShoppingDictionaryEntry = {
   slug: string;
   nameEn: string;
   nameDe: string;
   aisle: ShoppingAisle;
   isStaple: boolean;
+  /** Every spelling the server matches on (`ingredient_names`), display names included. */
+  namesDe: string[];
+  namesEn: string[];
 };
 
 /** A typed line split the way a recipe ingredient is: "10 Äpfel" is 10 of "Äpfel". */
@@ -105,6 +122,8 @@ export function parseSource(raw: Json): ShoppingItemSource | null {
     unit: stringOrNull(raw.unit),
     recipeId,
     recipeName: stringOrNull(raw.recipe_name),
+    name: stringOrNull(raw.name),
+    rawText: stringOrNull(raw.raw_text),
   };
 }
 
@@ -116,6 +135,8 @@ export function parseShoppingListItem(row: ShoppingListItemRow): ShoppingListIte
   return {
     id: row.id,
     name: row.name,
+    nameCustom: row.name_custom ?? false,
+    note: row.note ?? null,
     quantityValue: row.quantity_value,
     quantityDisplay: row.quantity_display,
     unit: row.unit,
@@ -130,22 +151,73 @@ export function parseShoppingListItem(row: ShoppingListItemRow): ShoppingListIte
   };
 }
 
+/** Null for a row without a slug (the view's columns are nullable in the types only). */
 export function parseDictionaryEntry(
-  row: Pick<DictionaryRow, "slug" | "name_en" | "name_de" | "category" | "is_staple">
-): ShoppingDictionaryEntry {
+  row: Pick<
+    DictionaryRow,
+    "slug" | "name_en" | "name_de" | "category" | "is_staple" | "names_de" | "names_en"
+  >
+): ShoppingDictionaryEntry | null {
+  if (!row.slug) return null;
+  const nameEn = row.name_en ?? "";
+  const nameDe = row.name_de ?? "";
   return {
     slug: row.slug,
-    nameEn: row.name_en,
-    nameDe: row.name_de,
+    nameEn,
+    nameDe,
     aisle: parseAisle(row.category),
     isStaple: row.is_staple ?? false,
+    // Without its names an entry still matches on its display names.
+    namesDe: row.names_de?.length ? row.names_de : [nameDe],
+    namesEn: row.names_en?.length ? row.names_en : [nameEn],
   };
 }
 
+const capitalized = (name: string) => name.charAt(0).toUpperCase() + name.slice(1);
+
 /** The name in the app's language, capitalized (the worker writes English lowercase). */
 export function dictionaryName(entry: ShoppingDictionaryEntry, language: string): string {
-  const name = language === "de" ? entry.nameDe : entry.nameEn;
-  return name.charAt(0).toUpperCase() + name.slice(1);
+  return capitalized(language === "de" ? entry.nameDe : entry.nameEn);
+}
+
+/** Every spelling of the product in one language, normalized. */
+export function normalizedNames(entry: ShoppingDictionaryEntry, language: string): string[] {
+  return (language === "de" ? entry.namesDe : entry.namesEn).map(normalize);
+}
+
+/**
+ * The app-language spelling a normalized query matches best, so a suggestion
+ * shows and saves what the shopper is typing: "Klo" offers "Klopapier", not the
+ * display name "Toilettenpapier". The display name wins a tie; null when a
+ * spelling of the other language matches better ("apple" in the German app).
+ */
+export function spellingMatching(
+  entry: ShoppingDictionaryEntry,
+  query: string,
+  language: string
+): string | null {
+  const display = normalize(language === "de" ? entry.nameDe : entry.nameEn);
+  const names = language === "de" ? entry.namesDe : entry.namesEn;
+  const normalized = normalizedNames(entry, language);
+  let best: { name: string; score: number } | null = null;
+  for (let index = 0; index < names.length; index += 1) {
+    const score = fuzzyScore(query, normalized[index]);
+    if (score === null) continue;
+    const ranked = score + (normalized[index] === display ? 1 : 0);
+    if (!best || ranked > best.score) best = { name: names[index], score: ranked };
+  }
+  const overall = entryScore(entry, query);
+  return best && overall !== null && best.score >= overall ? capitalized(best.name) : null;
+}
+
+/** How well a normalized query matches any spelling of the product, in either language; null for none. */
+export function entryScore(entry: ShoppingDictionaryEntry, query: string): number | null {
+  let best: number | null = null;
+  for (const name of [...normalizedNames(entry, "de"), ...normalizedNames(entry, "en")]) {
+    const score = fuzzyScore(query, name);
+    if (score !== null && (best === null || score > best)) best = score;
+  }
+  return best;
 }
 
 /** The identity a typed line is matched on (the server's `name_key`). */
@@ -163,6 +235,52 @@ export function itemAmountText(amount: Amount, locale: string): string {
 
 export function isFromRecipe(source: ShoppingItemSource, recipeId: string): boolean {
   return source.kind === "recipe" && source.recipeId === recipeId;
+}
+
+/**
+ * The title the server's `shopping_item_title` trigger gives the row for its
+ * ledger, so an optimistic row matches the answer: the household's rename
+ * stays; one distinct wording (folded like the dictionary match) is the title
+ * in its newest spelling; several on a product row take the product's name;
+ * none (a bought row) keep the title. A title equal to the current one once
+ * folded (case, accents, spaces), or whose key another row of the household
+ * holds (`name_key` is unique), is skipped.
+ */
+export function itemTitle(
+  item: ShoppingListItem,
+  productName: string | null,
+  otherNameKeys: Set<string>
+): string {
+  if (item.nameCustom) return item.name;
+  const wordings = item.sources.flatMap((source) => source.name?.trim() || []);
+  const distinct = new Set(wordings.map(normalize)).size;
+  const candidate =
+    distinct === 0
+      ? null
+      : distinct === 1
+        ? wordings[wordings.length - 1]
+        : item.ingredientSlug === null
+          ? null
+          : productName;
+  if (
+    !candidate ||
+    normalize(candidate) === normalize(item.name) ||
+    otherNameKeys.has(nameKey(candidate))
+  ) {
+    return item.name;
+  }
+  return candidate;
+}
+
+/**
+ * The line as it came in, for the details sheet: a recipe's line as written, a
+ * typed wording only where it isn't the title, nothing for an amount set by hand.
+ */
+export function originalLine(item: ShoppingListItem, source: ShoppingItemSource): string | null {
+  if (source.kind === "recipe") return source.rawText ?? source.name;
+  if (source.kind === "set" || !source.name) return null;
+  const wording = normalize(source.name);
+  return wording && wording !== normalize(item.name) ? source.name : null;
 }
 
 /** Null for a blank line. */
@@ -271,6 +389,8 @@ export function itemFromLine(
   return {
     id: options.id,
     name: line.name,
+    nameCustom: false,
+    note: null,
     ...pickAmount(line),
     ingredientSlug: options.slug,
     aisle: options.aisle,

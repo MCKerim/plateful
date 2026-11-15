@@ -24,6 +24,7 @@ import { useAddShoppingLine } from "@/hooks/shopping-list/useAddShoppingLine";
 import { useDeleteShoppingItem } from "@/hooks/shopping-list/useDeleteShoppingItem";
 import { useRemoveRecipeFromShoppingList } from "@/hooks/shopping-list/useRemoveRecipeFromShoppingList";
 import { aisleInfo } from "@/lib/shopping-list/aisle";
+import { contentLanguage } from "@/lib/contentLanguage";
 import type { ShoppingListItem, TypedLine } from "@/lib/shopping-list/item";
 import {
   aisleSections,
@@ -52,7 +53,7 @@ export default function ShoppingList() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const householdId = useAppSelector(selectHouseholdId);
-  const { data: items, isPending } = useShoppingList();
+  const { data: items, isPending, isError } = useShoppingList();
   const { data: dictionary = [] } = useShoppingDictionary();
   const { data: recipes } = useRecipes();
   // A refused add or removal, said above the list until the next one or a tap.
@@ -95,7 +96,7 @@ export default function ShoppingList() {
   }
 
   function add(line: TypedLine) {
-    const existing = previewLine(list, dictionary, line).existing;
+    const existing = previewLine(list, dictionary, line, contentLanguage()).existing;
     if (existing) setHighlightedId(existing.id);
     setWriteFailed(false);
     addLine(line);
@@ -174,6 +175,7 @@ export default function ShoppingList() {
   }
 
   const empty = isListEmpty(list);
+  const loadFailed = isError && !items;
 
   return (
     <Layout showHeader={false}>
@@ -186,7 +188,8 @@ export default function ShoppingList() {
           {t("shoppingList.writeError")}
         </button>
       )}
-      {isPending ? null : empty ? (
+      {/* A failed first load must not read as an empty list; the add button stays. */}
+      {isPending || loadFailed ? null : empty ? (
         <ShoppingEmptyState onAdd={() => setSheet({ kind: "add" })} />
       ) : (
         <div className="relative flex flex-col gap-6 pb-20">
@@ -227,7 +230,7 @@ export default function ShoppingList() {
         </div>
       )}
 
-      {!isPending && !empty && (
+      {!isPending && (loadFailed || !empty) && (
         <Fab aria-label={t("shoppingList.add")} onClick={() => setSheet({ kind: "add" })} />
       )}
 
@@ -277,7 +280,12 @@ export default function ShoppingList() {
         coverUrls={coverUrls}
         onOpenRecipe={openRecipe}
         onRemove={(recipe) => {
-          setSheet(null);
+          // Back to the trip's recipes when more stay on it, as on iOS.
+          setSheet(
+            sheet?.kind === "recipe" && sheet.fromList && trip.length > 1
+              ? { kind: "recipes" }
+              : null
+          );
           setWriteFailed(false);
           removeRecipe(householdId, recipe.id, list);
         }}

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ import {
   isDuplicateNameError,
   useEditShoppingItem,
 } from "@/hooks/shopping-list/useEditShoppingItem";
+import { useSetShoppingNote } from "@/hooks/shopping-list/useSetShoppingNote";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { AISLES, type ShoppingAisle } from "@/lib/shopping-list/aisle";
 import { itemAmountText, type ShoppingListItem } from "@/lib/shopping-list/item";
@@ -34,7 +36,10 @@ type Props = {
   onClose: () => void;
 };
 
-/** Name, this trip's amount set outright, and the aisle, in one save. */
+/**
+ * Name, this trip's amount set outright, the shopper's note and the aisle, in
+ * one save.
+ */
 export default function ShoppingItemEditSheet({
   householdId,
   item,
@@ -43,10 +48,13 @@ export default function ShoppingItemEditSheet({
 }: Readonly<Props>) {
   const { t } = useTranslation();
   const editItem = useEditShoppingItem();
+  const setNote = useSetShoppingNote();
   const [openedFor, setOpenedFor] = useState<ShoppingListItem | null>(null);
   const [name, setName] = useState("");
+  const [namePrefill, setNamePrefill] = useState("");
   const [amount, setAmount] = useState("");
   const [prefill, setPrefill] = useState("");
+  const [note, setNoteText] = useState("");
   const [aisle, setAisle] = useState<ShoppingAisle>("other");
   const [error, setError] = useState<string | null>(null);
 
@@ -60,8 +68,10 @@ export default function ShoppingItemEditSheet({
     const text = itemAmountText(item, contentLanguage());
     setOpenedFor(item);
     setName(item.name);
+    setNamePrefill(item.name);
     setAmount(text);
     setPrefill(text);
+    setNoteText(item.note ?? "");
     setAisle(item.aisle);
     setError(null);
   }
@@ -69,7 +79,11 @@ export default function ShoppingItemEditSheet({
 
   async function save() {
     if (!shown || editItem.isPending) return;
-    const problem = editProblem(items, shown.id, name);
+    // Untouched, the name is the row's as it is now: the title may have moved
+    // with a partner's add meanwhile, and sending the old one would rename the
+    // row back and freeze its title for good.
+    const newName = name === namePrefill ? shown.name : name;
+    const problem = editProblem(items, shown.id, newName);
     if (problem) {
       setError(t(`shoppingList.edit.${problem}`));
       return;
@@ -78,11 +92,15 @@ export default function ShoppingItemEditSheet({
       await editItem.mutateAsync({
         householdId,
         item: shown,
-        name,
+        name: newName,
         // The prefill is rounded text; untouched, the stored amount goes as it is.
         amountText: amount === prefill ? null : amount,
         aisle,
       });
+      // After the edit's answer, which carries the stored note and would overwrite this one.
+      if ((note.trim() || null) !== shown.note) {
+        setNote.mutate({ householdId, id: shown.id, text: note });
+      }
       onClose();
     } catch (saveError) {
       setError(
@@ -132,6 +150,18 @@ export default function ShoppingItemEditSheet({
             {shown && !shown.onList && (
               <p className="text-sm text-muted-foreground">{t("shoppingList.edit.boughtHint")}</p>
             )}
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="shopping-edit-note">{t("shoppingList.edit.note")}</Label>
+            <Textarea
+              id="shopping-edit-note"
+              rows={1}
+              maxHeight={120}
+              value={note}
+              onChange={(event) => setNoteText(event.target.value)}
+              placeholder={t("shoppingList.edit.notePlaceholder")}
+              disabled={editItem.isPending}
+            />
           </div>
           <div className="flex flex-col gap-1.5">
             <Label>{t("shoppingList.edit.aisle")}</Label>

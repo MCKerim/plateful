@@ -5,6 +5,8 @@ import {
   dictionaryName,
   itemAmountText,
   isFromRecipe,
+  itemTitle,
+  originalLine,
   parseDictionaryEntry,
   parseShoppingListItem,
   parseSource,
@@ -12,7 +14,7 @@ import {
   type ShoppingListItemRow,
 } from "@/lib/shopping-list/item";
 import { amountText, storedAmountText } from "@/lib/shopping-list/amount";
-import { makeItem } from "@/lib/shopping-list/testItems";
+import { makeItem, source } from "@/lib/shopping-list/testItems";
 
 function sources(json: string) {
   return (JSON.parse(json) as Json[]).map(parseSource);
@@ -126,10 +128,129 @@ describe("parseShoppingListItem", () => {
       name_de: "Mehl",
       category: "grains",
       is_staple: false,
+      names_de: ["Mehl", "Weizenmehl"],
+      names_en: ["flour"],
     });
-    expect(entry.aisle).toBe("grains");
-    expect(dictionaryName(entry, "de")).toBe("Mehl");
-    expect(dictionaryName(entry, "en")).toBe("Flour");
+    expect(entry?.aisle).toBe("grains");
+    expect(entry?.namesDe).toEqual(["Mehl", "Weizenmehl"]);
+    expect(entry && dictionaryName(entry, "de")).toBe("Mehl");
+    expect(entry && dictionaryName(entry, "en")).toBe("Flour");
+  });
+
+  it("lets a dictionary entry without names match on its display names", () => {
+    const entry = parseDictionaryEntry({
+      slug: "salt",
+      name_en: "salt",
+      name_de: "Salz",
+      category: "spices",
+      is_staple: true,
+      names_de: null,
+      names_en: [],
+    });
+    expect([entry?.namesDe, entry?.namesEn]).toEqual([["Salz"], ["salt"]]);
+    expect(
+      parseDictionaryEntry({
+        slug: null,
+        name_en: "x",
+        name_de: "x",
+        category: null,
+        is_staple: null,
+        names_de: null,
+        names_en: null,
+      })
+    ).toBeNull();
+  });
+
+  it("decodes the household's rename and note, and a row from before them", () => {
+    expect(parseShoppingListItem(row({ name_custom: true, note: "Bio" }))).toMatchObject({
+      nameCustom: true,
+      note: "Bio",
+    });
+    const old = parseShoppingListItem({
+      ...row({}),
+      name_custom: undefined,
+      note: undefined,
+    } as unknown as ShoppingListItemRow);
+    expect([old.nameCustom, old.note]).toEqual([false, null]);
+  });
+});
+
+describe("title and original lines", () => {
+  const typed = (name: string) => ({ ...source("manual", null), name });
+
+  it("follows one wording, takes the product's name for several, keeps a rename", () => {
+    const row = makeItem("a", "Jalapeños", "produce", { slug: "jalapeno" });
+    expect(
+      itemTitle(
+        { ...row, sources: [typed("Jalapeños"), typed("jalapeños ")] },
+        "Jalapeño",
+        new Set()
+      )
+    ).toBe("Jalapeños");
+    expect(
+      itemTitle(
+        { ...row, sources: [typed("Jalapeños"), typed("eingelegte Jalapeños")] },
+        "Jalapeño",
+        new Set()
+      )
+    ).toBe("Jalapeño");
+    expect(itemTitle({ ...row, sources: [typed("Peperoni grün")] }, "Jalapeño", new Set())).toBe(
+      "Peperoni grün"
+    );
+    // Folded like the dictionary match: "jalapenos" is the same wording.
+    expect(itemTitle({ ...row, sources: [typed("jalapenos")] }, "Jalapeño", new Set())).toBe(
+      "Jalapeños"
+    );
+    expect(
+      itemTitle(
+        { ...row, nameCustom: true, sources: [typed("Jalapeños"), typed("Chili")] },
+        "Jalapeño",
+        new Set()
+      )
+    ).toBe("Jalapeños");
+  });
+
+  it("keeps the title with no wordings, no product, or a name another row holds", () => {
+    const cookies = makeItem("c", "Kekse", "snacks");
+    expect(
+      itemTitle({ ...cookies, sources: [typed("Kekse"), typed("Butterkekse")] }, "Keks", new Set())
+    ).toBe("Kekse");
+    // Entries written before wordings were recorded count as none.
+    expect(itemTitle({ ...cookies, sources: [source("recipe", 2)] }, null, new Set())).toBe(
+      "Kekse"
+    );
+    const row = makeItem("a", "Jalapeños", "produce", { slug: "jalapeno" });
+    expect(
+      itemTitle(
+        { ...row, sources: [typed("Jalapeños"), typed("eingelegte Jalapeños")] },
+        "Jalapeño",
+        new Set(["jalapeño"])
+      )
+    ).toBe("Jalapeños");
+  });
+
+  it("shows recipe lines as written and only typed wordings unlike the title", () => {
+    const row = makeItem("a", "Jalapeño", "produce", { slug: "jalapeno" });
+    const lines = [
+      source(
+        "recipe",
+        3,
+        null,
+        { id: "r1", name: "Nachos" },
+        { name: "Jalapeño", rawText: "3 Jalapeño, in Ringen" }
+      ),
+      typed("Peperoni grün"),
+      typed("jalapeño "),
+      source("set", 7),
+    ].map((entry) => originalLine(row, entry));
+    // A recipe line shows even where its wording is the title.
+    expect(lines).toEqual(["3 Jalapeño, in Ringen", "Peperoni grün", null, null]);
+  });
+
+  it("decodes a ledger entry's wording and line as written", () => {
+    const [entry] = sources(`[{"kind": "recipe", "recipe_id": "r1", "name": "Sahne",
+      "raw_text": "200 ml Schlagsahne", "quantity_value": 200, "unit": "ml"}]`);
+    expect([entry?.name, entry?.rawText]).toEqual(["Sahne", "200 ml Schlagsahne"]);
   });
 });
 

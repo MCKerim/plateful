@@ -7,12 +7,11 @@ import {
   editItem,
   editProblem,
   markBought,
-  previewItem,
   previewLine,
-  previewName,
   putBack,
   recentlyBought,
   removeRecipe,
+  setNote,
   suggestionItem,
   suggestions,
   tripRecipes,
@@ -35,9 +34,18 @@ function entry(
   slug: string,
   nameEn: string,
   nameDe: string,
-  aisle: ShoppingAisle
+  aisle: ShoppingAisle,
+  names: { de?: string[]; en?: string[] } = {}
 ): ShoppingDictionaryEntry {
-  return { slug, nameEn, nameDe, aisle, isStaple: false };
+  return {
+    slug,
+    nameEn,
+    nameDe,
+    aisle,
+    isStaple: false,
+    namesDe: names.de ?? [nameDe],
+    namesEn: names.en ?? [nameEn],
+  };
 }
 
 function line(text: string): TypedLine {
@@ -46,8 +54,13 @@ function line(text: string): TypedLine {
   return parsed;
 }
 
-function preview(items: ShoppingListItem[], dictionary: ShoppingDictionaryEntry[], text: string) {
-  return previewLine(items, dictionary, line(text));
+function preview(
+  items: ShoppingListItem[],
+  dictionary: ShoppingDictionaryEntry[],
+  text: string,
+  language = "de"
+) {
+  return previewLine(items, dictionary, line(text), language);
 }
 
 function suggest(
@@ -58,7 +71,7 @@ function suggest(
 ) {
   const typed = parseTypedLine(text);
   return typed
-    ? suggestions(items, dictionary, previewLine(items, dictionary, typed), language)
+    ? suggestions(items, dictionary, previewLine(items, dictionary, typed, language), language)
     : [];
 }
 
@@ -70,8 +83,12 @@ function add(
   dictionary: ShoppingDictionaryEntry[] = []
 ) {
   return (
-    addLine(items, dictionary, line(text), { newId: `new-${text}`, now, userId: ME })?.items ??
-    items
+    addLine(items, dictionary, line(text), {
+      newId: `new-${text}`,
+      now,
+      userId: ME,
+      language: "de",
+    })?.items ?? items
   );
 }
 
@@ -80,9 +97,12 @@ function edit(
   id: string,
   name: string,
   amountText: string | null,
-  aisle: ShoppingAisle
+  aisle: ShoppingAisle,
+  dictionary: ShoppingDictionaryEntry[] = []
 ) {
-  return items.map((item) => (item.id === id ? editItem(item, { name, amountText, aisle }) : item));
+  return items.map((item) =>
+    item.id === id ? editItem(item, { name, amountText, aisle }, dictionary, "de") : item
+  );
 }
 
 const text = (item: ShoppingListItem | undefined) =>
@@ -179,7 +199,9 @@ describe("the list", () => {
 
   it("adds nothing for a name already on the list", () => {
     const items = [makeItem("a", "Milch", "dairy")];
-    expect(addLine(items, [], line("milch"), { newId: "x", now: 0, userId: ME })).toBeNull();
+    expect(
+      addLine(items, [], line("milch"), { newId: "x", now: 0, userId: ME, language: "de" })
+    ).toBeNull();
   });
 
   it("puts a bought item back when typed and adds typed amounts up", () => {
@@ -269,15 +291,40 @@ describe("the list", () => {
     expect(parseTypedLine("   ")).toBeNull();
   });
 
-  it("matches the dictionary with umlauts folded, like the server", () => {
+  it("finds a typed name's product by any spelling in either language, like the server", () => {
     const dictionary = [
-      entry("apple", "apple", "Apfel", "produce"),
-      entry("tissue", "tissue", "Taschentuch", "care"),
+      entry("apple", "apple", "Apfel", "produce", { en: ["apple", "apples"] }),
+      entry("tissue", "tissue", "Taschentuch", "care", { de: ["Taschentuch", "Taschentücher"] }),
+      entry("toilet-paper", "toilet paper", "Toilettenpapier", "household", {
+        de: ["Toilettenpapier", "Klopapier"],
+      }),
+      entry("semolina", "semolina", "Grieß", "grains"),
     ];
+    // Normalizing alone makes the umlaut plural its singular.
     expect(preview([], dictionary, "10 Äpfel")).toMatchObject({ slug: "apple", aisle: "produce" });
-    expect(preview([], dictionary, "Taschentücher")).toMatchObject({ slug: "tissue", aisle: "care" });
+    expect(preview([], dictionary, "  taschentücher ")).toMatchObject({ slug: "tissue" });
+    expect(preview([], dictionary, "Klopapier").slug).toBe("toilet-paper");
+    expect(preview([], dictionary, "Griess").slug).toBe("semolina");
+    // Letters without a combining mark fold as `unaccent` folds them.
+    const smorrebrod = entry("smorrebrod", "smørrebrød", "Smørrebrød", "bakery");
+    expect(preview([], [smorrebrod], "Smorrebrod").slug).toBe("smorrebrod");
+    // The other language is a fallback, not a wall.
+    expect(preview([], dictionary, "apples").slug).toBe("apple");
+    // No suffix guessing: a name nobody listed is a new item.
+    expect(preview([], dictionary, "Apfelsaft").slug).toBeNull();
+    expect(preview([], dictionary, "Taschentuchs").slug).toBeNull();
     const items = [makeItem("a", "Apfel", "produce", { slug: "apple" })];
     expect(addsNothing(preview(items, dictionary, "Äpfel"))).toBe(true);
+  });
+
+  it("matches a spelling in the app's language before the other's", () => {
+    // "Pepperoni" is a chili in German and salami in English.
+    const dictionary = [
+      entry("salami", "pepperoni", "Salami", "meat-fish", { en: ["pepperoni"] }),
+      entry("chili", "chili", "Peperoni", "produce", { de: ["Peperoni", "Pepperoni"] }),
+    ];
+    expect(preview([], dictionary, "Pepperoni", "de").slug).toBe("chili");
+    expect(preview([], dictionary, "Pepperoni", "en").slug).toBe("salami");
   });
 
   it("knows what a tap on the added card takes back", () => {
@@ -367,7 +414,7 @@ describe("recipes on the trip", () => {
     expect(trip[0]).toMatchObject({ timesAdded: 2, addedAt: 500 });
     expect(trip[0].items.map((item) => item.id)).toEqual(["a", "b"]);
     expect(text(keeping(tomatoes, (entry) => isFromRecipe(entry, "lasagne")))).toBe("600 g");
-    const { items, keptIds, touchedCount } = removeRecipe([tomatoes, sheets], "lasagne");
+    const { items, keptIds, touchedCount } = removeRecipe([tomatoes, sheets], "lasagne", [], "de");
     expect(touchedCount).toBe(2);
     expect(tripRecipes(aisleSections(items))).toEqual([]);
     expect(items.map((item) => item.id)).toEqual(["a"]);
@@ -411,7 +458,7 @@ describe("recipes on the trip", () => {
       }),
       cream,
     ];
-    const { items } = removeRecipe(before, "lasagne");
+    const { items } = removeRecipe(before, "lasagne", [], "de");
     const byId = (id: string) => items.find((item) => item.id === id);
     expect(tripRecipes(aisleSections(items)).map((recipe) => recipe.name)).toEqual([
       "Brot",
@@ -524,7 +571,7 @@ describe("the add sheet", () => {
       entry("apple", "apple", "Apfel", "produce"),
       entry("flour", "flour", "Mehl", "grains"),
     ];
-    const row = (query: string) => previewItem(preview(items, dictionary, query));
+    const row = (query: string) => preview(items, dictionary, query).item;
     expect(row("2 apfel").name).toBe("Äpfel");
     expect(text(row("2 apfel"))).toBe("12");
     expect(text(row("äpfel"))).toBe("10");
@@ -588,7 +635,7 @@ describe("the add sheet", () => {
     expect(addsNothing(preview(items, [], "Klopapier"))).toBe(true);
     expect(addsNothing(preview(items, [], "2 Klopapier"))).toBe(false);
     expect(addsNothing(preview(items, [], "Milch"))).toBe(false);
-    expect(text(previewItem(preview(items, [], "Äpfel")))).toBe("10");
+    expect(text(preview(items, [], "Äpfel").item)).toBe("10");
     expect(add(items, "Klopapier", 20)).toBe(items);
   });
 
@@ -624,7 +671,7 @@ describe("the add sheet", () => {
     const food = preview(items, dictionary, "500 g Mehl");
     expect(food.aisle).toBe("grains");
     expect(food.existing).toBeNull();
-    expect(previewName(food)).toBe("Mehl");
+    expect(food.item.name).toBe("Mehl");
     // An exact name beats a plural form: "Eis" is ice, not eggs.
     expect(preview(items, dictionary, "Eis").aisle).toBe("frozen");
     expect(preview(items, dictionary, "Zahnpasta").aisle).toBe("other");
@@ -637,9 +684,138 @@ describe("the add sheet", () => {
       items,
       [],
       { ...line("10 äpfl"), name: suggestion.name },
-      { newId: "x", now: 0, userId: ME }
+      { newId: "x", now: 0, userId: ME, language: "de" }
     );
     expect(next?.items).toHaveLength(1);
     expect(next?.items[0]).toMatchObject({ onList: true, quantityValue: 10 });
+  });
+});
+
+describe("the title follows the trip's wordings, like the server's trigger", () => {
+  const jalapeno = entry("jalapeno", "jalapeño", "Jalapeño", "produce", {
+    de: ["Jalapeño", "Jalapeños", "eingelegte Jalapeños", "Peperoni grün"],
+  });
+  const title = (items: ShoppingListItem[]) => items[0]?.name;
+
+  it("on one product row, driven through the list's own paths", () => {
+    let items = add([], "Jalapeños", 1, [jalapeno]);
+    expect(items[0]?.ingredientSlug).toBe("jalapeno");
+    expect(title(items)).toBe("Jalapeños");
+    // The same wording in another case keeps the row's spelling.
+    items = add(items, "2 jalapeños", 2, [jalapeno]);
+    expect(title(items)).toBe("Jalapeños");
+    // A second wording on a product row: the product's name.
+    items = add(items, "3 eingelegte Jalapeños", 3, [jalapeno]);
+    expect(title(items)).toBe("Jalapeño");
+    const id = items[0].id;
+    items = markBought(items, id, 4);
+    expect(title(items)).toBe("Jalapeño");
+    items = putBack(items, id, 5, ME);
+    expect(title(items)).toBe("Jalapeño");
+    expect(items[0].sources.map((source) => source.name)).toEqual(["Jalapeño"]);
+    // A fresh trip with one wording takes it.
+    items = add(markBought(items, id, 6), "Peperoni grün", 7, [jalapeno]);
+    expect(title(items)).toBe("Peperoni grün");
+    // The household's rename is final while the row keeps its product.
+    items = edit(items, id, "Jalapeño", null, "produce", [jalapeno]);
+    expect(items[0]).toMatchObject({ nameCustom: true, ingredientSlug: "jalapeno" });
+    items = add(items, "1 Jalapeños", 8, [jalapeno]);
+    expect(title(items)).toBe("Jalapeño");
+    expect(items).toHaveLength(1);
+  });
+
+  it("unlinks the product when a rename is no spelling of it, as the server does", () => {
+    let items = add([], "Jalapeños", 1, [jalapeno]);
+    items = edit(items, items[0].id, "Chili", null, "produce", [jalapeno]);
+    expect(items[0]).toMatchObject({ name: "Chili", nameCustom: true, ingredientSlug: null });
+    // The product's spelling now makes its own row.
+    items = add(items, "1 Jalapeños", 2, [jalapeno]);
+    expect(items.map((item) => item.name)).toEqual(["Chili", "Jalapeños"]);
+  });
+
+  it("marks only a change of spelling as the household's own title", () => {
+    const items = [makeItem("a", "Äpfel", "produce")];
+    expect(edit(items, "a", " Äpfel ", "3", "produce")[0].nameCustom).toBe(false);
+    expect(edit(items, "a", "äpfel", null, "produce")[0].nameCustom).toBe(true);
+  });
+
+  it("shows in the add sheet the title the row will have", () => {
+    const items = add([], "Jalapeños", 1, [jalapeno]);
+    const landing = preview(items, [jalapeno], "2 eingelegte Jalapeños");
+    expect(landing.item.name).toBe("Jalapeño");
+    expect(text(landing.item)).toBe("2");
+    // A bare name for the row on the list adds nothing: the title stays.
+    expect(preview(items, [jalapeno], "eingelegte Jalapeños").item.name).toBe("Jalapeños");
+    expect(title(items)).toBe("Jalapeños");
+  });
+
+  it("skips a title another row holds", () => {
+    // A slug-less row typed before the product existed holds its name.
+    const twin = makeItem("twin", "Jalapeño", "other");
+    let items = add([twin], "Jalapeños", 1, [jalapeno]);
+    items = add(items, "3 eingelegte Jalapeños", 2, [jalapeno]);
+    expect(items.map((item) => item.name)).toEqual(["Jalapeño", "Jalapeños"]);
+  });
+
+  it("retitles from the wordings left when a recipe comes off", () => {
+    const row = makeItem("a", "Jalapeño", "produce", {
+      slug: "jalapeno",
+      amount: [4, null],
+      sources: [
+        { ...source("manual", 1), name: "Jalapeños" },
+        source(
+          "recipe",
+          3,
+          null,
+          { id: "r1", name: "Nachos" },
+          { name: "eingelegte Jalapeños", rawText: "3 eingelegte Jalapeños" }
+        ),
+      ],
+    });
+    const { items } = removeRecipe([row], "r1", [jalapeno], "de");
+    expect(items[0]).toMatchObject({ name: "Jalapeños", quantityValue: 1 });
+  });
+
+  it("trims a note and clears a blank one", () => {
+    let items = [makeItem("a", "Äpfel", "produce")];
+    items = setNote(items, "a", "  Bio \n");
+    expect(items[0].note).toBe("Bio");
+    items = setNote(items, "a", "   ");
+    expect(items[0].note).toBeNull();
+  });
+});
+
+describe("a dictionary suggestion shows and saves the spelling being typed", () => {
+  const dictionary = [
+    entry("toilet-paper", "toilet paper", "Toilettenpapier", "household", {
+      de: ["Toilettenpapier", "Klopapier"],
+      en: ["toilet paper", "loo roll"],
+    }),
+    entry("apple", "apple", "Apfel", "produce", {
+      de: ["Apfel", "Äpfel"],
+      en: ["apple", "apples"],
+    }),
+  ];
+
+  it("offers the app-language spelling the query matches best", () => {
+    const [klo] = suggest([], dictionary, "2 klopap", "de");
+    expect(klo?.name).toBe("Klopapier");
+    const items = add([], "2 Klopapier", 0, dictionary);
+    expect(items[0]).toMatchObject({
+      name: "Klopapier",
+      ingredientSlug: "toilet-paper",
+      quantityValue: 2,
+    });
+    // Only an English spelling matches: the German display name.
+    expect(suggest([], dictionary, "appl", "de").map((suggestion) => suggestion.name)).toEqual([
+      "Apfel",
+    ]);
+    // Two spellings match equally: the display name.
+    expect(suggest([], dictionary, "papier", "de").map((suggestion) => suggestion.name)).toEqual([
+      "Toilettenpapier",
+    ]);
+    expect(suggest([], dictionary, "loo", "en").map((suggestion) => suggestion.name)).toEqual([
+      "Loo roll",
+    ]);
   });
 });

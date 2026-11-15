@@ -329,6 +329,8 @@
       "amountPlaceholder": "z. B. 2 kg",
       "boughtHint": "Kommt mit dieser Menge zurück auf die Liste.",
       "aisle": "Kategorie",
+      "note": "Notiz",
+      "notePlaceholder": "z. B. Bio, die große Packung",
       "saveError": "Konnte nicht speichern",
       "duplicateName": "Einen Artikel mit diesem Namen gibt es schon.",
       "nameRequired": "Ein Name wird gebraucht."

@@ -24,7 +24,10 @@ type Props = {
   onDetails?: () => void;
 };
 
-/** One product as a row: the picture, the name and this trip's amount. */
+/**
+ * One product as a row: the picture, the name, this trip's amount and the
+ * shopper's note (where the amount comes from is in the details).
+ */
 export default function ShoppingItemCard({
   item,
   onClick,
@@ -91,6 +94,11 @@ export default function ShoppingItemCard({
                 {amount}
               </span>
             )
+          )}
+          {item.note && (
+            <span className="line-clamp-2 text-xs break-words text-muted-foreground italic">
+              {item.note}
+            </span>
           )}
         </span>
         {onListNow && (

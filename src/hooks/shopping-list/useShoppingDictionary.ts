@@ -10,7 +10,10 @@ export function useShoppingDictionary() {
 
   return useQuery({
     queryKey: queryKeys.ingredientDictionary,
-    queryFn: async () => (await shoppingListApi.getDictionary(supabase)).map(parseDictionaryEntry),
+    queryFn: async () =>
+      (await shoppingListApi.getDictionary(supabase))
+        .map(parseDictionaryEntry)
+        .filter((entry) => entry !== null),
     staleTime: 1000 * 60 * 60,
   });
 }

@@ -1,6 +1,23 @@
-/** Lowercased, trimmed, diacritics folded so "apfel" finds "Äpfel". */
+/**
+ * The server's `private.shopping_name_norm`, for recognition and suggestions
+ * alike: lowercase, ß as ss, accents folded ("apfel" finds "Äpfel"), single
+ * spaces, trimmed.
+ */
 export function normalize(text: string): string {
-  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase().trim();
+  return (
+    text
+      .toLowerCase()
+      .replace(/ß/g, "ss")
+      // Letters `unaccent` folds that have no combining mark to strip.
+      .replace(
+        /[æœøłđ]/g,
+        (letter) => ({ æ: "ae", œ: "oe", ø: "o", ł: "l", đ: "d" })[letter] ?? letter
+      )
+      .normalize("NFD")
+      .replace(/\p{M}/gu, "")
+      .replace(/\s+/g, " ")
+      .trim()
+  );
 }
 
 /** Optimal string alignment distance: insert, delete, substitute, swap neighbours. */

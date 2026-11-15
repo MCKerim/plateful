@@ -20,10 +20,42 @@ import type { MealPlannerItem } from "@/types/meal-planning.types";
 import type { IngredientsBundle, RecipeIngredient } from "@/types/ingredient.types";
 
 const dictionary: ShoppingDictionaryEntry[] = [
-  { slug: "tomato", nameEn: "tomato", nameDe: "Tomate", aisle: "produce", isStaple: false },
-  { slug: "milk", nameEn: "milk", nameDe: "Milch", aisle: "dairy", isStaple: false },
-  { slug: "flour", nameEn: "flour", nameDe: "Mehl", aisle: "grains", isStaple: true },
-  { slug: "salt", nameEn: "salt", nameDe: "Salz", aisle: "spices", isStaple: true },
+  {
+    slug: "tomato",
+    nameEn: "tomato",
+    nameDe: "Tomate",
+    aisle: "produce",
+    isStaple: false,
+    namesDe: ["Tomate"],
+    namesEn: ["tomato"],
+  },
+  {
+    slug: "milk",
+    nameEn: "milk",
+    nameDe: "Milch",
+    aisle: "dairy",
+    isStaple: false,
+    namesDe: ["Milch"],
+    namesEn: ["milk"],
+  },
+  {
+    slug: "flour",
+    nameEn: "flour",
+    nameDe: "Mehl",
+    aisle: "grains",
+    isStaple: true,
+    namesDe: ["Mehl"],
+    namesEn: ["flour"],
+  },
+  {
+    slug: "salt",
+    nameEn: "salt",
+    nameDe: "Salz",
+    aisle: "spices",
+    isStaple: true,
+    namesDe: ["Salz"],
+    namesEn: ["salt"],
+  },
 ];
 
 describe("servings", () => {

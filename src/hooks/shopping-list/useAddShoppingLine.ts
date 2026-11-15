@@ -5,6 +5,7 @@ import { useAppSelector } from "@/redux/hooks";
 import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { selectUser } from "@/redux/slices/userSlice";
 import { queryKeys } from "@/lib/query-keys";
+import { contentLanguage } from "@/lib/contentLanguage";
 import { AnalyticsEvent } from "@/lib/analyticsEvents";
 import { shoppingListApi } from "@/api/shopping-list.api";
 import {
@@ -40,7 +41,12 @@ export function useAddShoppingLine(onError?: (error: Error) => void) {
 
   const mutation = useShoppingMutation({
     mutationFn: ({ householdId, line, rowId }: Variables) =>
-      shoppingListApi.addItem(supabase, { id: rowId, householdId, line }),
+      shoppingListApi.addItem(supabase, {
+        id: rowId,
+        householdId,
+        line,
+        language: contentLanguage(),
+      }),
     optimistic: (_items, { items }) => items,
     onError,
     onSuccess: (rows, { householdId, rowId, isNewRow }) => {
@@ -71,6 +77,7 @@ export function useAddShoppingLine(onError?: (error: Error) => void) {
       newId: randomId(),
       now: Date.now(),
       userId,
+      language: contentLanguage(),
     });
     if (!addition) return false;
     mutation.mutate({ householdId, line, ...addition });

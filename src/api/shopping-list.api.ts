@@ -27,10 +27,11 @@ export const shoppingListApi = {
     return data ?? [];
   },
 
+  /** Every product with all its spellings per language, the names the server matches on. */
   async getDictionary(supabase: Client) {
     const { data, error } = await supabase
-      .from("ingredients")
-      .select("slug, name_en, name_de, category, is_staple");
+      .from("ingredient_dictionary")
+      .select("slug, name_en, name_de, category, is_staple, names_de, names_en");
     if (error) throw error;
     return data ?? [];
   },
@@ -46,18 +47,19 @@ export const shoppingListApi = {
 
   /**
    * One typed line. The id is minted by the client, so a retry cannot add a
-   * second row; the server matches the name against the dictionary and answers
-   * with the row, slug and aisle included.
+   * second row; the server matches the name against the dictionary (the app's
+   * language first) and answers with the row, slug and aisle included.
    */
   async addItem(
     supabase: Client,
-    params: { id: string; householdId: string; line: TypedLine }
+    params: { id: string; householdId: string; line: TypedLine; language: string }
   ): Promise<ShoppingListItemRow[]> {
     const { data, error } = await supabase.rpc("add_shopping_list_item", {
       p_id: params.id,
       p_household_id: params.householdId,
       p_name: params.line.name,
       ...amountParams(params.line),
+      p_language: params.language,
     });
     if (error) throw error;
     return data ?? [];
@@ -81,19 +83,30 @@ export const shoppingListApi = {
     return data ?? [];
   },
 
-  /** The edit sheet: name, aisle and the amount as it should be stored. */
+  /**
+   * The edit sheet: name, aisle and the amount as it should be stored. A changed
+   * spelling marks the title as the household's own (`name_custom`), and a new
+   * name is matched against the dictionary in the app's language first.
+   */
   async updateItem(
     supabase: Client,
-    params: { id: string; name: string; aisle: ShoppingAisle; amount: Amount }
+    params: { id: string; name: string; aisle: ShoppingAisle; amount: Amount; language: string }
   ): Promise<ShoppingListItemRow[]> {
     const { data, error } = await supabase.rpc("update_shopping_list_item", {
       p_id: params.id,
       p_name: params.name,
       p_category: params.aisle,
       ...amountParams(params.amount),
+      p_language: params.language,
     });
     if (error) throw error;
     return data ?? [];
+  },
+
+  /** The shopper's own words; a plain update, the household's update policy covers it. */
+  async setNote(supabase: Client, id: string, note: string | null): Promise<void> {
+    const { error } = await supabase.from("shopping_list_items").update({ note }).eq("id", id);
+    if (error) throw error;
   },
 
   /** Replays the ledger without the recipe's lines; returns the rows it kept. */
