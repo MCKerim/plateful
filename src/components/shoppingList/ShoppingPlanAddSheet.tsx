@@ -28,7 +28,6 @@ import { useShoppingDictionary } from "@/hooks/shopping-list/useShoppingDictiona
 import { useAddRecipeIngredients } from "@/hooks/shopping-list/useAddRecipeIngredients";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { cn } from "@/lib/utils";
-import { shoppingEmoji } from "@/lib/shopping-list/emoji";
 import { itemAmountText } from "@/lib/shopping-list/item";
 import { aisleSections, checklistIndex, tripRecipes } from "@/lib/shopping-list/list";
 import {
@@ -205,7 +204,8 @@ function Steps({ meals, onClose }: Readonly<{ meals: PlanMeal[]; onClose: () => 
             <ShoppingChecklistRow
               key={line.id}
               isSelected={isLineSelected(line)}
-              emoji={shoppingEmoji(line.item.ingredientSlug, line.item.name, line.item.aisle)}
+              slug={line.item.ingredientSlug}
+              aisle={line.item.aisle}
               amount={itemAmountText(line.item, locale)}
               name={line.item.name}
               isStaple={line.isStaple}

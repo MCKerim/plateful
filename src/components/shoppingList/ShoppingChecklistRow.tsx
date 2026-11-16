@@ -4,10 +4,13 @@ import { Button } from "@/components/ui/button";
 import RecipeCover from "@/components/shoppingList/RecipeCover";
 import CheckMark from "@/components/general/CheckMark";
 import { cn } from "@/lib/utils";
+import ProductIcon from "@/components/shoppingList/ProductIcon";
+import type { ShoppingAisle } from "@/lib/shopping-list/aisle";
 
 type Props = {
   isSelected: boolean;
-  emoji: string;
+  slug: string | null;
+  aisle: ShoppingAisle;
   /** Empty for a line without one. */
   amount: string;
   name: string;
@@ -25,7 +28,8 @@ type Props = {
  */
 export default function ShoppingChecklistRow({
   isSelected,
-  emoji,
+  slug,
+  aisle,
   amount,
   name,
   isStaple = false,
@@ -47,12 +51,11 @@ export default function ShoppingChecklistRow({
       onClick={onToggle}
     >
       <CheckMark isSelected={isSelected} />
-      <span
-        className={cn("w-7 shrink-0 text-center text-xl", !isSelected && "opacity-60 grayscale")}
-        aria-hidden
-      >
-        {emoji}
-      </span>
+      <ProductIcon
+        slug={slug}
+        aisle={aisle}
+        className={cn("size-7 shrink-0", !isSelected && "opacity-60 grayscale")}
+      />
       <span className="min-w-0 flex-1">
         {amount && <span className="mr-1.5 font-semibold tabular-nums">{amount}</span>}
         <span className="break-words">{name}</span>

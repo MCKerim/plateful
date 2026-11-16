@@ -24,7 +24,6 @@ import { useShoppingList } from "@/hooks/shopping-list/useShoppingList";
 import { useShoppingDictionary } from "@/hooks/shopping-list/useShoppingDictionary";
 import { useAddRecipeIngredients } from "@/hooks/shopping-list/useAddRecipeIngredients";
 import { contentLanguage } from "@/lib/contentLanguage";
-import { shoppingEmoji } from "@/lib/shopping-list/emoji";
 import { itemAmountText } from "@/lib/shopping-list/item";
 import { checklistIndex } from "@/lib/shopping-list/list";
 import { canScale, displayName, listAmount, servingsScale } from "@/lib/shopping-list/planAdd";
@@ -161,7 +160,8 @@ function Checklist({
               <ShoppingChecklistRow
                 key={ingredient.id}
                 isSelected={isSelected(ingredient.id, slug)}
-                emoji={shoppingEmoji(slug, name, index.aisle(slug))}
+                slug={slug}
+                aisle={index.aisle(slug)}
                 amount={itemAmountText(listAmount(ingredient, scale), locale)}
                 name={name}
                 isStaple={index.isStaple(slug)}

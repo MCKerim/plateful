@@ -1,24 +1,24 @@
 /**
  * The store aisles an item is grouped under (Bring's taxonomy), in the order a
  * shop is walked. Ids are the `ingredients.category` values on the server; the
- * four non-food aisles exist only for typed items. The emoji is a tile's last
- * resort picture (see `shoppingEmoji`).
+ * four non-food aisles exist only for typed items. Each id also names its
+ * paper-bag placeholder, `public/product-bags/<id>.webp` (see `ProductIcon`).
  */
 export const AISLES = [
-  { id: "produce", labelKey: "shoppingList.aisle.produce", emoji: "🥬" },
-  { id: "bakery", labelKey: "shoppingList.aisle.bakery", emoji: "🥖" },
-  { id: "dairy", labelKey: "shoppingList.aisle.dairy", emoji: "🥛" },
-  { id: "meat-fish", labelKey: "shoppingList.aisle.meatFish", emoji: "🥩" },
-  { id: "spices", labelKey: "shoppingList.aisle.spices", emoji: "🧂" },
-  { id: "grains", labelKey: "shoppingList.aisle.grains", emoji: "🌾" },
-  { id: "frozen", labelKey: "shoppingList.aisle.frozen", emoji: "🧊" },
-  { id: "drinks", labelKey: "shoppingList.aisle.drinks", emoji: "🥤" },
-  { id: "snacks", labelKey: "shoppingList.aisle.snacks", emoji: "🍫" },
-  { id: "household", labelKey: "shoppingList.aisle.household", emoji: "🧹" },
-  { id: "care", labelKey: "shoppingList.aisle.care", emoji: "🧴" },
-  { id: "pets", labelKey: "shoppingList.aisle.pets", emoji: "🐾" },
-  { id: "garden", labelKey: "shoppingList.aisle.garden", emoji: "🌱" },
-  { id: "other", labelKey: "shoppingList.aisle.other", emoji: "🛒" },
+  { id: "produce", labelKey: "shoppingList.aisle.produce" },
+  { id: "bakery", labelKey: "shoppingList.aisle.bakery" },
+  { id: "dairy", labelKey: "shoppingList.aisle.dairy" },
+  { id: "meat-fish", labelKey: "shoppingList.aisle.meatFish" },
+  { id: "spices", labelKey: "shoppingList.aisle.spices" },
+  { id: "grains", labelKey: "shoppingList.aisle.grains" },
+  { id: "frozen", labelKey: "shoppingList.aisle.frozen" },
+  { id: "drinks", labelKey: "shoppingList.aisle.drinks" },
+  { id: "snacks", labelKey: "shoppingList.aisle.snacks" },
+  { id: "household", labelKey: "shoppingList.aisle.household" },
+  { id: "care", labelKey: "shoppingList.aisle.care" },
+  { id: "pets", labelKey: "shoppingList.aisle.pets" },
+  { id: "garden", labelKey: "shoppingList.aisle.garden" },
+  { id: "other", labelKey: "shoppingList.aisle.other" },
 ] as const;
 
 export type ShoppingAisle = (typeof AISLES)[number]["id"];

@@ -130,8 +130,10 @@ describe("parseShoppingListItem", () => {
       is_staple: false,
       names_de: ["Mehl", "Weizenmehl"],
       names_en: ["flour"],
+      icon_path: "flour-aea477dc.webp",
     });
     expect(entry?.aisle).toBe("grains");
+    expect(entry?.iconPath).toBe("flour-aea477dc.webp");
     expect(entry?.namesDe).toEqual(["Mehl", "Weizenmehl"]);
     expect(entry && dictionaryName(entry, "de")).toBe("Mehl");
     expect(entry && dictionaryName(entry, "en")).toBe("Flour");
@@ -146,6 +148,7 @@ describe("parseShoppingListItem", () => {
       is_staple: true,
       names_de: null,
       names_en: [],
+      icon_path: null,
     });
     expect([entry?.namesDe, entry?.namesEn]).toEqual([["Salz"], ["salt"]]);
     expect(
@@ -157,6 +160,7 @@ describe("parseShoppingListItem", () => {
         is_staple: null,
         names_de: null,
         names_en: null,
+        icon_path: null,
       })
     ).toBeNull();
   });

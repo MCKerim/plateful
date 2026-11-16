@@ -15,7 +15,7 @@ import RecipeCover from "@/components/shoppingList/RecipeCover";
 import { useShoppingByline } from "@/hooks/shopping-list/useShoppingByline";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { aisleInfo } from "@/lib/shopping-list/aisle";
-import { shoppingEmoji } from "@/lib/shopping-list/emoji";
+import ProductIcon from "@/components/shoppingList/ProductIcon";
 import {
   itemAmountText,
   originalLine,
@@ -114,9 +114,7 @@ export default function ShoppingItemDetailSheet({
     <Drawer open={item !== null} onOpenChange={(open) => !open && onClose()}>
       <DrawerContent className="max-h-[90dvh]">
         <DrawerHeader className="flex items-center gap-3.5 text-left">
-          <span className="flex size-16 shrink-0 items-center justify-center text-5xl" aria-hidden>
-            {shoppingEmoji(shown.ingredientSlug, shown.name, shown.aisle)}
-          </span>
+          <ProductIcon slug={shown.ingredientSlug} aisle={shown.aisle} className="size-16 shrink-0" />
           <span className="flex min-w-0 flex-col gap-1">
             <DrawerTitle className="line-clamp-2">{shown.name}</DrawerTitle>
             <DrawerDescription>{amount ? `${amount} · ${aisle}` : aisle}</DrawerDescription>

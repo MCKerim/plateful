@@ -14,7 +14,7 @@ import DeleteDialog from "@/components/general/DeleteDialog";
 import RecipeCover from "@/components/shoppingList/RecipeCover";
 import { useShoppingByline } from "@/hooks/shopping-list/useShoppingByline";
 import { contentLanguage } from "@/lib/contentLanguage";
-import { shoppingEmoji } from "@/lib/shopping-list/emoji";
+import ProductIcon from "@/components/shoppingList/ProductIcon";
 import { isFromRecipe, itemAmountText, keeping } from "@/lib/shopping-list/item";
 import type { TripRecipe } from "@/lib/shopping-list/list";
 
@@ -95,12 +95,11 @@ export default function ShoppingRecipeSheet({
             const remaining = itemAmountText(rest, locale);
             return (
               <div key={item.id} className="flex items-center gap-3 rounded-2xl bg-card p-2.5">
-                <span
-                  className="flex size-11 shrink-0 items-center justify-center text-[28px]"
-                  aria-hidden
-                >
-                  {shoppingEmoji(item.ingredientSlug, item.name, item.aisle)}
-                </span>
+                <ProductIcon
+                  slug={item.ingredientSlug}
+                  aisle={item.aisle}
+                  className="size-11 shrink-0"
+                />
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="line-clamp-2 text-sm font-medium">{item.name}</span>
                   {rest.sources.length > 0 && (

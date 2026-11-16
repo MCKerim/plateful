@@ -70,6 +70,8 @@ export type ShoppingDictionaryEntry = {
   nameDe: string;
   aisle: ShoppingAisle;
   isStaple: boolean;
+  /** The product's file in the `product-icons` bucket; null until it has one. */
+  iconPath: string | null;
   /** Every spelling the server matches on (`ingredient_names`), display names included. */
   namesDe: string[];
   namesEn: string[];
@@ -155,7 +157,7 @@ export function parseShoppingListItem(row: ShoppingListItemRow): ShoppingListIte
 export function parseDictionaryEntry(
   row: Pick<
     DictionaryRow,
-    "slug" | "name_en" | "name_de" | "category" | "is_staple" | "names_de" | "names_en"
+    "slug" | "name_en" | "name_de" | "category" | "is_staple" | "names_de" | "names_en" | "icon_path"
   >
 ): ShoppingDictionaryEntry | null {
   if (!row.slug) return null;
@@ -167,6 +169,7 @@ export function parseDictionaryEntry(
     nameDe,
     aisle: parseAisle(row.category),
     isStaple: row.is_staple ?? false,
+    iconPath: row.icon_path ?? null,
     // Without its names an entry still matches on its display names.
     namesDe: row.names_de?.length ? row.names_de : [nameDe],
     namesEn: row.names_en?.length ? row.names_en : [nameEn],

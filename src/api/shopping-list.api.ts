@@ -31,7 +31,7 @@ export const shoppingListApi = {
   async getDictionary(supabase: Client) {
     const { data, error } = await supabase
       .from("ingredient_dictionary")
-      .select("slug, name_en, name_de, category, is_staple, names_de, names_en");
+      .select("slug, name_en, name_de, category, is_staple, names_de, names_en, icon_path");
     if (error) throw error;
     return data ?? [];
   },

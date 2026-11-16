@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 import { contentLanguage } from "@/lib/contentLanguage";
-import { shoppingEmoji } from "@/lib/shopping-list/emoji";
+import ProductIcon from "@/components/shoppingList/ProductIcon";
 import { itemAmountText, type ShoppingListItem } from "@/lib/shopping-list/item";
 
 type Props = {
@@ -65,12 +65,7 @@ export default function ShoppingItemCard({
         transition={{ type: "spring", stiffness: 400, damping: 17 }}
         onClick={onClick}
       >
-        <span
-          className="flex size-[52px] shrink-0 items-center justify-center text-[34px]"
-          aria-hidden
-        >
-          {shoppingEmoji(item.ingredientSlug, item.name, item.aisle)}
-        </span>
+        <ProductIcon slug={item.ingredientSlug} aisle={item.aisle} className="size-[52px] shrink-0" />
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
           <span className="line-clamp-2 text-sm font-medium break-words">{item.name}</span>
           {changed ? (

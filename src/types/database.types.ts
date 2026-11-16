@@ -690,6 +690,7 @@ export type Database = {
           category: string
           contains_slugs: string[]
           created_at: string
+          icon_path: string | null
           is_staple: boolean
           name_de: string
           name_en: string
@@ -699,6 +700,7 @@ export type Database = {
           category?: string
           contains_slugs?: string[]
           created_at?: string
+          icon_path?: string | null
           is_staple?: boolean
           name_de: string
           name_en: string
@@ -708,6 +710,7 @@ export type Database = {
           category?: string
           contains_slugs?: string[]
           created_at?: string
+          icon_path?: string | null
           is_staple?: boolean
           name_de?: string
           name_en?: string
@@ -1205,7 +1208,6 @@ export type Database = {
           image_path: string | null
           import_id: string | null
           ingredient_slugs: string[] | null
-          nutrition: Json | null
           origin: string
           recipe_index: number
           snapshot: Json
@@ -1227,7 +1229,6 @@ export type Database = {
           image_path?: string | null
           import_id?: string | null
           ingredient_slugs?: string[] | null
-          nutrition?: Json | null
           origin?: string
           recipe_index?: number
           snapshot: Json
@@ -1249,7 +1250,6 @@ export type Database = {
           image_path?: string | null
           import_id?: string | null
           ingredient_slugs?: string[] | null
-          nutrition?: Json | null
           origin?: string
           recipe_index?: number
           snapshot?: Json
@@ -1955,6 +1955,7 @@ export type Database = {
       ingredient_dictionary: {
         Row: {
           category: string | null
+          icon_path: string | null
           is_staple: boolean | null
           name_de: string | null
           name_en: string | null
@@ -1964,6 +1965,7 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          icon_path?: string | null
           is_staple?: boolean | null
           name_de?: string | null
           name_en?: string | null
@@ -1973,6 +1975,7 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          icon_path?: string | null
           is_staple?: boolean | null
           name_de?: string | null
           name_en?: string | null

@@ -43,6 +43,7 @@ function entry(
     nameDe,
     aisle,
     isStaple: false,
+    iconPath: null,
     namesDe: names.de ?? [nameDe],
     namesEn: names.en ?? [nameEn],
   };
