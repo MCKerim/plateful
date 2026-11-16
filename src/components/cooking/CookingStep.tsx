@@ -1,9 +1,10 @@
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
 import { Check, Timer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import type { StepToken } from "@/lib/cooking/stepTokens";
 import type { ScaledIngredient } from "@/types/ingredient.types";
+import { useProductIconUrl } from "@/hooks/shopping-list/useProductIconUrl";
 
 export type TimerChipState = "idle" | "running" | "finished";
 
@@ -71,6 +72,7 @@ export default function CookingStep({
   onTimerChip,
   onSelect,
 }: Readonly<Props>) {
+  const iconUrlFor = useProductIconUrl();
   return (
     <div
       className={cn("transition-opacity duration-200", isCurrent ? "opacity-100" : "opacity-[0.42]")}
@@ -137,7 +139,10 @@ export default function CookingStep({
               className="cursor-pointer text-accent"
               onClick={(event) => event.stopPropagation()}
             >
-              {mention.emoji && <span className="text-[17px] font-semibold">{mention.emoji} </span>}
+              <MentionPicture
+                iconUrl={iconUrlFor(ingredient.ingredientSlug)}
+                emoji={mention.emoji}
+              />
               {text}
             </span>
           </PopoverTrigger>
@@ -151,4 +156,27 @@ export default function CookingStep({
       </>
     );
   }
+}
+
+/**
+ * A mention's picture on its first word: the product's icon, else the
+ * annotator's emoji (a step has no aisle for a bag, and a bag mid-sentence
+ * reads as an object). Mirrors the native `CookingStepView`.
+ */
+function MentionPicture({ iconUrl, emoji }: Readonly<{ iconUrl: string | null; emoji: string }>) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (iconUrl && iconUrl !== failedUrl) {
+    return (
+      <img
+        src={iconUrl}
+        alt=""
+        aria-hidden
+        decoding="async"
+        draggable={false}
+        className="mr-1 inline-block size-[1.25em] object-contain align-[-0.3em]"
+        onError={() => setFailedUrl(iconUrl)}
+      />
+    );
+  }
+  return emoji ? <span className="text-[17px] font-semibold">{emoji} </span> : null;
 }
