@@ -128,6 +128,7 @@ export default function CookingStep({
     const text = mention.words.join(" ");
     const space = mention.spaceBefore ? " " : "";
     if (!ingredient) return `${space}${text}`;
+    const iconUrl = iconUrlFor(ingredient.ingredientSlug);
     return (
       <>
         {space}
@@ -139,18 +140,30 @@ export default function CookingStep({
               className="cursor-pointer text-accent"
               onClick={(event) => event.stopPropagation()}
             >
-              <MentionPicture
-                iconUrl={iconUrlFor(ingredient.ingredientSlug)}
-                emoji={mention.emoji}
-              />
+              <MentionPicture iconUrl={iconUrl} emoji={mention.emoji} />
               {text}
             </span>
           </PopoverTrigger>
-          <PopoverContent className="w-auto max-w-xs space-y-1" onClick={(event) => event.stopPropagation()}>
-            <p className="text-base font-semibold">{ingredient.scaledQuantity.display}</p>
-            {ingredient.preparationNote && (
-              <p className="text-sm text-muted-foreground">{ingredient.preparationNote}</p>
+          <PopoverContent
+            className="flex w-auto max-w-xs items-center gap-3.5"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {iconUrl && (
+              <img
+                src={iconUrl}
+                alt=""
+                aria-hidden
+                draggable={false}
+                className="size-16 shrink-0 object-contain"
+                onError={(event) => (event.currentTarget.hidden = true)}
+              />
             )}
+            <div className="space-y-1">
+              <p className="text-base font-semibold">{ingredient.scaledQuantity.display}</p>
+              {ingredient.preparationNote && (
+                <p className="text-sm text-muted-foreground">{ingredient.preparationNote}</p>
+              )}
+            </div>
           </PopoverContent>
         </Popover>
       </>
