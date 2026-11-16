@@ -1,7 +1,7 @@
-import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getScaledQuantityDisplay } from "@/lib/ingredient-parser/scale-ingredients";
 import type { ScaledIngredient } from "@/types/ingredient.types";
+import ProductIcon from "@/components/shoppingList/ProductIcon";
 
 type Props = {
   ingredient: ScaledIngredient;
@@ -14,8 +14,8 @@ type Props = {
 
 /**
  * One ingredient line, checkable while cooking like the native app's: the
- * mark, the scaled amount column, the name with its preparation note, and
- * the optional badge.
+ * product picture (a tap greys it and strikes the line through), the scaled
+ * amount column, the name with its preparation note, and the optional badge.
  */
 export function IngredientRow({ ingredient, baseServings, targetServings, onToggle, checked = false }: Props) {
   const quantity = getScaledQuantityDisplay(ingredient, baseServings, targetServings);
@@ -25,14 +25,10 @@ export function IngredientRow({ ingredient, baseServings, targetServings, onTogg
   const content = (
     <>
       {onToggle && (
-        <span
-          className={cn(
-            "flex size-[22px] shrink-0 translate-y-1 items-center justify-center self-start rounded-full border-2",
-            checked ? "border-accent bg-accent text-accent-foreground" : "border-muted-foreground/60"
-          )}
-        >
-          {checked && <Check className="size-3.5" strokeWidth={3} />}
-        </span>
+        <ProductIcon
+          slug={ingredient.ingredientSlug}
+          className={cn("size-8 shrink-0 self-start transition-[filter]", checked && "grayscale")}
+        />
       )}
 
       <span className="min-w-16 font-semibold tabular-nums">{amount}</span>

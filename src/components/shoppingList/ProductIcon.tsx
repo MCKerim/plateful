@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useProductIconUrl } from "@/hooks/shopping-list/useProductIconUrl";
+import { useDictionaryEntry, useProductIconUrl } from "@/hooks/shopping-list/useProductIconUrl";
 import type { ShoppingAisle } from "@/lib/shopping-list/aisle";
 
 type Props = {
   slug: string | null;
-  aisle: ShoppingAisle;
+  /** The bag's aisle; without it the dictionary's aisle for the slug, else Other. */
+  aisle?: ShoppingAisle;
   className?: string;
 };
 
@@ -18,8 +19,10 @@ type Props = {
  */
 export default function ProductIcon({ slug, aisle, className }: Readonly<Props>) {
   const iconUrl = useProductIconUrl()(slug);
+  const entryFor = useDictionaryEntry();
+  const bagAisle = aisle ?? entryFor(slug)?.aisle ?? "other";
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
-  const src = iconUrl && iconUrl !== failedUrl ? iconUrl : `/product-bags/${aisle}.webp`;
+  const src = iconUrl && iconUrl !== failedUrl ? iconUrl : `/product-bags/${bagAisle}.webp`;
 
   return (
     <img
