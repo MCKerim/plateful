@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAmountColumn } from "@/hooks/useAmountColumn";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,7 @@ export function IngredientList({
 }: Props) {
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
+  const amountColumn = useAmountColumn<HTMLElement>();
   const effectiveBaseServings = baseServings ?? 1;
 
   // Read from the store, not copied into state: the add-to-list sheet changes it too.
@@ -102,7 +104,7 @@ export function IngredientList({
   }
 
   return (
-    <section className="flex flex-col gap-4">
+    <section ref={amountColumn} className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-xl font-bold">{t("ingredients.title")}</h2>
 

@@ -31,7 +31,9 @@ export function IngredientRow({ ingredient, baseServings, targetServings, onTogg
         />
       )}
 
-      <span className="min-w-16 font-semibold tabular-nums">{amount}</span>
+      <span className="shrink-0 font-semibold tabular-nums" style={{ minWidth: "max(4rem, var(--amount-w, 0px))" }}>
+        <span data-amount>{amount}</span>
+      </span>
 
       <span className="flex-1">
         {ingredient.name || ingredient.rawText}

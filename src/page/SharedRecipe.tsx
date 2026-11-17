@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAmountColumn } from "@/hooks/useAmountColumn";
 import { useParams, useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
 import { Capacitor } from "@capacitor/core";
@@ -82,6 +83,7 @@ export default function SharedRecipe() {
   // The servings shown; scales the amounts only, as on iOS (nothing to save here).
   const [servings, setServings] = useState<number | null>(null);
   const [checkedIds, setCheckedIds] = useState<ReadonlySet<string>>(new Set());
+  const amountColumn = useAmountColumn<HTMLElement>();
 
   async function handleSave() {
     if (!share || !user || !householdId || !token) return;
@@ -255,9 +257,9 @@ export default function SharedRecipe() {
         {/* Nutrition — the sharer's values, when the snapshot carries them */}
         {nutrition && <NutritionSection nutrition={nutrition} />}
 
-        {/* The recipe page's section in preview mode: scalable, not checkable. */}
+        {/* The recipe page's section in preview mode: scalable and checkable, nothing saved. */}
         {displayIngredients.length > 0 && (
-          <section className="flex flex-col gap-4">
+          <section ref={amountColumn} className="flex flex-col gap-4">
             <div className="flex items-center justify-between gap-2">
               <h2 className="text-xl font-bold">{t("ingredients.title")}</h2>
 
