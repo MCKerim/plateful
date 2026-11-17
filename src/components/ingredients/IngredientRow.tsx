@@ -7,7 +7,7 @@ type Props = {
   ingredient: ScaledIngredient;
   baseServings: number;
   targetServings: number;
-  /** Without it the row is read-only (a shared recipe that isn't the household's yet). */
+  /** Without it the row is read-only. */
   onToggle?: () => void;
   checked?: boolean;
 };

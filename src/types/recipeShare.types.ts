@@ -11,6 +11,8 @@ export type SnapshotIngredient = {
   is_scalable: boolean | null;
   is_optional: boolean | null;
   preparation_note: string | null;
+  /** The product, for its picture; absent in shares made before 2026-11-17. */
+  ingredient_slug?: string | null;
 };
 
 /**

@@ -57,7 +57,7 @@ function toDisplayIngredient(ing: SnapshotIngredient, index: number): RecipeIngr
     groupName: ing.group_name,
     sortOrder: ing.sort_order,
     isScalable: ing.is_scalable ?? true,
-    ingredientSlug: null,
+    ingredientSlug: ing.ingredient_slug ?? null,
   };
 }
 
@@ -81,6 +81,7 @@ export default function SharedRecipe() {
   const isLoggedIn = user !== null;
   // The servings shown; scales the amounts only, as on iOS (nothing to save here).
   const [servings, setServings] = useState<number | null>(null);
+  const [checkedIds, setCheckedIds] = useState<ReadonlySet<string>>(new Set());
 
   async function handleSave() {
     if (!share || !user || !householdId || !token) return;
@@ -281,6 +282,14 @@ export default function SharedRecipe() {
                       ingredient={ingredient}
                       baseServings={baseServings}
                       targetServings={targetServings}
+                      checked={checkedIds.has(ingredient.id)}
+                      onToggle={() =>
+                        setCheckedIds((ids) => {
+                          const next = new Set(ids);
+                          if (!next.delete(ingredient.id)) next.add(ingredient.id);
+                          return next;
+                        })
+                      }
                     />
                   ))}
                 </ul>

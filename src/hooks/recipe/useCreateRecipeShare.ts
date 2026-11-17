@@ -46,6 +46,7 @@ export function useCreateRecipeShare() {
         is_scalable: row.is_scalable,
         is_optional: row.is_optional,
         preparation_note: row.preparation_note,
+        ingredient_slug: row.ingredient_slug,
       }));
 
       // Cooking-mode annotations point at ingredient rows by id; the snapshot

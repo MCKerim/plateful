@@ -30,6 +30,11 @@ const snapshot = {
   })),
 };
 
+// Signed out, RLS answers the dictionary with no rows: every picture is a bag.
+test.beforeEach(async ({ page }) => {
+  await page.route("**/rest/v1/ingredient_dictionary?*", (route) => route.fulfill({ json: [] }));
+});
+
 test.describe("Shared recipe", () => {
   test.beforeEach(async ({ page }) => {
     await page.route("**/rest/v1/rpc/resolve_recipe_share", (route) =>
@@ -41,6 +46,14 @@ test.describe("Shared recipe", () => {
 
   test("shows the servings in words, not a translation key", async ({ page }) => {
     await expect(page.getByText("2 servings", { exact: true })).toBeVisible();
+  });
+
+  test("an ingredient checks off and back like the recipe page's", async ({ page }) => {
+    const fusilli = page.getByRole("checkbox", { name: /Fusilli/ });
+    await fusilli.click();
+    await expect(fusilli).toHaveAttribute("aria-checked", "true");
+    await fusilli.click();
+    await expect(fusilli).toHaveAttribute("aria-checked", "false");
   });
 
   test("the footer never covers the last step", async ({ page }) => {
