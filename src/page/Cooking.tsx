@@ -297,7 +297,7 @@ export default function Cooking() {
         open={showIngredients}
         onOpenChange={setShowIngredients}
         ingredients={scaledIngredients}
-        isScaled={targetServings !== baseServings}
+        baseServings={baseServings}
         servings={targetServings}
         servingsUnit={recipe?.servings_unit ?? "servings"}
         onServingsChange={cooking.setServings}

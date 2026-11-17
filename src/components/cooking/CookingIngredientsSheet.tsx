@@ -1,16 +1,16 @@
-import { Circle, CircleCheck } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Drawer, DrawerContent, DrawerTitle } from "@/components/ui/drawer";
+import { IngredientRow } from "@/components/ingredients/IngredientRow";
 import { ServingScaler } from "@/components/ingredients/ServingScaler";
+import { useAmountColumn } from "@/hooks/useAmountColumn";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
-import { cn } from "@/lib/utils";
 import type { ScaledIngredient } from "@/types/ingredient.types";
 
 type Props = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   ingredients: ScaledIngredient[];
-  isScaled: boolean;
+  baseServings: number;
   servings: number;
   servingsUnit: string;
   onServingsChange: (servings: number) => void;
@@ -19,12 +19,12 @@ type Props = {
   onToggle: (ingredientId: string) => void;
 };
 
-/** The ingredient list over the cooking screen: a servings stepper and check-off rows, grouped as in the recipe. */
+/** The ingredient list over the cooking screen: a servings stepper and the recipe detail's rows, grouped as in the recipe. */
 export default function CookingIngredientsSheet({
   open,
   onOpenChange,
   ingredients,
-  isScaled,
+  baseServings,
   servings,
   servingsUnit,
   onServingsChange,
@@ -32,13 +32,14 @@ export default function CookingIngredientsSheet({
   onToggle,
 }: Readonly<Props>) {
   const { t } = useTranslation();
+  const amountColumn = useAmountColumn<HTMLDivElement>();
   const groups = groupIngredients(ingredients);
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent>
         <DrawerTitle className="sr-only">{t("cooking.ingredients")}</DrawerTitle>
-        <div className="max-h-[75vh] overflow-y-auto px-4 pb-10 pt-4">
+        <div ref={amountColumn} className="max-h-[75vh] overflow-y-auto px-4 pb-10 pt-4">
           <div className="mb-4 flex justify-center">
             <ServingScaler value={servings} onChange={onServingsChange} unit={servingsUnit} />
           </div>
@@ -47,34 +48,16 @@ export default function CookingIngredientsSheet({
             <div key={group.name ?? ""} className="mb-3">
               {group.name && <p className="mb-1 text-sm font-semibold text-muted-foreground">{group.name}</p>}
               <ul>
-                {group.ingredients.map((ingredient) => {
-                  const isChecked = checked.has(ingredient.id);
-                  return (
-                    <li key={ingredient.id}>
-                      <button
-                        type="button"
-                        onClick={() => onToggle(ingredient.id)}
-                        className={cn(
-                          "flex w-full items-start gap-3 py-2 text-left",
-                          isChecked && "opacity-60"
-                        )}
-                        aria-pressed={isChecked}
-                      >
-                        {isChecked ? (
-                          <CircleCheck className="mt-0.5 size-5 shrink-0 text-accent" />
-                        ) : (
-                          <Circle className="mt-0.5 size-5 shrink-0 text-muted-foreground" />
-                        )}
-                        <span className={cn("font-medium", isChecked && "line-through")}>
-                          {isScaled ? ingredient.scaledQuantity.display : ingredient.rawText}
-                          {ingredient.isOptional && (
-                            <span className="ml-1 text-xs text-muted-foreground">(optional)</span>
-                          )}
-                        </span>
-                      </button>
-                    </li>
-                  );
-                })}
+                {group.ingredients.map((ingredient) => (
+                  <IngredientRow
+                    key={ingredient.id}
+                    ingredient={ingredient}
+                    baseServings={baseServings}
+                    targetServings={servings}
+                    checked={checked.has(ingredient.id)}
+                    onToggle={() => onToggle(ingredient.id)}
+                  />
+                ))}
               </ul>
             </div>
           ))}
