@@ -1,5 +1,5 @@
 import type { ShoppingAisle } from "@/lib/shopping-list/aisle";
-import { formatQuantity } from "@/lib/shopping-list/amount";
+import { formatQuantity } from "@/lib/ingredient-parser/format-quantity";
 import type { ShoppingItemSource, ShoppingListItem } from "@/lib/shopping-list/item";
 import type { RecipeIngredient } from "@/types/ingredient.types";
 

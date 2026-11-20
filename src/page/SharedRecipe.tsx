@@ -24,6 +24,7 @@ import { selectHouseholdId } from "@/redux/slices/householdSlice";
 import { groupIngredients } from "@/lib/transformers/ingredient.transformer";
 import { parseInstructionsMarkdown } from "@/lib/transformers/instruction.transformer";
 import { scaleIngredients } from "@/lib/ingredient-parser/scale-ingredients";
+import { contentLanguage } from "@/lib/contentLanguage";
 import { canScale } from "@/lib/shopping-list/planAdd";
 import { isTrustedRecipeImageUrl } from "@/api/recipeImage.api";
 import { mobileStoreUrl, openInAppLink } from "@/lib/appStores";
@@ -149,7 +150,7 @@ export default function SharedRecipe() {
   const baseServings = snapshot.base_servings ?? 1;
   const targetServings = servings ?? baseServings;
   const groupedIngredients = groupIngredients(
-    scaleIngredients(displayIngredients, baseServings, targetServings)
+    scaleIngredients(displayIngredients, baseServings, targetServings, contentLanguage())
   );
   // Structured steps; old shares (made before steps existed) only carry the
   // markdown, and a link out in the world can't be fixed, so it is parsed.

@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { getScaledQuantityDisplay } from "@/lib/ingredient-parser/scale-ingredients";
+import { contentLanguage } from "@/lib/contentLanguage";
 import type { ScaledIngredient } from "@/types/ingredient.types";
 import ProductIcon from "@/components/shoppingList/ProductIcon";
 
@@ -18,7 +19,7 @@ type Props = {
  * amount column, the name with its preparation note, and the optional badge.
  */
 export function IngredientRow({ ingredient, baseServings, targetServings, onToggle, checked = false }: Props) {
-  const quantity = getScaledQuantityDisplay(ingredient, baseServings, targetServings);
+  const quantity = getScaledQuantityDisplay(ingredient, baseServings, targetServings, contentLanguage());
   const amount = [quantity, ingredient.unit].filter(Boolean).join(" ");
   const rowClass = "flex w-full items-baseline gap-3 py-1 text-left text-base";
 

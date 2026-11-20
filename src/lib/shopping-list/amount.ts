@@ -1,11 +1,6 @@
-const DECIMAL = /^(\d+)[.,](\d+)$/;
+import { formatQuantity } from "@/lib/ingredient-parser/format-quantity";
 
-/** Up to two decimals with the reader's separator, no grouping ("1,5" in German). */
-export function formatQuantity(value: number, locale: string): string {
-  return new Intl.NumberFormat(locale, { maximumFractionDigits: 2, useGrouping: false }).format(
-    value
-  );
-}
+const DECIMAL = /^(\d+)[.,](\d+)$/;
 
 function decimalSeparator(locale: string): string {
   return (

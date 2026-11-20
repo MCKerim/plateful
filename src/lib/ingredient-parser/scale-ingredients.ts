@@ -9,11 +9,13 @@ import {
  *
  * @param ingredient - The ingredient to scale
  * @param scaleFactor - The factor to scale by (e.g., 2 for doubling)
+ * @param locale - The reader's language, for the decimal separator
  * @returns Scaled ingredient with updated display
  */
 export function scaleIngredient(
   ingredient: RecipeIngredient,
-  scaleFactor: number
+  scaleFactor: number,
+  locale?: string
 ): ScaledIngredient {
   // If ingredient is not scalable or has no quantity, return unchanged
   if (!ingredient.isScalable || ingredient.quantity.value === null) {
@@ -30,7 +32,8 @@ export function scaleIngredient(
   const scaledDisplay = formatScaledQuantity(
     scaledValue,
     ingredient.quantity.display,
-    scaleFactor
+    scaleFactor,
+    locale
   );
 
   // Reconstruct full text with scaled quantity
@@ -56,12 +59,14 @@ export function scaleIngredient(
  * @param ingredients - Array of ingredients to scale
  * @param baseServings - The base serving size the recipe was written for
  * @param targetServings - The target serving size
+ * @param locale - The reader's language, for the decimal separator
  * @returns Array of scaled ingredients
  */
 export function scaleIngredients(
   ingredients: RecipeIngredient[],
   baseServings: number,
-  targetServings: number
+  targetServings: number,
+  locale?: string
 ): ScaledIngredient[] {
   // Handle edge cases
   if (baseServings <= 0 || targetServings <= 0) {
@@ -87,7 +92,7 @@ export function scaleIngredients(
 
   const scaleFactor = targetServings / baseServings;
 
-  return ingredients.map((ingredient) => scaleIngredient(ingredient, scaleFactor));
+  return ingredients.map((ingredient) => scaleIngredient(ingredient, scaleFactor, locale));
 }
 
 /**
@@ -97,12 +102,14 @@ export function scaleIngredients(
  * @param ingredient - The ingredient
  * @param baseServings - Base servings
  * @param targetServings - Target servings
+ * @param locale - The reader's language, for the decimal separator
  * @returns The scaled quantity display string
  */
 export function getScaledQuantityDisplay(
   ingredient: RecipeIngredient,
   baseServings: number,
-  targetServings: number
+  targetServings: number,
+  locale?: string
 ): string {
   if (!ingredient.isScalable || ingredient.quantity.value === null) {
     return ingredient.quantity.display || "";
@@ -115,5 +122,5 @@ export function getScaledQuantityDisplay(
   const scaleFactor = targetServings / baseServings;
   const scaledValue = ingredient.quantity.value * scaleFactor;
 
-  return formatScaledQuantity(scaledValue, ingredient.quantity.display, scaleFactor);
+  return formatScaledQuantity(scaledValue, ingredient.quantity.display, scaleFactor, locale);
 }

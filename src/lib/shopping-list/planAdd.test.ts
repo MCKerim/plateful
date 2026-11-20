@@ -7,7 +7,6 @@ import {
   planLines,
   planMeals,
   planPortions,
-  roundScaled,
   servingsScale,
   type PlanPortion,
 } from "@/lib/shopping-list/planAdd";
@@ -16,6 +15,7 @@ import { checklistIndex } from "@/lib/shopping-list/list";
 import type { ShoppingDictionaryEntry } from "@/lib/shopping-list/item";
 import { makeIngredient, makeItem, PINCH } from "@/lib/shopping-list/testItems";
 import { getWeekdays } from "@/lib/dateHelper/dateHelper";
+import { roundQuantity } from "@/lib/ingredient-parser/format-quantity";
 import type { MealPlannerItem } from "@/types/meal-planning.types";
 import type { IngredientsBundle, RecipeIngredient } from "@/types/ingredient.types";
 
@@ -73,20 +73,27 @@ describe("servings", () => {
   });
 });
 
-describe("roundScaled", () => {
-  it("rounds scaled amounts to shopping precision", () => {
-    expect(roundScaled(583.333)).toBe(583);
-    expect(roundScaled(16.666)).toBe(17);
-    expect(roundScaled(9.96)).toBe(10);
-    expect(roundScaled(2.5)).toBe(2.5);
-    expect(roundScaled(1.666)).toBe(1.7);
-    expect(roundScaled(0.4166)).toBe(0.42);
-    expect(roundScaled(0.125)).toBe(0.13);
+describe("roundQuantity on the list", () => {
+  it("rounds scaled amounts to at most two decimals, like the recipe", () => {
+    expect(roundQuantity(583.333)).toBe(583.33);
+    expect(roundQuantity(16.666)).toBe(16.67);
+    expect(roundQuantity(9.96)).toBe(9.96);
+    expect(roundQuantity(2.5)).toBe(2.5);
+    expect(roundQuantity(1.666)).toBe(1.67);
+    expect(roundQuantity(0.4166)).toBe(0.42);
+    expect(roundQuantity(0.125)).toBe(0.13);
   });
 
   it("rounds a half at the rounding digit up like the server's numeric", () => {
-    expect(roundScaled(0.285)).toBe(0.29);
-    expect(roundScaled(1.14 * 0.25)).toBe(0.29);
+    expect(roundQuantity(0.285)).toBe(0.29);
+    expect(roundQuantity(1.14 * 0.25)).toBe(0.29);
+  });
+
+  it("shows a scaled line with the reader's separator", () => {
+    const flour = makeIngredient("f", 350, "g", "Mehl");
+    expect(itemAmountText(listAmount(flour, 5 / 3), "de")).toBe("583,33 g");
+    expect(itemAmountText(listAmount(makeIngredient("k", 0.75, "kg", "Mehl"), 1.5), "de")).toBe("1,13 kg");
+    expect(itemAmountText(listAmount(makeIngredient("t", 1, "TL", "Salz"), 5 / 3), "de")).toBe("1,67 TL");
   });
 });
 
@@ -94,7 +101,7 @@ describe("listAmount", () => {
   it("drops the written amount once scaled and keeps it at scale 1", () => {
     const potatoes = makeIngredient("a", 350, "g", "Kartoffeln", { slug: "potato" });
     expect(listAmount(potatoes, 5 / 3)).toEqual({
-      quantityValue: 583,
+      quantityValue: 583.33,
       quantityDisplay: null,
       unit: "g",
     });
