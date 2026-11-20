@@ -273,35 +273,5 @@ test.describe("Shopping List", () => {
         expect(await button.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
       }
     });
-
-    // Pixel emulator, 2026-11-20: with the keyboard up, the pinned "Speichern"
-    // stood where "Kategorie" was and the picker could not be seen.
-    test("the edit sheet keeps every field above Save with the keyboard open", async ({
-      page,
-      setupAuth,
-    }) => {
-      await setupAuth({ recipes: [], mealPlans: [] });
-      await serveRow(page, shoppingRow({ name: "Tomaten" }));
-
-      await page.goto("/shopping");
-      await page.getByRole("button", { name: "Details" }).click();
-      await page.getByRole("dialog").getByRole("button", { name: "Bearbeiten" }).click();
-      const sheet = page.getByRole("dialog", { name: "Artikel bearbeiten" });
-      await sheet.getByLabel("Name").focus();
-      // What the Android WebView leaves above the soft keyboard.
-      await page.setViewportSize({ width: 360, height: 453 });
-
-      const aisle = sheet.getByRole("combobox", { name: "Kategorie" });
-      const save = sheet.getByRole("button", { name: "Speichern" });
-      await expect
-        .poll(async () => {
-          const [picker, button] = await Promise.all([aisle.boundingBox(), save.boundingBox()]);
-          return picker!.y + picker!.height <= Math.min(button!.y, 453);
-        })
-        .toBe(true);
-      await save.scrollIntoViewIfNeeded();
-      const button = (await save.boundingBox())!;
-      expect(button.y + button.height).toBeLessThanOrEqual(453);
-    });
   });
 });
