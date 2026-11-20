@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from "@/components/ui/drawer";
 import { Input } from "@/components/ui/input";
+import { useSheetInVisualViewport } from "@/hooks/general/useSheetInVisualViewport";
 import ShoppingItemCard from "@/components/shoppingList/ShoppingItemCard";
 import { contentLanguage } from "@/lib/contentLanguage";
 import {
@@ -68,6 +69,14 @@ export default function ShoppingAddSheet({
   const [text, setText] = useState("");
   const [confirmation, setConfirmation] = useState<Confirmation | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const sheet = useRef<HTMLDivElement>(null);
+  useSheetInVisualViewport(sheet, open);
+  // autoFocus without the scroll: React's plain focus() let iPhone Safari pan
+  // the page by 330 px, so the page showed between the sheet and the keyboard.
+  const focusOnMount = useCallback((input: HTMLInputElement | null) => {
+    inputRef.current = input;
+    input?.focus({ preventScroll: true });
+  }, []);
 
   // Each opening starts empty, however the sheet was closed (the details close
   // it from the page, which vaul does not report through onOpenChange).
@@ -153,8 +162,11 @@ export default function ShoppingAddSheet({
   }
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent className="h-[90dvh]">
+    // vaul's own keyboard handling floated the sheet off the top in iPhone
+    // Safari and left it 408 px tall on Android after the keyboard went
+    // (2026-11-20); see docs/knowledge/sheet-with-fields-and-keyboard.md.
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+      <DrawerContent ref={sheet} className="h-[90dvh]">
         <DrawerHeader className="gap-3 text-left">
           <DrawerTitle>{t("shoppingList.addSheet.title")}</DrawerTitle>
           <form
@@ -164,8 +176,7 @@ export default function ShoppingAddSheet({
             }}
           >
             <Input
-              ref={inputRef}
-              autoFocus
+              ref={focusOnMount}
               value={text}
               onChange={(event) => {
                 setText(event.target.value);
@@ -184,7 +195,10 @@ export default function ShoppingAddSheet({
           </form>
         </DrawerHeader>
 
-        <div className="flex flex-col gap-2.5 overflow-y-auto px-4 pt-0.5 pb-6">
+        <div
+          data-sheet-scroll
+          className="flex flex-col gap-2.5 overflow-y-auto px-4 pt-0.5 pb-[calc(1.5rem+var(--keyboard-bar,0px))]"
+        >
           {preview ? (
             <>
               <ShoppingItemCard

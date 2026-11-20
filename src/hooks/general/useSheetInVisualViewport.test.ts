@@ -53,6 +53,7 @@ describe("useSheetInVisualViewport", () => {
     change({ height: 384 });
     expect(sheet.style.bottom).toBe("330px");
     expect(sheet.style.maxHeight).toBe("345px");
+    expect(sheet.style.minHeight).toBe("0px");
     expect(sheet.style.getPropertyValue("--keyboard-bar")).toBe("32px");
   });
 
@@ -75,6 +76,7 @@ describe("useSheetInVisualViewport", () => {
     rerender({ isOpen: false });
     expect(sheet.style.bottom).toBe("");
     expect(sheet.style.maxHeight).toBe("");
+    expect(sheet.style.minHeight).toBe("");
     expect(sheet.style.getPropertyValue("--keyboard-bar")).toBe("");
   });
 });

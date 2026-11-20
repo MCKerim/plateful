@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, CircleCheck, MoreHorizontal, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
+import { useSheetInVisualViewport } from "@/hooks/general/useSheetInVisualViewport";
 import { countdownText, durationLabel, hasFired, remainingSeconds, type CookingTimer } from "@/lib/cooking/timer";
 import { cn } from "@/lib/utils";
 
@@ -41,12 +42,18 @@ export default function CookingTimersSheet({
   const { t } = useTranslation();
   const [minutes, setMinutes] = useState("5");
   const newSeconds = Math.max(0, Math.min(180, Math.round(Number(minutes) || 0))) * 60;
+  const sheet = useRef<HTMLDivElement>(null);
+  useSheetInVisualViewport(sheet, open);
 
   return (
-    <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent>
+    // In iPhone Safari vaul floated the sheet over an empty band above the
+    // keyboard (2026-11-20); see docs/knowledge/sheet-with-fields-and-keyboard.md.
+    // Its height bounds sit on the sheet (plus the 1.5rem handle), so the hook
+    // can fit the sheet into what the keyboard leaves.
+    <Drawer open={open} onOpenChange={onOpenChange} repositionInputs={false}>
+      <DrawerContent ref={sheet} className="max-h-[calc(75vh+1.5rem)] min-h-[calc(40vh+1.5rem)]">
         <DrawerTitle className="sr-only">{t("cooking.timers")}</DrawerTitle>
-        <div className="flex min-h-[40vh] max-h-[75vh] flex-col px-4 pb-10 pt-4">
+        <div className="flex min-h-0 flex-1 flex-col px-4 pt-4 pb-[calc(2.5rem+var(--keyboard-bar,0px))]">
           <div className="flex-1 overflow-y-auto">
             {timers.length === 0 ? (
               <div className="flex h-full flex-col items-center justify-center gap-2 py-8 text-center">

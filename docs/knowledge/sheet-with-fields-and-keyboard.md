@@ -1,6 +1,6 @@
 # A sheet with text fields over the soft keyboard
 
-_Since 2026-11-20 the shopping edit sheet (`ShoppingItemEditSheet`) stays on the keyboard on Android and iPhone Safari; the other vaul sheets with fields (`ShoppingAddSheet`, `CookingTimersSheet`) keep vaul's default handling and were not checked on an iPhone; expect the problem below there too._
+_Since 2026-11-20 the vaul sheets with fields stay on the keyboard on Android and iPhone Safari: `ShoppingItemEditSheet`, `ShoppingAddSheet` (autofocus via `focus({ preventScroll: true })`, or Safari pans the page by about 330 px) and `CookingTimersSheet` (its height bounds moved onto the sheet; the hook sets `min-height: 0` while the keyboard is open so the 40vh floor can't beat the fitted max-height). Checked in the iOS Simulator (Safari, real keyboard) and the Android emulator. The drawer in `HouseholdSettings` also has a field and still uses vaul's default; not checked on an iPhone._
 
 **Android (Pixel_10 AVD, 360 × 453 CSS px over the keyboard):** the WebView shrinks, so the sheet keeps standing on the keyboard and `max-h-[90dvh]` gives it 408 px. A Save footer pinned under a scrolling form took 88 of them; the Kategorie picker ended at the form's clip edge and looked covered by "Speichern". Save therefore sits in the same scroll area as the fields (`data-sheet-scroll`): with the keyboard up every field shows and Save peeks out below Kategorie; with it down the sheet looks as before.
 

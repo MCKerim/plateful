@@ -46,6 +46,8 @@ export function useSheetInVisualViewport(sheet: RefObject<HTMLElement | null>, o
       const hidden = window.innerHeight - viewport.offsetTop - viewport.height;
       element.style.bottom = `${Math.max(0, hidden)}px`;
       element.style.maxHeight = `${Math.floor(viewport.height * MAX_SHARE)}px`;
+      // A floor like the timers sheet's 40vh would beat that max-height.
+      element.style.minHeight = "0px";
       element.style.setProperty("--keyboard-bar", KEYBOARD_BAR);
     };
 
@@ -129,5 +131,6 @@ function revealInSheet(field: HTMLElement) {
 function clear(element: HTMLElement) {
   element.style.removeProperty("bottom");
   element.style.removeProperty("max-height");
+  element.style.removeProperty("min-height");
   element.style.removeProperty("--keyboard-bar");
 }
