@@ -4,6 +4,32 @@ Per language 500 characters (Play Console limit). Same voice as the iOS
 What's New in the iOS repo's `docs/app-store-listing.md`; the Android notes
 for 1.4 fold iOS 1.2 and 1.3 into one release.
 
+## 1.7 (versionCode 48), 2026-11-20
+
+Follows iOS 1.6's What's New (product pictures, nutrition from the BLS
+database with the carb choice, shopping list notes and recipe rows, two-decimal
+amounts). Left out: the iOS-only share-your-dish and Magic Plan lines.
+
+**DE**
+
+Deine Zutaten haben jetzt Bilder!
+• Jede Zutat zeigt ein Produktbild: auf der Einkaufsliste, im Rezept, im Kochmodus und in geteilten Rezepten
+• Einkaufsliste: Einträge bekommen eine Notiz, die Details zeigen jede Zeile mit ihrem Rezept
+• Nährwerte aus einer Lebensmitteldatenbank. Unter Einstellungen → Nährwerte wählst du, wie Kohlenhydrate zählen
+• Umgerechnete Mengen haben höchstens zwei Nachkommastellen
+
+Auch neu: Speichern im Editor ist sicherer, und Zutatenzeilen werden besser erkannt
+
+**EN**
+
+Your ingredients have pictures now!
+• Every ingredient shows a product picture: on the shopping list, in the recipe, in cooking mode and in shared recipes
+• Shopping list: items can carry a note, and the details show every line with its recipe
+• Nutrition from a food database. In Settings → Nutrition, choose how carbs are counted
+• Scaled amounts show at most two decimals
+
+Also new: saving in the editor is safer, and ingredient lines are read more reliably
+
 ## 1.6 (versionCode 47), 2026-11-05
 
 **DE**

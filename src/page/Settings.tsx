@@ -336,7 +336,7 @@ export default function Settings() {
         <div className="flex flex-col gap-2 p-2 border rounded-lg">
           <h2 className="font-medium border-b">Info</h2>
 
-          <p className="text-sm">v1.6</p>
+          <p className="text-sm">v1.7</p>
 
           <div className="flex gap-2">
             <NavLink to="/privacy" className="w-full">
