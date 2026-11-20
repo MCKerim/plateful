@@ -30,7 +30,11 @@ jobs:
       - run: npm run test:run
 
   e2e-tests:
-    runs-on: ubuntu-latest
+    # Pinned, not ubuntu-latest: Playwright installs browsers only on the Ubuntu
+    # releases it knows, so a new image breaks the job until Playwright is
+    # upgraded. Move this label and @playwright/test together, after checking
+    # the new Playwright supports the new image (docs/knowledge/ci-e2e-runner-pin.md).
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
