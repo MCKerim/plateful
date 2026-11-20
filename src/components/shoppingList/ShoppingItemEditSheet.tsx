@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +23,7 @@ import {
   useEditShoppingItem,
 } from "@/hooks/shopping-list/useEditShoppingItem";
 import { useSetShoppingNote } from "@/hooks/shopping-list/useSetShoppingNote";
+import { useSheetInVisualViewport } from "@/hooks/general/useSheetInVisualViewport";
 import { contentLanguage } from "@/lib/contentLanguage";
 import { AISLES, type ShoppingAisle } from "@/lib/shopping-list/aisle";
 import { itemAmountText, type ShoppingListItem } from "@/lib/shopping-list/item";
@@ -57,6 +58,8 @@ export default function ShoppingItemEditSheet({
   const [note, setNoteText] = useState("");
   const [aisle, setAisle] = useState<ShoppingAisle>("other");
   const [error, setError] = useState<string | null>(null);
+  const sheet = useRef<HTMLDivElement>(null);
+  useSheetInVisualViewport(sheet, item !== null);
 
   // Each opening starts from the item as it is (state adjusted during render);
   // the last item stays shown through the closing animation.
@@ -111,93 +114,100 @@ export default function ShoppingItemEditSheet({
 
   return (
     <Drawer
+      // vaul's keyboard handling misses iPhone Safari's page scroll; see the hook.
+      repositionInputs={false}
       open={item !== null}
       onOpenChange={(open) => {
         if (!open && !editItem.isPending) onClose();
       }}
     >
-      <DrawerContent className="max-h-[90dvh]">
+      <DrawerContent ref={sheet} className="max-h-[90dvh]">
         <DrawerHeader className="text-left">
           <DrawerTitle>{t("shoppingList.edit.title")}</DrawerTitle>
         </DrawerHeader>
-        <form
-          className="flex flex-col gap-4 overflow-y-auto px-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            void save();
-          }}
-        >
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="shopping-edit-name">{t("shoppingList.edit.name")}</Label>
-            <Input
-              id="shopping-edit-name"
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-              autoCorrect="off"
-              disabled={editItem.isPending}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="shopping-edit-amount">{t("shoppingList.edit.amount")}</Label>
-            <Input
-              id="shopping-edit-amount"
-              value={amount}
-              onChange={(event) => setAmount(event.target.value)}
-              placeholder={t("shoppingList.edit.amountPlaceholder")}
-              autoCorrect="off"
-              disabled={editItem.isPending}
-            />
-            {shown && !shown.onList && (
-              <p className="text-sm text-muted-foreground">{t("shoppingList.edit.boughtHint")}</p>
-            )}
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label htmlFor="shopping-edit-note">{t("shoppingList.edit.note")}</Label>
-            <Textarea
-              id="shopping-edit-note"
-              rows={1}
-              maxHeight={120}
-              value={note}
-              onChange={(event) => setNoteText(event.target.value)}
-              placeholder={t("shoppingList.edit.notePlaceholder")}
-              disabled={editItem.isPending}
-            />
-          </div>
-          <div className="flex flex-col gap-1.5">
-            <Label>{t("shoppingList.edit.aisle")}</Label>
-            <Select
-              value={aisle}
-              onValueChange={(value) => setAisle(value as ShoppingAisle)}
-              disabled={editItem.isPending}
-            >
-              <SelectTrigger aria-label={t("shoppingList.edit.aisle")}>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {AISLES.map((entry) => (
-                  <SelectItem key={entry.id} value={entry.id}>
-                    {t(entry.labelKey)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          {error && (
-            <p className="text-sm text-destructive" role="alert">
-              <span className="font-semibold">{t("shoppingList.edit.saveError")}.</span> {error}
-            </p>
-          )}
-        </form>
-        <DrawerFooter className="pb-8">
-          <Button
-            variant="accent"
-            className="w-full"
-            onClick={() => void save()}
-            disabled={!name.trim() || editItem.isPending}
+        {/* Save scrolls with the fields: pinned below them it took 88 of the 408 px
+            the sheet has over the Android keyboard (about 350 over the iPhone's)
+            and cut the aisle picker off. */}
+        <div data-sheet-scroll className="flex min-h-0 flex-col overflow-y-auto">
+          <form
+            className="flex flex-col gap-4 px-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              void save();
+            }}
           >
-            {editItem.isPending ? t("common.saving") : t("common.save")}
-          </Button>
-        </DrawerFooter>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="shopping-edit-name">{t("shoppingList.edit.name")}</Label>
+              <Input
+                id="shopping-edit-name"
+                value={name}
+                onChange={(event) => setName(event.target.value)}
+                autoCorrect="off"
+                disabled={editItem.isPending}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="shopping-edit-amount">{t("shoppingList.edit.amount")}</Label>
+              <Input
+                id="shopping-edit-amount"
+                value={amount}
+                onChange={(event) => setAmount(event.target.value)}
+                placeholder={t("shoppingList.edit.amountPlaceholder")}
+                autoCorrect="off"
+                disabled={editItem.isPending}
+              />
+              {shown && !shown.onList && (
+                <p className="text-sm text-muted-foreground">{t("shoppingList.edit.boughtHint")}</p>
+              )}
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="shopping-edit-note">{t("shoppingList.edit.note")}</Label>
+              <Textarea
+                id="shopping-edit-note"
+                rows={1}
+                maxHeight={120}
+                value={note}
+                onChange={(event) => setNoteText(event.target.value)}
+                placeholder={t("shoppingList.edit.notePlaceholder")}
+                disabled={editItem.isPending}
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label>{t("shoppingList.edit.aisle")}</Label>
+              <Select
+                value={aisle}
+                onValueChange={(value) => setAisle(value as ShoppingAisle)}
+                disabled={editItem.isPending}
+              >
+                <SelectTrigger aria-label={t("shoppingList.edit.aisle")}>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {AISLES.map((entry) => (
+                    <SelectItem key={entry.id} value={entry.id}>
+                      {t(entry.labelKey)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {error && (
+              <p className="text-sm text-destructive" role="alert">
+                <span className="font-semibold">{t("shoppingList.edit.saveError")}.</span> {error}
+              </p>
+            )}
+          </form>
+          <DrawerFooter className="pb-[calc(2rem+var(--keyboard-bar,0px))]">
+            <Button
+              variant="accent"
+              className="w-full"
+              onClick={() => void save()}
+              disabled={!name.trim() || editItem.isPending}
+            >
+              {editItem.isPending ? t("common.saving") : t("common.save")}
+            </Button>
+          </DrawerFooter>
+        </div>
       </DrawerContent>
     </Drawer>
   );
