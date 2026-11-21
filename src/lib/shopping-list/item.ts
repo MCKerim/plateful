@@ -315,7 +315,7 @@ const TRAILING_AMOUNT = /^(.*?\S)[\s,:\-–]+(?:[x×]\s*)?([0-9]+(?:[.,][0-9]+)?
  * name, moved to the front. Only when the rest is a product ("Pampers Größe 4"
  * stays), a bare number only as a whole count up to 99 ("Milch 3,5" is the fat,
  * "Mehl 405" the type), and a word after the number only when the parser knows
- * it as a unit ("800 gr." stays). Mirrors iOS `TypedLine.trailingAmount`.
+ * it as a unit ("6 Pack" stays). Mirrors iOS `TypedLine.trailingAmount`.
  */
 function trailingAmount(text: string, isProduct: (name: string) => boolean): TypedLine | null {
   const match = TRAILING_AMOUNT.exec(text);

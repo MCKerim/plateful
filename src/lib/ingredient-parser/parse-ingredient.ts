@@ -101,6 +101,9 @@ const UNIT_MAP: Record<string, string> = {
   tl: "tsp",
   gramm: "g",
   kilogramm: "kg",
+  gr: "g",
+  kilo: "kg",
+  kilos: "kg",
   pfund: "lb",
   tasse: "cup",
   tassen: "cup",
@@ -155,6 +158,12 @@ const UNIT_MAP: Record<string, string> = {
   rollen: "roll",
   knolle: "bulb",
   knollen: "bulb",
+  kiste: "crate",
+  kisten: "crate",
+  kasten: "crate",
+  kästen: "crate",
+  netz: "net",
+  netze: "net",
   // Count/measure words missing from the English section above
   pinch: "pinch",
   pinches: "pinch",
@@ -617,6 +626,11 @@ function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
 
   // Extract unit
   let { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
+  // "1 gr. Zwiebel" is one large onion: "gr" is grams from 5 up, as `private.nutrition_lines` reads it.
+  if (unit?.toLowerCase() === "gr" && (quantityValue ?? 0) < 5) {
+    unit = unitNormalized = null;
+    afterUnit = afterQuantity;
+  }
   let measureAdjective: string | null = null;
   const adjective =
     quantityValue !== null && !unit
