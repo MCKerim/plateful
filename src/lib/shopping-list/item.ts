@@ -286,13 +286,48 @@ export function originalLine(item: ShoppingListItem, source: ShoppingItemSource)
   return wording && wording !== normalize(item.name) ? source.name : null;
 }
 
-/** Null for a blank line. */
-export function parseTypedLine(text: string): TypedLine | null {
+/**
+ * Null for a blank line. With `isProduct` (the dictionary), an amount written
+ * after a product's name counts too: "Wasser 2" is 2 Wasser.
+ */
+export function parseTypedLine(
+  text: string,
+  isProduct: (name: string) => boolean = () => false
+): TypedLine | null {
   const trimmed = text.trim();
   if (!trimmed) return null;
   const parsed = parseIngredient(trimmed);
-  return {
+  const line: TypedLine = {
     name: parsed.ingredientName ?? trimmed,
+    quantityValue: parsed.quantityValue,
+    quantityDisplay: parsed.quantityDisplay,
+    unit: parsed.unit,
+  };
+  if (line.quantityValue != null || line.quantityDisplay != null || line.unit != null) return line;
+  if (isProduct(line.name)) return line;
+  return trailingAmount(trimmed, isProduct) ?? line;
+}
+
+const TRAILING_AMOUNT = /^(.*?\S)[\s,:\-–]+(?:[x×]\s*)?([0-9]+(?:[.,][0-9]+)?)\s*(?:[x×](?=\s|$))?\s*(\D*?)\.?$/i;
+
+/**
+ * "Wasser 2", "Wasser x2", "Brötchen - 5", "Milch 1,5 l": the amount after the
+ * name, moved to the front. Only when the rest is a product ("Pampers Größe 4"
+ * stays), a bare number only as a whole count up to 99 ("Milch 3,5" is the fat,
+ * "Mehl 405" the type), and a word after the number only when the parser knows
+ * it as a unit ("800 gr." stays). Mirrors iOS `TypedLine.trailingAmount`.
+ */
+function trailingAmount(text: string, isProduct: (name: string) => boolean): TypedLine | null {
+  const match = TRAILING_AMOUNT.exec(text);
+  if (!match) return null;
+  const [, head, number, rest] = match;
+  if (!isProduct(head)) return null;
+  if (!rest && (number.length > 2 || /[.,]/.test(number))) return null;
+  const parsed = parseIngredient(`${number} ${rest} ${head}`);
+  if (!parsed.ingredientName || normalize(parsed.ingredientName) !== normalize(head)) return null;
+  if (rest && !parsed.unit) return null;
+  return {
+    name: head,
     quantityValue: parsed.quantityValue,
     quantityDisplay: parsed.quantityDisplay,
     unit: parsed.unit,

@@ -117,6 +117,15 @@ function dictionaryMatch(
   return owner(language) ?? owner(language === "de" ? "en" : "de") ?? null;
 }
 
+/** Whether a name is a dictionary product, for reading a typed line ("Wasser 2"). */
+export function isDictionaryProduct(
+  dictionary: ShoppingDictionaryEntry[],
+  name: string,
+  language: string
+): boolean {
+  return dictionaryMatch(dictionary, name, language) !== null;
+}
+
 /** The row under the title the server's trigger will give it (`itemTitle`). */
 function retitled(
   item: ShoppingListItem,

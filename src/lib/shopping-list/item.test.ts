@@ -339,3 +339,55 @@ describe("addTypedAmount", () => {
     expect(storedAmountText(8 / 3, null, "EL")).toBe("2.67 EL");
   });
 });
+
+describe("parseTypedLine: an amount after the name", () => {
+  const products = new Set(
+    ["Wasser", "Brötchen", "Milch", "Hackfleisch", "Eier", "Mehl", "Kaffee", "Tomaten", "Petersilie", "Windeln", "Bier"].map(
+      (name) => name.toLowerCase()
+    )
+  );
+  const isProduct = (name: string) => products.has(name.toLowerCase());
+  const parse = (text: string) => parseTypedLine(text, isProduct);
+
+  it.each([
+    ["Wasser 2", "Wasser", 2, null],
+    ["Brötchen 5", "Brötchen", 5, null],
+    ["Wasser 2x", "Wasser", 2, null],
+    ["Wasser x2", "Wasser", 2, null],
+    ["Wasser 2 x", "Wasser", 2, null],
+    ["Wasser ×2", "Wasser", 2, null],
+    ["Wasser - 2", "Wasser", 2, null],
+    ["Wasser, 2", "Wasser", 2, null],
+    ["Wasser 2 Flaschen", "Wasser", 2, "Flaschen"],
+    ["Milch 1,5 l", "Milch", 1.5, "l"],
+    ["Milch 2l", "Milch", 2, "l"],
+    ["Hackfleisch 500g", "Hackfleisch", 500, "g"],
+    ["Eier 10 Stk.", "Eier", 10, "Stk"],
+    ["Tomaten 2 Dosen", "Tomaten", 2, "Dosen"],
+    ["Petersilie 1 Bund", "Petersilie", 1, "Bund"],
+  ])("%s moves the amount to the front", (text, name, value, unit) => {
+    expect(parse(text)).toMatchObject({ name, quantityValue: value, unit });
+  });
+
+  it.each([
+    "Milch 3,5",
+    "Bier 0,5",
+    "Mehl 405",
+    "Kaffee 500",
+    "Hackfleisch 800 gr.",
+    "Pampers Größe 4",
+    "Windeln Größe 4",
+    "Latte 1",
+    "Joghurt 1,5%",
+    "Wasser 6x1,5l",
+    "Wasser2",
+  ])("%s stays the name", (text) => {
+    expect(parse(text)).toEqual({ name: text, quantityValue: null, quantityDisplay: null, unit: null });
+  });
+
+  it("reads an amount in front, or a line without the dictionary, as before", () => {
+    expect(parse("2 Wasser")?.name).toBe("Wasser");
+    expect(parse("2 Wasser 3")?.name).toBe("Wasser 3");
+    expect(parseTypedLine("Wasser 2")?.name).toBe("Wasser 2");
+  });
+});

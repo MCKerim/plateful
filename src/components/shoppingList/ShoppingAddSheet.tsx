@@ -15,6 +15,7 @@ import {
 import {
   addUndo,
   addsNothing,
+  isDictionaryProduct,
   previewLine,
   recentlyBought,
   suggestionItem,
@@ -90,7 +91,7 @@ export default function ShoppingAddSheet({
   }
 
   const language = contentLanguage();
-  const line = parseTypedLine(text);
+  const line = parseTypedLine(text, (name) => isDictionaryProduct(dictionary, name, language));
   const preview = line ? previewLine(items, dictionary, line, language) : null;
   const rows = preview ? suggestions(items, dictionary, preview, language) : [];
   const bought = preview ? [] : recentlyBought(items);
