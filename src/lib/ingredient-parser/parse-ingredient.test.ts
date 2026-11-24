@@ -42,11 +42,11 @@ describe("parseIngredient normalized name", () => {
   });
 
   it("never cuts a descriptor out of a longer word", () => {
-    expect(normalized("2 große Tomaten")).toBe("große tomaten");
+    expect(normalized("große Tomaten")).toBe("große tomaten");
     expect(normalized("Großer gemischter Salat")).toBe("großer gemischter salat");
-    expect(normalized("1 großes Ei")).toBe("großes ei");
+    expect(normalized("großes Ei")).toBe("großes ei");
     expect(normalized("1 Großpackung Chips")).toBe("großpackung chips");
     expect(normalized("200 g Süßmittel")).toBe("süßmittel");
-    expect(normalized("2 kleine Zwiebeln")).toBe("kleine zwiebeln");
+    expect(normalized("kleine Zwiebeln")).toBe("kleine zwiebeln");
   });
 });

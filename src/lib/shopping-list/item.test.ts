@@ -342,7 +342,7 @@ describe("addTypedAmount", () => {
 
 describe("parseTypedLine: an amount after the name", () => {
   const products = new Set(
-    ["Wasser", "Brötchen", "Milch", "Hackfleisch", "Eier", "Mehl", "Kaffee", "Tomaten", "Petersilie", "Windeln", "Bier"].map(
+    ["Wasser", "Brötchen", "Milch", "Hackfleisch", "Eier", "Mehl", "Kaffee", "Tomaten", "Petersilie", "Windeln", "Bier", "Zwiebeln"].map(
       (name) => name.toLowerCase()
     )
   );
@@ -390,5 +390,13 @@ describe("parseTypedLine: an amount after the name", () => {
     expect(parse("2 Wasser")?.name).toBe("Wasser");
     expect(parse("2 Wasser 3")?.name).toBe("Wasser 3");
     expect(parseTypedLine("Wasser 2")?.name).toBe("Wasser 2");
+  });
+
+  it.each([
+    ["2 gr. Hackfleisch", "Hackfleisch", 2, "gr."],
+    ["2 große Zwiebeln", "Zwiebeln", 2, "große"],
+    ["Zwiebeln 2 große", "Zwiebeln", 2, "große"],
+  ])("%s keeps the size in the amount and the product as the name", (text, name, value, unit) => {
+    expect(parse(text)).toMatchObject({ name, quantityValue: value, unit });
   });
 });

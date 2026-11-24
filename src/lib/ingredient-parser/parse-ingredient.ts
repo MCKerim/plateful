@@ -254,8 +254,9 @@ const MEASURE_ADJECTIVE =
   /^(gehäuft\p{L}*|gestrichen\p{L}*|knapp\p{L}*|gut\p{L}*|heaped|heaping|level|scant|generous|rounded)\s+/iu;
 const SPOON_OR_CUP_UNITS = new Set(["tbsp", "tsp", "cup"]);
 
-// A size word between the number and any unit ("3 dicke Scheiben") stays with the unit, and
-// so does a measure adjective before a unit that is not a spoon or cup ("1 gute Prise").
+// A size word after the number is part of the amount: before a unit it stays with the unit
+// ("3 dicke Scheiben"), without one it is the unit ("2 große Zwiebeln"). A measure adjective
+// before a unit that is not a spoon or cup stays with the unit too ("1 gute Prise").
 const SIZE_ADJECTIVE =
   /^((?:dick|dünn|groß|gross|klein|mittelgroß)(?:e[mnrs]?)?|thick|thin|large|big|small|medium)\s+/iu;
 
@@ -626,10 +627,11 @@ function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
 
   // Extract unit
   let { unit, unitNormalized, remaining: afterUnit } = extractUnit(afterQuantity);
-  // "1 gr. Zwiebel" is one large onion: "gr" is grams from 5 up, as `private.nutrition_lines` reads it.
+  // "1 gr. Zwiebel" is one large onion: under 5 "gr" stays as written with no canonical unit,
+  // and `private.nutrition_lines` weighs it as a large piece.
   if (unit?.toLowerCase() === "gr" && (quantityValue ?? 0) < 5) {
-    unit = unitNormalized = null;
-    afterUnit = afterQuantity;
+    unit = afterQuantity.slice(0, afterQuantity.length - afterUnit.length).trim();
+    unitNormalized = null;
   }
   let measureAdjective: string | null = null;
   const adjective =
@@ -645,6 +647,11 @@ function parseLine(rawText: string): Omit<ParsedIngredient, "isOptional"> {
       // Written as the import stores it, with no canonical unit: `ingredient_units` keys a
       // measure like "dicke scheiben" (40 g of feta) by these words, so an edit weighs the same.
       unit = `${adjective[1]} ${measured.unit}`;
+      unitNormalized = null;
+      afterUnit = measured.remaining;
+    } else if (SIZE_ADJECTIVE.test(adjective[0])) {
+      // "2 große Zwiebeln": the size is part of the amount, the name stays the product.
+      unit = adjective[1]!;
       unitNormalized = null;
       afterUnit = measured.remaining;
     }
